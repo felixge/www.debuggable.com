@@ -1,0 +1,2121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Hacking a commercial airport WLAN &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/hacking-a-commercial-airport-wlan:480f4dd5-50a0-40c6-aa60-4afccbdd56cb">Hacking a commercial airport WLAN</a></h2>	<div class="posted-on">
+		<p>Posted on 30/8/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><strong>Welcome <a href="http://www.hackszine.com/blog/archive/2008/08/free_airport_wifi.html?CMP=OTC-7G2N43923558">lifehacker.com</a> & <a href="http://www.hackszine.com/blog/archive/2008/08/free_airport_wifi.html?CMP=OTC-7G2N43923558">hackszine.com</a> visitors. Read this <a href="http://debuggable.com/posts/hacking-the-wires:48ae63ea-9888-482f-9a28-44684834cda3">follow up post</a> if you care about the story of this article.</strong></p>
+<p><strong>Update 06:20pm:</strong> My luggage just arrived - I'm happy ; ).</p>
+<p>Yesterday I left Atlanta, GA after having spent 6 weeks of my summer there to visit my host family that I was staying with the year before as a foreign exchange student. The flight back wasn't all that great, it had 4 hours of delay, I missed my connection flight, had a long waiting time at the Düsseldorf aiport and when I finally got back into Dresden my 2 big suit cases were missing - and still are. But oh well ... they'll show up, eventually.</p>
+<p>Meanwhile I want to share a little hack I did when I was waiting at the Atlanta airport. As most airports do these days, they have a wireless network there. Unfortunatly, they try to make you pay $7 for 24h, no matter how long you actually get on there. Since I didn't want to get ripped off, I started playing around with the network. Using LiveHTTPHeaders for firefox, I was able to see that they were redirecting me to their portal via a 302 whenever I tried to access a public site. So the first thing I tried was to deactivate redirects in the about:config, and hoped they would send me the site I wanted after their redirection header. This might sounds stupid, but checkout <a href="http://cakebaker.wordpress.com/2006/08/28/dont-forget-to-exit-after-a-redirect/">the post on cakebaker</a> talking about it if you are unfamiliar with the problem. Anyway, it didn't help, I wouldn't see any page at all, and instead get a firefox error message. So back to the beginning.</p>
+<p>I continued to try a couple other things, like checking if they eventually forgot some ports like 21 (ftp) or 110 (pop3). But no, all of them were properly blocked. After a lot of unsuccesfull attempts, I had some intuition telling me to check how they handle pictures. Without any hope of success I typed <a href="http://www.google.com/.jpg">http://www.google.com/.jpg</a> into  my browser's adress bar, and to my big surprise I saw the page you see when you follow the link right now. The next thing I typed in was: http://www.google.com/?.jpg but that didn't work. But I went on, and found that url's like <a href="http://www.google.com/search?.jpg">http://www.google.com/search?.jpg</a> worked like a charm. I found that I could easily visit sites like slashdot, google, or even this weblog, when adding a ?.jpg at the end of the url. The next logical step was to automate that. I downloaded greasemonkey.xpi?.jpg (*g*) and wrote a 4 line js script that would add ?.jpg to every link in a document. That way I was able to browse most sites without a hassle. Unfortunatly, I didn't get to explore this vulnerbility much more, because I had to board the airplane, were I waited another 3 hours due to a mechanical failure - without wlan : /.</p>
+<p>So, anyway, wish me good luck with getting my luggage back and if you are ever stuck at an aiport with commercial rip-off wlan only, you might want to give this little method a try ; ).</p>
+<p>--Felix Geisendörfer aka the_undefined</p>
+<p><strong>Update: Read this <a href="http://debuggable.com/posts/hacking-the-wires:48ae63ea-9888-482f-9a28-44684834cda3">follow up post</a> if you care about the story of this article.</strong><br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-50a0-40c6-aa60-4afccbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhacking-a-commercial-airport-wlan%3A480f4dd5-50a0-40c6-aa60-4afccbdd56cb &amp;title=Hacking+a+commercial+airport+WLAN';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhacking-a-commercial-airport-wlan%3A480f4dd5-50a0-40c6-aa60-4afccbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhacking-a-commercial-airport-wlan%3A480f4dd5-50a0-40c6-aa60-4afccbdd56cb&amp;title=Hacking+a+commercial+airport+WLAN&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhacking-a-commercial-airport-wlan%3A480f4dd5-50a0-40c6-aa60-4afccbdd56cb&amp;title=Hacking+a+commercial+airport+WLAN';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/hacking-the-wires:48ae63ea-9888-482f-9a28-44684834cda3">Hacking the Wires</a></li>
+							<li><a href="/posts/best-practises-bug-fixing-without-core-hacking:480f4dd5-57fc-4389-8948-49f6cbdd56cb">Best Practises: Bug Fixing without Core Hacking</a></li>
+							<li><a href="/posts/hacking-everything-the-good-way:480f4dd5-5a0c-46b5-97da-4597cbdd56cb">Hacking everything (the good way)</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/hacking-a-commercial-airport-wlan:480f4dd5-50a0-40c6-aa60-4afccbdd56cb">125 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/hacking-a-commercial-airport-wlan:480f4dd5-50a0-40c6-aa60-4afccbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4ddb-77e0-4bbe-8b70-44eacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f2b8a45c5431b462a8a038c975397e35&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.tommmy.de" rel="nofollow">Tom</a>						</strong>
+						<strong>said 
+						on Aug 30, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hehe Felix!<br />
+If i'll ever be stuck on an airport, i'll try that! :D</br></p>
+<p>Hope you'll get your luggage back, hate flying because of that...</p>
+<p>Cheers!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-1378-428d-bb5f-4a18cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=530affc36d8abf814ba78f4ebaab7eb3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.kestrelid.com" rel="nofollow">Ian Huet</a>						</strong>
+						<strong>said 
+						on Aug 31, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great way to keep yourself entertained. Begs the question though, how exactly does this get around the otherwise secure WLAN. How they handle pictures??? Please elaborate.</p>
+<p>was there anything you particularly loved in your luggage. Assuming you are inline for some compensation, should your bags not turn up. Couldn't you take that compensation and get a whole new wardrobe! ;-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-2b08-4e67-afd2-4625cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 31, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ian Huet: I don't think I would make a good deal with a compensation at all since my luggage in fact *already contained* a whole new wardrobe! I just spent several hundred bucks on clothing in the usa because it's cheaper there then it is here in Germany. And I don't think they would compensate me high enough for that. But I think I'll get the stuff back ... hm.</p>
+<p>Regarding the wlan thing: I'm not sure why this get's around their commercial authorization page. Maybe they have pictures on those sites lay outside the restricted access areas and one smart programmer came up with a regex to allow all url's ending in .jpg (/^.+\.jpg$/) or something like that. However, I didn't have enough time to confirm that thought.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-c400-41ab-967e-4605cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=913676ade654d201c72300fa2345843b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://klunejko.net" rel="nofollow">Konrad</a>						</strong>
+						<strong>said 
+						on Aug 31, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice, I'll have to try that! :D</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-bdc0-46ef-b223-4bd7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7f1868cedc38db62f754d53aea3de00c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							automagically&nbsp;						</strong>
+						<strong>said 
+						on Aug 31, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Cool tip.  I was at the Atlanta airport 2 weeks ago and had that problem.  They make you pay, where as the airport near my home, Pittsburgh, is free.  I'll try it on my return flight if I have a layover.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-45e4-4c7a-828d-481ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://scott.barberfam.com/wp/2006/08/30/airport-wifi/" rel="nofollow">it all flows together &raquo; Airport WiFi</a>						</strong>
+						<strong>said 
+						on Sep 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] I should have had this tip in the SLC airport earlier this month:ThinkingPHP and beyond » Hacking a commercial airport WLAN  feel good tech wifi     [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-9e50-494e-a781-479ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=90580593cc69f4a04dcd9fbacb9ca31a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							charvey&nbsp;						</strong>
+						<strong>said 
+						on Sep 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hi all,</p>
+<p>i'm in the cincinatti airport and just started trying common id and pwd combinations at random.  the one that worked?  "wifi" and "wifi".  hahahhahhahahha!!!!</p>
+<p>will use this trick the next time tho.</p>
+<p>danke felix.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-8fd8-4c5c-95e2-4dc4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0361f5281f88c5af1690dc551a5b9565&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.aikon.com.ve" rel="nofollow">Joaquin</a>						</strong>
+						<strong>said 
+						on Sep 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>Any idea on how do the airport manages to intercept every request to make the redirection. This is just what I need in my wlan. Not to block users from navigating but to return the solicited page inside a frame (and place news in an upper frame).</p>
+<p>Any idea or url I can see to achive this?</p>
+<p>Thanks.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-7c70-4ab3-a68d-4f15cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Joaquin, I definitly have no idea how they do it at the airport. But one idea is to write/use a little proxy between the wlan and the internet connection it uses. Then you can put your intereception logic inside the proxy without having to mess with the TCP/IP stream of the WLAN itself. And you should be able to setup the wlan to use the proxy. But really, I have no clue how this should be done in reality ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-7088-44d6-8d2a-45a6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=253b36d747d92eac564493bccfb86d7a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Eric&nbsp;						</strong>
+						<strong>said 
+						on Sep 09, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>What I have been lookin for!<br />
+Thanks!!!!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-8e18-4e8c-826d-4033cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=eebbe436bae2e7fc1c331d58afd57e79&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Marcello&nbsp;						</strong>
+						<strong>said 
+						on Oct 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>i tried this hack in several airports worldwide....it does not work.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-e09c-46b5-b114-435acbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Marcello: I can only confirm that it works at the Atlanta airport. But unless they developed their own access point system there should be at least some other airports where this would work. But maybe those are rare.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-83ec-43dd-8971-45bacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5c5cb264f8e80bf6b81e7cf12481a64c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Sachin&nbsp;						</strong>
+						<strong>said 
+						on Nov 21, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Cool discovery. i am gonna try this out at the next opportunity.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-5b38-4ade-a451-457acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b229d4c5b981c0bd69708f741cc08b8e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							James&nbsp;						</strong>
+						<strong>said 
+						on Nov 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sadly, this hack no longer works at the ATL airport.  I'm sitting here and have tried several variations, with no luck.</p>
+<p>Keep on hacking . . .</p>
+<p>-hk</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-0b3c-4eaa-b20a-4d5bcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Nov 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>James: Afaik there were several networks you could connect to at ATL. I was only able to try out one and it worked. But I don't remember the name of it any more, hm : /. But it's also possible that they've fixed it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-d7c4-43f8-9f5d-4f6ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=91220f4ef51a45bf690e798db4952f11&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dreamthi3f.net/" rel="nofollow">Malachi</a>						</strong>
+						<strong>said 
+						on Dec 26, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'll be getting the chance to try this in a couple weeks, but just a thought: perhaps use "#" instead of "?". If you're browsing a page with a url like domain.com/index.php?page=home or something then your method will screw it up, as php is going to look for the page called "home?". This may (or may not be) an issue on other sites, I dunno.</p>
+<p>"#" on the other hand terminates the url as far as any (to my knowledge) browser is concerned, and the likelihood that someone's going to have an anchor named ".jpg" somewhere in the site is low enough that not starting at the top of the page shouldn't happen too often ;)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-e7a0-4cdf-b884-4e4fcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Dec 26, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Malachi: Good idea! I should have tried that as well. However, I'm not sure if browsers send the '#' in their GET/POST requests. So this will only work if they do ...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-3b10-4aaa-81f7-4569cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=91220f4ef51a45bf690e798db4952f11&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dreamthi3f.net/" rel="nofollow">Malachi</a>						</strong>
+						<strong>said 
+						on Dec 30, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix: I just checked and unfortunately it seems you're right, firefox at least does not send the # and anything that follows in their GET/POST requests. However, manually appending "#hithere" to a get request does not change the response (at least on the servers I tried). It shouldn't be too hard to make a firefox extension to that purpose, although I'll need to read up on how to make them in the first place. I'll get back to you on that.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-e008-4eb0-b3c6-4af3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.xxeo.com/archives/2007/01/17/great-airport-wifi-tip.html" rel="nofollow">Dru&#8217;s Blog &raquo; Blog Archive &raquo; Great Airport Wifi</a>						</strong>
+						<strong>said 
+						on Jun 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] I saw this tip on how to get around some airport wifi restrictions. Check it out.    Posted by dru Filed in General [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ded-e124-455c-b904-4ef5cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=36a9e6931ec4828c293156c50ac339ec&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Trevor&nbsp;						</strong>
+						<strong>said 
+						on Jul 20, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Have you ever heard of ICMP tunneling? Sometimes wireless networks will block TCP and UDP requests, but forget about ICMP, so you can set up a 'ping tunnel.' Google PTunnel. It works for any site you can ping and get a response from.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ded-2654-4802-9fe5-41cbcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jul 20, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Trevor: Great tip, I'm flying to Atlanta again this autumn and will spend time on other airports as well so enough opportunity to try : p. Thanks a lot!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-cbe8-48b6-a6f3-4b94cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.goholiday.org/?p=68" rel="nofollow">How to get free wireless at any airport | Hotels reviews compari</a>						</strong>
+						<strong>said 
+						on Jan 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] But now that I&#8217;m online, I just found a great little trick that lets you save that $7.95 and get free wireless Internet at any airport. Here&#8217;s all you have to do: [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489b5dc7-d6dc-4d90-90ff-6cf64834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d886271969c1f32c3c9736e27b248a3e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://re-invention.nl" rel="nofollow">Michel</a>						</strong>
+						<strong>said 
+						on Aug 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I've never paid for WIFI. Most wifi gateways identify paid customers via there mac address. You only have to sniff the wifi network for associated mac addresses and clone the mac on of your wifi card. You can easily boot of the other associated clients using deauthorization attacks so you can use there internets >:). Works great every time!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489b629c-7018-4253-8c6f-75464834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=03d9445ceed1c27bc651479a9dc2beae&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.acooke.org" rel="nofollow">andrew cooke</a>						</strong>
+						<strong>said 
+						on Aug 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>i've looked at this in the past and concluded that they return dns results based on your mac address.  so you effectively pay to get the correct dns returned.</p>
+<p>is it possible that you had a fixed dns server cofigured?  and then you managed to workaround whatever secondary blocking they had added?  that would explain why you managed this when others haven't been able to reproduce it.</p>
+<p>andrew</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489b739f-5b64-4061-87b7-7f2b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ce870aceab6f42bc29ac3b66981fbe10&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Troy&nbsp;						</strong>
+						<strong>said 
+						on Aug 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wonder if that will beat McDonald's pay-for-wireless system?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489bbd9a-a3b4-455f-939b-7f1c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=afc22f372547935d4509651f9b97eb26&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.esmacorp.com" rel="nofollow">Phil</a>						</strong>
+						<strong>said 
+						on Aug 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>also if your work or school ever blocks websites. u will probly need these proxies</p>
+<p>www.esmacorp.com<br />
+www.reseachtoppicks.com</br><br />
+www.pimpmyproxy.info</br><br />
+www.proxy000.info</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489bc0f9-54c4-47e4-ac04-55db4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e2dbe2c16ed6b2a1a00fe0d5dc050041&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							azemute&nbsp;						</strong>
+						<strong>said 
+						on Aug 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>An excellent alternative [if you have a server to spare] is iodine and iodined.</p>
+<p>from the man page: </p>
+<p>iodine lets you tunnel IPv4 data through a DNS server. This can be useful in situations where Internet access is firewalled, but DNS queries are allowed. It needs a TUN/TAP device to operate. The bandwidth is asymmetrical with limited upstream and up to 1 Mbit/s downstream. iodine is the client application, iodined is the server. </p>
+<p>It's very useful for exactly that sort of situation.</p>
+<p><a rel="nofollow" href="http://linux.die.net/man/8/iodine">http://linux.die.net/man/8/iodine</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489bc35f-4e18-4382-b375-1c7c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c0e66bc64fc561a2cc72028317c2f4bc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://aphexmandelbrot.livejournal.com" rel="nofollow">Aphex.</a>						</strong>
+						<strong>said 
+						on Aug 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Download WifiWay v1.0b2.</p>
+<p>Install onto a USB key.<br />
+Boot from key.</br><br />
+15 minutes later, you have the key for any WEP/WAN.</br></p>
+<p>Then do a little dance.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489bfa65-5000-4d0d-bab3-06584834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b1d74b432c392fbbe28985a27c93678b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							x1101&nbsp;						</strong>
+						<strong>said 
+						on Aug 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice, I will have to give this a try next time I fly.</p>
+<p>Did you make the greasemonkey script avaliable?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489c0ae4-44dc-44c7-a2cb-4e324834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a2824687937fcbf37aad2451da309753&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dratone&nbsp;						</strong>
+						<strong>said 
+						on Aug 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Malachi:</p>
+<p>When you have a page like ?page=home you could just substitute ? for &. so for example you could get a URL like</p>
+<p>/?page=home&foobar.jpg</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489c4dee-159c-4d62-8ac0-3c0f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fa075c5c7e72dc2f6f015aaf1bac053b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.alfredfox.com" rel="nofollow">Freelance Web Design</a>						</strong>
+						<strong>said 
+						on Aug 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>There are many hotels that have the same kind of security protection to get you to pay for the wlan services. I'll have to give it a shot. Very cool.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489c57b4-8764-4071-b9fc-4cd74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=21fb1ee5ba9386c7fbb30edf8a1acd4b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nate&nbsp;						</strong>
+						<strong>said 
+						on Aug 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>so where is this magic greasemonkey userscript? :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489c5cea-2b7c-4922-87d9-2cbc4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e6f5715380c85aa1b9d5bc5e9fc89891&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dwaynecharrington.com" rel="nofollow">Dwayne Charrington</a>						</strong>
+						<strong>said 
+						on Aug 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wow, this is a really cool hack, thanks for sharing.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489c812c-d448-481c-a1ef-65f74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=528cbbc2114b2009f060e7296d422d26&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Bulb-Buster&nbsp;						</strong>
+						<strong>said 
+						on Aug 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hmmm, you could be accused of terrorist activity...Keep up the good work!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489e8ff9-4d60-437b-8c96-1e244834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=af1537eb2daf8bfcd5c73908619b6383&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							MightyKK&nbsp;						</strong>
+						<strong>said 
+						on Aug 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Maybe they caught on to what you were doing and are auctioning your luggage to recover the $7 :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489ea199-b328-4883-9861-7c8d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0e2031a0e059a3cf6b99b52ba3d954f1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							CC&nbsp;						</strong>
+						<strong>said 
+						on Aug 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>That's Atlanta for you, ask directions of anybody, even cops and they put their hand out for a tip(cash).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489ee584-809c-41ab-bbd3-5f594834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1ac0dd57441c7c1da41b02e8c0157ff2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							JG&nbsp;						</strong>
+						<strong>said 
+						on Aug 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>You are admittedly dishonest over 7 bucks.  Then above that is a "Hire Us" Good Luck with that.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489ef6ce-da40-4135-ac41-57734834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>JG: I'd say they are dishonest about the 7 bucks. They say you have to pay them but you don't ; ).</p>
+<p>Come on, this is a perfect example for the joy of hacking. I'm paying more money for wifi access at airports and hotels while traveling then I usually pay for my faster and better connection at home. This is poor service at high price being enforced on you like popcorn in movie theaters ... I have little guilt breaking the rules here.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489f7f47-e22c-45c5-9d53-3df74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ba0d468ed62977f100794f397d657de8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							mark&nbsp;						</strong>
+						<strong>said 
+						on Aug 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>huh...I thought for sure that you'd have to spoof some other paying members mac address. Various wireless training's have explained that when you pay your mac gets added to the allowed list. Changing your wireless mac address to a mac address of a user who has paid may have worked as well. I'll try this out next time. Thanks for the feedback.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489fb1db-a924-4f7f-b820-6d8d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=62a26ed6a8a2297d551b31d5642f266a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Michael&nbsp;						</strong>
+						<strong>said 
+						on Aug 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The reason popcorn costs so much is because the theatre has to pay almost all of their ticket sales to the studios. They have to make up the difference some how.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a0145b-52c4-4031-888b-35ec4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a6633fb2ac09ac4d02feb1c5865efdd9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Suvvy Parx&nbsp;						</strong>
+						<strong>said 
+						on Aug 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>can you please send the Greasemonkey script to my email? i would appreciate it a lot </p>
+<p>or could you please upload it somewhere :)</p>
+<p>thanks!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a01bee-08f8-4110-8ff1-44804834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Michael: Well hollywood using their monopoly on the theaters is another issue ...</p>
+<p>About the Greasemonkey script: I've just checked and I don't have it anymore. After all this post is 2 years old and I have no idea how it got so popular over at reddit ; ). Sorry folks.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a06cbd-0500-40f9-9fae-4d1a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=842f8043a964fa5077abafd3fed092ef&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Z&nbsp;						</strong>
+						<strong>said 
+						on Aug 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Felix, I live in GA and my main Airport is Atlanta. That is amazing news to hear. Next time I travel I will definitely use your method, and possibly test this out on a school proxy to see if I can use it to get around things. It sounds like a fun experiment. Thanks for the Info.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a096ea-8748-484a-bce1-7ea24834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b3ef03d9b22ebf05be504855fc2f0107&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							kam&nbsp;						</strong>
+						<strong>said 
+						on Aug 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>i'm tempted to try this but i just got back from england/france and they "ramdomly" security checked me leaving the country, entering england, and france as well as on the way back. the risk of being sent to gitmo i'll just sit there and play games on my phone. lol</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a0bec3-5038-49d4-a4db-65cf4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=04c111ef81fdee320a6b8211a0546dd1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.10000listings.com" rel="nofollow">Directory</a>						</strong>
+						<strong>said 
+						on Aug 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Interesting and smart, just by adding ( ? )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a0ea76-994c-411e-8b62-2c794834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=985d24b332e5b749c730aa213f5062fc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Mr. Chandler&nbsp;						</strong>
+						<strong>said 
+						on Aug 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks bud, I've been looking for a quick and easy hack to use for those types of WLAN. I bet this will work at my hospital too, trying to charge me to do what I do while I'm laying in bed sick! Ha! Take THAT! Well, anyway, thanks again, mate!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a18fde-3aac-4d07-95ad-67704834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=927044522ec80adec53c5d8fe10ed84d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blockhead.com" rel="nofollow">blockhead</a>						</strong>
+						<strong>said 
+						on Aug 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I got your luggage hahaha.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a21efa-0aec-4b92-8f01-77514834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6a5ac7f8760f8dbcde28856201b611c9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://itgossips.com" rel="nofollow">it gossips</a>						</strong>
+						<strong>said 
+						on Aug 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>That's awesome. I'll try it :D</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a540c5-3320-498b-bdc9-3d554834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c4e482cae166148c253fc287a8aafca1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://amatoc.com" rel="nofollow">Aicorp</a>						</strong>
+						<strong>said 
+						on Aug 15, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I wanted to try this at my airport, but the internet was free.... only time i was disappointed to not have to pay for internet lol</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a5f7b7-80e8-46da-b354-6c3d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=667be3f99f02e043629c817ed085abba&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							JB&nbsp;						</strong>
+						<strong>said 
+						on Aug 15, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Excellent hack.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a6daab-4df8-4281-8142-3d124834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4fdce145bab6d27d69e34403f99fd11c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.01shoes.com/" rel="nofollow">Shoes</a>						</strong>
+						<strong>said 
+						on Aug 16, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for sharing :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a6de04-37a4-4deb-913a-4c8e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=40b1cdc80ab29a94f90105e9c8cabd14&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Spkl&nbsp;						</strong>
+						<strong>said 
+						on Aug 16, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>going to the airport now, im going to try this out.<br />
+i wonder if you still can get on the network if you arent actually browsing the web...</br><br />
+i want to get on irc.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a6ea2d-cb30-4d29-ac13-6db74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f68f472780bd712a1893ccef8eee7d0e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.aybardumlu.com" rel="nofollow">aybar</a>						</strong>
+						<strong>said 
+						on Aug 16, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>thankss, great discovery<br />
+_________________________</br><br />
+<a rel="nofollow" href="http://www.aybardumlu.com">http://www.aybardumlu.com</a></br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a74c31-8d50-41c2-8755-4d304834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ae7f7eefd3a694e5cc217f5583baf2e6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.techsandtoys.com" rel="nofollow">Jim</a>						</strong>
+						<strong>said 
+						on Aug 16, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Will definitely give this a try in the course of my travels. Thanks for the tip.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a7aeca-35d4-4dfc-ac53-7d244834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99d5db03d5953254149ee220db678636&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://allysource.com/" rel="nofollow">the0ne</a>						</strong>
+						<strong>said 
+						on Aug 17, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>sweet, I hope I don't get into trouble if I try this</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a7c5b2-8598-4860-b24c-34ab4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=50d43cbb3b4f0b5438476a5c73a64cb8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Bill&nbsp;						</strong>
+						<strong>said 
+						on Aug 17, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hmm... at TPA (Tampa International Airport, in Florida) they have free Internet.  All the Internet you can eat for free...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a7db63-be0c-4530-ac0f-5ccc4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3a0235ca990f86829a9e1afaabfecb29&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://hashim.110mb.com" rel="nofollow">Hashim</a>						</strong>
+						<strong>said 
+						on Aug 17, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>haha that was really clever thinking, I'll try your trick in college which is fully wifi :D</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a86180-cc7c-408c-a4de-6dd94834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3a7abd71c411501b7c3631fe50e5e238&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dailydd.wordpress.com" rel="nofollow">benny</a>						</strong>
+						<strong>said 
+						on Aug 17, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>great post, ill try next time!<br />
+is the script somewhere avalaible; im not experienced in scripting.</br><br />
+thanks!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a861bb-cb64-4fcb-ab7a-0c034834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3a7abd71c411501b7c3631fe50e5e238&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://endlessmasquerade.deviantart.com" rel="nofollow">benny</a>						</strong>
+						<strong>said 
+						on Aug 17, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>oups, the question had already been answered, im sorry.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a91635-cd88-457d-b38f-0f264834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b9917fa942f917a4994511bd5afb5e7e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://twoguysrally.com" rel="nofollow">Charles Smith</a>						</strong>
+						<strong>said 
+						on Aug 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Awesome Felix! I'll try this out next time I'm in one of many airports. Hopefully the IT staff at airports across the country havent read this yet :P.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a98d7e-b494-4af2-9ad8-475d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a532a0315493a99db11b97f81bde57fe&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.writingservicescompany.com" rel="nofollow">Term Paper Help</a>						</strong>
+						<strong>said 
+						on Aug 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hahaha.......very good piece on information. I hate paying for Wifi access at airports. They should provide free internet access to passengers. They already charge us so much for tickets. Why should we pay more?</p>
+<p>I will certainly try this on my next trip. Lets see if I am able to get through.</p>
+<p>Minni,<br />
+<a rel="nofollow" href="http://www.writingservicescompany.com">http://www.writingservicescompany.com</a></br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a9983f-05b4-436c-ab72-6cce4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=35bfbf07b5377135b3e2425daafa33e7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.mirefoot.co.uk" rel="nofollow">Eldred Curwen</a>						</strong>
+						<strong>said 
+						on Aug 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Priceless information, especially as I am an airline pilot.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a9986f-a7f0-4f08-b6de-57634834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e265cf1915f7eb07f1a139972b6c919&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.mirefoot.co.uk" rel="nofollow">Lake District Holiday Cottages</a>						</strong>
+						<strong>said 
+						on Aug 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Bloody marvelous, shall have to try this in Heathrow T5...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ab5373-66a8-49b3-89fa-155a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=549f134b51df2c5fd977eafb82882d8e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://roulettesecretsuncovered.co.uk" rel="nofollow">Ryan G</a>						</strong>
+						<strong>said 
+						on Aug 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I've been looking for something like this for ages.  Thanks for sharing.  Now I can eventually hook-up when my flights are delayed AGAIN (Gatwick, UK)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ace430-ad40-4a45-a67b-677f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a217e0399abba4d2cc004c28f34ffb70&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							krispy&nbsp;						</strong>
+						<strong>said 
+						on Aug 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>dude,<br />
+do you really believe it was just a coincidence that your flight was delayed and luggage was lost after you hacked the arport's secure network?</br><br />
+atlanta is the busiest airport in america, used heavily by the us armed forces.  ive been there numerous times and security is beyond airtught, its parania lockdown... use your brain next time genius.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ae014a-0354-41ba-9876-5d404834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=873116568f62d83d660a8f2823fd6495&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							seannewflower&nbsp;						</strong>
+						<strong>said 
+						on Aug 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>i wish i had seen this 4 days ago before i went to the airport and encountered a 5 hour delay.</p>
+<p>well hey, now i got it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ae02b1-ffdc-4a72-af65-055e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=26bdfdaa8950b657acf040a93e45b7d3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Jeff&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>krispy: That made me chuckle. You've been watching too much TV!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ae155a-55e0-45e4-9ec3-6ca14834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d6523aae1799e1e499abacfefceb1ca0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Max&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Even though you don't have the script anymore, can't you just write out the code for it? You said it's only 4 lines.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ae15bb-f360-482a-b15c-6ffd4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a5080e45cf70628f863b4e946d637c7b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							graham&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It may be a simple script but I have no idea how to code. Could you make your script available to download for greasemonkey?</p>
+<p>Thanks!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ae349f-ef40-4087-a1c0-05784834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f0b92a2f3ca7cbf11779c99d4b2d13ea&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://simply-basic.com" rel="nofollow">John Kolbert</a>						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I haven't read all the comments, so hopefully this isn't a repeat. Here's a simple Greasemonkey script that adds "?.jpg" to every link in the page you're on. I haven't tried it at an airport, but if others say it works, why not!</p>
+<p><a rel="nofollow" href="http://simply-basic.com/posts/1941387">http://simply-basic.com/posts/1941387</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ae5e8e-b7d8-4011-8bbb-347d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=83a26ec9d8e4baded0346f2bdbace73d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.karlroos.se" rel="nofollow">Karl Roos</a>						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice, publish the script?<br />
+Please :)</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ae64f9-95a0-44af-aa08-44404834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Everybody: Please give John's script linked above a chance. It looks pretty much like the one I came up with back than ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ae820e-d050-4d17-ad88-44754834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a8b1342842dbeec2456f37184d7c655f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.webdistortion.com" rel="nofollow">Paul @ Web Design Ireland</a>						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix, great stuff. Just about to go on the holidays, so that one should come in super useful!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ae9813-ec24-4664-9e87-34a74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5ace55d8f32dfaf37df25228bfee6c6a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							MRSuckmyP&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well I will try it in 345 days. (next holiday).</p>
+<p>at time being , f4ck 411</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48aeafea-5bdc-463f-9874-75bc4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a0c635d492fc8b2d3964ab581d06e7c8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							zbigniew&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>So, as long as you can get past the lock it is permissible to steal. The airport WiFi is a product for sale. You know that there is a fee and password and you publicize a system to defeat the security. Regardless of the fact that the security is weak and the method to defeat it is trivial it should still be within your conscience not to steal. That would certainly be the example that I would set for my children.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48aeb057-88c0-4d5f-a5d3-7dc94834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=17d07916392ff048b90394fbe8e38f5c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Kyo&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Whoa..</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48aeb639-9e38-440f-b6ab-377e4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>zbigniew: I'd be happy to see my children stay on the edge of what is legally and morally allowed and develop themselves freely ; ). Let me take that back, if my children would be too afraid to hack into a computer system for the pure joy of overcoming the lock without the intention of harm they'd be grounded for a while ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48aeb69a-7328-4325-9d1d-548a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4147302c1e10bba5be2a94dacb5ccc4d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://hopheaded.com" rel="nofollow">gonzo</a>						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>danke!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48aec409-0cc4-422d-9922-44b94834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Felix Geisendörfer, @zbigniew : Felix you're so right... That's a so 20th century mind of yours zbigniew, he was doing no harm, and besides didn't he spend money on just being at the airport (meal, flight, surveys...)? Wireless (at public places) and Information should be totally free, and they should even encourage you to use it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48af0356-155c-44a2-86ed-0f584834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d6523aae1799e1e499abacfefceb1ca0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Max&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for the script John. :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48af1044-2bb8-4164-b0a8-549f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c3544d3faede26852ae8b43069716f83&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debohobo.com" rel="nofollow">Debo Hobo</a>						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I am glad to someone trying to get around the system.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48af1921-12d0-4dd8-9483-27624834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6393d0c138fbaf81af4ce61044de118a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Anonymous&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi there,</p>
+<p>I work(ed) for the company that originally provided the wireless network access in the Hartsfield-Jackson Atlanta airport.  It's a long story, but basically they bought system from us, we installed it, and had it working, and they decided to stop paying us for support.  Effectively that means that any updates that we've come out with over the past few years haven't made it into their system (at least, not by us).</p>
+<p>The vulnerability you found is legit -- we had to have some mechanism to handle pictures and other things for some various reasons.  Contained on the server that manages the access, there is a list of URLs and domain names that we will allow anybody to visit, without being authenticated.  Google.com is in there, which is why <a rel="nofollow" href="http://www.google.com/.jpg">http://www.google.com/.jpg</a> works.</p>
+<p>Visiting a site that isn't in the list of allowed URLs won't work, and will either redirect your browser to the portal page or display a blank page (depends on the circumstance).</p>
+<p>This system is in place at many locations, and not just airports.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48af19ce-9368-4262-a95f-446b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6393d0c138fbaf81af4ce61044de118a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Anonymous&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Oh and as an aside, this particular system is only in place at the Atlanta airport.  Unless other wireless providers use a similar method, it probably won't work in other airports as we never serviced any others.</p>
+<p>So I meant to say the vulnerability is "quasi-legit", as it does work, but only for allowed URLs.</p>
+<p>If some completely random URLs work, then the code is probably really outdated (but hey, no support contract = no updates).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48af1b28-3ec8-429c-8466-7f974834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5797e84418951f96b14f6afe571f9785&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Insider&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>you're going through a port redirected proxy.  images are allowed to flow to take stress off the proxy.  Your trick will only work on the most simple and bare of pages, such as google.  Trying it on a complex page, like www.cnn.com wouldn't work.  If you were really clever you could possibly capture and rewrite the urls on the fly, but honestly - it still wouldn't work for many things and at that point you're spending more in labor than in access rights.  You'll also see that things like security updates and such are allowed to flow freely, in the greater interest of the community.  Why would you want a compromised machine on your network, right?  So.. nice discovery, but it won't get you very far - sorry.</p>
+<p>-da man</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48af2912-bb70-42c7-8e59-4e194834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Anonymous, Insider: I was able to access any site, not just google. Complex sites like gmail didn't work, but I was able to improve many sites with additional grease monkey / rewriting magic. But yes, in the long run this is more of a PoC than a swiss pocket knife to hacking this particular Wifi system.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48af3dfe-7e70-49be-9267-05394834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ce977a6e71b537fa11b88467310cbc43&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							sclean&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>zbigniew:  so you've never downloaded a song, recorded a t.v. show, fast forwarded through a commercial, or burned a cd?</p>
+<p>are you jesus?  unless you are, no one wants to here your self-righteous bull. save it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48af4762-82e0-484f-b862-7ff04834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5d415dae8e6af1f8da261c1b469a0a16&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Fudo&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@ zbigniew: Corey Doctorow, in his book _Little_Brother_ (and related blog posts) has some very eloquent things about the necessity (yes, necessity) of defeating security. Essentially, it makes us _more_ secure.</p>
+<p>If you look, you can find more than a few youtube videos, instructibles, etc. detailing how to defeat a popular padlock with a soda can. Is that irresponsible? Does it promote theft and criminal activity? Debate that if you want, but I, for one, will _not_ be buying one of those locks in the future, now that I know how easily they're defeated.</p>
+<p>And _that_ is the point. How do you know how secure you are until someone has tried (and failed) to get around it?</p>
+<p>My son just started a daycare that has webcameras in the rooms so parents can hover from work. The camera page is protected with a login and password unique to each child. In attempting to find ways to get their [abysmal] site to work with my Mac, I found that the camera feeds themselves were behind an _insecure_ server. Good, that I'm now able to see my son, but bad, that absolutely anyone on the internet can watch every kid in the school. I told them about it, and they shrugged their shoulders. </p>
+<p>Which parents would be OK with that?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48af84a7-ed70-4ec1-9ade-155a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=29c721515da3907da558e6a5f2770e65&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Joseph Krieger&nbsp;						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is something if any body within my school system in Florida (County will not be shown because I don't want no $#@! from them...). Had both the Java script knowledge and actually used Grease Monkey then... Lets just say... our county might just shut the internet down for a long ass time.. then again.. Id love to see them even be able to hack into the WiFi connections at the school and not be arrested... But this was funny coming from a total tech geek... </p>
+<p>Note: Still trying to learn programing at moment...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48af9b92-0250-455a-980f-1c714834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=31bdda3baba9a3bc780aacbb88b24f3f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Kirsti H.&nbsp;						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>haha, wow, that's awesome!<br />
+you can always rely on good ol' Hartsfeild to give you a delay and a rip off. I was there two weeks ago and they tryed to charge me like $2 dollars for a bottle of water! anyways, next time im sitting around I might try and check that out...</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48af9c03-b468-4f5e-9490-47594834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=31bdda3baba9a3bc780aacbb88b24f3f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Kirsti H.&nbsp;						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>oh, and way to stick it to the man! XD</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b01a6d-07ec-463a-a60d-244a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=60e2ed41c95650c1699a9e979990de5f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://mixeduperic.com" rel="nofollow">Eric</a>						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice. I fly this weekend and will have a layover. I will attempt to play with this. Great article!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b031cb-c84c-4069-a935-0ccc4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=79882fcf42b7b776852545d376f61828&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Bill&nbsp;						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I hope you lose your luggage!  You circumvented a legitimate service charge.  That's theft of services.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b043ea-8eb4-430f-a132-1d6d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=121fb4dd4e7ea6bd7637e021edeeaa84&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.squidoo.com/extra-money-to-your-paypal" rel="nofollow">http://www.squidoo.com/extra-money-to-your-paypal</a>						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Haha, that was real slick man. If I get a laptop, thats something I might would like to try.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b2a121-e7d4-49d7-b1f7-34634834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9aa51afb60b91d52d5a90f1a78c568e7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							MINGO&nbsp;						</strong>
+						<strong>said 
+						on Aug 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>GOOD IDEA I WONDER IF THIS WILL WORK ALONG WITH MCDONALDS AND OTHER ESTABLISHMENTS IN THE LIKE.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b335b9-287c-4c45-9f73-2d894834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2effde89761b83872e27d76552b263a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							pistachoo&nbsp;						</strong>
+						<strong>said 
+						on Aug 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>tried it today at Prague airport - no luck.  :(</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b52b0b-1754-4e20-a7a3-76db4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e44911d34d576326ddffd05c0eb66e50&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.mymmogames.net" rel="nofollow">Isabelle</a>						</strong>
+						<strong>said 
+						on Aug 27, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Felix, great found!</p>
+<p>Thanks for the tips and tricks, and I'll definitely try this trick whenever I stuck at airport while waiting my uncle to pick me up ;)</p>
+<p>Cheers</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b60142-d48c-4fc5-95bc-27fe4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0c297eb8476489f052eca319324b3eb6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://davis.remmel.googlepages.com/" rel="nofollow">davisr</a>						</strong>
+						<strong>said 
+						on Aug 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This does NOT work at Mitchel Itnl. in Milwaukee :(</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b6f830-2aa4-4769-8b39-74f84834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1e2d2ebeb7def4ecc7880eec7b3c6b11&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							keegan&nbsp;						</strong>
+						<strong>said 
+						on Aug 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>How do you disable redirects in about:config?  I can't seem to find any values in there that would be relevant.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b70989-17b8-4cc7-9b39-645f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=26e7a7064878e98b74aa45aa80415e39&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Williwaw&nbsp;						</strong>
+						<strong>said 
+						on Aug 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well Done!  So, maybe you can give a full tutorial on the process including the four lines of js script.</p>
+<p>Cheers</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48bb72ac-b124-4f72-8e6f-059f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f31a03da98bd9396c9f4a422e01cb630&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Matthew&nbsp;						</strong>
+						<strong>said 
+						on Sep 01, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I made a script: <a rel="nofollow" href="http://userscripts.org/scripts/show/32896?.jpg">http://userscripts.org/scripts/show/32896?.jpg</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48bc92b7-c138-494c-9b98-06ff4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4200e32c79f4955431fc26935a5fe4b4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://zangoole.com" rel="nofollow">Babak</a>						</strong>
+						<strong>said 
+						on Sep 02, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>So cool. thanks for sharing.<br />
+I'll give it a try soon.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48be85b7-c534-4d97-af28-073a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=74c442f6d8ce8790e518180c916e47b4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							kon&nbsp;						</strong>
+						<strong>said 
+						on Sep 03, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hey for all the new people to this, including me lol can any one make that script? and how to make it work?? thanks</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48bff17a-c814-4b7d-b78c-7ce54834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=788147c0fdbf29b98b228785a6f955c7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.misterinfo.de/users/erichansa" rel="nofollow">erichansa</a>						</strong>
+						<strong>said 
+						on Sep 04, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>did you succeed?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48c0faba-ffe0-4ebb-a669-1e144834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f60f5fbdb7ae87728f9d6b210d89509c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.abc-scan.de" rel="nofollow">anony</a>						</strong>
+						<strong>said 
+						on Sep 05, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>if only google works (here or in other occasions)<br />
+you can probably visit all other websites on the world by using the google-website-translation service, no?</br></p>
+<p>like</p>
+<p>h**p://translate.google.de/translate?hl=de&sl=en&u=<a rel="nofollow" href="http://debuggable.com">http://debuggable.com</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48c70e27-0f60-4971-9958-4d0d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=983b4364ec7a45c02fc7cd6248fbcfea&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Icebrain&nbsp;						</strong>
+						<strong>said 
+						on Sep 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I tried to circumvent a system like that in a parking camp (not to avoid paying, but because they were saying it didn't work :| And although it allowed google neither 'translate' nor 'cached' pages worked. </p>
+<p>Will try that method next time, but I don't have much faith. :P</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48c9d45c-c094-47c4-bfff-7d3a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5932ecae41c3e5452b53100d7a5aa16&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							joshua&nbsp;						</strong>
+						<strong>said 
+						on Sep 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>i would learn more about this topic.. i would like get into red that my computer localized.. i dont have the password of this red but i want to know if is the same method to get in...??</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ce9837-5ae4-4338-9cc8-3c5a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=93cee8106d481676b64d1c796dc07526&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.whatalamp.com" rel="nofollow">David</a>						</strong>
+						<strong>said 
+						on Sep 15, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It is so hi-tech hack.<br />
+You spend 2 hours to find it?</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d415bc-7510-43d8-a52a-45924834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=144f30b3dd7a925e55d7d9082e46b310&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://eblog.lichao.net" rel="nofollow">WebGuru</a>						</strong>
+						<strong>said 
+						on Sep 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great finding. But unfortunately it is not working on Atlanta airport wi-fi (as I indicated in my own blog), but maybe others.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d8f45d-154c-47cb-9eae-0c6f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a026e2b986882dd2bfe924492fe70768&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://airdump.net/" rel="nofollow">airdump.net</a>						</strong>
+						<strong>said 
+						on Sep 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Old but actual.. Shows vulnerability easy to understand. Check the wireless hardworkers at <a rel="nofollow" href="http://airdump.net/">http://airdump.net/</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48da618f-9ba4-4024-817d-6f334834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=144f30b3dd7a925e55d7d9082e46b310&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							WebGuru&nbsp;						</strong>
+						<strong>said 
+						on Sep 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The direct link to the post I mentioned above is <a rel="nofollow" href="http://lichao.net/eblog/hack-the-wi-fi-network-of-atlanta-airport-is-the-old-news-200809173.html">http://lichao.net/eblog/hack-the-wi-fi-network-of-atlanta-airport-is-the-old-news-200809173.html</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48de464b-20f4-4221-ae57-15194834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b22903173accf980eacff168e11da0c1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Falling Up!&nbsp;						</strong>
+						<strong>said 
+						on Sep 27, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Does anyone have Wifiway that they can send me?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48e0bf69-8d64-40d8-80b3-74134834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ada0892efaf4569a147ba26201c396d0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.fatfoogoo.com" rel="nofollow">Microtransaction</a>						</strong>
+						<strong>said 
+						on Sep 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice hack!  I realize it's 2 years old now and won't work anymore, but with more and more people carrying wi-fi enabled devices, I don't understand why wi-fi at airports simply isn't free everywhere.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48edeb9f-e4d0-4346-8082-17874834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=36fd628643ec29ba7b62262136b0a75c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							jose&nbsp;						</strong>
+						<strong>said 
+						on Oct 09, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>does these works on starbucks??</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fee8f5-2d5c-47d5-bc8e-0d604834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e4fd60b2dd7507115b773a330617a27a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							savage tongan&nbsp;						</strong>
+						<strong>said 
+						on Oct 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>im all the way over in newzealand and it workz  cheerz for that mean hack</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-494d39d6-30f8-410c-b45b-1e444834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5e1c6f6b8d2031a76f4c9e8d3d35cbda&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							b&nbsp;						</strong>
+						<strong>said 
+						on Dec 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sitting in Atlanta airport now and this no longer works.It continues to redirect me.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49aa5de6-b950-4572-bb5a-7e3c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1d69f7dd2ee7c29c6889b49c5fec866d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.inurl-viewerframe.com/" rel="nofollow">inurl:viewerframe?mode= </a>						</strong>
+						<strong>said 
+						on Mar 01, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Google let us meet the desire of peeping-camera hacking</p>
+<p>Hack to search live Camera with google</p>
+<p>Here’s a fun thing to play around with, if you’re bored.</p>
+<p>And Google will sniffs out network cameras that have Web interfaces and the URL or link location to the viewers that have been indexed by Google. With this hack and trick, video surfers can peek into videos or intermittently capture images showing places and scenes such as office, restaurant interiors, a Japanese barnyard, women doing laundry, the interior of an Internet collocation facility, government project sites, animals, parks, streets, Internet cafes, casinos, private rooms, and a cage full of rodents, among other things, in locales and locations scattered around the world.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49c90bd2-abc8-442d-842b-7d944834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d4450dd7d50b0477fdd97f3e612dd676&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.basisrente.net/" rel="nofollow">Basisrente</a>						</strong>
+						<strong>said 
+						on Mar 24, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>yes! really, starbucks would be interesting.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a418ff1-6888-4188-b9fa-44144834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a8506416dee2cd2479f65ec7292385c9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							anynomous&nbsp;						</strong>
+						<strong>said 
+						on Jun 24, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>owned you are so the man the same thing happened to me i just got a free unsecured wlan from the control tower some how i geuss i was close enough so i never got the motivation to figure all that</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a637fa5-a324-4957-a430-3e174834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e67b206d891c4c9417336828fa089679&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.sheafdesign.co.uk" rel="nofollow">Ian Sheffield</a>						</strong>
+						<strong>said 
+						on Jul 19, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Did anyone manage to get this to work in Starbucks. or with the T-Mobile systems?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a6db475-2c58-4a29-a545-7ccd4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=eecdf83f049a9c97e06a9e3ba4590082&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							C0SM0S-&nbsp;						</strong>
+						<strong>said 
+						on Jul 27, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Try this script: <a rel="nofollow" href="http://userscripts.org/scripts/show/32896">http://userscripts.org/scripts/show/32896</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a6dbe41-2820-4d09-bf17-1dc64834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jul 27, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>C0SM0S-: Yeah, this could work.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4aa6325c-21c8-4fd3-a320-01dfcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=49773c28eefb1ac28ae319e2e064f5ae&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.whyismycomputersoslow.org" rel="nofollow">Why is my computer so slow</a>						</strong>
+						<strong>said 
+						on Sep 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wow thats great - smart thinking! Definately going to give this a go next time i travel</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4aa63297-7720-454b-ba82-01cdcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c5b83f255fb5e95a8499f0023c5def4e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://coldsorefree.net" rel="nofollow">How to get rid of a cold sore fast</a>						</strong>
+						<strong>said 
+						on Sep 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hmm thats really thinking outside the box. I like malachi's idea though, with a bit of time we might be able to get that to work.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4abb2c61-b3d8-4140-ab4a-4cbccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=712efc14056f07ab3244c7b3bba2a9c4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Samuel Jaxon&nbsp;						</strong>
+						<strong>said 
+						on Sep 24, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I  find this article about AirPort WLAN very helpful for my <a rel="nofollow" >essay writing</a> in college. Thanks.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4affe3c1-8d98-4f9c-8123-2593cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f41009c40d54c0fac1d4c65c631f4726&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.hausianer.de" rel="nofollow">micha</a>						</strong>
+						<strong>said 
+						on Nov 15, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I also like the idea of Starbucks ;-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

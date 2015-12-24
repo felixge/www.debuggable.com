@@ -1,0 +1,540 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Blog &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="paging">
+	<a href="/posts/index/page:50" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:47">47</a></span> | <span><a href="/posts/index/page:48">48</a></span> | <span><a href="/posts/index/page:49">49</a></span> | <span><a href="/posts/index/page:50">50</a></span> | <span class="current">51</span> | <span><a href="/posts/index/page:52">52</a></span> | <span><a href="/posts/index/page:53">53</a></span> | <span><a href="/posts/index/page:54">54</a></span> | <span><a href="/posts/index/page:55">55</a></span> <a href="/posts/index/page:52" class="next">Next &raquo;</a></div>
+	<div class="post">
+	<h2><a href="/posts/prototypes-and-how-they-are-used:480f4dfd-38e4-4006-aaf8-49aecbdd56cb">Prototypes and how they are used</a></h2>	<div class="posted-on">
+		<p>Posted on 29/3/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<h2>What are prototypes?</h2>
+<p>Prototypes are generally used to test an idea in an existing system or before a real system is established. The goal of the prototype is to prove whether the components that will also be in the final system will work together as expected. Think of car manufacturing. Most people use computer models to test things there, without the need to build the final product - the car. We build software prototypes due to the same reasons. On the one hand to fix problems with a lot less hassle and on the other hand to test things in advance. The real essence of prototypes lies in the things you learn building it.</p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<h2>Different forms of prototypes</h2>
+<p>When people think of software prototypes they think about source code. That is of course true, but only to a certain degree. A prototype in the php world could be a small script that checks whether the database, the php script and the Ajax request will work together as expected. You could also think of a typical <a href="http://www.php-design-patterns.com/structural-patterns/model-view-controller/" title="The Model View Controller Pattern">Model View Controller setup</a>. Your prototype could be a simple setup of the pattern to check if the controller, the model and the view operate together as expected and whether they are encapsulated as expected. You wouldn't want to build an entire application around your implementation of the Model-View-Controller-pattern only to decide after 6 months that your system is not flexible or scalable enough.</p>
+<p>These two examples focus on prototypes being a source code product. However, prototypes need not be source code at all. When you do webdesign and you make a mock up of your website in Photoshop, then that's of course a prototype. When you are making a graphical user interface for another language, like java and not for php, you can use sketches on post-it-sheets, which will ultimately be a prototype of one form or the other too. <a href="/category/cakephp-specific/" title="Cake PHP-specific coding practices">CakePHP</a>'s scaffolding is a good example of prototypes used in php webdevelopment. The scaffolding in php is basically a source code generator - a prototype generator.</p>
+<h2>The goal of prototypes</h2>
+<p>Prototypes are required to answer questions only, that's why they are cheaper to produce. They can ignore unimportant details without which the actual product would be senseless. Details which aren't important for you now, but will be for the future users of your application. For example, when you are making a prototype for a website interface you don't need to have correct data. You can even live without that bad user interface when you are making prototypes for your performance tests. </p>
+<p>The essence of using prototypes lies in what your learn building them.</p>
+<h2>What do prototypes investigate?</h2>
+<p>Put simply, prototypes need to investigate all risky things. Everything nobody has tried before and things that are absolutely critical to the final application. These things could be critical changes made to the database - something that I had to do last week - develop a password encryption system that encrypts all passwords in our current live database. Also I had to change all client code that operates on the passwords, like password resetting functionality. </p>
+<p>Besides that, you can use prototypes on everything you feel uncomfortable with. Think of the following:</p>
+<ul>
+<li>Architecture</li>
+<li>New functionality in an existing system</li>
+<li>Buildup and contents of external data</li>
+<li>Tools, frameworks, libraries, etc. from external parties.</li>
+<li>Performance-Issues</li>
+<li>Graphical User Interfaces</li>
+<li>Critical changes to the database</li>
+</ul>
+<p>The value of prototypes is not in the source code you produce, but in the things you learn from it. That's the most important thing you need to remember about prototypes.</p>
+<h2>How to use prototypes</h2>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>Which details can be ignored with prototypes (most of the time)?</p>
+<ul>
+<li>Correctness - you can use fictive data with prototypes</li>
+<li>Completeness - it could be that the prototype needs to work only with a specific input</li>
+<li>Error-checking - If you don't use the correct path, your prototype might explode. That's okay.</li>
+<li>Documentation - Yes, most prototypes don't need much documentation.</li>
+</ul>
+<p>When using prototypes, make sure that everybody involved knows, that you are writing something for the trash bin.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfd-38e4-4006-aaf8-49aecbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprototypes-and-how-they-are-used%3A480f4dfd-38e4-4006-aaf8-49aecbdd56cb &amp;title=Prototypes+and+how+they+are+used';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprototypes-and-how-they-are-used%3A480f4dfd-38e4-4006-aaf8-49aecbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprototypes-and-how-they-are-used%3A480f4dfd-38e4-4006-aaf8-49aecbdd56cb&amp;title=Prototypes+and+how+they+are+used&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprototypes-and-how-they-are-used%3A480f4dfd-38e4-4006-aaf8-49aecbdd56cb&amp;title=Prototypes+and+how+they+are+used';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/prototypes-and-how-they-are-used:480f4dfd-38e4-4006-aaf8-49aecbdd56cb">0 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/prototypes-and-how-they-are-used:480f4dfd-38e4-4006-aaf8-49aecbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/issues-with-error-reporting:480f4dfd-3b04-46b0-b33e-4552cbdd56cb">Issues with error reporting</a></h2>	<div class="posted-on">
+		<p>Posted on 29/3/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>PHP provides a means to adjust your error reporting level. That means you can decide, which types of errors will be displayed to you and your users.</p>
+<p>You can either adjust the error reporting level in your php configuration file or you can use the <a href="http://www.php.net/manual/de/function.ini-set.php" title="PHP's ini-set() function">ini_set() - function</a> to adjust the error reporting level.</p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<br />
+<span class="co1">// don't report any errors</span><br />
+<a href="http://www.php.net/error_reporting"><span class="kw3">error_reporting</span></a><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// report runtime errors</span><br />
+<a href="http://www.php.net/error_reporting"><span class="kw3">error_reporting</span></a><span class="br0">&#40;</span><span class="kw2">E_ERROR</span> | <span class="kw2">E_WARNING</span> | <span class="kw2">E_PARSE</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// report notices as well</span><br />
+<a href="http://www.php.net/error_reporting"><span class="kw3">error_reporting</span></a><span class="br0">&#40;</span><span class="kw2">E_ERROR</span> | <span class="kw2">E_WARNING</span> | <span class="kw2">E_PARSE</span> | <span class="kw2">E_NOTICE</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// report all errors except notices</span><br />
+<a href="http://www.php.net/error_reporting"><span class="kw3">error_reporting</span></a><span class="br0">&#40;</span><span class="kw2">E_ALL</span> ^ <span class="kw2">E_NOTICE</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// report all php errors</span><br />
+<a href="http://www.php.net/error_reporting"><span class="kw3">error_reporting</span></a><span class="br0">&#40;</span><span class="kw2">E_ALL</span><span class="br0">&#41;</span>;<br />
+<br />
+<a href="http://www.php.net/ini_set"><span class="kw3">ini_set</span></a> <span class="br0">&#40;</span><span class="st0">'error_reporting'</span>, <span class="kw2">E_ALL</span><span class="br0">&#41;</span>;
+</div>
+<h2>Which types of errors are there?</h2>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<ul>
+<li>E_ERROR - Fatal runtime errors. This shows errors, that can't be resolved. Script execution is halted.</li>
+<li>E_WARNING - Warnings (no fatal errors). Script execution is not halted.</li>
+<li>E_PARSE - Parse errors (for example, syntax errors) cause a script halt.</li>
+<li>E_NOTICE - Notifications that may indicate a problem in your source code. Script execution is not halted. However, if notices aren't intended you should fix the corresponding problem. Also make sure you do not display notices to your visitors, because that may encourage them to hack your site.</li>
+<li>E_CORE_ERROR - Errors that are caused when PHP is starting. These are like E_ERROR with the only difference that they are not caused by a script, but by the PHP core.</li>
+<li>E_CORE_WARNING - Warnings from the PHP Core. They are like E_WARNING.</li>
+<li>E_COMPILE_ERROR - Errors that are caused by the Zend Engine during compilation of PHP.</li>
+<li>E_COMPILE_WARNING - Warnings caused by the Zend Engine during compilation of PHP.</li>
+<li>E_USER_ERROR - These are like E_ERROR with the difference that they are deliberately caused in the script through the usage of trigger_error().</li>
+<li>E_USER_WARNING - Warnings caused by trigger_error() in the script.</li>
+<li>E_USER_NOTICE - Notices caused by trigger_error() in the script when something unexpected happens.</li>
+<li>E_ALL - Displays all errors of all error levels, except E_STRICT.</li>
+<li>E_STRICT - Notices by the run time system. They make you aware of possible code changes you should make to maintain interoperability.</li>
+</ul>
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfd-3b04-46b0-b33e-4552cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fissues-with-error-reporting%3A480f4dfd-3b04-46b0-b33e-4552cbdd56cb &amp;title=Issues+with+error+reporting';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fissues-with-error-reporting%3A480f4dfd-3b04-46b0-b33e-4552cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fissues-with-error-reporting%3A480f4dfd-3b04-46b0-b33e-4552cbdd56cb&amp;title=Issues+with+error+reporting&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fissues-with-error-reporting%3A480f4dfd-3b04-46b0-b33e-4552cbdd56cb&amp;title=Issues+with+error+reporting';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/issues-with-error-reporting:480f4dfd-3b04-46b0-b33e-4552cbdd56cb">0 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/issues-with-error-reporting:480f4dfd-3b04-46b0-b33e-4552cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/extreme-automation:480f4dfd-a5a4-4218-8ec1-4186cbdd56cb">Extreme Automation</a></h2>	<div class="posted-on">
+		<p>Posted on 28/3/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>In software development there are many things that can be automatized. Whether it be version control, the build process, deployment to the live site or generating a documentation website from your php comments. Such things, if done manually, can destroy the consistency in your project and will cause miss-feelings within your programming. So why hesitate? Make everything possible automatic!</p>
+<h2>Everything done automatically</h2>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>From my experience in a company I worked for I know that when every developer uses the same IDE it can lead to uneasyness.Our lead developer told everybody to install this plugin and this plugin, each with a 2 pages manual on how to do it. At the end of the day, every work station was configured in a slightly different way. This lead to the main application exposing bugs on one work station, but not on the other, resulting in a resident nightmare.</p>
+<p>That's only one reason why you should always avoid doing something manually. Human-beings simply can't repeat as well as machines do. Simple. Oh and we also shouldn't expect our colleagues to be able to do it. A batch script can launch the same command ever and ever again - for example a DB backup. If it worked once, then it is likely to work again.</p>
+<h2>Using Cron Jobs</h2>
+<p>A very popular tool is cron (or at on Windows systems). With it you can make your server execute certain scripts or php files on a fixed time ever and ever again. For example you could you use it to clean your sessions table in the database every night automatically, writing entries to a separate history file. Here you can find a <a href="http://en.wikipedia.org/wiki/Crontab" title="Quick Introduction to Cron">Quick Introduction to Cron</a>.</p>
+<h2>Automatic Testing</h2>
+<p>Using <a href="http://simpletest.org" title="Simpletest">Simpletest</a> and <a href="http://en.wikipedia.org/wiki/Crontab" title="Quick Introduction to Cron">Cron</a> you can easily automatize the testing process of your application and run nightly regression tests.</p>
+<h2>Generating Sourcecode</h2>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>It's a best coding practice to generate all sourcecode by tools if you can. Look at our article about <a href="http://cakephp.org" title="CakePHP">CakePHP</a>'s source code generator Bake here: <a href="http://php-coding-practices.com/tools/using-the-bake-code-generator/" title="The Bake Code Generator">The Bake Code Generator</a>.</p>
+<h2>Automatic Paperstuff</h2>
+<p>Wouldn't it be nice if all programmers could use their time for programming? Unfortunately this is rarely the case. An email must be answered, contracts must be made, documents must be uploaded to the intranet. Maybe you decide for a shell script to do the dirty work 8well, not the contracts :)). However, you still have to remember to execute the script. Cron is your friend.</p>
+<h2>Generating Documentation Websites</h2>
+<p><a href="http://phpdoc.org" title="PHP Documentor">PHP Documentor</a> is a great tool to generate documentation sites. Simply put php doc tags around your class, methods and functions, run the phpdoc and voila - there you go.</p>
+<p>Here is an example:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="coMULTI">/**<br />
+&nbsp;* This function computes the the sum of two values<br />
+&nbsp;*<br />
+&nbsp;* @author tim<br />
+&nbsp;* @param float first summand<br />
+&nbsp;* @param float second summand<br />
+&nbsp;* @return float the sum of the two summands<br />
+&nbsp;*/</span><br />
+<span class="kw2">function</span> sum<span class="br0">&#40;</span><span class="re0">$val1</span>,<span class="re0">$val2</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp;<span class="kw1">return</span> <a href="http://www.php.net/round"><span class="kw3">round</span></a><span class="br0">&#40;</span><span class="re0">$val1</span>+<span class="re0">$val2</span>,<span class="nu0">2</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Whatever you do, generate php documentation site often and, most important of all, automatically.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfd-a5a4-4218-8ec1-4186cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fextreme-automation%3A480f4dfd-a5a4-4218-8ec1-4186cbdd56cb &amp;title=Extreme+Automation';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fextreme-automation%3A480f4dfd-a5a4-4218-8ec1-4186cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fextreme-automation%3A480f4dfd-a5a4-4218-8ec1-4186cbdd56cb&amp;title=Extreme+Automation&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fextreme-automation%3A480f4dfd-a5a4-4218-8ec1-4186cbdd56cb&amp;title=Extreme+Automation';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/extreme-automation:480f4dfd-a5a4-4218-8ec1-4186cbdd56cb">0 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/extreme-automation:480f4dfd-a5a4-4218-8ec1-4186cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/which-editor-ide-should-i-use:480f4dfd-1a6c-41c3-b521-458bcbdd56cb">Which Editor / IDE should I use?</a></h2>	<div class="posted-on">
+		<p>Posted on 23/3/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>When you are a programmer you need a good set of tools. Every tool must be simple to use, but be able to serve its purpose. This is true for all coder's tools, but especially for the editor / ide (integrated-development-environmenz) that he uses. You must be able to edit source code as easy as possible, since source code is, well, the fundamental thing for a programmer. :) Let's take a quick look over various functionality your ide / editor should provide you with.</p>
+<h2>You should use only one editor</h2>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>I think it's the best to only know one editor, but know it like your wallet. I am of the opinion that you should use it for everything - coding, documentation, messages, etc. "Why?" I hear you asking. Because, most editors have different sets of shortcuts, commandos, toolbars etc. If you are using <a href="http://phpeclipse.org" titlte="PHP Eclipse Plugin">PHPEclipse</a> for your coding, <a href="http://textpad.com" title="Textpad">Textpad</a> for your documentation needs and a monolithic office-product to organise your todo lists and to type emails, you won't get as fast as you can get with only one editor. In each of these environments you will different commands and conventions. </p>
+<p>You must use shortcuts. Using cut, copy and paste via the mouse will not be as efficient as using CTRL+X, CTRL+C and CTRL+V.</p>
+<p>Choose one editor, understand it fully and use for all editing tasks. If there is only one set of shortcuts for editing tasks,you will not lose any time thinking about what was the correct shortcut for the search functionality. Some editors use "F5" for that, some use CTRL+F. </p>
+<p>Make sure, that your editor can be used with all platforms that you are using.</p>
+<h2>Necessary Editor Functionality</h2>
+<p>Apart from the comfortable or useful functionality, that you like to use, I will present a couple of functions here that every editor should provide.</p>
+<ul>
+<li><strong>Easy configuration.</strong> Every aspect should be configurable as to your preferences. Especially shortcuts are important, because if you use them often, your hands won't need to abandon your keyboard.</li>
+<li><strong>Easy extensions</strong>. An editor should be able to cope with new developments, such as a new programming language being released.</li>
+<li><strong>Programmable.</strong> You should be able to program your editor for complext asks. This can be done via Makros or embedded programming languages.</li>
+</ul>
+<p>Other than that your editor should feature the following functionality:</p>
+<ul>
+<li>Syntax-Highlighting</li>
+<li>Automatic indentation</li>
+<li>Automatic completion of words, functions, etc.</li>
+<li>Predefined text templates</li>
+<li>A useful help section</li>
+<li>Features that are common among IDEs - like an embedded compiler and debugger</li>
+</ul>
+<h2>Predefined Fileheaders</h2>
+<p>Most modern Editors / IDEs provide a useful feature that automatically writes a comment at the top of the file with the </p>
+<ul>
+<li>Name of the class</li>
+<li>Your name</li>
+<li>A skeleton for declarations, like constructors, destructors, etc.</li>
+</ul>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>In <a href="http://phpeclipse.org" titlte="PHP Eclipse Plugin">PHPEclipse</a> for example, you could automatically add <a href="http://www.phpdoc.org/" title="PHP Documentor">PHPDoc tags</a> as in here:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="coMULTI">/**<br />
+&nbsp; * File description<br />
+&nbsp; * Created on &lt;date&gt;<br />
+&nbsp; *<br />
+&nbsp; * @author me &lt;me @email.com&gt;<br />
+&nbsp; * @todo<br />
+&nbsp; */</span></div>
+<h2>Code Inspection</h2>
+<p>When you are not so used to object oriented programming in PHP, it's a best coding practice to use an editor that provides code inspection. For example it provides with a list of all functions in your file. One c lick on a function scrolls to that function immediately.</p>
+<p>This is of course true for an OOP setup  as well. A very useful feature.</p>
+<h2>So which editor should you use?</h2>
+<p>There are actually various options here, ranging from <a href="http://textpad.com/" title="Textpad">Textpad</a> over  <a href="http://phpeclipse.org" titlte="PHP Eclipse Plugin">PHPEclipse</a> to <a href="http://www.zdnet.de/downloads/prg/9/m/de00009M-wc.html" title="UltraEdit">UltraEdit</a>. These three are not only the industry standardin PHP development environments, but also in most coding environments using other languages as well.</p>
+<p>For the PHP community there is also <a href="http://www.zend.com/products/zend_studio" title="Zend Studio">Zend Studio</a>, the official ide made by the developers of PHP. Zend Studio is certainly a good and useful ide with many features that I discussed in this post. However, the fact that there is similarly good freeware, you probably should not invest into it.</p>
+<p><a href="http://php-designer.softonic.de/" title="PHP Designer">PHP Designer</a> is another good option, providing support for better HTML and CSS Coding as well.</p>
+<p>However, if you ask me, for now <a href="http://phpeclipse.org" titlte="PHP Eclipse Plugin">PHPEclipse</a> is the way to go, as it provides integration with debugging, web testing and your webserver. It also features code inspection, auto indentation, code highlighting.You can toggle functions and phpdoc comments to get a better idea for the big feature. ANotheri mportant fact isa lso that most professional teams work with itand it always looks good on your application when you have substantial experience with Eclipse.</p>
+<h2>What should you try to do now?</h2>
+<ul>
+<li>Explore all features on your currently used editor / ide</li>
+<li>Surprise you colleagues that use the same editor with a cool new feature nobody has used so far</li>
+<li>Use your editor's embedded programming language to automatize your work</li>
+<li>Learn your editor's table of shortcuts by heart</li>
+<li>Use your editor for all tasks, including programming, simple text editing, writing email templates, etc.</li>
+<li>Decide whether you need a new editor / ide</li>
+</ul>
+<p></me></date><br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfd-1a6c-41c3-b521-458bcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwhich-editor-ide-should-i-use%3A480f4dfd-1a6c-41c3-b521-458bcbdd56cb &amp;title=Which+Editor+%2F+IDE+should+I+use%3F';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwhich-editor-ide-should-i-use%3A480f4dfd-1a6c-41c3-b521-458bcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwhich-editor-ide-should-i-use%3A480f4dfd-1a6c-41c3-b521-458bcbdd56cb&amp;title=Which+Editor+%2F+IDE+should+I+use%3F&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwhich-editor-ide-should-i-use%3A480f4dfd-1a6c-41c3-b521-458bcbdd56cb&amp;title=Which+Editor+%2F+IDE+should+I+use%3F';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/which-editor-ide-should-i-use:480f4dfd-1a6c-41c3-b521-458bcbdd56cb">11 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/which-editor-ide-should-i-use:480f4dfd-1a6c-41c3-b521-458bcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/using-profilers:480f4dfd-b09c-4e6c-acf8-4eb8cbdd56cb">Using Profilers</a></h2>	<div class="posted-on">
+		<p>Posted on 21/3/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<h3>What is a profiler?</h3>
+<p>A profiler is an application that inspects your php code. It determines, how often every function (including the built-in functions) have been called and how much time they needed to complete. This is really great for optimising your program and makes finding the really tough and slow functions and methods in your application very easy.</p>
+<h3>Should I use a profiler?</h3>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>Of course, every serious programmer should use a profiler to debug his code. Making a speedy application is one of the fundamentials for its success. Professional studies state, that the average user waits around six to seven seconds for an application or website to load - before he moves on. For you that would mean lost business, lost money. You sure don't want to lose money due to a call to preg_replace with the wrong regular expression.</p>
+<h3>What profiler should I use?</h3>
+<p>If you ask me, there is one great profiler, which is used by thousands of php programmers worldwide. It's php's <a href="http://xdebug.org/" title="XDebug extension">XDebug Extension</a>. It is under heavy development and has a great support system, installation guidelines and general documentation.</p>
+<p>Here is an example code snippet on how you can use XDebug:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// Check whether xdebug is installed</span><br />
+<span class="kw1">if</span><span class="br0">&#40;</span>!<a href="http://www.php.net/extension_loaded"><span class="kw3">extension_loaded</span></a><span class="br0">&#40;</span><span class="st0">'xdebug'</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <a href="http://www.php.net/die"><span class="kw3">die</span></a><span class="br0">&#40;</span><span class="st0">'Xdebug is required!'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Start the profiling</span><br />
+xdebug_start_profiling<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<br />
+<span class="kw2">class</span> MyClass <span class="br0">&#123;</span><br />
+&nbsp; &nbsp;<a href="http://www.php.net/static"><span class="kw3">static</span></a> <span class="kw2">function</span> hello_world<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// echo 'Hello World'</span><br />
+&nbsp; &nbsp;<span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="co1">// Let's use xdebug to profile how much time calling a static class method using call_user_func() and MyClass::here2 takes</span><br />
+<br />
+<span class="re0">$cycles</span> = <span class="nu0">50000</span>;<br />
+<br />
+<span class="kw1">for</span><span class="br0">&#40;</span><span class="re0">$i</span>=<span class="nu0">0</span>;<span class="re0">$i</span>&lt;<span class="re0">$cycles</span>;<span class="re0">$i</span>++<span class="br0">&#41;</span> MyClass::<span class="me2">here2</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw1">for</span><span class="br0">&#40;</span><span class="re0">$i</span>=<span class="nu0">0</span>;<span class="re0">$i</span>&lt;<span class="re0">$cycles</span>;<span class="re0">$i</span>++<span class="br0">&#41;</span> <a href="http://www.php.net/call_user_func"><span class="kw3">call_user_func</span></a><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'MyClass'</span>,<span class="st0">'here2'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Display the xdebug report</span><br />
+xdebug_dump_function_profile<span class="br0">&#40;</span>XDEBUG_PROFILER_NC<span class="br0">&#41;</span>;</div>
+<p>The code should be pretty straightforward. We simply use two different methods of calling the same static function of the class MyClass2. Once we call it 50000 times using MyClass::here2 and once using call_user_func().</p>
+<p>If you have correctly installed xdebug, you will find out that the call_user_func actually takes about 3 times as much time as MyClass::here2().</p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>Using XDEBUG_PROFILER_NC in our call to xdebug_dump_function_profile tells xdebug to merge all function calls in the same line into a single entry in the report. There are several other constants, i.e. methods of profiling available. Those range from sorting function names in order of their speed to reporting the average execution time for each function.</p>
+<h3>Two versions of xdebug</h3>
+<p>You have to know that there are now two versions of Xdebug available. One will just work the way my code documents it. This is called XDebug1 in the xdebug documentation. However, an even better coding practice is to use XDebug2, which dumps its reports to files which can then be used via <a href="http://sourceforge.net/projects/wincachegrind/" title="Wincachgrind">Wincachegrind</a>.</p>
+<h3>Conclusion</h3>
+<p>Using xdebug and profiling in general is a quick way of defining the slow parts of your application, without having to code a thousand calls to array_sum(explode(' ',microtime()));. </p>
+<p>Every programmer should use profiling. It's a so-called best coding practice. Although the example provided may seem trivial, XDebug is very powerful when you profile your entire application.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfd-b09c-4e6c-acf8-4eb8cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fusing-profilers%3A480f4dfd-b09c-4e6c-acf8-4eb8cbdd56cb &amp;title=Using+Profilers';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fusing-profilers%3A480f4dfd-b09c-4e6c-acf8-4eb8cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fusing-profilers%3A480f4dfd-b09c-4e6c-acf8-4eb8cbdd56cb&amp;title=Using+Profilers&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fusing-profilers%3A480f4dfd-b09c-4e6c-acf8-4eb8cbdd56cb&amp;title=Using+Profilers';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/using-profilers:480f4dfd-b09c-4e6c-acf8-4eb8cbdd56cb">0 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/using-profilers:480f4dfd-b09c-4e6c-acf8-4eb8cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="paging">
+	<a href="/posts/index/page:50" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:47">47</a></span> | <span><a href="/posts/index/page:48">48</a></span> | <span><a href="/posts/index/page:49">49</a></span> | <span><a href="/posts/index/page:50">50</a></span> | <span class="current">51</span> | <span><a href="/posts/index/page:52">52</a></span> | <span><a href="/posts/index/page:53">53</a></span> | <span><a href="/posts/index/page:54">54</a></span> | <span><a href="/posts/index/page:55">55</a></span> <a href="/posts/index/page:52" class="next">Next &raquo;</a></div>	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

@@ -1,0 +1,914 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Cake 1.2's Set class eats nested arrays for breakfast! &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/cake-12s-set-class-eats-arrays-for-breakfast:480f4dd6-d084-4fb7-bacc-49fdcbdd56cb">Cake 1.2's Set class eats nested arrays for breakfast!</a></h2>	<div class="posted-on">
+		<p>Posted on 24/2/07 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>I was just taking a little trip through the CakePHP core code trying to wrap my head around Acl, Model behaviors and all sorts of stuff. While doing so I saw that the core code starts to be using the Set class more and more that was added a while ago. So far this has been a little dark spot for me in the core and from my previous quick looks at the class I've never been quite able to figure out what it's exact purpose was. Until now all I knew was "well it's probably some fancy array manipulation code that is somewhat obfuscated and undocumented". Oh boy, I wish I had spent more time on this earlier. It's probably one of coolest new features in 1.2 and nobody realizes it ; ).</p>
+<p>So before starting to drool over it too much ahead of time, let's take a look at a simple example. You have an array of $users as it could have been returned from a findAll call to your User model:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$users</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+<span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="nu0">0</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'User'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'id'</span> =&gt; <span class="nu0">1</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="st0">'name'</span> =&gt; <span class="st0">'Felix'</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span>&nbsp;&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; , <span class="nu0">1</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'User'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'id'</span> =&gt; <span class="nu0">2</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="st0">'name'</span> =&gt; <span class="st0">'Bob'</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; , <span class="nu0">2</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'User'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'id'</span> =&gt; <span class="nu0">3</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="st0">'name'</span> =&gt; <span class="st0">'Jim'</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><br />
+<span class="br0">&#41;</span>;</div>
+<p>What you really want however, is just a simple array containing all user 'name's: array('Felix', 'Bob', 'Jim'). Hmm. Up until today I'd probably have written some code like this to do it:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$userNames</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$users</span> <span class="kw1">as</span> <span class="re0">$user</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$userNames</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <span class="re0">$user</span><span class="br0">&#91;</span><span class="st0">'User'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Simple enough, right? Not any more! Using the new Set class we can achieve the exact same outcome like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$userNames</span> = Set::<a href="http://www.php.net/extract"><span class="kw3">extract</span></a><span class="br0">&#40;</span><span class="re0">$users</span>, <span class="st0">'{n}.User.name'</span><span class="br0">&#41;</span>;</div>
+<p>Doesn't blow you away yet? Well, let's look at another example. Let's say our User model as a hasMany associations to an Item model. Then we would get an array like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$users</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+<span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="nu0">0</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'User'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'id'</span> =&gt; <span class="nu0">1</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="st0">'name'</span> =&gt; <span class="st0">'Felix'</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="st0">'Item'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="nu0">0</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'id'</span> =&gt; <span class="nu0">1</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="st0">'name'</span> =&gt; <span class="st0">'Mouse'</span>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="nu0">1</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'id'</span> =&gt; <span class="nu0">2</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="st0">'name'</span> =&gt; <span class="st0">'KeyBoard'</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span>&nbsp;&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; , <span class="nu0">1</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'User'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'id'</span> =&gt; <span class="nu0">2</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="st0">'name'</span> =&gt; <span class="st0">'Bob'</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="st0">'Item'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="nu0">0</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'id'</span> =&gt; <span class="nu0">3</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="st0">'name'</span> =&gt; <span class="st0">'CD'</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; , <span class="nu0">2</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'User'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'id'</span> =&gt; <span class="nu0">3</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="st0">'name'</span> =&gt; <span class="st0">'Jim'</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="st0">'Item'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="nu0">0</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'id'</span> =&gt; <span class="nu0">4</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="st0">'name'</span> =&gt; <span class="st0">'USB Stick'</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="nu0">1</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'id'</span> =&gt; <span class="nu0">5</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="st0">'name'</span> =&gt; <span class="st0">'MP3 Player'</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="nu0">2</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'id'</span> =&gt; <span class="nu0">6</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; , <span class="st0">'name'</span> =&gt; <span class="st0">'Cellphone'</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><br />
+<span class="br0">&#41;</span>;</div>
+<p>Now here is how I would have traditionally turned this into a 'User.name' => 'User.items' array:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$userItems</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$users</span> <span class="kw1">as</span> <span class="re0">$user</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$user</span><span class="br0">&#91;</span><span class="st0">'User'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'Item'</span><span class="br0">&#93;</span> <span class="kw1">as</span> <span class="re0">$item</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$userItems</span><span class="br0">&#91;</span><span class="re0">$user</span><span class="br0">&#91;</span><span class="st0">'User'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <span class="re0">$item</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>But using the new Set class this is still pretty much a simple one-liner (split up in multiple lines so you don't have to scroll):</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$userItems</span> = array_combine<br />
+<span class="br0">&#40;</span><br />
+&nbsp; &nbsp; Set::<a href="http://www.php.net/extract"><span class="kw3">extract</span></a><span class="br0">&#40;</span><span class="re0">$users</span>, <span class="st0">'{n}.User.name'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; , Set::<a href="http://www.php.net/extract"><span class="kw3">extract</span></a><span class="br0">&#40;</span><span class="re0">$users</span>, <span class="st0">'{n}.User.Item.{n}.name'</span><span class="br0">&#41;</span><br />
+<span class="br0">&#41;</span>;</div>
+<p>Both methods will output:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<a href="http://www.php.net/array"><span class="kw3">Array</span></a><br />
+<span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="br0">&#91;</span>Felix<span class="br0">&#93;</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">Array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span> =&gt; Mouse<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span> =&gt; KeyBoard<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+<br />
+&nbsp; &nbsp; <span class="br0">&#91;</span>Bob<span class="br0">&#93;</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">Array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span> =&gt; CD<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+<br />
+&nbsp; &nbsp; <span class="br0">&#91;</span>Jim<span class="br0">&#93;</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">Array</span></a><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span> =&gt; USB Stick<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span> =&gt; MP3 Player<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span> =&gt; Cellphone<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+<span class="br0">&#41;</span></div>
+<p>"But doesn't it cost more performance to loop through the array twice in the Set example?" I hear some of you cry. Yes it does. And? Have you built your application yet? Does it implement all features you are dreaming of? And most importantly: Do your web stats indicate you are going to have 1 million hits / day soon? If so go back into your code and remove the Set example with the less succinct foreach alternative. If not, listen to <a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a> who's motto for 2007 is <a href="http://www.littlehart.net/atthekeyboard/2007/01/02/just-build-it-damnit/">Just Build It, Damnit!</a>.</p>
+<p>Anyway, here comes my last fun thing to do with Set::extract - parsing an RSS feed for all post titles. For my example I'll use the new XML class in Cake 1.2. Right now Set::extract only supports arrays but hopefully it will either natively support Xml objects at some point, or the Xml class get it's own extract function. For now I've written a little function that can turn an Xml instance into an array that looks like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> xmltoArray<span class="br0">&#40;</span><span class="re0">$node</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$array</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$node</span>-&gt;<span class="me1">children</span> <span class="kw1">as</span> <span class="re0">$child</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$child</span>-&gt;<span class="me1">children</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$value</span> = <span class="re0">$child</span>-&gt;<span class="me1">value</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$value</span> = xmltoArray<span class="br0">&#40;</span><span class="re0">$child</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$key</span> = <span class="re0">$child</span>-&gt;<span class="me1">name</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$array</span><span class="br0">&#91;</span><span class="re0">$key</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$array</span><span class="br0">&#91;</span><span class="re0">$key</span><span class="br0">&#93;</span> = <span class="re0">$value</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span> <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/is_array"><span class="kw3">is_array</span></a><span class="br0">&#40;</span><span class="re0">$array</span><span class="br0">&#91;</span><span class="re0">$key</span><span class="br0">&#93;</span><span class="br0">&#41;</span> || !<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$array</span><span class="br0">&#91;</span><span class="re0">$key</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$array</span><span class="br0">&#91;</span><span class="re0">$key</span><span class="br0">&#93;</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="re0">$array</span><span class="br0">&#91;</span><span class="re0">$key</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$array</span><span class="br0">&#91;</span><span class="re0">$key</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <span class="re0">$value</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$array</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>So now let's assume we would want to extract all post titles from my feed: <a href="http://feeds.feedburner.com/thinkingphp">http://feeds.feedburner.com/thinkingphp</a> we could leverage the Set class to make our code as succinct as:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+uses<span class="br0">&#40;</span><span class="st0">'Xml'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$feed</span> = xmltoArray<span class="br0">&#40;</span><span class="kw2">new</span> XML<span class="br0">&#40;</span><span class="st0">'http://feeds.feedburner.com/thinkingphp'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$postTitles</span> = Set::<a href="http://www.php.net/extract"><span class="kw3">extract</span></a><span class="br0">&#40;</span><span class="re0">$feed</span>, <span class="st0">'rss.channel.item.{n}.title'</span><span class="br0">&#41;</span>;</div>
+<p>Which will give you a $postTitles array like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<a href="http://www.php.net/array"><span class="kw3">Array</span></a><br />
+<span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span> =&gt; How-to: Use Html <span class="nu0">4.01</span> in CakePHP <span class="nu0">1.2</span><br />
+&nbsp; &nbsp; <span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span> =&gt; Looking up foreign <a href="http://www.php.net/key"><span class="kw3">key</span></a> values using Model::<span class="me2">displayField</span><br />
+&nbsp; &nbsp; <span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span> =&gt; Bug-fix update <span class="kw1">for</span> SVN/FTP Deployment Task<br />
+&nbsp; &nbsp; <span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span> =&gt; Access your config files rapidly <span class="br0">&#40;</span>Win32 only<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#91;</span><span class="nu0">4</span><span class="br0">&#93;</span> =&gt; Making error handling <span class="kw1">for</span> Model::<span class="me2">save</span> more beautiful in CakePHP<br />
+&nbsp; &nbsp; <span class="br0">&#91;</span><span class="nu0">5</span><span class="br0">&#93;</span> =&gt; Full content RSS feed<br />
+&nbsp; &nbsp; <span class="br0">&#91;</span><span class="nu0">6</span><span class="br0">&#93;</span> =&gt; Visual Sorting - Some Javascript fun I had last night<br />
+<span class="br0">&#41;</span></div>
+<p>Now that's beauty right there and a good way to end this post ; ). Take a look at the <a href="https://trac.cakephp.org/browser/branches/1.2.x.x/cake/libs/set.php">Set classes source</a> to find out about some other cool methods it has, but to me this is by far the coolest.</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-d084-4fb7-bacc-49fdcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcake-12s-set-class-eats-arrays-for-breakfast%3A480f4dd6-d084-4fb7-bacc-49fdcbdd56cb &amp;title=Cake+1.2%27s+Set+class+eats+nested+arrays+for+breakfast%21';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcake-12s-set-class-eats-arrays-for-breakfast%3A480f4dd6-d084-4fb7-bacc-49fdcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcake-12s-set-class-eats-arrays-for-breakfast%3A480f4dd6-d084-4fb7-bacc-49fdcbdd56cb&amp;title=Cake+1.2%27s+Set+class+eats+nested+arrays+for+breakfast%21&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcake-12s-set-class-eats-arrays-for-breakfast%3A480f4dd6-d084-4fb7-bacc-49fdcbdd56cb&amp;title=Cake+1.2%27s+Set+class+eats+nested+arrays+for+breakfast%21';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/simple-listshelper-for-displaying-nested-ul-ol-lists:480f4dd5-19f4-4612-9508-4797cbdd56cb">Simple ListsHelper for displaying nested ul / ol lists</a></li>
+							<li><a href="/posts/new-fix-for-array-junkies-setmerge-assembles-yummy-arrays:480f4dd6-0c04-46be-a87f-443ecbdd56cb">New fix for array junkies: Set::merge assembles yummy arrays</a></li>
+							<li><a href="/posts/dessert-4-keep-your-cake-fresh-use-svn-head:480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb">Dessert #4 - Keep your Cake fresh (use SVN HEAD)</a></li>
+							<li><a href="/posts/donate-your-php-arrays:49811879-9c6c-4985-8850-76c54834cda3">Donate your PHP arrays!</a></li>
+							<li><a href="/posts/cake-vs-zend-vs-symfony-vs-igniter:4942b243-85bc-404a-afc9-34aa4834cda3">Cake vs Zend vs Symfony vs Igniter</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/new-feed-for-cake-news:480f4dd5-0378-4781-91ee-44b2cbdd56cb">New feed for Cake News</a></li>
+							<li><a href="/posts/exceptional-cake:480f4dd5-1b10-4bc8-931f-49cecbdd56cb">Exceptional Cake</a></li>
+							<li><a href="/posts/Cake_3_interview_with_Nate_Abele:4a665a5e-5bfc-4e42-96ee-6d284834cda3">Cake 3 interview with Nate Abele</a></li>
+							<li><a href="/posts/dessert-14-the-new-xml-class:480f4dd5-4e94-4cc3-91d5-4b5acbdd56cb">Dessert #14 - The new Xml class</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/cake-12s-set-class-eats-arrays-for-breakfast:480f4dd6-d084-4fb7-bacc-49fdcbdd56cb">32 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/cake-12s-set-class-eats-arrays-for-breakfast:480f4dd6-d084-4fb7-bacc-49fdcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4de6-7c9c-4e97-b411-409ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2a4f4f2259921a89fbb16f44034f395a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.marianoiglesias.com.ar" rel="nofollow">Mariano Iglesias</a>						</strong>
+						<strong>said 
+						on Feb 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Long live the Set::extract() method, something that I should be working on to port for CakePHP 1.1. It should work out-of-the-box but still need to test it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-8448-411c-bac4-4e44cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7d4a15715d4f147df7e99c16d06eb93d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.medikoo.com" rel="nofollow">medyk</a>						</strong>
+						<strong>said 
+						on Feb 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>For your last example it would be much better to use xpath query.. it's as well 2 line code.. but it will be much more efficient.. and anyway I believe you can do much more with xpath than with xmltoarray plus Cake's set class.<br />
+As side note: I think all those XML to array methods are made and used by those who are afraid of learning DOM.. and it's shame - DOM is much more powerfull than array - learning it well, opens many doors.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-3ccc-40e1-b4bf-4a21cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>medyk: ?. Maybe I'm missing something but neither do I know of a DOM nor of a XPATH implementation in CakePHP. I'm wrong about that and those exist please let me know as that would be really exiting, but meanwhile be assured that the DOM and I are having a beer together several times a week ... ; ).</p>
+<p>Oh and please also keep in mind: xmlToArray as well as the last example are like a 30 minute hack and no production ready xml query language. I was just exited about the extract function and felt like using it on xml, that's all.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-e9e4-49bc-aeb6-43a7cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakephp.org/" rel="nofollow">Nate</a>						</strong>
+						<strong>said 
+						on Feb 26, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Felix,</p>
+<p>Great post.  Couple other things I wanted to point out about the Set object.  In the latest SVN version of Cake 1.2, there's also Set::insert(), Set::check(), and Set::remove(), which all use the same path syntax.</p>
+<p>Also, we're looking at getting XPath implemented in the XML object before 1.2 final.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-bee0-4b01-9c42-4a9bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.phpdeveloper.org/news/7360" rel="nofollow">PHPDeveloper.org</a>						</strong>
+						<strong>said 
+						on Feb 28, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p><strong>Felix Geisendorfer's Blog: Cake 1.2’s Set class eats nested arrays for breakfast!...</strong></p>
+<p>...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-1ec0-471c-b230-4fbdcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.developercast.com/2007/02/28/felix-geisendorfers-blog-cake-12e28099s-set-class-eats-nested-arrays-for-breakfast/" rel="nofollow">developercast.com &raquo; Blog Archive &raquo; Felix Geisendorfe</a>						</strong>
+						<strong>said 
+						on Feb 28, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Felix Geisendorfer has a great functionality note that CakePHP users might want to check out. It&#8217;s related to the Set class and how it handles nested arrays.   So far this has been a little dark spot for me in the core and from my previous quick looks at the class I&#8217;ve never been quite able to figure out what it&#8217;s exact purpose was. Until now all I knew was &#8220;well it&#8217;s probably some fancy array manipulation code that is somewhat obfuscated and undocumented&#8221;. Oh boy, I wish I had spent more time on this earlier. It&#8217;s probably one of coolest new features in 1.2 and nobody realizes it. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-b52c-402b-9c73-40eccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7d4a15715d4f147df7e99c16d06eb93d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.medikoo.com" rel="nofollow">medyk</a>						</strong>
+						<strong>said 
+						on Mar 01, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix.. XPath is implemented in php DOM extension which is part of php core.. :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-562c-4464-bcbf-4e85cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 01, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>medyk: Is that a standard extension in terms of being available on most hosts? Didn't know about it so far but might take a look at it at some point.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-2e04-4194-a063-4ec1cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c5ce8ee560e32daaad850240be698060&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.silberkind.de" rel="nofollow">Nils Hitze</a>						</strong>
+						<strong>said 
+						on Mar 01, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Damn .. it work's, thank you .. no more nested foreach in a foreach in a foreach .. and so on</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-d3f8-40e3-bcee-4b03cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7d4a15715d4f147df7e99c16d06eb93d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.medikoo.com" rel="nofollow">medyk</a>						</strong>
+						<strong>said 
+						on Mar 01, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix it's in php5 and this extension comes with default php configuration.. so unless your host disabled it for any reason (very unlikely) it will be available for you.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-207c-4443-88a6-49e9cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 01, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>medyk: php5 there you go. I use it for client stuff but personally I'm still doing a lot of php4 and if I was to write some generic library it would always have to work in php4 and 5 for me to make sense ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-3214-4ef9-9fdd-43eecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4a1e7ccf9ec98a3d31548bc415e138a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://omnibuscreative.com" rel="nofollow">Benjamin Hirsch</a>						</strong>
+						<strong>said 
+						on Mar 07, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wow! And I've been fighting arrays all freaking day.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-90f4-45ab-9e38-4779cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7d4a15715d4f147df7e99c16d06eb93d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.medikoo.com" rel="nofollow">medyk</a>						</strong>
+						<strong>said 
+						on Mar 08, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>To me php4 doesn't exist.. I write heavy OOP applications.. If there wouldn't be php5 I wouldn't use php at all... and trying to be backwards compatible with php4 is really impossible witm my code... after all I don't think it's worth a hassle  - you know we live in 2007 :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-0ad4-4f77-a4dc-4bdccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2007/04/05/new-fix-for-array-junkies-setmerge-assembles-yummy-arrays/" rel="nofollow">ThinkingPHP and beyond &raquo; New fix for array junkies: Set::m</a>						</strong>
+						<strong>said 
+						on Apr 05, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] long time - no post, as always - I suck. I intend to make up for it with a screencast on unit testing in the next days, but meanwhile I want to talk about my favourite data type in PHP again: Arrays. For those of you just tuning in, I already wrote about how Cake 1.2’s Set class eats nested arrays for breakfast a while ago and if you haven't read this post yet, go ahead and do it now ; ). Todays post features a brand new Set function called merge that was a side product of me working on a cool new cake class. If you've done a lot of array work in the past, you've probably have come in situations where you wanted to merge to arrays into a new one. Usually that's a no-brainer in PHP by simply using the array_merge function (or the CakePHP wrapper 'am'): PLAIN TEXT PHP: [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de8-91b8-4691-905c-45dccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f4193df6a36260aafcf095fcf22c4ec3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.sephlietz.com/" rel="nofollow">Seph Lietz</a>						</strong>
+						<strong>said 
+						on Apr 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for the great tip!</p>
+<p>I've found Set::extract() very useful in conjunction with Set::contains() as well.</p>
+<p><code><br />
+if( Set:contains(Set::extract::($group['User'], '{n}.id'), a($this-&gt;Session-&gt;read('User.id'))) ) {</br><br />
+   // then User belongs to the Group</br><br />
+}</br><br />
+</br></code></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de8-1f24-48f5-85db-44d4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=078bdad82d6ae364b4536a7f0105be31&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							JDS&nbsp;						</strong>
+						<strong>said 
+						on Apr 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Is it just me or is there just not enough information out there?</p>
+<p>What is "{n}"??????</p>
+<p>Arrgh!!!!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de8-7d74-4a1d-87e4-4fedcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>JDS: It's not just you. CakePHP 1.2 is not released and some internal class like Set is going to be pretty far down the list when it comes to documentation - that's why I highlight it here ; ).</p>
+<p>{n} indicates that any numerical key will be matched and looped through. Sample:</p>
+<p>$a = array('User' => array(0 => array('name' => 'Jim'), 1=> array('name' => 'Bob')));<br />
+$b = Set::extract($a, 'User.{n}.name');</br></p>
+<p>is the same as:</p>
+<p>$b = array('Jim', 'Bob');</p>
+<p>Does that explain it?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df6-7090-4774-b815-4debcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.pseudocoder.com/archives/2008/02/10/cakephp-tutorials/" rel="nofollow">CakePHP Tutorials :: PseudoCoder.com</a>						</strong>
+						<strong>said 
+						on Feb 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] post interesting, make sure to subscribe to the RSS feed. If you have something to say go ahead and leave a comment. This blog has removed the nofollow attribute and is running the BlogFollow plugin. By leaving yourcomment you get a back link to your site and if your site has a feed, a snippet from the latest entry will appear below your comment. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df6-7118-40f0-82f6-4d4bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a51a12aa87e368e0cae150a1d3669e1c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Alex&nbsp;						</strong>
+						<strong>said 
+						on Feb 14, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix,</p>
+<p>this is very valuable information. Thank you very much for all your work.<br />
+May I add parts of it into: http://book.cakephp.org/</br></p>
+<p>(Of course so may want to do it on your own :-))</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df6-ddd4-4ecd-872b-4a02cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Unless stated otherwise all info found on this page should be considered public domain, so go for it ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-cdfc-4d40-ae5e-4422cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.shawnjohnjr.idv.tw/wp/?p=331" rel="nofollow">playing with nested array (i hate it) at Stay hungry, Stay fooli</a>						</strong>
+						<strong>said 
+						on Mar 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] 這篇文章給了很好的示範：  Cake 1.2’s Set class eats nested arrays for breakfast Cakephp set class [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-481a1eb8-e6b8-4de1-a91e-74e54834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=62aae276fc8e79fdc7a5f867b92048fe&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Aaron&nbsp;						</strong>
+						<strong>said 
+						on May 01, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Looks like you need to repair the title of this page so there's more Google juice.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-481ad7d4-6158-4fa7-af5f-35524834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 02, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Aaron: What do you mean?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-486acbe9-d23c-47f3-89ed-0e8f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=156f89c990f4065cefddcf1ef69b5d9c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							johnbenclark&nbsp;						</strong>
+						<strong>said 
+						on Jul 02, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I liked it so much I implemented it in javascript (using mootools for the map function on data.. replace with your own toolkit)</p>
+<p>function extract(data, path) {<br />
+	var key  = path.split('.', 1)[0];</br><br />
+	var rest = path.slice(path.indexOf('.') + 1);</br><br />
+	if (key == '{n}') {</br><br />
+		return data.map(function(item){</br><br />
+			return extract(item, rest);</br><br />
+		});</br><br />
+	} else {</br><br />
+		if (rest == key) {</br><br />
+			return data[key];</br><br />
+		}</br><br />
+		else {</br><br />
+			return extract(data[key], rest);</br><br />
+		}</br><br />
+	}</br><br />
+}</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-486cb888-816c-4dae-8063-67e44834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jul 03, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>johnbenclark1: Nice! Now do it for jQuery. And while you're at it try to see if you can get the new XPath stuff going as well ; P.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48e0cb02-db3c-47f3-9319-67944834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=98555d92a0a4cc0dafd51048a2486205&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://ok.ryotic.de/blog" rel="nofollow">Oktay Acikalin</a>						</strong>
+						<strong>said 
+						on Sep 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>felix: i just did a simple test with jquery and it worked quite well :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4931b461-6ab4-47cd-825f-1c804834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e635a6ed36b7ac74ebdbdfc408f97e66&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Jörg Peters&nbsp;						</strong>
+						<strong>said 
+						on Nov 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Why not use  Set::combine<br />
+instead of</br><br />
+$userItems = array_combine(Set::extract(..,Set::extract</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4931bc21-c808-4520-af78-0f224834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Nov 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Jörg: Why use super glue if duck tape will do? : )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4937a907-0470-4100-934b-35a24834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=57868cee928f88a60194652f9c329955&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://oneyeareatingcake.blogspot.com/" rel="nofollow">pragnatek</a>						</strong>
+						<strong>said 
+						on Dec 04, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix: thanks for this!<br />
+As someone new to Cake & PHP I came to this post looking for help iterating through nested arrays (I was getting lost in nested foreach loops!) but I like this solution much better. Keep finding myself on debuggable.com - great stuff!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49a779e2-b1b0-45f0-b756-6e9c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b052aa609720bd698f0cd6e2b0de39ec&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Ben&nbsp;						</strong>
+						<strong>said 
+						on Feb 27, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>If you're looking for an elegant way of making a find('list') that shows two or more fields in the select box, then here's how to do it:</p>
+<p>$membersArray = $this->Member->find('all');</p>
+<p>$membersList = Set::combine(<br />
+			$membersArray,</br><br />
+			'{n}.Member.MemberID',</br><br />
+			array(</br><br />
+				'{0} {1}',</br><br />
+				'{n}.Member.MemberFirstName',</br><br />
+				'{n}.Member.MemberLastName'</br><br />
+			)</br><br />
+		);</br></p>
+<p>You can even use this to put related model data into the select box.  Very very useful little trick :-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a70777d-ca20-4b58-81ae-44a34834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=77facb9235772ebd506e15c680fe8e73&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.twitter.com/crabweasel" rel="nofollow">Chris</a>						</strong>
+						<strong>said 
+						on Jul 29, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix! Thanks a lot for this. Its 8 minutes to go before my working day is over, and I've just found your post.  Thanks for saving the day!!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b0bd1c5-7a28-4d7d-a53a-4615cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=74d79157f3bec23d51fe53ef43b960a9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://andrw.net" rel="nofollow">Andrew</a>						</strong>
+						<strong>said 
+						on Nov 24, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for the amazing write up on the Set class. I have been ignoring it for too long finally going to take a stab at it rather than use foreach loops. </p>
+<p>Cheers</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

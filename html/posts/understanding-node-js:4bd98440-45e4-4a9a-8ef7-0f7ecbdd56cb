@@ -1,0 +1,693 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Understanding node.js &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/understanding-node-js:4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb">Understanding node.js</a></h2>	<div class="posted-on">
+		<p>Posted on 29/4/10 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><a href="http://nodejs.org/">Node.js</a> has generally caused two reactions in people I've introduced it to. Basically people either "got it" right away, or they ended up being very confused.</p>
+
+<p>If you have been in the second group so far, here is my attempt to explain node:</p>
+
+<ul>
+<li>It is a command line tool. You download a tarball, compile and install the source.</li>
+<li>It let's you run JavaScript programs by typing 'node my_app.js' in your terminal.</li>
+<li>The JS is executed by the <a href="http://code.google.com/p/v8/">V8 javascript engine</a> (the thing that makes Google Chrome so fast).</li>
+<li>Node provides a JavaScript API to access the network and file system</li>
+</ul>
+
+<p><strong><em>"But I can do everything I need in: ruby, python, php, java, ... !".</em></strong></p>
+
+<p>I hear you. And you are right! Node is no freaking unicorn that will come and do your work for you, sorry. It's just a tool, and it probably won't replace your regular tools completely, at least not for now.</p>
+
+<p><strong><em>"Get to the point!"</em></strong></p>
+
+<p>Alright, I will. Node is basically very good when you need to do several things at the same time. Have you ever written a piece of code and said "I wish this would run in parallel"? Well, in node everything runs in parallel, except your code.</p>
+
+<p><strong><em>"Huh?"</em></strong></p>
+
+<p>That's right, <em>everything runs in parallel, except your code</em>. To understand that, imagine your code is the king, and node is his army of servants.</p>
+
+<p>The day starts by one servant waking up the king and asking him if he needs anything. The king gives the servant a list of tasks and goes back to sleep a little longer. The servant now distributes those tasks among his colleagues and they get to work.</p>
+
+<p>Once a servant finishes a task, he lines up outside the kings quarter to report. The king lets one servant in at a time, and listens to things he reports. Sometimes the king will give the servant more tasks on the way out.</p>
+
+<p>Life is good, for the king's servants carry out all of his tasks in parallel,   but only report with one result at a time, so the king can focus. *</p>
+
+<p><strong><em>"That's fantastic, but could you quit the silly metaphor and speak geek to me?"</em></strong></p>
+
+<p>Sure. A simple node program may look like this:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> fs = require<span class="br0">&#40;</span><span class="st0">'fs'</span><span class="br0">&#41;</span><br />
+&nbsp; , sys = require<span class="br0">&#40;</span><span class="st0">'sys'</span><span class="br0">&#41;</span>;<br />
+<br />
+fs.<span class="me1">readFile</span><span class="br0">&#40;</span><span class="st0">'treasure-chamber-report.txt'</span>, <span class="kw2">function</span><span class="br0">&#40;</span>report<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; sys.<span class="me1">puts</span><span class="br0">&#40;</span><span class="st0">&quot;oh, look at all my money: &quot;</span>+report<span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+<br />
+fs.<span class="me1">writeFile</span><span class="br0">&#40;</span><span class="st0">'letter-to-princess.txt'</span>, <span class="st0">'...'</span>, <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; sys.<span class="me1">puts</span><span class="br0">&#40;</span><span class="st0">&quot;can't wait to hear back from her!&quot;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span>;</div></p>
+
+<p>Your code gives node the two tasks to read and write a file, and then goes to sleep. Once node has completed a task, the callback for it is fired. But there can only be one callback firing at the same time. Until that callback has finished executing, all other callbacks have to wait in line. In addition to that, there is no guarantee on the order in which the callbacks will fire.</p>
+
+<p><strong><em>"So I don't have to worry about code accessing the same data structures at the same time?"</em></strong></p>
+
+<p>You got it! That's the entire beauty of JavaScripts single-threaded / event loop design!</p>
+
+<p><strong><em>"Very nice, but why should I use it?"</em></strong></p>
+
+<p>One reason is efficiency. In a web application, your main response time cost is usually the sum of time it takes to execute all your database queries. With node, you can execute all your queries at once, reducing the response time to the duration it takes to execute the slowest query.</p>
+
+<p>Another reason is JavaScript. You can use node to share code between the browser and your backend. JavaScript is also on its way to become a really universal language. No matter if you did python, ruby, java, php, ... in the past, you've probably picked up some JS along the way, right?</p>
+
+<p>And the last reason is raw speed. V8 is constantly pushing the boundaries in being one of the fastest dynamic language interpreters on the planet. I can't think of any other language that is being pushed for speed as aggressively as JavaScript is right now. In addition to that, node's I/O facilities are really light weight, bringing you as close to fully utilizing your system's full I/O capacities as possible.</p>
+
+<p><strong><em>"So you are saying I should write all my apps in node from now on?"</em></strong></p>
+
+<p>Yes and no. Once you start to swing the node hammer, everything is obviously going to start looking like a nail. But if you're working on something with a deadline, you might want to base your decision on:</p>
+
+<ul>
+<li>Are low response times / high concurrency important? Node is really good at that.</li>
+<li>How big is the project? Small projects should be fine. Big projects should evaluate carefully (available libraries, resources to fix a bug or two upstream, etc.).</li>
+</ul>
+
+<p><strong><em>"Does node run on Windows?"</em></strong></p>
+
+<p>No. If you are on windows, you need to run a virtual machine (I recommend <a href="http://www.virtualbox.org/">VirtualBox</a>) with Linux. Windows support for node is planned, but don't hold your breath for the next few months unless you want to help with the port.</p>
+
+<p><strong><em>"Can I access the DOM in node?"</em></strong></p>
+
+<p>Excellent question! No, the DOM is a browser thingy, and node's JS engine (V8) is thankfully totally separate from all that mess. However, there are people working on implementing <a href="http://www.yuiblog.com/blog/2010/04/09/node-js-yui-3-dom-manipulation-oh-my/">the DOM as a node module</a>, which may open very exciting possibilities such as unit testing client-side code.</p>
+
+<p><strong><em>"Isn't event driven programming really hard?"</em></strong></p>
+
+<p>That depends on you. If you already learned how to juggle AJAX calls and user events in the browser, getting used to node shouldn't be a problem.</p>
+
+<p>Either way, test driven development can really help you to come up with maintainable designs.</p>
+
+<p><strong><em>"Who is using it?"</em></strong></p>
+
+<p>There is a small / incomplete list in the <a href="http://wiki.github.com/ry/node">node wiki</a> (scroll to "Companies using Node"). <a href="http://www.yuiblog.com/blog/2010/04/09/node-js-yui-3-dom-manipulation-oh-my/">Yahoo</a> is experimenting with node for YUI, <a href="http://www.plurk.com/">Plurk</a> is using it for massive comet and Paul Bakaus (of jQuery UI fame) is building a <a href="http://ajaxian.com/archives/aves-game-engine">mind-blowing game engine</a> that has some node in the backend. <a href="http://www.joyent.com/">Joyent</a> has hired Ryan Dahl (the creator of node) and heavily sponsors the development.</p>
+
+<p>Oh, and Heroku just announced (experimental ) <a href="http://blog.heroku.com/archives/2010/4/28/node_js_support_experimental/">hosting support for node.js</a> as well.</p>
+
+<p><strong><em>"Where can I learn more?"</em></strong></p>
+
+<p>Tim Caswell is running the excellent <a href="http://howtonode.org/">How To Node</a> blog. Follow <a href="http://search.twitter.com/search?q=%23nodejs">#nodejs</a> on twitter. Subscribe to the <a href="http://groups.google.com/group/nodejs">mailing list</a>. And come and hang out in the IRC channel, <em>#node.js</em> (yes, the dot is in the name). We're close to hitting the 200 lurker-mark there soon : ).</p>
+
+<p>I'll also continue to write articles here on <a href="http://debuggable.com/">debuggable.com</a>.</p>
+
+<p>That's it for now. Feel free to comment if you have more questions!</p>
+
+<p>--fg</p>
+
+<p>*: The metaphor is obviously a simplification, but if it's hard to find a counterpart for the concept of non-blocking in reality.</p>
+
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Funderstanding-node-js%3A4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb &amp;title=Understanding+node.js';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Funderstanding-node-js%3A4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Funderstanding-node-js%3A4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb&amp;title=Understanding+node.js&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Funderstanding-node-js%3A4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb&amp;title=Understanding+node.js';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/node_js:4ab4d9d7-b788-41d4-85c0-1b51cbdd56cb">node.js</a></li>
+							<li><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li>
+							<li><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li>
+							<li><a href="/posts/streaming-file-uploads-with-node-js:4ac094b2-b6c8-4a7f-bd07-28accbdd56cb">Streaming file uploads with node.js</a></li>
+							<li><a href="/posts/unit-testing-with-node-js:4b647d40-34e4-435a-a880-3b04cbdd56cb">Unit testing with node.js</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/node-js-dealing-with-uncaught-exceptions:4c933d54-1428-443c-928d-4e1ecbdd56cb">node.js - Dealing with uncaught exceptions </a></li>
+							<li><a href="/posts/streaming-utf-8-with-node-js:4bf28e8b-a290-432f-a222-11c1cbdd56cb">Streaming UTF-8 (with node.js)</a></li>
+							<li><a href="/posts/parsing-file-uploads-at-500-mb-s-with-node-js:4c03862e-351c-4faa-bb67-4365cbdd56cb">Parsing file uploads at 500 mb/s with node.js</a></li>
+							<li><a href="/posts/understanding-hidden-classes-in-v8:4c7e81e4-1330-4398-8bd2-761bcbdd56cb">Understanding hidden classes in v8</a></li>
+							<li><a href="/posts/parsing-a-form-in-node-js-1:4b0bff13-4244-4ebc-8455-4975cbdd56cb">Parsing form data with node.js</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/understanding-node-js:4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb">26 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/understanding-node-js:4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4bd988de-1bb8-4069-8330-16dacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=09e2c643c9bebf8ec3e82afee9a4fc81&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://mark-story.com" rel="nofollow">Mark Story</a>						</strong>
+						<strong>said 
+						on Apr 29, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great introduction Felix, I've been reading the Node.js docs and it looks pretty amazing.  Just need to get the time to get my hands dirty :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4bd98e64-0888-4be1-a564-1f44cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e98c54cef11fbd834f02498416f61798&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Felix Vargas&nbsp;						</strong>
+						<strong>said 
+						on Apr 29, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey! thanks for the intro...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4bd99fdc-a1f0-4577-8836-383ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=aa0667f46a39aebc1b0f58f46dcdc957&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://gr.ayre.st" rel="nofollow">Karl G</a>						</strong>
+						<strong>said 
+						on Apr 29, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix. Good job on the node evangelism. I just have one complaint.</p>
+<p>> V8 is constantly pushing the boundaries in being the fastest dynamic language interpreter on the planet. I can't think of any other language that is being pushed for speed as aggressively as JavaScript is right now.</p>
+<p>This is, unfortunately, not true. To my knowledge, the fastest dynamic language interpreter is Mike Pall's LuaJIT. There was an extended exchange between Mike, Brendan Eich, and Andreas Gal on Lambda the Ultimate at the end of March [1] but in brief, js language semantics prevent some optimizations that LuaJIT has in place.</p>
+<p>[1] <a rel="nofollow" href="http://lambda-the-ultimate.org/node/3851">http://lambda-the-ultimate.org/node/3851</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4bd9a737-6bcc-45ab-8390-45accbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2bf4937564b1801712a764df6b43ecd5&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://twitter.com/botanicus" rel="nofollow">Botanicus</a>						</strong>
+						<strong>said 
+						on Apr 29, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi, I like this blog, thanks for it! Anyway I'm writing about Node.js as well at <a rel="nofollow" href="http://blog.101ideas.cz">http://blog.101ideas.cz</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4bdab07a-b114-41bb-a121-361dcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 30, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Karl G: I agree with you partially, so I changed the wording to 'one of the fastest'.</p>
+<p>However, I don't see evidence that LuaJIT is the *fastest* interpreter. At least we'd have to decide on an exact definition of "fast" first : ).</p>
+<p>LuaJIT seems to do very well in the game of language benchmarks, but those seem rather un-realistic at times. I mean I would consider anything related to closures much more important (speed-wise), than any raw number crunching.</p>
+<p>Either way, it's great to see the kind of innovation going on there.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4bdc2f8c-f9b4-46c9-b6aa-5aedcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8f93a872e399bc1353cc8d4e791d5401&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://mislav.uniqpath.com" rel="nofollow">Mislav</a>						</strong>
+						<strong>said 
+						on May 01, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I loved the metaphor.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4be12f4d-7f64-4d85-a6e4-4c81cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b91248b3c027e3e86245e3d077bda733&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://vipullimbachiya.com" rel="nofollow">Vipul Limbachiya</a>						</strong>
+						<strong>said 
+						on May 05, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great article and introduction to node.js.</p>
+<p>It helped me to understand very basic thing about it and where and why to use it.</p>
+<p>Thanks for sharing</p>
+<p>Vipul</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4c4557ed-74cc-4bd4-b2ec-2f45cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=26d6c8016e460ef39846627c9e0711d5&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://graysontechnology.co.uk" rel="nofollow">Paul Grayson</a>						</strong>
+						<strong>said 
+						on Jul 20, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice introduction Felix. A lot of people seem to have heard of node.js but miss the evented/non-blocking aspect and think it's just another server stack - all be it a JS one. I'll be pointing them at this article in future ;-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4c4cf58f-796c-4ac8-a5f3-719dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b785c67c8926efec6e4efbf718e5e233&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Stuart&nbsp;						</strong>
+						<strong>said 
+						on Jul 26, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Love your RSS feed bug! Gave me a laugh.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4c5144f3-fd70-4ae9-9cbd-037fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1d2b00ab49dfba5408e00b62d8b545a3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							bruce&nbsp;						</strong>
+						<strong>said 
+						on Jul 29, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>check out simon willison's blog.</p>
+<p><a rel="nofollow" href="http://simonwillison.net/2009/Nov/23/node/">http://simonwillison.net/2009/Nov/23/node/</a></p>
+<p>he uses an analogy with bunnies :)</p>
+<p><a rel="nofollow" href="http://www.slideshare.net/simon/evented-io-based-web-servers-explained-using-bunnies">http://www.slideshare.net/simon/evented-io-based-web-servers-explained-using-bunnies</a></p>
+<p>loving your work with multipart uploads using node.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4c664626-17e4-4d65-97f7-7f21cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=22184b90539c866099c39872b3c12a0e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							asksuperuser&nbsp;						</strong>
+						<strong>said 
+						on Aug 14, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>why wouldn't it run on windows since v8 can ?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4c66ae31-7de8-4e52-b688-01b1cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 14, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>asksuperuser: It runs on cygwin now. Full windows support should be possible as well, there just needs to be somebody to actually get a build going.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4c6b3f4e-b504-4682-b39b-3b43cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f19a4807544338636bf12e76aff178af&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://nucleussystems.com/" rel="nofollow">Jonah Bron</a>						</strong>
+						<strong>said 
+						on Aug 18, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Cool, I didn't really understand what node.js was before.  Nice introduction, thanks!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4c6cf9dc-f410-4aa1-9a29-7835cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=448f1fc4709e98499433a16c3ae1c09e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Alexis Lee&nbsp;						</strong>
+						<strong>said 
+						on Aug 19, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks, this is just what I needed.</p>
+<p>For nonblocking, I may be misunderstanding of course... I imagine a servant standing in front of the king, making a phone call.</p>
+<p>Of course the king can hire a peon to wait for the servant to finish his call, tell the peon how to handle the results and ask it to report back to him - but that's a lot of trivia to deal with a rude servant. Off with his head!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4c6e8938-96e8-462e-8c3b-06c5cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7fc73a8f5ba54a1438217cb6e9e58672&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://itsalldiet.com" rel="nofollow">Alex C</a>						</strong>
+						<strong>said 
+						on Aug 20, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wait.</p>
+<p>I'm still not clear... is this something I would use for a web page or for a "stand alone / compiled app" ?<br />
+The bit about asynchronous database calls made me just a little bit giddy.  Sounds really cool.  </br></p>
+<p>I worry that I'm not quite smart enough to leverage the power of that but maybe we're all a little scared (and excited) around new languages... but I guess you don't know until you try.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4c6e898a-53fc-4e06-ab08-0d15cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7fc73a8f5ba54a1438217cb6e9e58672&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://itsalldiet.com" rel="nofollow">Alex C</a>						</strong>
+						<strong>said 
+						on Aug 20, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>like is it just 'automatically faster' or do I have to change my program architecture to take advantage?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4c75859a-b7e8-4bcf-b726-7294cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b681feb514f5756a45a4f106cf0f32de&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://sam.heroku.com" rel="nofollow">Sam</a>						</strong>
+						<strong>said 
+						on Aug 25, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great explanation of the most important web programming language. What are the other alternatives?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4c855b28-17a0-4d07-b738-38f0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=038132586dba60cae0c8f13f21ef799b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://gtothesquare.com" rel="nofollow">Geries</a>						</strong>
+						<strong>said 
+						on Sep 06, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for the explanation, was kind of lost. </p>
+<p>Here is a list of modules for node.js <a rel="nofollow" href="http://github.com/ry/node/wiki/modules#database">http://github.com/ry/node/wiki/modules#database</a> In case anybody is wondering (like I did) what DB to use. Also, you will find parsers, template systems, middleware, frameworks, etc. <a rel="nofollow" href="http://github.com/ry/node/wiki/modules">http://github.com/ry/node/wiki/modules</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4c8d6625-4990-477f-b40d-4074cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5423432e7e2367e4f5ed1ea4962e69d0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://geile-chefin.com" rel="nofollow">smegroume</a>						</strong>
+						<strong>said 
+						on Sep 12, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>nice blog man also really like the design</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4c8e110d-b9dc-4c58-b7c8-1915cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f7b3bd84fe59e41d1c7640ea58a0854e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.tech-wd.com" rel="nofollow">www.tech-wd.com</a>						</strong>
+						<strong>said 
+						on Sep 13, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Of course the king can hire a peon to wait for the servant to finish his call, tell the peon how to handle the results and ask it to report back to him - but that's a lot of trivia to deal with a rude servant. Off with his head!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ca50051-caa0-44a6-8ac5-13c7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=18dae55f4ac79bf593f3f56449c454a5&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://shapeshifting.comuv.com" rel="nofollow">a-dizzle</a>						</strong>
+						<strong>said 
+						on Sep 30, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Apparently I am taking a calculus class from Ryan Dahl's mother. She was talking about how her son made a bunch of money making this thing called "node.js" the other day. Small world...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ca5195d-f6cc-44e4-be89-718ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ffe189ca955d2ec509d122d826e3a0cb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							wjr&nbsp;						</strong>
+						<strong>said 
+						on Sep 30, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>How can I use this if my hosting site is something like godaddy.com or dreamhost?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ca56566-533c-4f49-9da6-649acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1d2b00ab49dfba5408e00b62d8b545a3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://brucelim.com/" rel="nofollow">bruce</a>						</strong>
+						<strong>said 
+						on Oct 01, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>just checking google 'nodejs hosting' came us these articles...</p>
+<p><a rel="nofollow" href="http://remysharp.com/2010/02/14/slicehost-nodejs-websockets/">http://remysharp.com/2010/02/14/slicehost-nodejs-websockets/</a></p>
+<p><a rel="nofollow" href="http://blog.nodejitsu.com/nodejs-cloud-server-in-three-minutes">http://blog.nodejitsu.com/nodejs-cloud-server-in-three-minutes</a></p>
+<p>this is a list from a stack overflow thread... hope that helps.<br />
+also joyent seemed to pop up alot.</br></p>
+<p>WebFaction<br />
+Heroku – Closed Beta</br><br />
+ElusiveHippo – Not Working</br><br />
+Prgmr</br><br />
+Slicehost</br><br />
+Linode</br><br />
+Amazon EC2</br><br />
+Rackspace Cloud</br><br />
+VPS.Net</br><br />
+Joyent</br><br />
+no.de – Closed Beta</br><br />
+DreamHostPS – Need a total reconfiguration of virtual machines</br><br />
+Webbynode – setup guide here</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cbe4da6-58a8-4d08-ae0b-2f8acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=03a9e38190ff8cf141bdc4390cb76161&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Cliff James&nbsp;						</strong>
+						<strong>said 
+						on Oct 20, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Just for clarification.  Node isn't a generic tool for doing event-based multi-threading right?  Isn't more about event-based async IO.  I mean if you were developing some kind of processor intensive task (no IO) that you wanted split across multiple cores, I don't see how Node helps you.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cbea101-930c-480c-abf9-6a2acbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 20, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Cliff James: It depends, but generally the distribution of CPU bound algorithms is not a strength of node, because you have to split tasks up into processes and use sockets for communicating between them (which is significant overhead in certain scenarios). So look at your problem and see if you can life with the IPC overhead or not.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc1b4bb-fb50-4d41-8570-1192cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5fc9ed9f23af20ba1f79d982205e7ad2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://twitter.com/marko999" rel="nofollow">Marko</a>						</strong>
+						<strong>said 
+						on Oct 22, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>very good introduction, best I have found for #nodejs...thanx</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

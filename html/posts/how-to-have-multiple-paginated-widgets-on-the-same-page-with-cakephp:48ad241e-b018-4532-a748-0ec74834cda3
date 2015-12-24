@@ -1,0 +1,821 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>How to have multiple paginated widgets on the same page with CakePHP &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/how-to-have-multiple-paginated-widgets-on-the-same-page-with-cakephp:48ad241e-b018-4532-a748-0ec74834cda3">How to have multiple paginated widgets on the same page with CakePHP</a></h2>	<div class="posted-on">
+		<p>Posted on 25/8/08 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>many of you might have run into the problem of having multiple boxes on the same page that need to be paginated. For example you might have a left column with a list of members of your site and a right column that shows for a example a list of forums. Yeah, that's not the best example, but you get the idea.</p>
+<p>So the problem with Cake's paginator is, that its link structure does not know which widget is actually paginated. Let's have a look at a typical url after you clicked a pagination link:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+/users/view/488070d4-f5c8-41aa-87aa-4a951490b5da/page:<span class="nu0">2</span></div>
+<p>Okay great. So imagine we have a UsersController with a view() action and our pagination passes in the page we would like to be on with regards to the list of users. Now, we click a pagination link in the communities box (let's call these boxes "widgets" from now on)... Yes you are right, the link will just look the same. So clicking on the pagination links in the community widget will just paginate our user list and the community list will stay at page 1. : /</p>
+<h2>Problem</h2>
+<p>How can we tell the CakePHP paginator which model it shall paginate?</p>
+<h2>The Solution</h2>
+<p>There are three things we need for this:</p>
+<ol>
+<li>We need to pass in the model that is being paginated to the structure.</li>
+<li>We need to ensure we stay on the same page type when we click on a pagination link.</li>
+<li>We need to extract the proper page variable from the url depending on the given model and put it into our pagination configuration.</li>
+</ol>
+<h2>1. Pass in the model that is being paginated to the structure</h2>
+<p>Okay what I would like to recommend to you here is to have a generic paging.ctp element, which could contain the following code:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$paginator</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'paging'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">return</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$model</span><span class="br0">&#41;</span> || <span class="re0">$paginator</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'paging'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$model</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'pageCount'</span><span class="br0">&#93;</span> &lt; <span class="nu0">2</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">return</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$options</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$options</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">?&gt;</span><br />
+&lt;div class=&quot;paging&quot;&gt;<br />
+&nbsp; <span class="kw2">&lt;?php</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$paginator</span>-&gt;<span class="me1">prev</span><span class="br0">&#40;</span><span class="st0">'&lt;&lt; Previous'</span>, <a href="http://www.php.net/array_merge"><span class="kw3">array_merge</span></a><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'escape'</span> =&gt; <span class="kw2">false</span>, <span class="st0">'class'</span> =&gt; <span class="st0">'prev'</span><span class="br0">&#41;</span>, <span class="re0">$options</span><span class="br0">&#41;</span>, <span class="kw2">null</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'class'</span> =&gt; <span class="st0">'disabled'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$paginator</span>-&gt;<span class="me1">numbers</span><span class="br0">&#40;</span>am<span class="br0">&#40;</span><span class="re0">$options</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'before'</span> =&gt; <span class="kw2">false</span>, <span class="st0">'after'</span> =&gt; <span class="kw2">false</span>, <span class="st0">'separator'</span> =&gt; <span class="kw2">false</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$paginator</span>-&gt;<span class="me1">next</span><span class="br0">&#40;</span><span class="st0">'Next &gt;&gt;'</span>, <a href="http://www.php.net/array_merge"><span class="kw3">array_merge</span></a><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'escape'</span> =&gt; <span class="kw2">false</span>, <span class="st0">'class'</span> =&gt; <span class="st0">'next'</span><span class="br0">&#41;</span>, <span class="re0">$options</span><span class="br0">&#41;</span>, <span class="kw2">null</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'class'</span> =&gt; <span class="st0">'disabled'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw2">?&gt;</span><br />
+&lt;/div&gt;</div>
+<p>By that you ensure that the pagination texts are consistent throughout your application - something that is desirable in most cases. However, the most important reason for this is that we have all the fancy logic to make this hack work in one place and reusable for all widgets.</p>
+<p>Here is how you would call the paging element for your Users index list out of your views:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;"><span class="kw2">&lt;?php</span><br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$this</span>-&gt;<span class="me1">element</span><span class="br0">&#40;</span><span class="st0">'paging'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'model'</span> =&gt; <span class="st0">'User'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<span class="kw2">?&gt;</span></div>
+<p>Let's go over the element's code now. Firstly, we check if we need to do paging - if a model is supplied and if its pageCount is greater than 1. We then supply a link structure for the paging links, including a previous and a next link and numbers. If you have worked with Cake's pagination before, this should be all very familiar to you.</p>
+<p>Now on to making our fancy logic work.</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$paginator</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'paging'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">return</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$model</span><span class="br0">&#41;</span> || <span class="re0">$paginator</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'paging'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$model</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'pageCount'</span><span class="br0">&#93;</span> &lt; <span class="nu0">2</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">return</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$options</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$options</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="re0">$options</span><span class="br0">&#91;</span><span class="st0">'model'</span><span class="br0">&#93;</span> = <span class="re0">$model</span>;<br />
+<span class="re0">$options</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'model'</span><span class="br0">&#93;</span> = <span class="re0">$model</span>;<br />
+<span class="re0">$paginator</span>-&gt;__defaultModel = <span class="re0">$model</span>;<br />
+<span class="kw2">?&gt;</span><br />
+&lt;div class=&quot;paging&quot;&gt;<br />
+&nbsp; <span class="kw2">&lt;?php</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$paginator</span>-&gt;<span class="me1">prev</span><span class="br0">&#40;</span><span class="st0">'&lt;&lt; Previous'</span>, <a href="http://www.php.net/array_merge"><span class="kw3">array_merge</span></a><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'escape'</span> =&gt; <span class="kw2">false</span>, <span class="st0">'class'</span> =&gt; <span class="st0">'prev'</span><span class="br0">&#41;</span>, <span class="re0">$options</span><span class="br0">&#41;</span>, <span class="kw2">null</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'class'</span> =&gt; <span class="st0">'disabled'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$paginator</span>-&gt;<span class="me1">numbers</span><span class="br0">&#40;</span>am<span class="br0">&#40;</span><span class="re0">$options</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'before'</span> =&gt; <span class="kw2">false</span>, <span class="st0">'after'</span> =&gt; <span class="kw2">false</span>, <span class="st0">'separator'</span> =&gt; <span class="kw2">false</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$paginator</span>-&gt;<span class="me1">next</span><span class="br0">&#40;</span><span class="st0">'Next &gt;&gt;'</span>, <a href="http://www.php.net/array_merge"><span class="kw3">array_merge</span></a><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'escape'</span> =&gt; <span class="kw2">false</span>, <span class="st0">'class'</span> =&gt; <span class="st0">'next'</span><span class="br0">&#41;</span>, <span class="re0">$options</span><span class="br0">&#41;</span>, <span class="kw2">null</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'class'</span> =&gt; <span class="st0">'disabled'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw2">?&gt;</span><br />
+&lt;/div&gt;</div>
+<p>We are passing the model to the $options array and set a private paginator variable to the $model value. Yeah, that's the ugly part about this hack. However, since we have it only in one place we can live with it. With that code in place, your links render fine and supply the model that needs to be paginated. Our link would now look like:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+/users/view/488070d4-f5c8-41aa-87aa-4a951490b5da/page:<span class="nu0">2</span>/model:User</div>
+<p>Keep in mind we have this all configurable when calling the paging element. You can even pass in your own options array to the element if you want to go any further with this.</p>
+<h2>2. We need to ensure we stay on the same page type when we click on a pagination link</h2>
+<p>Imagine that you want to display your paginated widgets not only on one page, the users index, but also on /users/view/[ID]. How do we let the paginator know we want to stay on the same user page? Let me rephrase, how do we supply the user ID in a consistent manner to the pagination links, so that if a pagination link in a widget is clicked, it redirects you back to /users/view/[ID], but with the widget being at the proper page.</p>
+<p>The code for this is relatively easy, but I am not so happy with the solution yet. What I did is check for a certain variable that would *only* occur on the said pages, like /users/view:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$community</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$options</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <span class="re0">$community</span><span class="br0">&#91;</span><span class="st0">'Community'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'id'</span><span class="br0">&#93;</span>;<br />
+<span class="br0">&#125;</span> <span class="kw1">elseif</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$user</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$options</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <span class="re0">$user</span><span class="br0">&#91;</span><span class="st0">'User'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'id'</span><span class="br0">&#93;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>So, if a $user variable is set, we assume we are on a user specific page. Same for a community... , a forum post, etc.. I feel bad about this part, because that could so easily be buggy. I won't present another approach I had in mind for this, because I would like you guys to discuss the one presented here first. : ]</p>
+<p>Here is the pagination element in its entirety:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$paginator</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'paging'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">return</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$model</span><span class="br0">&#41;</span> || <span class="re0">$paginator</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'paging'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$model</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'pageCount'</span><span class="br0">&#93;</span> &lt; <span class="nu0">2</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">return</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$options</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$options</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="re0">$options</span><span class="br0">&#91;</span><span class="st0">'model'</span><span class="br0">&#93;</span> = <span class="re0">$model</span>;<br />
+<span class="re0">$options</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'model'</span><span class="br0">&#93;</span> = <span class="re0">$model</span>;<br />
+<span class="re0">$paginator</span>-&gt;__defaultModel = <span class="re0">$model</span>;<br />
+<br />
+<span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$community</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$options</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <span class="re0">$community</span><span class="br0">&#91;</span><span class="st0">'Community'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'id'</span><span class="br0">&#93;</span>;<br />
+<span class="br0">&#125;</span> <span class="kw1">elseif</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$user</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$options</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <span class="re0">$user</span><span class="br0">&#91;</span><span class="st0">'User'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'id'</span><span class="br0">&#93;</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="kw2">?&gt;</span><br />
+&lt;div class=&quot;paging&quot;&gt;<br />
+&nbsp; <span class="kw2">&lt;?php</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$paginator</span>-&gt;<span class="me1">prev</span><span class="br0">&#40;</span><span class="st0">'&lt;&lt; Previous'</span>, <a href="http://www.php.net/array_merge"><span class="kw3">array_merge</span></a><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'escape'</span> =&gt; <span class="kw2">false</span>, <span class="st0">'class'</span> =&gt; <span class="st0">'prev'</span><span class="br0">&#41;</span>, <span class="re0">$options</span><span class="br0">&#41;</span>, <span class="kw2">null</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'class'</span> =&gt; <span class="st0">'disabled'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$paginator</span>-&gt;<span class="me1">numbers</span><span class="br0">&#40;</span>am<span class="br0">&#40;</span><span class="re0">$options</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'before'</span> =&gt; <span class="kw2">false</span>, <span class="st0">'after'</span> =&gt; <span class="kw2">false</span>, <span class="st0">'separator'</span> =&gt; <span class="kw2">false</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$paginator</span>-&gt;<span class="me1">next</span><span class="br0">&#40;</span><span class="st0">'Next &gt;&gt;'</span>, <a href="http://www.php.net/array_merge"><span class="kw3">array_merge</span></a><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'escape'</span> =&gt; <span class="kw2">false</span>, <span class="st0">'class'</span> =&gt; <span class="st0">'next'</span><span class="br0">&#41;</span>, <span class="re0">$options</span><span class="br0">&#41;</span>, <span class="kw2">null</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'class'</span> =&gt; <span class="st0">'disabled'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw2">?&gt;</span><br />
+&lt;/div&gt;</div>
+<h2>3. Extract the proper page variable from the url</h2>
+<p>So it seems we got the frontend part done. Let's have a look at some code for the backend to make this work. For the users list, your code to paginate the users might likely look like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">paginate</span><span class="br0">&#91;</span><span class="st0">'User'</span><span class="br0">&#93;</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; <span class="st0">'contain'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Profile'</span><span class="br0">&#41;</span>,<br />
+&nbsp; <span class="st0">'order'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'User.name'</span> =&gt; <span class="st0">'asc'</span><span class="br0">&#41;</span>,<br />
+&nbsp; <span class="st0">'limit'</span> =&gt; <span class="nu0">20</span><br />
+<span class="br0">&#41;</span>;<br />
+<span class="re0">$users</span> = <span class="re0">$this</span>-&gt;<span class="me1">paginate</span><span class="br0">&#40;</span><span class="st0">'User'</span><span class="br0">&#41;</span>;</div>
+<p>Straightforward, we need 20 users paginated. Now we need to investigate the url to check if the user model is given in a reusable manner, so that this will work for all paginations of all models:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="coMULTI">/**<br />
+&nbsp;* undocumented function<br />
+&nbsp;*<br />
+&nbsp;* @param string $model <br />
+&nbsp;* @return void<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; <span class="kw2">function</span> pageForPagination<span class="br0">&#40;</span><span class="re0">$model</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$page</span> = <span class="nu0">1</span>;<br />
+&nbsp; &nbsp; <span class="re0">$sameModel</span> = <a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'named'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'model'</span><span class="br0">&#93;</span><span class="br0">&#41;</span> &amp;&amp; <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'named'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'model'</span><span class="br0">&#93;</span> == <span class="re0">$model</span>;<br />
+&nbsp; &nbsp; <span class="re0">$pageInUrl</span> = <a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'named'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'page'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$sameModel</span> &amp;&amp; <span class="re0">$pageInUrl</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$page</span> = <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'named'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'page'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">passedArgs</span><span class="br0">&#91;</span><span class="st0">'page'</span><span class="br0">&#93;</span> = <span class="re0">$page</span>;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$page</span>;<br />
+&nbsp; <span class="br0">&#125;</span></div>
+<p>The trick is this handy little function that you place in your AppController class. It analyzes the url's given model and extracts the page. If the model is not given, it defaults to page 1. By that we ensure the widget that is being paginated is put on the right page and the other ones stay at page 1.</p>
+<p>Here is the rewritten controller code:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$page</span> = <span class="re0">$this</span>-&gt;<span class="me1">pageForPagination</span><span class="br0">&#40;</span><span class="st0">'User'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$this</span>-&gt;<span class="me1">paginate</span><span class="br0">&#91;</span><span class="st0">'User'</span><span class="br0">&#93;</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; <span class="st0">'contain'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Profile'</span><span class="br0">&#41;</span>,<br />
+&nbsp; <span class="st0">'order'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Profile.name'</span> =&gt; <span class="st0">'asc'</span><span class="br0">&#41;</span>,<br />
+&nbsp; <span class="st0">'limit'</span> =&gt; <span class="nu0">20</span>,<br />
+&nbsp; <span class="st0">'page'</span> =&gt; <span class="re0">$page</span><br />
+<span class="br0">&#41;</span>;<br />
+<span class="re0">$users</span> = <span class="re0">$this</span>-&gt;<span class="me1">paginate</span><span class="br0">&#40;</span><span class="st0">'User'</span><span class="br0">&#41;</span>;</div>
+<p>Don't forget to supply the calculated page in your pagination config.</p>
+<p>Now you are totally free for the other widgets. For example the pagination code for your community widget would look like this now:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$page</span> = <span class="re0">$this</span>-&gt;<span class="me1">pageForPagination</span><span class="br0">&#40;</span><span class="st0">'Community'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$this</span>-&gt;<span class="me1">paginate</span><span class="br0">&#91;</span><span class="st0">'Community'</span><span class="br0">&#93;</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; <span class="st0">'contain'</span> =&gt; <span class="kw2">false</span>,<br />
+&nbsp; <span class="st0">'order'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Community.title'</span> =&gt; <span class="st0">'asc'</span><span class="br0">&#41;</span>,<br />
+&nbsp; <span class="st0">'limit'</span> =&gt; <span class="nu0">5</span>,<br />
+&nbsp; <span class="st0">'page'</span> =&gt; <span class="re0">$page</span><br />
+<span class="br0">&#41;</span>;<br />
+<span class="re0">$communities</span> = <span class="re0">$this</span>-&gt;<span class="me1">paginate</span><span class="br0">&#40;</span><span class="st0">'Community'</span><span class="br0">&#41;</span>;</div>
+<p>Alrighty, that's it for paginating multiple widgets on the same page with CakePHP. As you see, the hack did not involve a lot of fancy logic, which really is a plus for Cake's paginator. You might wonder why CakePHP does not offer this functionality in the first place. Well, it doesn't yet, but since pagination might be redone in the future chances are good it will support this out of the core at some point.</p>
+<p>Also keep in mind we want to promote the use of the controller's $paginate property. In this article I overwrite it for the action used. You might want to move the parameters that aren't changed up to the $params property initialisation.</p>
+<p>Have a good one!</p>
+<p>-- Tim Koschuetzki aka DarkAngelBGE<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/48ad241e-b018-4532-a748-0ec74834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-have-multiple-paginated-widgets-on-the-same-page-with-cakephp%3A48ad241e-b018-4532-a748-0ec74834cda3 &amp;title=How+to+have+multiple+paginated+widgets+on+the+same+page+with+CakePHP';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-have-multiple-paginated-widgets-on-the-same-page-with-cakephp%3A48ad241e-b018-4532-a748-0ec74834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-have-multiple-paginated-widgets-on-the-same-page-with-cakephp%3A48ad241e-b018-4532-a748-0ec74834cda3&amp;title=How+to+have+multiple+paginated+widgets+on+the+same+page+with+CakePHP&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-have-multiple-paginated-widgets-on-the-same-page-with-cakephp%3A48ad241e-b018-4532-a748-0ec74834cda3&amp;title=How+to+have+multiple+paginated+widgets+on+the+same+page+with+CakePHP';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/bringing-the-cold-war-to-cakephp-12-the-containable-behavior:480f4dd6-2b50-4d7b-ab05-418dcbdd56cb">Bringing the cold war to CakePHP 1.2 - The Containable Behavior</a></li>
+							<li><a href="/posts/cakephp-goes-10:480f4dd5-9008-4af0-b2e7-4c46cbdd56cb">CakePHP goes 1.0!</a></li>
+							<li><a href="/posts/slides-for-my-cakephp-unit-testing-talk:480f4dfe-4880-4b82-9a52-4bd8cbdd56cb">Slides for my CakePHP Unit Testing Talk</a></li>
+							<li><a href="/posts/using-cakephp-in-external-php-systems-cmss-weblogs-etc:480f4dd5-ed94-4186-acda-4443cbdd56cb">Using CakePHP in external PHP Systems (CMS&#039;s, Weblogs, etc.)</a></li>
+							<li><a href="/posts/cakephp-12-manual:480f4dfe-2080-491a-a22c-43e6cbdd56cb">CakePHP 1.2 Manual</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/10-days-of-free-dessert-cakephp-tips:480f4dd5-1da4-4248-91f4-4043cbdd56cb">10 Days of free Dessert! (CakePHP Tips)</a></li>
+							<li><a href="/posts/4-cakephp-tricks:4811ad82-32dc-4a38-bc10-36304834cda3">Two CakePHP tricks</a></li>
+							<li><a href="/posts/command-line-fun-in-cakephp-12:480f4dd6-7ecc-41d1-83bb-43d2cbdd56cb">Command line fun in CakePHP 1.2</a></li>
+							<li><a href="/posts/with-jquery-cakephp-to-world-domination-slides:480f4dd6-7cb8-4e84-af4f-4dc6cbdd56cb">With jQuery &amp; CakePHP to World Domination (Slides)</a></li>
+							<li><a href="/posts/job-interested-in-working-on-a-huge-cakephp-project:480f4dd6-55b4-43ae-9e63-491dcbdd56cb">[Job] Interested in working on a huge CakePHP project?</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/how-to-have-multiple-paginated-widgets-on-the-same-page-with-cakephp:48ad241e-b018-4532-a748-0ec74834cda3">23 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/how-to-have-multiple-paginated-widgets-on-the-same-page-with-cakephp:48ad241e-b018-4532-a748-0ec74834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-48b3be09-ea98-48a4-ae9c-2cdd4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=32378c4f76f261d63c3c3a941054e440&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.neilcrookes.com" rel="nofollow">Neil Crookes</a>						</strong>
+						<strong>said 
+						on Aug 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice solution Tim. I would make the pageForPagination() function protected to imply that it isn't an action. I wonder what <a rel="nofollow" href="http://www.debuggable.com/posts/programming-psychology-ii-private-methods:481ed862-b0d8-4a0e-9247-165c4834cda3">Felix would say</a> to that though.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b3beee-a138-49ff-9ae2-2cdd4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=32378c4f76f261d63c3c3a941054e440&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.neilcrookes.com" rel="nofollow">Neil Crookes</a>						</strong>
+						<strong>said 
+						on Aug 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It would be cool to be able to paginate through multiple lists at the same time though wouldn't it? For example, consider a page with 2 columns, left for users, right for forum posts. You paginate through the list of users looking for someone then once you've found the person you're looking for, you can then paginate through his posts. (Another weird example I know, but it could happen... maybe)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d13098-df6c-44ea-8f8a-56984834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f0e51b26b8683f7040348037db33fd71&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.iteisa.com" rel="nofollow">Jaime Gómez Obregón</a>						</strong>
+						<strong>said 
+						on Sep 17, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>So "page 2 for model A" should look like /page:2/model:A.</p>
+<p>But... how should the URL's look like if you want to show page:2 for model A and page 5 for model B?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d131c8-0e10-4f0a-bef9-4fd94834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f0e51b26b8683f7040348037db33fd71&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.iteisa.com" rel="nofollow">Jaime Gómez Obregón</a>						</strong>
+						<strong>said 
+						on Sep 17, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I mean, you have to use AJAX for the pagination, because otherwise the table you are not paging will be affected. The only issue is that you cannot freeze (permalink) a given state of the pages, but that should not be a big problem.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d6ac94-d944-4194-9e3c-46fb4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=edb4a8148e13b761ca46d971136e54b9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Brian&nbsp;						</strong>
+						<strong>said 
+						on Sep 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'm wondering something similar. How can we sort multiple models at the same time on the same page?</p>
+<p>For example, if you have a model Foo that hasMany Bar and Baz records and you want to let the user sort the columns in the html tables showing the Bar and Baz records belonging to a Foo record. Then when you sort on one column in the Bar table and then on a column in the Baz table, both sorts will persist after the page reloads.</p>
+<p>Can your solution adapt to allow such a mechanism?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-490ebafa-3c5c-4a12-bb57-1f944834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=06b48ad3cc978988141bbb8686f37c84&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.sanchanworld.com" rel="nofollow">Sanjeev</a>						</strong>
+						<strong>said 
+						on Nov 03, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>How can i avoid executing the function using following way<br />
+/user/view/page:2/limit:10. I mean i want to avoid the special parameters</br><br />
+I heard that we can set this in our pagination function. but i dont know how exactly to set</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4926dfcf-48d8-49ac-8d7b-3f204834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Nov 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Neil Crookes and Jaime Gómez Obregón : Since you guys propose the same thing, I will answer you both. : ) Yeah well it should be possible to do this. However, I haven't included that in this version of the code. It's going to be interesting - to keep the same pages for different models without using ajax.</p>
+<p>Brian: Not at the moment. But I will have a look.</p>
+<p>Sanjeev: I don't quite understand what you try to do. Can you explain it some more please?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49ca57c2-0ae0-4f64-8d50-2fc74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2c81da652f7f7b9f7888eb5ce7c76f3f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.sebgalarneau.com" rel="nofollow">Sebastien G.</a>						</strong>
+						<strong>said 
+						on Mar 25, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks a lot Tim, was very useful for my quick search field on my home page to search and display multiple models.</p>
+<p>Great !</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49ca5ece-e108-4376-932e-7ce34834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Mar 25, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Glad it helped you. :]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49ca8ab0-8bcc-4474-9411-07ee4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6d89fd8ab744c73cdb38595d86475896&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Robin&nbsp;						</strong>
+						<strong>said 
+						on Mar 25, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Tim,</p>
+<p>first i want to thank you for this post!<br />
+But i still have a problem, because my website is multilingual (english, german) and normally my links should look like: /deu/actual/index</br><br />
+But now with the hack they are going to look like this: /actual/index/page:2/language:deu/model:Project</br><br />
+I tried to fix this by myself, but no chance - iam a cakephp newbie ;-)</br><br />
+can you give me a hint how to change the links back correctly?</br></p>
+<p>Thanks a lot!<br />
+Robin</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49caaa43-8900-4ea3-8dbe-457f4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Mar 25, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well in the paging widget you could put in something like</p>
+<p>if (isset($url)) {<br />
+	$options['url'][] = $url;</br><br />
+}</br></p>
+<p>and then pass an url in your paging element and see if you can get it working. :]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49ccba38-2e44-43bd-8547-17b84834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6d89fd8ab744c73cdb38595d86475896&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Robin&nbsp;						</strong>
+						<strong>said 
+						on Mar 27, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Tim, thanks for your answer...</p>
+<p>but i cant solve the problem anyway.<br />
+what ive tried to do is:</br></p>
+<p>$options['model'] = $model;<br />
+$options['url']['model'] = $model;</br><br />
+$paginator->__defaultModel = $model;</br></p>
+<p>$options['url'][] = $this->params['language'];<br />
+$options['url'][] = $this->params['controller'];</br><br />
+$options['url'][] = $this->params['action'];</br><br />
+$options['url'][] = $this->params['pass'][0];</br></p>
+<p>so, now my url looks this way: /actual/view/deu/actual/view/1/page:2/model:Project/language:deu</p>
+<p>you can see i put language/controller/action/param[0] into the link, but its always additional to the first /controller/action and i dont know how to delete this from the link.</p>
+<p>Also there is "language:deu" as last parameter given... why the hell? ;-)</p>
+<p>I hope you understand my problem...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49fc1802-da18-4f6f-b7d7-3daa4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e3151de8c92d9dbdb69f4db602d5400c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							m&nbsp;						</strong>
+						<strong>said 
+						on May 02, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Good morning.<br />
+Task: two pagination widgets paginating over Model1 and Model2.</br><br />
+Applied solution: mentioned above (Tim) except the lines in pagination element (i haven't apply them at all):</br><br />
+      if (isset($community)) {</br><br />
+          $options['url'][] = $community['Community']['id'];</br><br />
+      } elseif (isset($user)) {</br><br />
+          $options['url'][] = $user['User']['id'];</br><br />
+        }</br><br />
+Problem: I have to remember both page number for Model1 and page number for Model 2.</br><br />
+So I did: change the function pageForPagination(Model) to:</br><br />
+           pageForPagination(Model, old_page)</br><br />
+    where old_page is old page for Model - remembered in session</br><br />
+Still problem: in browser - pagination for Model1 (which is the first one at the code) don't work. (Clicking on it does nothing). And pagination for Model2 alter pages for Model1 and Model2 (eg. in Model2 ->page2, in Model1 ->page2).</br><br />
+What i did: after a lot of tries and errors, in source code of paginate - cake/libs/controller/controller.php line 975:</br><br />
+$options = array_merge($this->params, $this->params['url'], $this->passedArgs);</br><br />
+change:</br><br />
+$options = array_merge($this->params, $this->params['url']);</br></p>
+<p>And it works fine.<br />
+My question: is it safe? maybe it will broke sth in future?</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49feb84f-c8d0-44d0-9388-0cc34834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on May 04, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yeah well, hacking the cake core is never a good idea.</p>
+<p>Of the top of my head I feel you should set the session value to this->params['paging'] in the controller, so it is sent to your view.</p>
+<p>Maybe you can show your entire code?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49ff08ad-9cd4-49ff-8ba9-66064834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e3151de8c92d9dbdb69f4db602d5400c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							m&nbsp;						</strong>
+						<strong>said 
+						on May 04, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>First of all, i thank you for help. It is not exactly "hack", because (for brevity) i didn't mention that i've copied all paginate function to my app_controller.php. And then changed it.<br />
+As far as i know, original paginate function takes the parametr from options supplied in controller ($this->params) and then parametr supplied in url ($this->passedArgs). So, as you say - the best way would be supply in the url all parameters. I would have to recognize which 'number of page' parameter is for which model. Cake don't make it easier and force the format:</br><br />
+.../page:4/model:User (for example). It would be messy, when i would put there my additional paging parameters, i think.</br></p>
+<p>In my controller, i've two functions: yours pageForPagination (a bit changed)<br />
+function pageForPagination($model, $page)</br><br />
+{</br><br />
+    if(empty($page)) $page=1;</br><br />
+    ...</br></p>
+<p>, and my, which does whole needed pagination task:</p>
+<p>function doPagination($model, $pagination_data,$conditions)<br />
+{</br><br />
+     $session_page=($this->Session->check("page_$model"))?</br><br />
+                    $this->Session->read("page_$model"):null;</br><br />
+     $page_model = $this->pageForPagination($model, $session_page);</br><br />
+     $this->Session->write("page_$model", $page_model);</br><br />
+     $this->paginate[$model] = array_merge($pagination_data,</br><br />
+                                           array('page'=>$page_model));</br><br />
+     return $this->paginate($model,$conditions);</br><br />
+}</br></p>
+<p>Where $conditions is additional data for finding in model. Then, what doPagination return, i set to view (and then to my pagination element):</p>
+<p>$this->set('Model1_data', /* result from pagination*/);<br />
+$this->set('Model1_additional_args', /* additional args i need in url */);</br></p>
+<p>The same for model2.<br />
+my pagination element takes two arguments: $model - model name, and $additional_args - additional args to paste in url, and then:</br></p>
+<p>...<br />
+$options['model'] = $model;</br><br />
+$options['url']['model'] = $model;</br><br />
+$paginator->__defaultModel = $model;</br></p>
+<p>if(!empty($additional_args))<br />
+{</br><br />
+    if(is_array($additional_args))</br><br />
+    {</br><br />
+        foreach($additional_args as $arg)</br><br />
+            $options['url'][]=$arg;</br><br />
+    }</br><br />
+    else $options['url'][]=$additional_args;</br><br />
+}</br></p>
+<p>  echo $paginator->prev('Previous',<br />
+                        array_merge(</br><br />
+                              array('escape' => false, 'class' => 'prev'),</br><br />
+                              $options),</br><br />
+                        null,</br><br />
+                        array('class' => 'disabled')</br><br />
+                       );</br><br />
+ ... /* numbers, and next in analogous way */</br></p>
+<p>On the other hand, if i would somehow manage all these parameters in url, remembering the numbers of pages in session will not be needed.</p>
+<p>cheers,<br />
+m</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a359953-3700-4553-b096-76864834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bf888894a4c60e6658c85f18f07ba87e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Chris&nbsp;						</strong>
+						<strong>said 
+						on Jun 15, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The params not work for me... they are only available in the controller that is requested.. changed it to this:</p>
+<p>[CODE]<br />
+$params = Dispatcher::parseParams(Dispatcher::uri());</br><br />
+		$sameModel = isset($params['named']['model']) && $params['named']['model'] == $model;</br><br />
+		$pageInUrl = isset($params['named']['page']);		</br></p>
+<p>		if ($sameModel && $pageInUrl) {<br />
+		  $page = $params['named']['page'];</br><br />
+		}</br></p>
+<p>		$this->passedArgs['page'] = $page;<br />
+		return $page;</br><br />
+[/code]</br></p>
+<p>And it works... but still need to fix sort.. cause it ignores the model</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a5b3255-baf4-4d52-ab77-0d624834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d178520f4807af80972739cf4978bac7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Daniel Voyce&nbsp;						</strong>
+						<strong>said 
+						on Jul 13, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Chris,</p>
+<p>Could you post your code in its entirity please? I cant work out which part you have replaced with what. I have a page with 8 different widgets on it and trying to paginate them all independently</p>
+<p>Dan</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a5b3c3e-a05c-4e7b-96b4-25554834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bf888894a4c60e6658c85f18f07ba87e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Chris&nbsp;						</strong>
+						<strong>said 
+						on Jul 13, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I changed the code that goes in appmodel.. function pageForPagination</p>
+<p>I dont have the code anymore don't ask.. hehe but am pretty sure it went like this.</p>
+<p>  function pageForPagination($model) {<br />
+    $page = 1;</br><br />
+    $params = Dispatcher::parseParams(Dispatcher::uri());</br><br />
+	$sameModel = isset($params['named']['model']) && $params['named']['model'] == $model;</br><br />
+	$pageInUrl = isset($params['named']['page']);</br></p>
+<p>	if ($sameModel && $pageInUrl) {<br />
+	$page = $params['named']['page'];</br><br />
+	}</br></p>
+<p>	$this->passedArgs['page'] = $page;<br />
+	return $page;</br><br />
+  }</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a5b3dfc-3488-4580-a9bd-271f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d178520f4807af80972739cf4978bac7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Daniel Voyce&nbsp;						</strong>
+						<strong>said 
+						on Jul 13, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ok im with you now :) Did you get it working in the end?</p>
+<p>thanks for the quick reply dude!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b033449-528c-45a8-9866-22fbcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7133eb1ee4779e53e87c0701d5bfed26&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://med.fora.pl/" rel="nofollow">PRIDGIGULNERN</a>						</strong>
+						<strong>said 
+						on Nov 17, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Bonjour, debuggable.com!<br />
+<a rel="nofollow" href=<a rel="nofollow" href="http://meds.fora.pl/>Acheter">http://meds.fora.pl/>Acheter</a> du viagra   <a rel="nofollow" href=<a rel="nofollow" href="http://medsonline.fora.pl/>Acheter">http://medsonline.fora.pl/>Acheter</a> du viagra   <a rel="nofollow" href=<a rel="nofollow" href="http://onlinefarmacia.fora.pl/>">http://onlinefarmacia.fora.pl/></a> viagra en ligne  <a rel="nofollow" href=<a rel="nofollow" href="http://masar.fora.pl/>">http://masar.fora.pl/></a> viagra online  <a rel="nofollow" href=<a rel="nofollow" href="http://med.fora.pl/>Acheter">http://med.fora.pl/>Acheter</a> du viagra online</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b06cbdd-e990-4a43-8fc3-7332cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f048632b7464e52caa74687da5ff3c91&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://c3library.com/" rel="nofollow">HockBoord</a>						</strong>
+						<strong>said 
+						on Nov 20, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hello<br />
+<a rel="nofollow" href="http://www.geomaticsoman.com/">http://www.geomaticsoman.com/</a> - buy generic ambien</br></p>
+<p>Most insomniacs would be happy to know that there is a drug called Ambien (Zoldipem) which can treat their insomnia.<br />
+<a rel="nofollow" href=<a rel="nofollow" href="http://www.geomaticsoman.com/>generic">http://www.geomaticsoman.com/>generic</a> ambien</br><br />
+ Save big money ordering Ambien (Zolpidem) in bulk.</br><br />
+<a rel="nofollow" href=<a rel="nofollow" href="http://www.geomaticsoman.com/>purchase">http://www.geomaticsoman.com/>purchase</a> ambien</br></p>
+<p>Most insomniacs would be happy to know that there is a drug called Ambien (Zoldipem) which can treat their insomnia.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b0a1b4c-25e0-4924-9dd9-0796cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9a3ec2b5f253a74cf3cbcb85435f2fa6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Vinod&nbsp;						</strong>
+						<strong>said 
+						on Nov 23, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hello Tim,<br />
+Great article. But I have some different problem, I need to use multiple pagination widget on same page for same 'Model'. So could you please suggest any way how to achieve this.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b0a8ff3-b29c-4d7b-84f3-149dcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Nov 23, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Vinoid,</p>
+<p>well this is very hard as Cake uses the pagination parameters to build the pagination links. Your second call to controller->paginate() would overwrite these parameters. Without a bigger core hack this will be very hard to do.</p>
+<p>What's your usecase? Maybe you could look at ajaxing all of these pagination lists, so that you only have to paginate one list at the same time.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

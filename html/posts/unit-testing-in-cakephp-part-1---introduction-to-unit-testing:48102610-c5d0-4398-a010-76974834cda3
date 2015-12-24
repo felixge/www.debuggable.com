@@ -1,0 +1,761 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Unit Testing in CakePHP Part 1 - Introduction to Unit Testing &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/unit-testing-in-cakephp-part-1---introduction-to-unit-testing:48102610-c5d0-4398-a010-76974834cda3">Unit Testing in CakePHP Part 1 - Introduction to Unit Testing</a></h2>	<div class="posted-on">
+		<p>Posted on 6/5/08 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>So you want to read up on Unit Testing in CakePHP? That is great, testing can be such a help in finding bugs. It's a shame that so few clients dedicate a budget to it and then expect their application that contains a ton of complicated code to be stable nevertheless.</p>
+<p>Surprisingly, many people do not know yet what unit testing is. In this first part of a whole series you can get a good grasp of what it is and is not.</p>
+<h3>1.1 Introduction to Unit Testing</h3>
+<p>According to Wikipedia, unit testing is an automated procedure to ensure your software units work properly. Units are the smallest testable parts of an application. Meaning, they are procedures or functions in procedural programming and object methods in object oriented programming. Classes are also commonly referred to as being the units of the system. Quite a few JUnit (the first testing framework of the XUnit family - made for Java) folks do not like the term "Unit Testing" at all, because they think it is overused. They like to refer to Unit Testing as "Programmer Testing". No, we are not testing programmer here. But programmers are testing their own source code. To me it does not matter. Seriously, I could not care less. No matter what you think a unit is, you will understand what I am talking about here. For the sake of clarity, I will refer to it as "Unit Testing".</p>
+<p>The idea behind unit testing is that once you have a unit that you think works, you set up a testcase where you specify some input to the unit and compare the result of your unit with your expected result. You know about the expected result, because you know what your unit is doing (or you should know it). Well, you better know what your unit is supposed to do, or else you should not do programming in the first place... ; ) Then you run the tests and the CakePHP/&laquo;insert your framework here&raquo; testsuite tells you if they passed or if not, with some graceful message where the error occured.</p>
+<p>Now you have that testcase. Now you add testcases for t h a t input and this one. The advantage of this is that once you wrote the tests down they are there (cool, huh?) and you can hold on to them. There is no need anymore for you to open the browser and test everything manually again when you change your system. Instead, you add functionality, run the automated unit tests again, if they pass you are good to go, if they don't pass you broke something. Well, what if you broke something but your tests don't catch it? That's something that UT cannot do for you. You must make sure you have a good test coverage (<a href="http://en.wikipedia.org/wiki/Code_coverage">http://en.wikipedia.org/wiki/Code_coverage</a>) for UT to work very well for you. However, having not enough tests is still much better than having no tests, so....</p>
+<p>Typically, the order of the running of the tests should not matter. There might be special cases, but in well over 90% it does not. This should also be your goal, too, to have two different problems if two test cases fail. Keep them all isolated and you will sleep well. For most tests there is also not much configuration to be done. You specify the input, your expected result, crank the handle and evaluate how well you have done. You should typically be able to group tests together, too. When you run these groups you can get a good overview over large components of your system.</p>
+<p>If you use a framework - like CakePHP - you should also be able to run all tests to see how well your system works.</p>
+<p>Unit Testing also tells you when you are done with your work. If you get a green bar (ie all tests are passing) you are done  (except if there are more tests to add, heh). If you get a red bar, you got work to do. Simple.</p>
+<h3>1.2 So How Does It Work?</h3>
+<p>Unit Testing generally works with assertions that take two parameters - at least most of them do. The first one is your known expected result and the second one is the output of your unit based on your input. The testsuite then compares the expected result with the output of your unit. The CakePHP Testsuite in its current state strictly relies on http://simpletest.org and thereby inherits SimpleTest's assertions. Let's have a look at them:</p>
+<table>
+<thead>
+<tr>
+<th>Assertion</th>
+<th>What it does</th>
+<th>Example</th>
+</tr>
+</thead</p>
+<tbody>
+<tr>
+<td>assertTrue($x)</td>
+<td>Fail if $x is false</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">assertTrue</span><span class="br0">&#40;</span><span class="nu0">1</span> == <span class="kw2">true</span><span class="br0">&#41;</span>;</div>
+</td>
+</tr>
+<tr>
+<td>assertFalse($x)</td>
+<td>Fail if $x is true</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">assertFalse</span><span class="br0">&#40;</span><span class="nu0">1</span> === <span class="kw2">true</span><span class="br0">&#41;</span>;</div>
+</td>
+</tr>
+<tr>
+<td>assertNull($x)</td>
+<td>Fail if $x is set</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$variable</span> = <span class="kw2">null</span>;<br />
+<br />
+&nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertNull</span><span class="br0">&#40;</span><span class="re0">$variable</span><span class="br0">&#41;</span>;</div>
+</td>
+</tr>
+<tr>
+<td>assertNotNull($x)</td>
+<td>Fail if $x not set</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$variable</span> = <span class="st0">'something but not null'</span>;<br />
+<br />
+&nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertNotNull</span><span class="br0">&#40;</span><span class="re0">$variable</span><span class="br0">&#41;</span>;</div>
+</td>
+</tr>
+<tr>
+<td>assertIsA($x, $t)</td>
+<td>Fail if $x is not the class or type $t</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$tim</span> = <span class="kw2">new</span> Person;<br />
+&nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertIsA</span><span class="br0">&#40;</span><span class="re0">$tim</span>, <span class="st0">'Person'</span><span class="br0">&#41;</span>;</div>
+</td>
+</tr>
+<tr>
+<td>assertNotA($x, $t)</td>
+<td>Fail if $x is of the class or type $t</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$tim</span> = <span class="kw2">new</span> Person;<br />
+&nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertNotA</span><span class="br0">&#40;</span><span class="re0">$tim</span>, <span class="st0">'Animal'</span><span class="br0">&#41;</span>; <span class="co1">// or maybe I am? o_O</span></div>
+</td>
+</tr>
+<tr>
+<td>assertEqual($x, $y)</td>
+<td>Fail if $x == $y is false</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$fahrenheit</span> = <span class="nu0">50</span>;<br />
+&nbsp; <span class="re0">$celsius</span> = <span class="br0">&#40;</span><span class="nu0">5</span>/<span class="nu0">9</span><span class="br0">&#41;</span>*<span class="br0">&#40;</span><span class="re0">$fahrenheit</span><span class="nu0">-32</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertEqual</span><span class="br0">&#40;</span><span class="nu0">10</span>, <span class="re0">$celsius</span><span class="br0">&#41;</span>;</div>
+</td>
+</tr>
+<tr>
+<td>assertNotEqual($x, $y)</td>
+<td>Fail if $x == $y is true</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">assertNotEqual</span><span class="br0">&#40;</span><span class="st0">'5'</span>, <span class="nu0">5</span><span class="br0">&#41;</span>; <span class="co1">// fails, they are equal but not identical</span></div>
+</td>
+</tr>
+<tr>
+<td>assertWithinMargin($x, $y, $m)</td>
+<td>Fail if abs($x - $y) < $m is false</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">assertWithinMargin</span><span class="br0">&#40;</span><span class="nu0">10</span>, <span class="nu0">50</span>, <span class="nu0">60</span><span class="br0">&#41;</span>; <span class="co1">// passes</span><br />
+<br />
+&nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertWithinMargin</span><span class="br0">&#40;</span><span class="nu0">10</span>, <span class="nu0">50</span>, <span class="nu0">30</span><span class="br0">&#41;</span>; <span class="co1">// fails</span></div>
+</td>
+</tr>
+<tr>
+<td>assertOutsideMargin($x, $y, $m)</td>
+<td>Fail if abs($x - $y) < $m is true</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">assertOutsideMargin</span><span class="br0">&#40;</span><span class="nu0">10</span>, <span class="nu0">50</span>, <span class="nu0">60</span><span class="br0">&#41;</span>; <span class="co1">// fails</span><br />
+&nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertOutsideMargin</span><span class="br0">&#40;</span><span class="nu0">10</span>, <span class="nu0">50</span>, <span class="nu0">30</span><span class="br0">&#41;</span>; <span class="co1">// true</span></div>
+</td>
+</tr>
+<tr>
+<td>assertIdentical($x, $y)</td>
+<td>Fail if $x == $y is false or a type mismatch</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">assertIdentical</span><span class="br0">&#40;</span><span class="nu0">0</span>, <span class="kw2">false</span><span class="br0">&#41;</span>; <span class="co1">// will fail since 0 is not false</span></div>
+</td>
+</tr>
+<tr>
+<td>assertNotIdentical($x, $y)</td>
+<td>Fail if $x == $y is true and types match</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">assertIdentical</span><span class="br0">&#40;</span><span class="nu0">10</span>, <span class="nu0">100</span>/<span class="nu0">10</span>*<span class="nu0">5</span> - <span class="nu0">40</span><span class="br0">&#41;</span>;</div>
+</td>
+</tr>
+<tr>
+<td>assertReference($x, $y)</td>
+<td>Fail unless $x and $y are the same variable</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$a</span> = <span class="nu0">5</span>;<br />
+&nbsp; <span class="re0">$b</span> =&amp; <span class="re0">$a</span>;<br />
+&nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertReference</span><span class="br0">&#40;</span><span class="re0">$a</span>, <span class="re0">$b</span><span class="br0">&#41;</span>;</div>
+</td>
+</tr>
+<tr>
+<td>assertClone($x, $y)</td>
+<td>Fail unless $x and $y are identical copies, that means they are identical but not referenced</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$a</span> = <span class="nu0">5</span>;<br />
+&nbsp; <span class="re0">$b</span> = <span class="nu0">5</span>;<br />
+&nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertClone</span><span class="br0">&#40;</span><span class="re0">$a</span>, <span class="re0">$b</span><span class="br0">&#41;</span>; <span class="co1">// passes, 5 equals 5, but $a and $b are not references to each other</span></div>
+</td>
+</tr>
+<tr>
+<td>assertPattern($p, $x)</td>
+<td>Fail unless the regex $p matches $x</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">assertPattern</span><span class="br0">&#40;</span><span class="st0">'/hello/i'</span>, <span class="st0">'Hello world'</span><span class="br0">&#41;</span>;</div>
+</td>
+</tr>
+<tr>
+<td>assertNoPattern($p, $x)</td>
+<td>Fail if the regex $p matches $x</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">assertNoPattern</span><span class="br0">&#40;</span><span class="st0">'/heppo/i'</span>, <span class="st0">'Hello world'</span><span class="br0">&#41;</span>; <span class="co1">// passes</span></div>
+</td>
+</tr>
+<tr>
+<td>expectError($x)</td>
+<td>Swallows any upcoming matching error</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<a href="http://www.php.net/trigger_error"><span class="kw3">trigger_error</span></a><span class="br0">&#40;</span><span class="st0">'Catastrophe'</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; <span class="re0">$this</span>-&gt;<span class="me1">expectError</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+</td>
+</tr>
+<tr>
+<td>assert($e)</td>
+<td>Fail on failed expectation object $e; use SimpleTest's built in expectation objects to have fun here</td>
+<td>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;"><span class="kw2">&lt;?php</span><br />
+<span class="kw2">class</span> TestOfNetworking <span class="kw2">extends</span> UnitTestCase <span class="br0">&#123;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; ...<br />
+&nbsp; &nbsp; &nbsp; <span class="kw2">function</span> assertValidIp<span class="br0">&#40;</span><span class="re0">$ip</span>, <span class="re0">$message</span> = <span class="st0">'%s'</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assert</span><span class="br0">&#40;</span><span class="kw2">new</span> ValidIp<span class="br0">&#40;</span><span class="br0">&#41;</span>, <span class="re0">$ip</span>, <span class="re0">$message</span><span class="br0">&#41;</span>; <span class="co1">// uses validIp expectation</span><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="kw2">function</span> testGetValidIp<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$server</span> = <span class="kw2">&amp;new</span> Server<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertValidIp</span><span class="br0">&#40;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$server</span>-&gt;<span class="me1">getIp</span><span class="br0">&#40;</span><span class="br0">&#41;</span>,<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'Server IP address-&gt;%s'</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="kw2">?&gt;</span></div>
+</td>
+</tr>
+<p></tbdoy><br />
+</table</p>
+<p>So, with the custom assert() function, mentioned last in the table, you can build your own assertions keeping your code really clean. The others should be straightforward. If not, head on over to http://simpletest.org and read the documentation there.</p>
+<p>When any of these assertions fail, you will be presented an error message telling you which test failed, on which line and what the error is. What if you want to supply your own error messages - for example to better mark an often failing test? You can do that in simpletest pretty easily. Just append your custom message as the last parameter to the assertion:</p>
+<p>$this->assertTrue(1, 'This should pass');</p>
+<p>You will notice that it replaces the automatic error message. If you want to embed your custom message within the automatic one, use %s:</p>
+<p>$this->assertTrue(1, 'This should pass: %s');</p>
+<h3>1.2 A quick SimpleTest example</h3>
+<p>Okay so before we are going to jump onto the cake test wagon let's look at a real world simpletest example. That way it will be easier for us to deal with cake's testsuite later.</p>
+<p>So here is the problem:</p>
+<p>You want to calculate the costs for a given trip (to a cakefest). You get: $flightPrice, $hotelCosts and expenses for food and drinks ($otherExpenses). You know you will need more money since gwoo (the president of the Cake Software foundation) will come along persuading you to do <a href="http://www.youtube.com/watch?v=M0ZRiTPgTR8">sling shot</a> (and yes we had a lot of fun at Cakefest in Orlando :]) although you are already a little drunk. So we take on a 10% buffer that we add to the sum. Our total expenses are:</p>
+<p>Formula: $total = 110% of ($flightPrice + $hotelCosts + $otherExpenses)</p>
+<p>So, we might end up with:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;"><span class="kw2">&lt;?php</span><br />
+<span class="kw1">require_once</span><span class="br0">&#40;</span><span class="st0">'simpletest/unit_tester.php'</span><span class="br0">&#41;</span>; <span class="co1">// install simpletest into /vendors after you downloaded it from http://simpletest.org</span><br />
+<span class="kw1">require_once</span><span class="br0">&#40;</span><span class="st0">'simpletest/reporter.php'</span><span class="br0">&#41;</span>;<br />
+<br />
+<a href="http://www.php.net/define"><span class="kw3">define</span></a><span class="br0">&#40;</span><span class="st0">'BUFFER_RATE'</span>, <span class="nu0">0.1</span><span class="br0">&#41;</span>;<br />
+<span class="kw2">function</span> calcTravelExpenses<span class="br0">&#40;</span><span class="re0">$flightPrice</span>, <span class="re0">$hotelCosts</span>, <span class="re0">$otherExpenses</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$sum</span> = <span class="re0">$flightPrice</span> + <span class="re0">$hotelCosts</span> + <span class="re0">$otherExpenses</span>;<br />
+&nbsp; <span class="re0">$sum</span> = <span class="br0">&#40;</span>BUFFER_RATE<span class="br0">&#41;</span> * <span class="re0">$sum</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">class</span> TestOfTravelExpenses <span class="kw2">extends</span> UnitTestCase <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">function</span> testExceededTravelExpenses<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertEqual</span><span class="br0">&#40;</span><span class="nu0">1320</span>, calcTravelExpenses<span class="br0">&#40;</span><span class="nu0">600</span>, <span class="nu0">400</span>, <span class="nu0">200</span><span class="br0">&#41;</span>, <span class="st0">'Okay so this is a pretty exciting test %s message end'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="re0">$test</span> = <span class="kw2">&amp;new</span> TestOfTravelExpenses<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$test</span>-&gt;<span class="me1">run</span><span class="br0">&#40;</span><span class="kw2">new</span> HtmlReporter<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<span class="kw2">?&gt;</span></div>
+<p>When you run this you see you get a red bar with the message that "Integer" differs from "NUll". So 1320 is obviously an integer and the output of our function is NULL. Uh oh, okay, so there is no return statement! Let's add it:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> calcTravelExpenses<span class="br0">&#40;</span><span class="re0">$flightPrice</span>, <span class="re0">$hotelCosts</span>, <span class="re0">$otherExpenses</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$sum</span> = <span class="re0">$flightPrice</span> + <span class="re0">$hotelCosts</span> + <span class="re0">$otherExpenses</span>;<br />
+&nbsp; <span class="re0">$sum</span> = <span class="br0">&#40;</span>BUFFER_RATE<span class="br0">&#41;</span> * <span class="re0">$sum</span>;<br />
+&nbsp; <span class="kw1">return</span> <span class="re0">$sum</span>; <span class="co1">// here</span><br />
+<span class="br0">&#125;</span></div>
+<p>Now the value is not quite right. Ah okay, because we are taking 10% of the sum instead of 110%:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$sum</span> = <span class="br0">&#40;</span><span class="nu0">1</span>+BUFFER_RATE<span class="br0">&#41;</span> * <span class="re0">$sum</span>;</div>
+<p>Green bar! Now that's a great feeling right? We can do all sorts of crazy <a href="http://debuggable.com/posts/what-is-refactoring:480f4dfd-f130-4e25-a1bd-4d98cbdd56cb">refactorings</a> now to our little function and still we will see if it works or not. And all of that automagically! Wohoo! Right, so what are the benefits of all this?</p>
+<h3>1.3 Benefits of Unit Testing</h3>
+<p>1. Unit Testing allows us to <a href="http://debuggable.com/posts/what-is-refactoring:480f4dfd-f130-4e25-a1bd-4d98cbdd56cb">refactor</a> our code later with real confidence. If we break something and have plenty of tests there should be a test failing, we fix it up and the entire system should work again (that means all units independently of each other). Great!</p>
+<p>2. It forces you to think about what your code is really supposed to do. You finally get rid of the script kiddy attitude that hacks something together fast and does not even lose a second on thinking if his unit even returns an integer or if there could not be a division by zero error. I am not sure how it happens, but you will think about the edge cases, the most important cases, automatically. It's so difficult to think about them without automated tests, but with UT you approach the problem from a more theoretical and mathematical side.</p>
+<p>3. Automatic testing is faster than browser testing. Period.</p>
+<p>4. UT provides living documentation. If you develop in a team with several people and someone wrote a unit without phpdoc comments and you have no idea what it does, you can frequent the tests for it. Understanding code from tests is ultra easy and fast and most of the time better than any discussion. You could even picture the code in your head (if you are smart enough) just looking at the tests.</p>
+<p>5. It helps you separate interface from implementation. Code that uses your code works with your interface, that is the unit name and the parameter signature and your return type. If you don't change that you can do what you want in the unit implementation. It's so great because it gives you so much freedom. Also as long as the original tests still run, you ensure backwards compatibility of your code, too.</p>
+<p>6. Make the CakePHP Core Team happy. Many people submit tickets to CakePHP to make us aware of bugs. That's a good thing. However, if more people submitted tests alongside their bugreports that would help even more.</p>
+<p>There are plenty of other benefits..</p>
+<h3>1.4 Limitations of Unit Testing</h3>
+<p>1. UT as such does not prove there are no errors in your system. It is not a theoretical / mathematical prove that a particular unit is bug free. Yes it shows the presence of errors if you have good and enough tests. However, it does not show the absence of errors.</p>
+<p>2. Besides that, unit testing tests the units of your system independently of each other (for the most part). So if your system suffers from performance problems or integration problems, unit testing will not catch them. Also it will not prove that your system is not vulnerable to any security attack from the outside.</p>
+<p>3. What's more? Well, many people don't implement unit testing yet, because it takes a rigorous amount of discipline to do it consistently. Especially in a team environment with clients paying, tight deadlines and all sorts of other interruptions, testing seems to be the first thing to cut on. However, in the long term it will prove to be much more productive to do it. The drawback stays, though: You write extra code that does not add any "real" features to your application. Don't get me wrong - I love to do it, but I can partly understand the clients, too. Would be cool if you could throw in your two bits on this one.</p>
+<p>Conclusion: Do it! No I mean try it out. And if you only implement ten tests in your application, you are still much better off than without any tests.</p>
+<h3>1.5 Test-driven Development</h3>
+<p>So, when do you write the tests? From what you have read so far, you must have the idea that you write the tests after you wrote the code. However, with that "interface-over-implementation" and that "think-about-it-before-you-start-it" benefits, wouldn't it be cool to write the tests before you write the code? Test-driven Development - also known as TDD - does that.</p>
+<p>Essentially TDD is a software development technique consisting of short iterations where new tests covering the desired improvement or new functionality are written first. Then you implement the production code necessary to pass the tests. TDD helps a lot, to make your code design nice and to accommodate changes you refactor.</p>
+<p>The availability of tests before actual development ensures rapid feedback after any change. Remember that green-bar-means-you-are-done and red-bar-means-work? TDD ultimately boils down to those.</p>
+<p>TDD is actually a method of designing your software instead of testing it. Why? Because with TDD you REALLY think about the stuff you do before you do it. If you have a problem you cannot tackle, you write the simplest possible test, make it work, and go from there. As you write more tests and as you think about how people should use your code (ie, what your interface shall look like), you design your software well automatically. Yeah, it's not always that easy, but you get the idea.</p>
+<p>In TDD you have a rough cycle that should take just minutes, if not seconds: </p>
+<p>Add a test -> see it failing -> make it work -> see the green bar -> refactor -> still see the green bar - > add a test -> see it failing -> ...</p>
+<h3>1.6 Mock Objects</h3>
+<p>Mock Objects are objects that simulate real objects that would normally be difficult to construct or time consuming to set up for a test. The most common use of mock objects is the mocking of a database connection object.</p>
+<p>Setting up a test database at the start of each test would slow testing to a crawl and would require the installation of the database engine and test data on the test machine. If the connection can be simulated you can return data of your choosing. By that you not only win on the pragmatics of testing, but can also feed your code spurious data to see how it responds. You could simulate databases being down or other extremes without having to create a broken database for real. In other words, you get greater control of the test environment.</p>
+<p>However, the mock objects not only play a part (by supplying chosen return values on demand) they are also sensitive to the messages sent to them (via expectations). By setting expected parameters for a method call they act as a guard that the calls upon them are made correctly. If expectations are not met they save you the effort of writing a failed test assertion by performing that duty on our behalf.</p>
+<p>This can be very useful, because with standard Unit Testing you just test the interfaces of your objects. Mock Objects give you a means to test the inner implementation of them.</p>
+<h3>1.7 Resources and Further Reading</h3>
+<p>Process is at least as important as tools. The type of process that makes the heaviest use of a developer's testing tool is of course <a href="http://www.extremeprogramming.org/">Extreme Programming</a>. You should also read about <a href="http://www.agilealliance.com/articles/index">Agile Methodologies</a> in general. If you want to read up on test-driven Development, please do so <a href="http://www.testdriven.com/modules/news/">here</a>.</p>
+<p>The original Unit Test Framework was <a href="http://www.junit.org/">JUnit</a>. Most people writing their own test tools seem to be cloning it in one way or the other. <a href="http://www.phpunit.de/">PHP Unit</a> is the XUnit ambassador for the PHP world. Together with <a href="http://simpletest.org">Simpletest</a> it forms the top testing framework in the php world.</p>
+<h3>Wrap Up</h3>
+<p>By now you should have an idea of what you can get out of Unit Testing and automated tests in general. I hope I have raised some questions or made controversial statements. As we discuss this article, some good things can be added to it I am sure.</p>
+<p>In the next part of the series we will look at Cake's Testsuite.</p>
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/48102610-c5d0-4398-a010-76974834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Funit-testing-in-cakephp-part-1---introduction-to-unit-testing%3A48102610-c5d0-4398-a010-76974834cda3 &amp;title=Unit+Testing+in+CakePHP+Part+1+-+Introduction+to+Unit+Testing';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Funit-testing-in-cakephp-part-1---introduction-to-unit-testing%3A48102610-c5d0-4398-a010-76974834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Funit-testing-in-cakephp-part-1---introduction-to-unit-testing%3A48102610-c5d0-4398-a010-76974834cda3&amp;title=Unit+Testing+in+CakePHP+Part+1+-+Introduction+to+Unit+Testing&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Funit-testing-in-cakephp-part-1---introduction-to-unit-testing%3A48102610-c5d0-4398-a010-76974834cda3&amp;title=Unit+Testing+in+CakePHP+Part+1+-+Introduction+to+Unit+Testing';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/how-to-organize-your-cakephp-app%e2%80%99s-javascript-ii:480f4dd6-a780-45dc-bd65-4284cbdd56cb">How to organize your CakePHP App’s Javascript II</a></li>
+							<li><a href="/posts/ten-simple-tricks-that-will-make-you-a-valuable-colleague-part-i:480f4dfe-dfe0-44f3-9af7-46a0cbdd56cb">Ten Simple Tricks That Will Make You A Valuable Colleague, Part I</a></li>
+							<li><a href="/posts/controller-testing-in-cakephp:480f4dd5-c62c-4ec2-9a05-422dcbdd56cb">Controller testing in CakePHP</a></li>
+							<li><a href="/posts/remember-the-days-before-spam-a-cakephp-model-for-akismet:480f4dd5-d358-4f51-ac83-45f1cbdd56cb">Remember the days before spam? A CakePHP Model for Akismet  </a></li>
+							<li><a href="/posts/a-solution-for-e-mail-sending-in-cakephp:480f4dd5-b500-4bdc-a6c5-4ef6cbdd56cb">A solution for e-mail sending in CakePHP</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/cakephp-rc2-released!:486746fc-65d8-4fba-98b9-1edd4834cda3">CakePHP RC2 Released!</a></li>
+							<li><a href="/posts/screencast-using-vendor-branching-and-cakephp:480f4dd6-6cac-44cb-b685-4d6bcbdd56cb">Screencast #1: Using vendor branching and CakePHP</a></li>
+							<li><a href="/posts/4-cakephp-tricks:4811ad82-32dc-4a38-bc10-36304834cda3">Two CakePHP tricks</a></li>
+							<li><a href="/posts/google-analytics-php-api-cakephp-model:480f4dd5-b2a4-452a-b4ed-4f3fcbdd56cb">Google Analytics PHP Api (CakePHP Model)</a></li>
+							<li><a href="/posts/a-php-developers-guide-to-javascript-part-i:480f4dd6-8a0c-4f43-b2ba-474dcbdd56cb">A PHP developers guide to JavaScript - Part I</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/unit-testing-in-cakephp-part-1---introduction-to-unit-testing:48102610-c5d0-4398-a010-76974834cda3">19 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/unit-testing-in-cakephp-part-1---introduction-to-unit-testing:48102610-c5d0-4398-a010-76974834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4820bad2-ab58-4962-be3d-340c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=80bd2b4db7a84b42110191252ad94f5f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Andreas&nbsp;						</strong>
+						<strong>said 
+						on May 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for this introduction.<br />
+I'm looking forward for the next part about cake's testsuite.</br><br />
+This blog has been a great resource for me to learn about testing with cakePHP so far.</br></p>
+<p>One little issue: Your example for assertNotNull is the same as for assertNull.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4820bc92-fcc4-401c-b43a-7d104834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a4d64bc52fe24677bacd604d01f487aa&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							websta&nbsp;						</strong>
+						<strong>said 
+						on May 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Jolly good read there Tim, i've very much felt the need for unit testing coming through as my Cake apps get a little more hairy, and im most definately going to tackle it in the coming week thanks to your candid and informative introduction. Cheers ;-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4820bd95-9a1c-41ee-ac42-0cf24834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on May 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Andreas: Cheers mate. Thanks for the issue report. I changed that. : ]</p>
+<p>@websta: Lmao..."apps getting hairy".. never heard of that saying yet. :D Thanks for a good laugh. :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4820ca4e-54f0-4852-9d92-1efd4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1f27710d8568b64fa5b3c1e08e7a55de&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Heath Nail&nbsp;						</strong>
+						<strong>said 
+						on May 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It might be worth noting that Cake's tests (6311beta) don't work with the latest release of simpletest. Anybody know when/if Cake's tests will work with the latest simpletest release?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4820cd2a-1618-4f38-995c-255e4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on May 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Heath, what problems are you experiencing ?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4820d7c4-e134-4f21-ba12-4f094834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1f27710d8568b64fa5b3c1e08e7a55de&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Heath Nail&nbsp;						</strong>
+						<strong>said 
+						on May 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ok it does work. I don't know what I did. Please wish me luck while living in the twilight zone...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4820da53-cd5c-43d2-9efd-4f154834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ec320b0e979ac11e86e02bf7fef19f41&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Aitch&nbsp;						</strong>
+						<strong>said 
+						on May 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Good stuff. I still can't wrap my head around how you write a unit tests for a cake (or crud like) method like edit() or delete() though, i look forward  to and hope that you will get to this in the next section. I will be really interested to see what you write.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4821459e-2f3c-42c9-83da-66ae4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on May 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Aitch: Which code are you willing to test? Maybe I can help you already without you needing to wait for the second part.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48218346-fd64-4c20-9936-1ffe4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=34d57f8b69c811da62b91ee792e8fcaa&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dsi.vozibrale.com/" rel="nofollow">dr. Hannibal Lecter</a>						</strong>
+						<strong>said 
+						on May 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great article! Reminds me of a presentation I saw... :-)</p>
+<p>Looking forward to the next part!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4821a6c5-fae8-444f-bbcf-5e594834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=be965afd8e05334af7ed2adc64736310&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.schreiblogade.de" rel="nofollow">Patrick</a>						</strong>
+						<strong>said 
+						on May 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for this great article. I wonder if there's something like autotest for PHP so that the tests run automatically in a terminal window?</p>
+<p>Thanks in advance</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4821aa6a-a758-4fcb-9fef-0ceb4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on May 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@dr. Hannibal Lecter: ;]</p>
+<p>@Patrick: I recently contributed a testshell to Cake, which will be featured in a new blogpost soon. If it's really urgent, contact me <a rel="nofollow" href="http://debuggable.com/tim">here</a> please.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48245b69-1dc8-4fc8-85be-7eca4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9714e93521066cab6520d80f7c2dbab5&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							mr. ambiguator &nbsp;						</strong>
+						<strong>said 
+						on May 09, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great article, Tim. This has given me the motivation to start the unit testing that I've been putting off. </p>
+<p>I'd be interested to hear more about mock objects and especially to see some examples if you need a topic for any upcoming posts.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48250e8e-9c74-40f5-9f4e-7d864834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on May 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@r. ambiguator: Ah alright, I will keep that in mind. : )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-483a190d-2c20-45e1-93e3-75724834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=669144d1ab0a861af5d54175371bc586&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://mark-story.com" rel="nofollow">Mark Story</a>						</strong>
+						<strong>said 
+						on May 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great article Tim, really good introduction to testing in general.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48418638-479c-4573-9953-36254834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5f1ee5d27634200b6604d8db1f831b71&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://itsnotvalid.com" rel="nofollow">itsnotvalid</a>						</strong>
+						<strong>said 
+						on May 31, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>May be it was just me... I saw that the examples of assertWithinMargin and assertOutsideMargin seems to be wrong.<br />
+( abs(10-50) "smaller than" 60 ) = ( 40 "smaller than" 60 ) should be a true statement.</br></p>
+<p>(where "smaller than" equals to the operator concerned, as "Only simple Html tags like: a, b, i strong, em are allowed.")</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48419961-f6f0-459d-aef4-2f324834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on May 31, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Very good find itsnotvalid. I changed them accordingly.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-484395d4-2d54-48d2-9805-2c4f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c3c5907d2d49cbe8f230115d022332a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thomas-sittig.de" rel="nofollow">Thomas</a>						</strong>
+						<strong>said 
+						on Jun 02, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>nice, extented introduction to CakePHP-basd unittesting.<br />
+and i'm really looking forward for an article to see how you will setup testable for classes with simple or even complex db-interactions. that's a point where i personaly stuck with php and mock-objects.</br></p>
+<p>@patrick<br />
+there is a simple workaround if you using the eclipse ide. there you can use tasks (projetc properties -> builders) for each project, that will initiate a common command to, f.e. execute a php-script (like the shell-script from tim) on different events like 'auto build'. aaand this event will triggered by eclipse itself while you do changes to a project. like saving, creating or something like this.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4843f1b1-4268-4ea5-91f2-4e774834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Jun 02, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Thomas: Thanks for the feedback.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4874c58a-d994-42b1-93e1-55bf4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a6cd3d253b83f4ee1e9119bfe6dd075c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							liaittypriort&nbsp;						</strong>
+						<strong>said 
+						on Jul 09, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>tests time mashine</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

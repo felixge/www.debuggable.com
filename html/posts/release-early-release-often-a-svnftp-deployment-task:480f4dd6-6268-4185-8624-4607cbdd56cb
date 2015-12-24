@@ -1,0 +1,712 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Release early, Release often, A SVN/FTP Deployment Task &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/release-early-release-often-a-svnftp-deployment-task:480f4dd6-6268-4185-8624-4607cbdd56cb">Release early, Release often, A SVN/FTP Deployment Task</a></h2>	<div class="posted-on">
+		<p>Posted on 22/11/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p><strong>Warning:</strong> All of this is meant for CakePHP 1.2 which is still under heavy development. People are not recommended to use 1.2 so far unless they are very experienced with CakePHP and able to fix their problems them selfs. There will be no official support for the 1.2 branch before it's released and it might go through some major changes before that.</p>
+<p>After recently releasing my experimental little testsuite called <a href="http://www.thinkingphp.org/2006/11/16/release-early-release-often-caketaster/">CakeTaster</a> it is time for me to release the next project I've been working on. This one might be even more interesting for most people, as it's already pretty advanced. Nevertheless I consider this to be an experimental release, so plz don't depend on it quite yet ; ).</p>
+<p>As the headline says, this time it's going to be my SVN/FTP Deployment Task written for the new Bake in CakePHP 1.2. It will not work with the Cake 1.1.x.x branch, and I currently do not have time to explain the procedure to work around this. </p>
+<p>First of all let me explain what it does (or is supposed to do). The job of this task is to SYNC a given SVN repository with a remote folder of an FTP server. It provides functions to install, update, or delete this remote copy of your application. The install/update function also allow you to specifiy a revision you want to install or update to. This way you can roll back a recent update if you discover a problem, or simply take your app back in time for the fun of it ; ).</p>
+<p>Sounds interesting? Time to get started. First of all <a href="http://www.thinkingphp.org/downloads/deploy_task_0.1.1.zip">download the code</a>. Then directly copy all the folders over the ones of your application. Nothing should be overwritten, but it's your responsible to double check that. Once you are done with this, go to /app/config/deployment.php and start to edit this file. You should see something like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<br />
+<span class="kw2">class</span> AppDeployment <span class="kw2">extends</span> BasicDeployment<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$ftpConfig</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'host'</span> &nbsp; &nbsp; &nbsp;=&gt; <span class="st0">'playground.thinkingphp.org'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'connect'</span> &nbsp; =&gt; <span class="st0">'ftp_connect'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'login'</span> &nbsp; &nbsp; =&gt; <span class="st0">'user'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'password'</span> &nbsp;=&gt; <span class="st0">'secret-pw'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'port'</span> &nbsp; &nbsp; &nbsp;=&gt; <span class="st0">'21'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'timeout'</span> &nbsp; =&gt; <span class="st0">'30'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'base_path'</span> =&gt; <span class="st0">'/'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'svn_file'</span> &nbsp;=&gt; <span class="st0">'/app/webroot/revision.txt'</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$ftpActions</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'chmod_777'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'/app/tmp'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$svnConfig</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'url'</span> &nbsp; &nbsp; &nbsp; =&gt; <span class="st0">'file:///C:/Repositories/project'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'login'</span> &nbsp; &nbsp; =&gt; <span class="st0">''</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'password'</span> &nbsp;=&gt; <span class="st0">''</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'path'</span> &nbsp;=&gt; <span class="st0">'/trunk'</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="co1">// pluse some code I added to beautify the log output and set the php time limit to infinite</span><br />
+<span class="br0">&#125;</span>
+</div>
+<p>All you have to do is to fill in your FTP / SVN information and that's it. You're ready for the first little ride. Fire up your command line / shell and navigate to /cake/scripts/. Then type in the following command.</p>
+<p><code>php -q bake2.php deploy install</code></p>
+<p>Now you'll see that little shell of yours becoming very busy. It will export the latest version of your application from the SVN directory you specified into a temporary folder (If you see an error, please make sure the application can write to /app/tmp). After that it will login to the FTP server, upload all files, and finally recursively chmod the remote /app/tmp to 777.</p>
+<p>Go ahead and make some changes to your application. Save them, commit them to svn. Then run this command:</p>
+<p><code>php -q bake2.php deploy update</code></p>
+<p>If everything is setup correctly, the task will contact the ftp server and download the revision file in order to know what revision is located on the remote server. After it knows this information it will diff this version vs. SVN:HEAD, checkout the modified files and upload (only) them in order to overwrite the old ones. It will also delete files that have been removed in the repository.</p>
+<p>Alright, once you are finished jumping around your work place after enjoying this delightful deployment experience it's time to get a little fancier. (In case you hit a problem before that, leave a comment and I'll try to help you to get to the happy-jumping-around part). For a simple application the default deploy behavior will be all you ever need. But as we developers tend to create space ships whenever we are asked to do something sligthly more complex then printing "Hello World", here comes some freedom: The /app/config/deployment.php contains a class called AppDeployment which extends BasicDeployment. Functionality like install/update/uninstall are actual functions inside the BasicDeployment class. This means you can overwrite them.</p>
+<p>Just take a look at the BasicDeployment::install() function, to get a better feel for how it works:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> install<span class="br0">&#40;</span><span class="re0">$installRevision</span> = <span class="st0">'HEAD'</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$remotePath</span> = <span class="re0">$this</span>-&gt;<span class="me1">ftpConfig</span><span class="br0">&#91;</span><span class="st0">'base_path'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$tmpFolder</span> = TMP.<span class="st0">'svn'</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;__deleteTmpFolder<span class="br0">&#40;</span><span class="re0">$tmpFolder</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$this</span>-&gt;__svnExport<span class="br0">&#40;</span><span class="re0">$Svn</span>, <span class="re0">$tmpFolder</span>, <span class="re0">$installRevision</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$this</span>-&gt;__svnCreateRevisionFile<span class="br0">&#40;</span><span class="re0">$Svn</span>, <span class="re0">$tmpFolder</span>, <span class="re0">$installRevision</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$this</span>-&gt;__ftpConnect<span class="br0">&#40;</span><span class="re0">$Ftp</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$this</span>-&gt;__ftpUploadDir<span class="br0">&#40;</span><span class="re0">$Ftp</span>, <span class="re0">$tmpFolder</span>, <span class="re0">$remotePath</span>, <span class="kw2">true</span>, <span class="kw2">false</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$this</span>-&gt;__ftpExecuteActions<span class="br0">&#40;</span><span class="re0">$Ftp</span>, <span class="re0">$remotePath</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;__ftpDisconnect<span class="br0">&#40;</span><span class="re0">$Ftp</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;__deleteTmpFolder<span class="br0">&#40;</span><span class="re0">$tmpFolder</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">'Succesfully installed app at '</span>.<span class="re0">$this</span>-&gt;<span class="me1">ftpConfig</span><span class="br0">&#91;</span><span class="st0">'base_path'</span><span class="br0">&#93;</span>.<span class="st0">' (Revision '</span>.<span class="re0">$this</span>-&gt;__svnResolveRevision<span class="br0">&#40;</span><span class="re0">$Svn</span>, <span class="re0">$installRevision</span><span class="br0">&#41;</span>.<span class="st0">').'</span>, <span class="st0">'info'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">true</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Now it's your turn. Try out the task, start playing around with it, and let me know what yout hink about it. I've been talking with the other devs and it's not out of question for this to become part of the CakePHP core. But to make this possible I need all the testing I can get, and as much feedback as you guys can give me ; ).</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-6268-4185-8624-4607cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frelease-early-release-often-a-svnftp-deployment-task%3A480f4dd6-6268-4185-8624-4607cbdd56cb &amp;title=Release+early%2C+Release+often%2C+A+SVN%2FFTP+Deployment+Task';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Frelease-early-release-often-a-svnftp-deployment-task%3A480f4dd6-6268-4185-8624-4607cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frelease-early-release-often-a-svnftp-deployment-task%3A480f4dd6-6268-4185-8624-4607cbdd56cb&amp;title=Release+early%2C+Release+often%2C+A+SVN%2FFTP+Deployment+Task&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frelease-early-release-often-a-svnftp-deployment-task%3A480f4dd6-6268-4185-8624-4607cbdd56cb&amp;title=Release+early%2C+Release+often%2C+A+SVN%2FFTP+Deployment+Task';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/programming-psychology-return-home-early:4811de9f-ae28-49c2-a7dc-2f154834cda3">Programming Psychology - Return home early</a></li>
+							<li><a href="/posts/bug-fix-update-for-svnftp-deployment-task:480f4dd6-fedc-4453-82b3-4ab5cbdd56cb">Bug-fix update for SVN/FTP Deployment Task</a></li>
+							<li><a href="/posts/release-early-release-often-caketaster:480f4dd6-0b74-41c2-a201-436acbdd56cb">Release early, Release often, CakeTaster</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/release-early-release-often-a-svnftp-deployment-task:480f4dd6-6268-4185-8624-4607cbdd56cb">29 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/release-early-release-often-a-svnftp-deployment-task:480f4dd6-6268-4185-8624-4607cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4de2-22cc-4f88-be0c-451fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=43908171efe873dfdeec773fc86c95a8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.siteamonth.com" rel="nofollow">MattC</a>						</strong>
+						<strong>said 
+						on Nov 22, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Just so I'm clear: The main benefit of using this deployment method, rather than just doing an SVN checkout/update on the remote server is not having the .SVN dirs on the remote instance?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-9c2c-4adc-99f1-445ecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Nov 22, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>MattC: This is mostly ment for people deploying on shared hosts without remote access. However, there is another benifit of using a DeployTask: The ability to run custom scripts in order to modify files, the DB, etc. with each update.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-2d54-4aba-b87e-4ea8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f8a279f95d60ec8ec9819a156edd06e4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.tijs.org" rel="nofollow">Tijs</a>						</strong>
+						<strong>said 
+						on Nov 22, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It's like a version of capistrano that actually makes sense! Keep up the great work Felix.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-92e0-4ffe-86b9-41e7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fd24ab9b18c0a2aa04d70ab266eb57ae&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							RosSoft&nbsp;						</strong>
+						<strong>said 
+						on Nov 22, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Very useful, bake2 rocks</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-f8a8-45a1-9c84-449bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=43908171efe873dfdeec773fc86c95a8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.siteamonth.com" rel="nofollow">MattC</a>						</strong>
+						<strong>said 
+						on Nov 23, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for the reply Felix.  I look forward to the release of 1.2 - I'll definatly give this a try then.  My only suggestiong would be to allow for multiple deployment servers.  That way if I have a QA server I can use this to push the code there first, then if everything looks good there I could push the code to the production server.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-0798-4aba-b7ae-4ae1cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ba26218b7aad274fcabfbb370c9720b1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://robmeek.com" rel="nofollow">meek</a>						</strong>
+						<strong>said 
+						on Nov 23, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>looks very ingenious. nice one felix! i think many, perhaps even the majority of cake developers deploy to shared hosts. looking forward to trying this out on my next project.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-9560-46d6-be0a-4b79cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Nov 23, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>MattC: You can add a beforeFilter that modifies the values of $this->ftpConfig / $this->svnConfig on demand in order to achieve this functionality. I might add native support for this at some point, but as the workaround is very easy, I don't consider it a main prirority right now.</p>
+<p>RosSoft: You are alive ; ). I haven't heard or let's say read you in ages! I'm glad to see you around.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-0918-49be-b4e9-4208cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.phpdeveloper.org/news/6776" rel="nofollow">PHPDeveloper.org</a>						</strong>
+						<strong>said 
+						on Nov 27, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p><strong>Felix Geisendorfer's Blog: Release early, Release often, A SVN/FTP Development Task...</strong></p>
+<p>...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-adac-4fd4-88a8-4f60cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f0b8fa14cbee5edfdeeac6b8f9ad062d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://sanisoft.com/" rel="nofollow">Tarique Sani</a>						</strong>
+						<strong>said 
+						on Nov 28, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is going to be a huge time saver - thanks a lot for your efforts</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-7030-4996-ba3d-46f4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1b35bf03134afd2fa7393b9122439513&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Garbonzo Vasquez&nbsp;						</strong>
+						<strong>said 
+						on Nov 28, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>What, is svn update broken? Talk about re-inventing the wheel.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-96d8-42ed-aeb9-43a6cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Nov 28, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Garbonzo: No it's not. I've just not gotten it to work via FTP so far ... ; ). Again: This is ment for sharing hosted enviornments, if you are lucky enough that your client is paying for dedicated hosting go ahead and use svn update via SSH.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-d8a4-42ac-ad71-4467cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9429c55ad29757685f345bdeae88595d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Amit Kumar Singh&nbsp;						</strong>
+						<strong>said 
+						on Dec 09, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>i just feel like a fool right now.....  wasted so much time trying to re create something you have already done, and it is here for me to consume!!!! now i can use your code to finish my job faster. i thinks i should say thank you.. for making my life a bit more easier... :)</p>
+<p>i was looking for an simple solution to this problem though many heavy weight solutions exist i dislike them all.. they are to heavy for my little mind....</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-d174-4c3a-89c4-4f89cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99cf87231f06f534edc360b735af926c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://slun.ic.cz/" rel="nofollow">poLK</a>						</strong>
+						<strong>said 
+						on Jan 08, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice work, Felix!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-474c-4032-bcf1-49e2cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99cf87231f06f534edc360b735af926c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://slun.ic.cz/" rel="nofollow">poLK</a>						</strong>
+						<strong>said 
+						on Jan 12, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,<br />
+let me ask You something, please:</br><br />
+'The ability to run custom scripts in order to modify files, the DB, etc. with each update.'</br><br />
+- how looks intended implementation of this functionality, please? Am I wrong with simple (example)</br></p>
+<p>if (file_exists(TMP.'distro'.DS.'update.php')) {<br />
+    // parse above file against current revision.txt</br><br />
+    // if necessary, do something</br><br />
+}</br></p>
+<p>in bootstrap/beforeFilter ?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-723c-4c45-adce-45d2cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c0582d0a1f625afacf3b22c0e8497ed7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							TJ Singleton&nbsp;						</strong>
+						<strong>said 
+						on Jan 14, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This may be dense, but what is this line "'svn_file'  =&gt; '/app/webroot/revision.txt');" ?<br />
+Where does revision.txt come from?</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-2c9c-4c96-95c6-4171cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>poLK: AppDeployment extends BasicDeployment. This means you can overwrite functions in it to use your own ones. If you need to run the normal behavior first, you can simply do: parent::update() and so on.</p>
+<p>TJ Singleton: The 'svn_file' is a file created by the Deploy script when uploading/updating your site on an FTP server. It contains the revision number of the currently uploaded files so when you 'update' the code next time, it knows what revision-diff to apply.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-ddf8-42a2-8482-408dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99cf87231f06f534edc360b735af926c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://slun.ic.cz/" rel="nofollow">poLK</a>						</strong>
+						<strong>said 
+						on Jan 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>thanks for answer but I still don't understand how You can call some update procedures on live server by AppDeployment's code executed in terminal and accessing target site through FTP. I am responding to Your 2nd post here with mentioned 'ability to run custom scripts in order to modify files, the DB, etc' ;)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-3a08-4218-8eaa-4a10cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>poLK: You can't ; ). The script is running locally and all procedures it might start run local as well.  You can however use the script to connect to your remote DB server in order to update it and things like that - that's what I meant when writing about it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-cd74-42a2-8ad5-4e1ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2006/10/10/ant-sucks-for-ftp-deployment-what-alternatives-do-we-have/" rel="nofollow">ThinkingPHP and beyond &raquo; Ant sucks for FTP deployment - Wh</a>						</strong>
+						<strong>said 
+						on Feb 05, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Bruno D. has spent quite some time researching alternatives to ANT deployment and posted his results in the comments. So if you don&#8217;t like my SVN deployment task for Cake 1.2, you might find his suggestionsuseful. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-0e24-4601-8cad-4cb7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2d306e9d958cb02f932f518f4f7f77b8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							D.Pape&nbsp;						</strong>
+						<strong>said 
+						on Feb 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix.</p>
+<p>Great work!!<br />
+But there's a problem if there is a new folder in the repository and he want to create this folder on ftp-server.</br><br />
+I tried to change persmissions on ftp-server, but no chance.</br><br />
+Any ideas?</br></p>
+<p>Cheers, Daniel</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-f7b0-4938-af40-4681cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 14, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey D.Pape: Dunno what's going on there, but one of the things on my high-priority-when-time list is to rewrite this upload thing completely but using some new CakePHP datasources stuff that is under development. Hope you can fix your problem temporarily until then.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-f6c4-4d19-bef0-4eaacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2d306e9d958cb02f932f518f4f7f77b8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							D.Pape&nbsp;						</strong>
+						<strong>said 
+						on Feb 14, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hi felix.<br />
+it would be great if this thing will be fixed sometime, because this ftp-svn-deployment thing is very very nice and saved a lot of time!</br><br />
+prost, daniel</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-7f28-4b88-a88c-4ac9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2007/02/17/bug-fix-update-for-svnftp-deployment-task/" rel="nofollow">ThinkingPHP and beyond &raquo; Bug-fix update for SVN/FTP Deploy</a>						</strong>
+						<strong>said 
+						on Feb 17, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] this is just a quick update for the CakePHP 1.2 SVN/FTP Deployment task I released a while ago. It fixes a problem that would sometimes cause &#8216;Folder could not be created&#8217; errors to show up even so the folder was successfully created via ftp. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-faac-4437-af97-4f1ecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 17, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>D.Pape: Here you go, see the trackback link above ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-72a8-40dc-8f17-493acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2d306e9d958cb02f932f518f4f7f77b8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							D.Pape&nbsp;						</strong>
+						<strong>said 
+						on Feb 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks Felix!! :o)<br />
+I will try it this evening.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ded-8808-460c-adde-40b4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2f11c840ab7eccb6788ab0c4331f5dad&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Yevgeny&nbsp;						</strong>
+						<strong>said 
+						on Jul 31, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Will you update this task code for supporting of last cake 1.2 release?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ded-eecc-4729-9b1c-4917cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 03, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yevgeny: Eventually, but it's not on my schedule for now.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df1-6ac8-4be9-9b9a-4539cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 30, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I've closed comments on this post b/c it just attracted spam like crazy. If you need to post something let me know (felix@thinkingphp.org).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4832990d-a8f0-49d9-9227-6c254834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b821ee1231994faa5a6259818e1ec0f8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://bijayrungta.blogspot.com" rel="nofollow">Bijay Rungta</a>						</strong>
+						<strong>said 
+						on May 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Tim, Hi Felix,<br />
+I came across this post of yours when looking for a tool to do the deployment in a live server.</br></p>
+<p>Your Site engaged me for more than an hour...<br />
+Checked out some PHP best practices posts by you, checked the about section and your profiles.. I also checked out PostTask.com...</br><br />
+I am impressed with both of you..</br></p>
+<p>My Problem is as follows...<br />
+Suppose I am working on a Project which is Live.</br><br />
+I make changes to one or more files.</br><br />
+I then need to Browse to the respective folders for each of the files and copy-paste/drag-drop each file.</br></p>
+<p>I have observed that even when copying one file some Visit requests for the pages which required that file fails..<br />
+can't include file blah-blah-blah file does not exist..</br></p>
+<p>I was looking at a way so that all files are first copied to some folder in the Server and when done move all the necessary files top their respective locations at one go...</p>
+<p>This Script might be useful for me... but I may not want to deploy the whole set of files that are there in the Repository..<br />
+Perhaps I can create a Branch for the Deployment purpose but I am not sure if this is the best solution..</br></p>
+<p>Any hint for the Solution I am looking for???</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Blog &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="paging">
+	<a href="/posts/index/page:35" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:32">32</a></span> | <span><a href="/posts/index/page:33">33</a></span> | <span><a href="/posts/index/page:34">34</a></span> | <span><a href="/posts/index/page:35">35</a></span> | <span class="current">36</span> | <span><a href="/posts/index/page:37">37</a></span> | <span><a href="/posts/index/page:38">38</a></span> | <span><a href="/posts/index/page:39">39</a></span> | <span><a href="/posts/index/page:40">40</a></span> <a href="/posts/index/page:37" class="next">Next &raquo;</a></div>
+	<div class="post">
+	<h2><a href="/posts/upcoming:-code-coverage-in-cakephp---test-how-well-you-test:4814f672-0d78-4585-a349-64c64834cda3">Upcoming: Code Coverage in CakePHP - Test How Well You Test</a></h2>	<div class="posted-on">
+		<p>Posted on 27/4/08 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>the last week I have been dealing with an implementation of code coverage analysis for the upcoming release 1.2 of CakePHP. For those of you who do not yet know what code coverage is, here is a short excerpt from Wikipedia:</p>
+<blockquote><p>
+Code coverage is a measure used in software testing. It describes the degree to which the source code of a program has been tested. It is a form of testing that inspects the code directly and is therefore a form of white box testing.
+</p></blockquote>
+<p>There are several different kinds of criteria to code coverage. The two most important ones are line coverage (or statement coverage as wikipedia puts) it and path coverage. Line coverage basically analyzes if each line of the subject-under-test has been executed during the test.</p>
+<p>Path coverage examines if every possible route through the code has been executed. Since I rely on <a href="http://xdebug.org">Xdebug</a> for the implementation we are talking line coverage here.</p>
+<p>So how is it going to work? Pretty simple actually. Whenever you run a CakePHP test case Cake assembles information in the background about which lines of your subject-under-test are called. Then it will display all code lines from the subject-under-test and mark those that were "covered" (ie executed by the testcase) and which were not. Lines that play no role for the code coverage percentage, such as multiline comments, will be displayed in a different color.</p>
+<p>How could an example report look like? Here you go:</p>
+<p><img src="http://thinkingphp.org/img/code_coverage_html_view.png" /></p>
+<p>I have also implemented a diff-style report. It just lists all the lines that are not covered by your tests and then seven lines before and after each of those. This is what the diff view looks like for the cakephp core router.test.php:</p>
+<p><img src="http://thinkingphp.org/img/code_coverage_html_diff_view.png" /></p>
+<p>Within the dev team we are currently discussing these two views. If you favor one of these, can recommend another or just want to voice your opinion on the looks of them, please do so by commenting. For your information: Code coverage analysis currently only works for separate test cases only. However, the plan for this week is to get aggregate code coverage working. This means that your group tests are analyzed and the coverage percentage displayed for each of the test subjects involved.</p>
+<p>If you ask me this is a very valuable tool when developing tests for your cakephp application. Although we are talking line coverage here and not path coverage (do your tests go through every possible paths through your application?) it is a good indicator of how thorough your tests are.</p>
+<p>Please fire away your suggestions!</p>
+<p>-- Tim Koschuetzki aka DarkAngelBGE<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4814f672-0d78-4585-a349-64c64834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fupcoming%3A-code-coverage-in-cakephp---test-how-well-you-test%3A4814f672-0d78-4585-a349-64c64834cda3 &amp;title=Upcoming%3A+Code+Coverage+in+CakePHP+-+Test+How+Well+You+Test';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fupcoming%3A-code-coverage-in-cakephp---test-how-well-you-test%3A4814f672-0d78-4585-a349-64c64834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fupcoming%3A-code-coverage-in-cakephp---test-how-well-you-test%3A4814f672-0d78-4585-a349-64c64834cda3&amp;title=Upcoming%3A+Code+Coverage+in+CakePHP+-+Test+How+Well+You+Test&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fupcoming%3A-code-coverage-in-cakephp---test-how-well-you-test%3A4814f672-0d78-4585-a349-64c64834cda3&amp;title=Upcoming%3A+Code+Coverage+in+CakePHP+-+Test+How+Well+You+Test';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/upcoming:-code-coverage-in-cakephp---test-how-well-you-test:4814f672-0d78-4585-a349-64c64834cda3">2 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/upcoming:-code-coverage-in-cakephp---test-how-well-you-test:4814f672-0d78-4585-a349-64c64834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/programming-psychology-return-home-early:4811de9f-ae28-49c2-a7dc-2f154834cda3">Programming Psychology - Return home early</a></h2>	<div class="posted-on">
+		<p>Posted on 25/4/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>this is an experimental post on the psychology of programming. As of lately I have become very interested in the thought processes that cause us to write certain code. Because I believe understanding the patterns in your own thinking will by far make the biggest impact on how good you will get as a programmer. Forget design patterns, forget unit testing, forget all those functions you know. Important is to question why they exist and how they could be improved. I'm not saying you cannot be a good programmer if you do not care about this. But I am saying you will most likely never exceed the skills of all the other programmers out there. You will more or less write the same code everybody else does.</p>
+<p>In the scope of this post I will try to explain a very simple thought pattern that I am calling "return home early" that evolved out of me analyzing my coding habits. The simplest way for you to follow the thought process is to have a look at the following <strong>bad code</strong>:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> edit<span class="br0">&#40;</span><span class="re0">$id</span> = <span class="kw2">null</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'id'</span>, <span class="re0">$id</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">exists</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$post</span> = <span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">read</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$this</span>-&gt;<span class="me1">RequestHandler</span>-&gt;<span class="me1">isGet</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">validates</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">save</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">data</span><span class="br0">&#91;</span><span class="st0">'Post'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Message</span>-&gt;<span class="me1">add</span><span class="br0">&#40;</span><span class="st0">'Post was saved successfully.'</span>, <span class="st0">'ok'</span><span class="br0">&#41;</span>;&nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Message</span>-&gt;<span class="me1">add</span><span class="br0">&#40;</span><span class="st0">'A db problem permitted your data from being saved'</span>, <span class="st0">'error'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Message</span>-&gt;<span class="me1">add</span><span class="br0">&#40;</span><span class="st0">'Post was saved successfully.'</span>, <span class="st0">'ok'</span><span class="br0">&#41;</span>;&nbsp; <br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/assert"><span class="kw3">Assert</span></a>::<span class="me2">notEmpty</span><span class="br0">&#40;</span><span class="re0">$result</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">data</span> = <span class="re0">$post</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">render</span><span class="br0">&#40;</span><span class="st0">'404'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>What you see is a typical Post::edit action like the one used on this blog (in fact I derived it from it). I tried to cripple the code so badly that you can tell what is wrong with it right away:</p>
+<blockquote class="center"><p>There are way too many levels of nesting for something that should be dead simple.</p></blockquote>
+<p>But yet, most projects that I have been involved with had code like this in them. This is not because most programmers are stupid, I think this is a result of logic thinking. Even so I luckily never had to draw much flow charts in my life, I think that my brain somewhat works like one. I think most of us who think logically develop their thoughts in form of a tree, jumping from node to node, leaving dead ends all over because we are not able to focus on too many things at once. This is also why <a href="http://www.mindmeister.com/">mind mapping</a> is a useful technique that I started to embrace lately. It helps us to increase the amount of connections per node in our thinking and lets us discover new nodes (ideas) previously unreachable with our normal thinking.</p>
+<p>Another technique that really helps understanding your thinking is to visualize it. Close your eyes and try to see the patterns in whatever it is you are doing (not just programming) for a second. Applied to our particular example above, we could visualize the code above like this:</p>
+<p><img class="center" src="http://thinkingphp.org/img/return_home_early_1.png"></p>
+<p>Now suddenly it becomes very easy to simplify what we are doing. All we have to do is to align those nodes that are not dead ends. Visually speaking that means to make a re-arrangement like this:</p>
+<p><img class="center" src="http://thinkingphp.org/img/return_home_early_2.png"></p>
+<p>In terms of code this means to get rid of anything that looks like an else statement and use a return statement wherever we hit a dead-end (return home early). Our particular example for example could be re-written as follows:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> edit<span class="br0">&#40;</span><span class="re0">$id</span> = <span class="kw2">null</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'id'</span>, <span class="re0">$id</span><span class="br0">&#41;</span>;<br />
+&nbsp; <a href="http://www.php.net/assert"><span class="kw3">Assert</span></a>::<span class="kw2">true</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">exists</span><span class="br0">&#40;</span><span class="br0">&#41;</span>, <span class="st0">'404'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="re0">$post</span> = <span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">read</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">RequestHandler</span>-&gt;<span class="me1">isGet</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">data</span> = <span class="re0">$post</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="re0">$result</span> = <span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">save</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">data</span><span class="br0">&#91;</span><span class="st0">'Post'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">validationErrors</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">Message</span>-&gt;<span class="me1">add</span><span class="br0">&#40;</span><span class="st0">'Please fill out all fields'</span>, <span class="st0">'error'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <a href="http://www.php.net/assert"><span class="kw3">Assert</span></a>::<span class="me2">notEmpty</span><span class="br0">&#40;</span><span class="re0">$result</span>, <span class="st0">'save'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Message</span>-&gt;<span class="me1">add</span><span class="br0">&#40;</span><span class="st0">'Post was saved successfully.'</span>, <span class="st0">'ok'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>What you can see right away is that we have saved a couple lines of code, but that's not even the exciting part. The exciting part is that by recognizing a pattern in our thinking we were able to produce much simpler results! An interesting implication of this technique is that it is much harder for us to reverse engineer our logic than it is for us to produce it. This is why reading other people's source code can be difficult at times. It is not that their code is difficult, it is just that it's laid out in the way of the thought process that created it. So when you sometimes read a piece of code and really enjoy reading it, it is most likely a sign of conscious thinking and <strong>reorganization</strong> of typical <strong>thought patterns</strong> into <strong>human readable patterns</strong>.</p>
+<p><strong>Note:</strong>  I do not use the word refactoring in this post because the word has too much association with design patterns for my taste. Design patterns itself do not make things simpler! The process of reorganizing your natural thinking does.</p>
+<p><strong>Regarding the second code example:</strong> I cheated a little bit in terms of saving if statements by using my <a href="http://www.debuggable.com/posts/assert-the-yummyness-of-your-cake:480f4dd6-7fe0-4113-9776-458acbdd56cb">Assert class</a> to simplify things even further.</p>
+<p>All right, I'm really interested in hearing if some of you would enjoy more posts like this. I also still have tons of behaviors and components in my backlog for publishing, but this is a fascinating topic to me right now that I would like to write more about.</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4811de9f-ae28-49c2-a7dc-2f154834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprogramming-psychology-return-home-early%3A4811de9f-ae28-49c2-a7dc-2f154834cda3 &amp;title=Programming+Psychology+-+Return+home+early';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprogramming-psychology-return-home-early%3A4811de9f-ae28-49c2-a7dc-2f154834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprogramming-psychology-return-home-early%3A4811de9f-ae28-49c2-a7dc-2f154834cda3&amp;title=Programming+Psychology+-+Return+home+early&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprogramming-psychology-return-home-early%3A4811de9f-ae28-49c2-a7dc-2f154834cda3&amp;title=Programming+Psychology+-+Return+home+early';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/programming-psychology-return-home-early:4811de9f-ae28-49c2-a7dc-2f154834cda3">28 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/programming-psychology-return-home-early:4811de9f-ae28-49c2-a7dc-2f154834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/migration-completed:480f53e4-843c-4b30-bf02-545b4834cda3">Migration completed</a></h2>	<div class="posted-on">
+		<p>Posted on 23/4/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>this is just a quick announcement that the migration has been completed and less stuff seems to be broken than we expected : )!</p>
+<p>So you can go ahead and leave some feedback on the new Design, Navigation and most importantly all the bugs you notice while using the site. We worked incredibly hard, for the past 7 hours we've been coding non stop and did ~70 commits to the SVN repository for this project.</p>
+<p>But still there is some work left to do. While all blog posts links should have survived the migration many others pointing to our categories and sub pages have not. We also want to make the syntax highlighting for code prettier (it's supposed to look like our Textmate theme, but Geshi isn't fine grained enough) and finish all the project pages listed on the right side.</p>
+<p>One good news however is left: We have re-categorized all our posts (See the "Read more about section to your right") and also marked about ~60% of all posts as deprecated. That means they won't show up in any index or search on our site, and if you find them via Google a big warning will be displayed saying the content is not up to date anymore. This way we hope people will start browsing through our archives and read some of our previous posts while we work on new material over the next couple of days : ).</p>
+<p>All right, thanks for all the feedback in advance!<br />
+-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f53e4-843c-4b30-bf02-545b4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmigration-completed%3A480f53e4-843c-4b30-bf02-545b4834cda3 &amp;title=Migration+completed';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmigration-completed%3A480f53e4-843c-4b30-bf02-545b4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmigration-completed%3A480f53e4-843c-4b30-bf02-545b4834cda3&amp;title=Migration+completed&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmigration-completed%3A480f53e4-843c-4b30-bf02-545b4834cda3&amp;title=Migration+completed';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/migration-completed:480f53e4-843c-4b30-bf02-545b4834cda3">19 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/migration-completed:480f53e4-843c-4b30-bf02-545b4834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/join-the-wordpress-funeral-on-wednesday:480f4dd6-82d8-4936-b186-417dcbdd56cb">Join the Wordpress funeral on Wednesday</a></h2>	<div class="posted-on">
+		<p>Posted on 20/4/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>wednesday will be the official funeral for thinkingphp.org and php-coding-practices.com. Both blogs will be shut down and hopefully come back phoenix style as <a href="http://www.debuggable.com/">debuggable.com</a> right away ...</p>
+<p>However. There still is lots of work left on the the new blog system and Tim and I are already swamped with client work, commitments to open source projects and various other things.</p>
+<p>That means chances are this is going to be a funeral indeed and things might go horribly wrong in the process of transition. So please get ready to send all your complaints about broken links, features, pages, etc. to <a href="mailto:bugs@debuggable.com"> bugs@debuggable.com</a>.</p>
+<p>We've decided to set this little deadline (no pun intended) for ourselves since launching the new blog has been one of the things we've said is about a week or two from happening for the past couple months and nothing has happened. This is especially frustrating since we currently consider this to be our most important long term project and several other small projects and software releases have been pushed back because of it.</p>
+<p>So mark your calendars and hope the best for our two sites when we pull the plugs on April 23rd. We'll do it regardless of how much progress is going to be made in between now and then ; ).</p>
+<p>-- Felix Geisendörfer aka the_undefined</p>
+<p>PS: Sorry Wordpress, you have been good to us for all those years - but its just time to move on ...<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-82d8-4936-b186-417dcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fjoin-the-wordpress-funeral-on-wednesday%3A480f4dd6-82d8-4936-b186-417dcbdd56cb &amp;title=Join+the+Wordpress+funeral+on+Wednesday';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fjoin-the-wordpress-funeral-on-wednesday%3A480f4dd6-82d8-4936-b186-417dcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fjoin-the-wordpress-funeral-on-wednesday%3A480f4dd6-82d8-4936-b186-417dcbdd56cb&amp;title=Join+the+Wordpress+funeral+on+Wednesday&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fjoin-the-wordpress-funeral-on-wednesday%3A480f4dd6-82d8-4936-b186-417dcbdd56cb&amp;title=Join+the+Wordpress+funeral+on+Wednesday';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/join-the-wordpress-funeral-on-wednesday:480f4dd6-82d8-4936-b186-417dcbdd56cb">12 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/join-the-wordpress-funeral-on-wednesday:480f4dd6-82d8-4936-b186-417dcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/best-written-programming-book:480f4dd6-fa94-4754-8913-4b5bcbdd56cb">Best written programming book</a></h2>	<div class="posted-on">
+		<p>Posted on 17/4/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>just a quick question to all of you: What is the best written programming book you know? I don't care what language or technology it is about. I'm looking for a book on the topic of programming that has the atmosphere of a good novel and really sucks you into it. A book you take with you everywhere b/c you want to know how it continues ; ).</p>
+<p>The thing is that most programming books that I know are not like this. They usually tend to either be way to simple and stupid throughout the entire book. Or way too intimidating and difficult so that you need to re-read every page from the first chapter to get it. Or some of them just loose their bite after 150-200 pages and you find yourself skipping lots of pages.</p>
+<p>So if you have any suggestions on *must-read* programming books please let me know. An exception would be books that are written about programming and team work itself and don't really contain code examples.</p>
+<p>thanks a lot,<br />
+-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-fa94-4754-8913-4b5bcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbest-written-programming-book%3A480f4dd6-fa94-4754-8913-4b5bcbdd56cb &amp;title=Best+written+programming+book';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbest-written-programming-book%3A480f4dd6-fa94-4754-8913-4b5bcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbest-written-programming-book%3A480f4dd6-fa94-4754-8913-4b5bcbdd56cb&amp;title=Best+written+programming+book&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbest-written-programming-book%3A480f4dd6-fa94-4754-8913-4b5bcbdd56cb&amp;title=Best+written+programming+book';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/best-written-programming-book:480f4dd6-fa94-4754-8913-4b5bcbdd56cb">38 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/best-written-programming-book:480f4dd6-fa94-4754-8913-4b5bcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="paging">
+	<a href="/posts/index/page:35" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:32">32</a></span> | <span><a href="/posts/index/page:33">33</a></span> | <span><a href="/posts/index/page:34">34</a></span> | <span><a href="/posts/index/page:35">35</a></span> | <span class="current">36</span> | <span><a href="/posts/index/page:37">37</a></span> | <span><a href="/posts/index/page:38">38</a></span> | <span><a href="/posts/index/page:39">39</a></span> | <span><a href="/posts/index/page:40">40</a></span> <a href="/posts/index/page:37" class="next">Next &raquo;</a></div>	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

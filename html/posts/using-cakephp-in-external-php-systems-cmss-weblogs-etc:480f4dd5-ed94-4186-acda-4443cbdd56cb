@@ -1,0 +1,519 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Using CakePHP in external PHP Systems (CMS's, Weblogs, etc.) &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/using-cakephp-in-external-php-systems-cmss-weblogs-etc:480f4dd5-ed94-4186-acda-4443cbdd56cb">Using CakePHP in external PHP Systems (CMS's, Weblogs, etc.)</a></h2>	<div class="posted-on">
+		<p>Posted on 4/5/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p>Well CakePHP is a great PHP framework, in fact I think it is the best. But sometimes even that isn't good enough for keeping up with this really tight deadlines one might have. In those cases I tend to go with other OS systems that are already close to what I need. For now that's mostly been Drupal, but I'm also thinking about doing the same thing with WordPress on this site.</p>
+<p>Now one might wonder what's the best way to utilize the powers of cakephp in those projects for getting the customization done as fast as possible. Now that I've tried a couple of approaches to do so (an earlier <a href="http://drake.kdz-online.de/drake/">PoC can be seen here</a>), mostly keeping the two systems in seperate folders and using customized .htaccess files to get the the two systems connected.</p>
+<p>But today I started to work on a little bit on my Drake project again and found an even better way to go. With better I don't neccessary mean the "cakephp right way", but one that required very little code and is easy to maintain, which is my criteria.</p>
+<p>I'll explain what I did for Drupal (and it should be just about 99% the same for any other system):</p>
+<h3>Where to put the foreign system?</h3>
+<p>Technically it would be a vendor, so one might think that's a good place to put it. But in most cases this won't work because parts of the foreign system will need to be accessible by the browser of the client. You could use .htaccess to do that, but you'd only make another folder useless that way, the webroot folder. And that's the place I decided to try out today. </p>
+<p>Just take the whole foreign app (drupal for me) and paste it into cakephp's <strong>app/webroot folder</strong>. Now the other app is likely to already provide it's own .htacess as well as index.php. You should <strong>rename the cakephp index.php</strong> to cakephp.php before and <strong>overwrite the cakephp .htaccess</strong> one of the foreign system. Now you should be able to access the foreign system just like you would access you cakephp app normally.</p>
+<h3>How to use CakePHP in the foreign system</h3>
+<p>Now open up the cakephp.php (the original index.php of app/webroot) and comment out the following lines at the end of the file like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">if</span><span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$_GET</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span><span class="br0">&#41;</span> &amp;&amp; <span class="re0">$_GET</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span> === <span class="st0">'favicon.ico'</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+<span class="br0">&#125;</span><br />
+<span class="kw1">else</span><br />
+<span class="br0">&#123;</span><br />
+<span class="coMULTI">/* &nbsp; &nbsp;$Dispatcher= new Dispatcher ();<br />
+&nbsp; &nbsp; $Dispatcher-&gt;dispatch($url);*/</span><br />
+<span class="br0">&#125;</span></div>
+<p>Now you can include CakePHP via require_once() in the foreign system without a page beeing directly rendered. We want it like this because that makes it possible to do as many 'requestActions' inside drupal/wordpress/whatever as you need, which is essential to fully use cakephp in those apps. Now all you need is a function called <strong>requestCakePHP()</strong> in your foreign system in order to retrieve data produced by CakePHP. This is the one I've come up with:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> requestCakePHP<span class="br0">&#40;</span><span class="re0">$url</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="co1">// Sessions are done by Drupal, don't use CakePHP built in ones</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/defined"><span class="kw3">defined</span></a><span class="br0">&#40;</span><span class="st0">'AUTO_SESSION'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/define"><span class="kw3">define</span></a><span class="br0">&#40;</span><span class="st0">'AUTO_SESSION'</span>, <span class="kw2">false</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="co1">// Set the url parameter for cakephp</span><br />
+&nbsp; &nbsp; <span class="re0">$_GET</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span> = <span class="re0">$url</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">require_once</span> <span class="st0">'cakephp.php'</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="co1">// We only need this to tell the name of the database we want to use,</span><br />
+&nbsp; &nbsp; <span class="co1">// user/pass can be left blank for that reason.</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/class_exists"><span class="kw3">class_exists</span></a><span class="br0">&#40;</span><span class="st0">'DATABASE_CONFIG'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/eval"><span class="kw3">eval</span></a><span class="br0">&#40;</span><span class="st0">&quot;class DATABASE_CONFIG<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;{<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;var <span class="es0">\$</span>default = array('driver' &nbsp; &nbsp;=&gt; 'mysql',<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 'connect' &nbsp;=&gt; 'drupal_connection',<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 'host' &nbsp; &nbsp; =&gt; 'localhost',<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 'login' &nbsp; &nbsp;=&gt; 'root',<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 'password' =&gt; '',<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 'database' =&gt; 'drake',<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 'prefix' &nbsp; &nbsp;=&gt; ''); <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;}&quot;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// Fire up CakePHP and buffer results</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/ob_start"><span class="kw3">ob_start</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="re0">$Dispatcher</span>= <span class="kw2">new</span> Dispatcher <span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$Dispatcher</span>-&gt;<span class="me1">dispatch</span><span class="br0">&#40;</span><span class="re0">$url</span><span class="br0">&#41;</span>; &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/ob_get_clean"><span class="kw3">ob_get_clean</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">function</span> &amp;drupal_connection<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// CakePHP expects this function to return a database connection, this is the one Drupal uses</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/global"><span class="kw3">global</span></a> <span class="re0">$active_db</span>; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$active_db</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Now most of this code just takes care of making sure that cakephp uses the same database as the foreign app and does <strong>NOT</strong> try to reconnect to it. The rest of the code should be fairly easy to understand.</p>
+<p>The only thing you need to do now is to tell your foreign app to use requestCakePHP() for content retrieval when the system itself doesn't know how to handle a path. For Drupal this would be:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> drake_init<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp;variable_set<span class="br0">&#40;</span><span class="st0">'site_404'</span>, <span class="st0">'drake'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<br />
+<span class="kw2">function</span> drake_menu<span class="br0">&#40;</span><span class="re0">$may_cache</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$items</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$items</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'path'</span> =&gt; <span class="st0">'drake'</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'title'</span> =&gt; t<span class="br0">&#40;</span><span class="st0">'Drake'</span><span class="br0">&#41;</span>, <span class="st0">'access'</span> =&gt; <span class="kw2">true</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'callback'</span> =&gt; <span class="st0">'requestCakePHP'</span>, <span class="st0">'type'</span> =&gt; MENU_CALLBACK,<br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'callback arguments'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="re0">$_GET</span><span class="br0">&#91;</span><span class="st0">'q'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; <span class="kw1">return</span> <span class="re0">$items</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>That's it! And as you can see it's really something that should work with almost any other php application. The only thing you need to hope for is, that the other application doesn't provide functions with the same name as cakephp does inside basics.php. But since cakephp mostly uses classes for it's stuff luck should be on your side.</p>
+<p>I hope I'll be able to release my Drake code (that's based on this new solution) soon, I'll write a blog post as soon as it's done.</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-ed94-4186-acda-4443cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fusing-cakephp-in-external-php-systems-cmss-weblogs-etc%3A480f4dd5-ed94-4186-acda-4443cbdd56cb &amp;title=Using+CakePHP+in+external+PHP+Systems+%28CMS%27s%2C+Weblogs%2C+etc.%29';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fusing-cakephp-in-external-php-systems-cmss-weblogs-etc%3A480f4dd5-ed94-4186-acda-4443cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fusing-cakephp-in-external-php-systems-cmss-weblogs-etc%3A480f4dd5-ed94-4186-acda-4443cbdd56cb&amp;title=Using+CakePHP+in+external+PHP+Systems+%28CMS%27s%2C+Weblogs%2C+etc.%29&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fusing-cakephp-in-external-php-systems-cmss-weblogs-etc%3A480f4dd5-ed94-4186-acda-4443cbdd56cb&amp;title=Using+CakePHP+in+external+PHP+Systems+%28CMS%27s%2C+Weblogs%2C+etc.%29';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/how-to-do-group-by-conditions-in-model-find()-calls:483fdc1c-8454-4593-a55e-37244834cda3">How to do Group By conditions in Model find() calls in the CakePHP RC1</a></li>
+							<li><a href="/posts/a-solution-for-e-mail-sending-in-cakephp:480f4dd5-b500-4bdc-a6c5-4ef6cbdd56cb">A solution for e-mail sending in CakePHP</a></li>
+							<li><a href="/posts/basic-cakephp-templating-skills:480f4dd6-4040-4c57-8c17-4606cbdd56cb">Basic CakePHP templating skills</a></li>
+							<li><a href="/posts/unit-testing-in-cakephp-part-1---introduction-to-unit-testing:48102610-c5d0-4398-a010-76974834cda3">Unit Testing in CakePHP Part 1 - Introduction to Unit Testing</a></li>
+							<li><a href="/posts/upcoming:-code-coverage-in-cakephp---test-how-well-you-test:4814f672-0d78-4585-a349-64c64834cda3">Upcoming: Code Coverage in CakePHP - Test How Well You Test</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/handling-database-connection-errors-in-cakephp:480f4dd5-9570-421a-a04d-43cdcbdd56cb">Handling database connection errors in CakePHP</a></li>
+							<li><a href="/posts/learning-from-the-cakephp-source-code-part-ii:480f4dd6-57fc-4715-8709-439acbdd56cb">Learning from the CakePHP source code - Part II</a></li>
+							<li><a href="/posts/cakephp-all-others:480f4dfe-0bb0-46bc-b668-415ccbdd56cb">CakePHP &gt; All Others</a></li>
+							<li><a href="/posts/cakephp-1.2-stable-come-and-help:4829b3ac-903c-4f56-94dc-27af4834cda3">CakePHP 1.2 Stable! Come and help</a></li>
+							<li><a href="/posts/bringing-the-cold-war-to-cakephp-12-the-containable-behavior:480f4dd6-2b50-4d7b-ab05-418dcbdd56cb">Bringing the cold war to CakePHP 1.2 - The Containable Behavior</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/using-cakephp-in-external-php-systems-cmss-weblogs-etc:480f4dd5-ed94-4186-acda-4443cbdd56cb">15 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/using-cakephp-in-external-php-systems-cmss-weblogs-etc:480f4dd5-ed94-4186-acda-4443cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dd7-fd74-449a-80f1-4916cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cd79fc3b72f84dd8716d0c21c3fe4f63&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							j o e l&nbsp;						</strong>
+						<strong>said 
+						on May 05, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks, Felix.  I hope to play around with this some this weekend.</p>
+<p>I'm looking forward to the update to your Drake code, also.</p>
+<p>Thanks again!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-24d0-49cb-ba7e-40c0cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 05, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Joel, thanks for your interest. The new Drake code will propably not contain too many things, since I've decided to start all over. But the difference will be that it will be way easier to implement, as well as more stable to run, and more flexible to use.</p>
+<p>I hope I'll be done this weekend.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-5ab8-4fea-ba9b-41c2cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=dfbcd231acf46cc079f9d49602b2a734&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.chapeco-online.com.br" rel="nofollow">Marcelo Serpa</a>						</strong>
+						<strong>said 
+						on May 15, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Very interesting stuff indeed Felix. Thanks for sharing! ;)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-4a68-48fa-a343-4dcbcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9ec75a40730a94884c9b22d8af5e2fc8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.m4rc.nl" rel="nofollow">Marc</a>						</strong>
+						<strong>said 
+						on Jun 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix, thanks for sharing this. I'm reasonably new to Cake, and just decided to use acl for my project. I'll be sure to keep your article handy; It will sure spare me some pittfalls.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-7c78-4d94-adc1-41e0cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 04, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey marc, this sounds like this would be a response to my "CakePHP and Acl - Why is it so difficult?" post, so how does it happen to pop up here? ; ).</p>
+<p>--Felix</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-0220-43fc-b465-4f59cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=95ef9c3b3d31bbf3ed9e274e75880195&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.imotech.ca/" rel="nofollow">Dan</a>						</strong>
+						<strong>said 
+						on Jun 19, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thank you for another informative posting.  I just started with CakePHP a few weeks ago after several years of writing in PHP the "normal" way.  Your postings have helped me solve several problems that have come up as a result of learning to do things the CakePHP way.</p>
+<p>One question, though, when you say "Now open up the cakephp.php (the original index.php of app/webroot) and uncomment the following lines at the end of the file like this", should that actually say "comment out" instead of "uncomment"?</p>
+<p>Thanks.</p>
+<p>Dan.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-2614-4b24-a28e-467dcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 19, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Dan, yes you are correct I ment to use "comment out" instead of "uncomment". English is not my first language (I'm German) so most of my posts could potentially contain more or less significant language mistakes in them. However, since you spotted this one for me, I corrected it in the post above - Thanks ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-63d0-44cf-bfe8-4d47cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=aff9039dc673beda1d2f37e836c58271&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.gigapromoters.com" rel="nofollow">Max</a>						</strong>
+						<strong>said 
+						on Dec 24, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>I read about your Drake project, 2 months back. And I knew some of the developers from Drupal were also against that project because it was just a *redirection* trick according to them. Till then, I've been thinking about some solution to solve this. But WOW, You already posted it before I started learning Cake. I'm feeling much better now.</p>
+<p>Thanks a lot. Max</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-e534-42b1-8502-454ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=aff9039dc673beda1d2f37e836c58271&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.gigapromoters.com" rel="nofollow">Max</a>						</strong>
+						<strong>said 
+						on Jan 29, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Felix,</p>
+<p>I am able to come up with this: http://www.gigapromoters.com/blog/2007/01/28/joining-powers-of-two-great-systems-joomla-and-cakephp/</p>
+<p>Thanks to you....</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-3760-4387-b4cd-49decbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2a4f4f2259921a89fbb16f44034f395a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.marianoiglesias.com.ar" rel="nofollow">Mariano Iglesias</a>						</strong>
+						<strong>said 
+						on Feb 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Felix,</p>
+<p>What’s up! Weird to see you outside of CakePHP google group  </p>
+<p>Have a question, what’s the status of this project? Can I extend it? </p>
+<p>Using the same procedures I used for building Jake (following Max’s work, now available at http://dev.sypad.com/projects/jake) I just built a module for Drupal 5.1 that:</p>
+<p>1. Same as Jake, allows your CakePHP application to run with or without Drupal, with no code modifications at either end.</p>
+<p>2. Handles the possibility that Drupal &amp; CakePHP may be using different databases.</p>
+<p>3. Properly manages sessions (since Drupal may use a session handler that is not the same as Cake, plus Cake brings by default the AUTO_SESSION which would make your Cake application to complain when running inside Drupal): sessions are closed before running the application and restored afterwards, so your CakePHP application can use sessions at will, and Drupal doesn’t loose its session information.</p>
+<p>4. No need to change any links or anything in your CakePHP application, the module automatically makes every link/AJAX resource to go through Drupal (*if* the CakePHP application is running on Drupal in the first place)</p>
+<p>Well and a lot more things, so I was wondering how we can combine efforts.</p>
+<p>Thanks mate! :)</p>
+<p>PS: I posted this on an older blog post you had regarding the issue but it was throwing errors so I figured I tried here.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-171c-4d37-99ce-4750cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2007/02/26/drake-drupal-cakephp-101b-released/" rel="nofollow">ThinkingPHP and beyond &raquo; Drake :: Drupal-CakePHP 1.0.1b Re</a>						</strong>
+						<strong>said 
+						on Feb 26, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] this is just a quick announcement that a completely new Drake has has been released by Mariano Iglesias. For those of you who don&#8217;t remember: I used to have some fun with integrating CakePHP with other PHP applications around such as drupal which in term created a project called Drake. I only released a couple versions and by looking at Mariano documentation for Drakes none of them were as easy to set up. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-f12c-4493-9cee-44c8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ef65ceaac9b7ad1673dc876426fe2317&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							cybercow&nbsp;						</strong>
+						<strong>said 
+						on Apr 02, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well... that`s absolutely true, although cake saved our azes several times!, when deadlines knocked on the dor, and the day before nothing to show to our clients :O - when implementing it with common php apps, we haved bad $_SESSION issues, i will try this tricks to see what happens ... </p>
+<p>... disabling the </p>
+<p>Configure::write('Session.start', false);</p>
+<p>not works/</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-becc-41da-8405-4f03cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ef65ceaac9b7ad1673dc876426fe2317&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							cybercow&nbsp;						</strong>
+						<strong>said 
+						on Apr 02, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>well ...  i done like here described, cake is killing my actual php session and i can`t do nothing about :(</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-488d6f13-3794-4ecd-bfae-46814834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=88a8a4835b13c60fb0c95e96a7681da0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							mimic&nbsp;						</strong>
+						<strong>said 
+						on Jul 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>i'm beginner using cakephp for final year project. i want to know where i can get installer of cakephp and how to install it?<br />
+i dont known anything about cakephp..</br><br />
+help me...</br><br />
+thanks..</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-488f251f-5570-40e6-87a1-25be4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bf366932b14714022c187f66258a80e1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.score-advertising.nl" rel="nofollow">Bo</a>						</strong>
+						<strong>said 
+						on Jul 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@mimic, just download a stable build from:<br />
+www.cakephp.org</br></p>
+<p>The installation process is nothing more than uploading the files and configurating some other settings (database, routes, etc.). You can find more about this at:<br />
+<a rel="nofollow" href="http://book.cakephp.org/view/32/installation">http://book.cakephp.org/view/32/installation</a></br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Blog &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="paging">
+	<a href="/posts/index/page:55" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:52">52</a></span> | <span><a href="/posts/index/page:53">53</a></span> | <span><a href="/posts/index/page:54">54</a></span> | <span><a href="/posts/index/page:55">55</a></span> | <span class="current">56</span> | <span><a href="/posts/index/page:57">57</a></span> | <span><a href="/posts/index/page:58">58</a></span> | <span><a href="/posts/index/page:59">59</a></span> | <span><a href="/posts/index/page:60">60</a></span> <a href="/posts/index/page:57" class="next">Next &raquo;</a></div>
+	<div class="post">
+	<h2><a href="/posts/dessert-13-a-simple-config-model:480f4dd5-d100-4e7f-80e6-416acbdd56cb">Dessert #13 - A simple Config Model</a></h2>	<div class="posted-on">
+		<p>Posted on 20/9/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>A lot of you probably like the idea of storing some of your applications configuration in a database since this way you can easily tweak things at run time versus having to edit configuration files on the server.</p>
+<p>For me I found it pretty useful to just have a simple table called configs which contains two fields: "name" and "value". "name" is the primary key and it's type is varchar(255). The "value" fields type is text. After setting this up, I created a simple Model called Config and added two convenient little function named get & store to it which I can call from my controllers.</p>
+<p>The code for the Config Model is this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> Config <span class="kw2">extends</span> AppModel <br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">'Config'</span>; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$primaryKey</span> = <span class="st0">'name'</span>;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$validate</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'name'</span> =&gt; VALID_NOT_EMPTY<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw2">function</span> get<span class="br0">&#40;</span><span class="re0">$name</span>, <span class="re0">$default</span> = <span class="kw2">null</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$config</span> = <span class="re0">$this</span>-&gt;<span class="me1">findByName</span><span class="br0">&#40;</span><span class="re0">$name</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$config</span><span class="br0">&#91;</span><span class="st0">'Config'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'value'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$config</span><span class="br0">&#91;</span><span class="st0">'Config'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'value'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span> <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$default</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw2">function</span> store<span class="br0">&#40;</span><span class="re0">$name</span>, <span class="re0">$value</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">save</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'name'</span> =&gt; <span class="re0">$name</span>, <span class="st0">'value'</span> =&gt; <span class="re0">$value</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>And usage is as simple as this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> AppController <span class="kw2">extends</span> Controller <br />
+<span class="br0">&#123;</span> &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$uses</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Config'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw2">function</span> beforeFilter<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">theme</span> = <span class="re0">$this</span>-&gt;<span class="me1">Config</span>-&gt;<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'theme'</span>, <span class="st0">'summer'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>So in the example above the beforeFilter tries to get the value of 'theme' out of the configs table and in case that fails (theme isn't set), it will return 'summer' as default value.</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-d100-4e7f-80e6-416acbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-13-a-simple-config-model%3A480f4dd5-d100-4e7f-80e6-416acbdd56cb &amp;title=Dessert+%2313+-+A+simple+Config+Model';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-13-a-simple-config-model%3A480f4dd5-d100-4e7f-80e6-416acbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-13-a-simple-config-model%3A480f4dd5-d100-4e7f-80e6-416acbdd56cb&amp;title=Dessert+%2313+-+A+simple+Config+Model&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-13-a-simple-config-model%3A480f4dd5-d100-4e7f-80e6-416acbdd56cb&amp;title=Dessert+%2313+-+A+simple+Config+Model';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/dessert-13-a-simple-config-model:480f4dd5-d100-4e7f-80e6-416acbdd56cb">12 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/dessert-13-a-simple-config-model:480f4dd5-d100-4e7f-80e6-416acbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/dessert-12-debugging-requestaction:480f4dd5-bca4-4e86-820c-4f4dcbdd56cb">Dessert #12 - Debugging requestAction</a></h2>	<div class="posted-on">
+		<p>Posted on 19/9/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>You can regard this as a general php debugging tip, but I found it pretty useful when either working with Object::requestAction() (you probably mostly use it from within the controller which extends object), or when having problems to understand a function call sequence in general.</p>
+<p>The basic problem is that sometimes you want to find out which function called the function you are in right now, or even see the entire sequence of function calls that led to your current function being executed. In that case php's debug_backtrace() comes really handy. However the array it returns is a little too long and complex for what you usally need. In my case that is a list of Class::function()'s that were called. So what I did was to write a little snippet that I can insert by using a shortcut of my IDE. The code itself looks like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$backtrace</span> = <a href="http://www.php.net/array_reverse"><span class="kw3">array_reverse</span></a><span class="br0">&#40;</span><a href="http://www.php.net/debug_backtrace"><span class="kw3">debug_backtrace</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>; <br />
+<span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$backtrace</span> <span class="kw1">as</span> <span class="re0">$trace</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span> <br />
+&nbsp; &nbsp; debug<span class="br0">&#40;</span>@<span class="re0">$trace</span><span class="br0">&#91;</span><span class="st0">'class'</span><span class="br0">&#93;</span>.<span class="st0">'::'</span>.@<span class="re0">$trace</span><span class="br0">&#91;</span><span class="st0">'function'</span><span class="br0">&#93;</span>.<span class="st0">'()'</span><span class="br0">&#41;</span>; <br />
+<span class="br0">&#125;</span></div>
+<p>Usally when I paste it, it's 1 line long, but I split it up so you can read it a little better on here. For those of you who use some advanced debugging extensions or additional classes, of course, this will seem like a joke, but I believe in light weight debugging, because as soon as you need huge debugging frameworks you are in huge trouble ; ). So feel free to post your approaches to debugging function sequences, but keep in mind that this is only ment to be a quick & dirty snippet I trigger by pressing a hotkey, but which has served me well so far ; ).</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-bca4-4e86-820c-4f4dcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-12-debugging-requestaction%3A480f4dd5-bca4-4e86-820c-4f4dcbdd56cb &amp;title=Dessert+%2312+-+Debugging+requestAction';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-12-debugging-requestaction%3A480f4dd5-bca4-4e86-820c-4f4dcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-12-debugging-requestaction%3A480f4dd5-bca4-4e86-820c-4f4dcbdd56cb&amp;title=Dessert+%2312+-+Debugging+requestAction&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-12-debugging-requestaction%3A480f4dd5-bca4-4e86-820c-4f4dcbdd56cb&amp;title=Dessert+%2312+-+Debugging+requestAction';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/dessert-12-debugging-requestaction:480f4dd5-bca4-4e86-820c-4f4dcbdd56cb">0 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/dessert-12-debugging-requestaction:480f4dd5-bca4-4e86-820c-4f4dcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/the-48-minutes-challenge-a-rush-of-productivity:480f4dd5-daac-4f88-bf20-45cecbdd56cb">The 48 Minutes challenge / A rush of productivity</a></h2>	<div class="posted-on">
+		<p>Posted on 18/9/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>For those of you who have followed this site in the past days you might have noticed that I was writing a lot of posts on here recently. This of course has something to do with my <a href="http://www.thinkingphp.org/2006/09/13/10-days-of-free-dessert-cakephp-tips/">10 Days of Free Dessert!</a> series, but on saturday and sunday both, I wrote 3 desserts even so the bet just says I got to write 1 / day.</p>
+<p>In the past 3-4 weeks, I've started to work hard on myself. I've been trying to <a href="http://www.stevepavlina.com/blog/2005/05/how-to-become-an-early-riser/">get up at 5am every day</a> and even so I still oversleep at least once a week and feel a little sleepy when getting up, it has given me a serious increase in productivity. Together with that I've  pretty much given up drinking coffee especially in the morning. I still drink a cup in the afternoon from time to time, but gone are the days of waking up by the brute force of my <a href="http://www.thinkgeek.com/homeoffice/mugs/3820/">Geeky 16 ounce coffee cup</a>. </p>
+<p>Even so all of this has really been benifital it wasn't until last saturday that I discovered a real killer strategy for increasing my productivity. It was a post on lifehacker.com, and it suggested to <a href="http://www.lifehacker.com/software/timer/work-in-48-minute-increments-201004.php">Work in 48 minute increments</a>. So you would always work for 48 minutes on a certain task while making it your main priority to fight distraction. After that you take a 12 minutes break before you start to work again. This entire pattern has really pushed my productivity way up. On the past weekend when I started to apply it, I wrote 6 good sized posts on here, refactored (almost rewritten) the complete application I work on right now to increase code quality, did all my homework (I never do that ... ^^), met with friends and also completed a ton of minor tasks. Especially the first two items are pretty big and normally would have taken me 4-6 days instead of two. Now a lot of people who commented it negativley on it, but for me this just seems to work like a charm, so in case you are interested in trying it out as well, here are some advices I would like to give you:</p>
+<ol>
+<li>Use a coundown timer to keep track of the 48 minutes, otherwise you'll get of path easily. I personally love using my watch for it, but maybe you want to get yourself a big countdown timer instead.</li>
+<li>In the 48 minutes of work, *really* blend out all distractions. No email checking, no news reading, no instant messaging, no banging your head against the monitor. Force yourself to stay on task - you know after 48 minutes you'll definitly get a break.</li>
+<li>If you feel the urge to go to the toilet please go, I don't want to be responsible for any accidents ; ).</li>
+<li>If you get distracted by the outside world like a phone call or things like this, stop the timer. If you feel like you'll have some control over how long the distraction will be, remember where you stopped the clock and set it to the new value you try to stay with. After you are done, get right back on task.</li>
+<li>You'll maybe notice that this technic can lead to serious pressure of trying to finish the task in the given time, maybe even setting the timer back to get more time. Don't do that, if the task can't be done in 48 minutes take a break and start in 12 minutes again. This will make sure you don't exhaust yourself too badly for the hours to come.</li>
+<li>If you have to eat something or such, take a bigger break. Maybe 30, maybe 40 minutes. However, set the timer for this time as well to make sure you're not using it as an excuse for goofing of after a while.</li>
+</ol>
+<p>Ok, if you wonder *why* 48 minutes: I don't know. It probably works just as well with any other combination. I'll probably experiment with that a little bit in the future.</p>
+<p>PS: <a href="http://www.43folders.com/2005/10/11/procrastination-hack-1025/">Here is a similar post</a>, but this strategy has a good list of people who will especially benifit from this technic (like me).</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-daac-4f88-bf20-45cecbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-48-minutes-challenge-a-rush-of-productivity%3A480f4dd5-daac-4f88-bf20-45cecbdd56cb &amp;title=The+48+Minutes+challenge+%2F+A+rush+of+productivity';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-48-minutes-challenge-a-rush-of-productivity%3A480f4dd5-daac-4f88-bf20-45cecbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-48-minutes-challenge-a-rush-of-productivity%3A480f4dd5-daac-4f88-bf20-45cecbdd56cb&amp;title=The+48+Minutes+challenge+%2F+A+rush+of+productivity&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-48-minutes-challenge-a-rush-of-productivity%3A480f4dd5-daac-4f88-bf20-45cecbdd56cb&amp;title=The+48+Minutes+challenge+%2F+A+rush+of+productivity';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/the-48-minutes-challenge-a-rush-of-productivity:480f4dd5-daac-4f88-bf20-45cecbdd56cb">11 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/the-48-minutes-challenge-a-rush-of-productivity:480f4dd5-daac-4f88-bf20-45cecbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/dessert-11-welcome-back-friendly-urls:480f4dd5-8dac-414b-b329-4dd5cbdd56cb">Dessert #11 - Welcome back, Friendly URL's</a></h2>	<div class="posted-on">
+		<p>Posted on 18/9/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Not too long ago you've all heard me saying <a href="http://www.thinkingphp.org/2006/08/02/bye-bye-friendly-urls/">Bye, bye Friendly URL’s</a>. Now, after a lot of feedback and some more thoughts on it I came to what I find a nice compromise between REST'ness, SEO'ness, and FRIENDLY'ness.</p>
+<p>For those of you who didn't read the old post, the basic problem was that it's very nice and convenient to have full control over your url's. So instead of having /posts/view/1 you might prefer /a-cool-thing or /post/a-cool-thing or something else, more friendly to both human's and search engines. However, the problem you get, is that you easily break bookmarks & links to your sites when you change the title of the post. And yet another issue is that this method requires all title fields to be unique. Now you can work around all of those, but what I decided in the <a href="http://www.thinkingphp.org/2006/08/02/bye-bye-friendly-urls/">Bye, bye Friendly URL’s</a>-article was that it is too much of a hassle and you loose several advantages like the ease of building web api's.</p>
+<p>So for my current project I started to rethink the issue again and remembered the idea brought up by <a href="http://www.i-scream.net/">tomo</a> (and <a href="http://www.onelobby.com/">Peter Goodman</a>). Instead of using the post title to identify a post in the url, just use it as 'decoration' together with the real id. So for example you could use urls like this in your application: /post/1/my-cool-post. Your action will only check the first parameter (1) in order to identify the post, so if the title ever changes, the link will still work, or to say it differently /post/1* will all lead to the same page.</p>
+<p>What I didn't like about this structure was that for both, search engines, and people it could look like "my-cool-post" is a sub-item of /post/1/ which isn't the case. So a couple days ago I came up with a syntax I really like a lot:</p>
+<p>/post/1:my-post-title</p>
+<p>Maybe it's just personal preference. But to me it has all the good stuff:</p>
+<ul>
+<li>When the title changes, all other urls (/post/1:*) will remain usable</li>
+<li>The hierarchy is correct: "my-post-title" is the "1"st "post"</li>
+<li>It's REST'ful: /post/1 instead of /posts/view/1 (which is RPC)</li>
+<li>... and, I think it just looks very pretty ; )</li>
+</ul>
+<p>So however you may want to structure your url's, here is how to accomblish this stuff in CakePHP. The first thing is a route that will redirect your /post/* url's to PostsController::show();. My example is from CakePHP 1.2's Router, however it should work just the same with the old one:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+Router::<span class="me2">connect</span><span class="br0">&#40;</span><span class="st0">'/post/*'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'controller'</span> =&gt; <span class="st0">'posts'</span>, <span class="st0">'action'</span> =&gt; <span class="st0">'show'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>In your PostsController::show() action you'll just need a tiny bit of logic to split the id and post title (which I call url_suffix since I have an additional field for it in my project to gain more control over it):</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> show<span class="br0">&#40;</span><span class="re0">$id</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; @<a href="http://www.php.net/list"><span class="kw3">list</span></a><span class="br0">&#40;</span><span class="re0">$id</span>, <span class="re0">$url_suffix</span><span class="br0">&#41;</span> = <a href="http://www.php.net/preg_split"><span class="kw3">preg_split</span></a><span class="br0">&#40;</span><span class="st0">'/[:]/'</span>, <span class="re0">$id</span>, <span class="nu0">2</span><span class="br0">&#41;</span>; &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="re0">$post</span> = <span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">findById</span><span class="br0">&#40;</span><span class="re0">$id</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'post'</span>, <span class="re0">$post</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Ok and for those of you who want to get even fancier here is an improved version:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> show<span class="br0">&#40;</span><span class="re0">$id</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; @<a href="http://www.php.net/list"><span class="kw3">list</span></a><span class="br0">&#40;</span><span class="re0">$id</span>, <span class="re0">$url_suffix</span><span class="br0">&#41;</span> = <a href="http://www.php.net/preg_split"><span class="kw3">preg_split</span></a><span class="br0">&#40;</span><span class="st0">'/[:]/'</span>, <span class="re0">$id</span>, <span class="nu0">2</span><span class="br0">&#41;</span>; &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="re0">$post</span> = <span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">findById</span><span class="br0">&#40;</span><span class="re0">$id</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$url_suffix</span>!==<span class="re0">$post</span><span class="br0">&#91;</span><span class="st0">'Post'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'url_suffix'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">redirect</span><span class="br0">&#40;</span><span class="st0">'/post/'</span>.<span class="re0">$post</span><span class="br0">&#91;</span><span class="st0">'Post'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'id'</span><span class="br0">&#93;</span>.<span class="st0">':'</span>.<span class="re0">$post</span><span class="br0">&#91;</span><span class="st0">'Post'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'url_suffix'</span><span class="br0">&#93;</span>, <span class="nu0">301</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/exit"><span class="kw3">exit</span></a>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'post'</span>, <span class="re0">$post</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>The difference between this function and the first one is that the function checks if the $url_prefix that was in the user request is the same one as currently assigned to our post. In case it has changed (and our user is using an old bookmark for example), we redirect him to a page with the proper url_suffix attached to the url. This is not all that important for normal users, but it's very efficent for telling search engines that your page has moved.</p>
+<p>Oh and I'll post a function that'll convert "This is my post" type of titles into url ones like "this-is-my-post". It's not all that difficult, but I want to make sure it takes care of a lot of eventualities (Umlaute/Utf8 chars, double spaces, ...).</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-8dac-414b-b329-4dd5cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-11-welcome-back-friendly-urls%3A480f4dd5-8dac-414b-b329-4dd5cbdd56cb &amp;title=Dessert+%2311+-+Welcome+back%2C+Friendly+URL%27s';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-11-welcome-back-friendly-urls%3A480f4dd5-8dac-414b-b329-4dd5cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-11-welcome-back-friendly-urls%3A480f4dd5-8dac-414b-b329-4dd5cbdd56cb&amp;title=Dessert+%2311+-+Welcome+back%2C+Friendly+URL%27s&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-11-welcome-back-friendly-urls%3A480f4dd5-8dac-414b-b329-4dd5cbdd56cb&amp;title=Dessert+%2311+-+Welcome+back%2C+Friendly+URL%27s';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/dessert-11-welcome-back-friendly-urls:480f4dd5-8dac-414b-b329-4dd5cbdd56cb">31 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/dessert-11-welcome-back-friendly-urls:480f4dd5-8dac-414b-b329-4dd5cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/a-horrible-suspicion:480f4dd5-db80-4721-992e-4235cbdd56cb">A horrible suspicion</a></h2>	<div class="posted-on">
+		<p>Posted on 17/9/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>I think I just made pretty bad discovery a minute ago. For some reason I've always been pretty bad with names of Locations, People, etc., but for some reason I almost always remember the first letter correctly. So if I met a girl named "Sandra" and see hear again I would be like "Hey S ... S ... S ... S-Sorry, what was your name again?". Ok, no, I actually figured out that pretending to remember the name works a lot better then that, but anyway, the problem still exists.</p>
+<p>So as I said a minute ago a horrible suspicion came to my mind. What is if all of this had to do with my programming, or to be more exact my with IDE. For those of you who don't know, I come from a BASIC background and started to use Visual Basic (*sigh*) fairly early. One of the nice aspects of it was that they always had a really good IDE with auto completion, just like my current IDE. So my suspicion is, that the auto complete feature is what causes me to forgot names. If I have a class called Pictures, I just type P press Ctrl+Space and hit enter -> done. I do this approximitly 100-300 times a day, so I think this could seriously have something to do with my inability to remember names. Whenever I use an IDE without auto completion, I feel really uncomfortable and my productivity goes way down which seems to support this theory as well.</p>
+<p>What do you guys think, anybody having similar experiences? Any ideas how to fix it? I should probably start using Notepad++ for my coding at least once a week : ).</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-db80-4721-992e-4235cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-horrible-suspicion%3A480f4dd5-db80-4721-992e-4235cbdd56cb &amp;title=A+horrible+suspicion';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-horrible-suspicion%3A480f4dd5-db80-4721-992e-4235cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-horrible-suspicion%3A480f4dd5-db80-4721-992e-4235cbdd56cb&amp;title=A+horrible+suspicion&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-horrible-suspicion%3A480f4dd5-db80-4721-992e-4235cbdd56cb&amp;title=A+horrible+suspicion';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/a-horrible-suspicion:480f4dd5-db80-4721-992e-4235cbdd56cb">10 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/a-horrible-suspicion:480f4dd5-db80-4721-992e-4235cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="paging">
+	<a href="/posts/index/page:55" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:52">52</a></span> | <span><a href="/posts/index/page:53">53</a></span> | <span><a href="/posts/index/page:54">54</a></span> | <span><a href="/posts/index/page:55">55</a></span> | <span class="current">56</span> | <span><a href="/posts/index/page:57">57</a></span> | <span><a href="/posts/index/page:58">58</a></span> | <span><a href="/posts/index/page:59">59</a></span> | <span><a href="/posts/index/page:60">60</a></span> <a href="/posts/index/page:57" class="next">Next &raquo;</a></div>	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

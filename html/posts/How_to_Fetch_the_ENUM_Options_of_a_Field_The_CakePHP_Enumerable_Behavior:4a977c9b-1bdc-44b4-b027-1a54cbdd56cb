@@ -1,0 +1,427 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>How to Fetch the ENUM Options of a Field - The CakePHP Enumerable Behavior &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/How_to_Fetch_the_ENUM_Options_of_a_Field_The_CakePHP_Enumerable_Behavior:4a977c9b-1bdc-44b4-b027-1a54cbdd56cb">How to Fetch the ENUM Options of a Field - The CakePHP Enumerable Behavior</a></h2>	<div class="posted-on">
+		<p>Posted on 8/9/09 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>for a current client project of ours we had to build an extensive ACL-like permission system. It had to support roles permissions and specific user permissions, possibly overriding the roles permissions. So, to create a user, you had to first define his "role" or "level" as I called it in a dropdown box in a form.</p>
+<p>However, the field users.level is an enum type and can have the values 'guest', 'user', 'admin', 'superadmin' and 'root'. The problem is that it could be possible that new levels were added in the future. There was no need though to have a seperate user_levels table and a UserLevel model there, since the system should simply not be as generic to allow that and adding a new level in the future would require a complete other version of the software. So I went the easy way.<br />
+Besides, as we use uuids, the users.level field would contain them and after all we want our database to be readable in our favorite db management system.</p>
+<p>So what I came up with is a very simple behavior that can extract the options for any ENUM field. It uses simple caching in order for the query to not be run all the time, so make sure to clear your cache as you update your enum field options in the db.</p>
+<p>Here is the behavior:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;"><span class="kw2">&lt;?php</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* Behavior with useful functionality around models containing an enum type field<br />
+&nbsp;*<br />
+&nbsp;* Copyright (c) Debuggable, http://debuggable.com<br />
+&nbsp;*<br />
+&nbsp;* @package default<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+<span class="kw2">class</span> EnumerableBehavior <span class="kw2">extends</span> ModelBehavior <span class="br0">&#123;</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* Fetches the enum type options for a specific field<br />
+&nbsp;*<br />
+&nbsp;* @param string $field <br />
+&nbsp;* @return void<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; <span class="kw2">function</span> enumOptions<span class="br0">&#40;</span><span class="re0">$model</span>, <span class="re0">$field</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$cacheKey</span> = <span class="re0">$model</span>-&gt;<span class="me1">alias</span> . <span class="st0">'_'</span> . <span class="re0">$field</span> . <span class="st0">'_enum_options'</span>;<br />
+&nbsp; &nbsp; <span class="re0">$options</span> = Cache::<span class="me2">read</span><span class="br0">&#40;</span><span class="re0">$cacheKey</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$options</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$sql</span> = <span class="st0">&quot;SHOW COLUMNS FROM `{$model-&gt;useTable}` LIKE '{$field}'&quot;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$enumData</span> = <span class="re0">$model</span>-&gt;<span class="me1">query</span><span class="br0">&#40;</span><span class="re0">$sql</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$options</span> = <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$enumData</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$patterns</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'enum('</span>, <span class="st0">')'</span>, <span class="st0">'<span class="es0">\'</span>'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$enumData</span> = r<span class="br0">&#40;</span><span class="re0">$patterns</span>, <span class="st0">''</span>, <span class="re0">$enumData</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'COLUMNS'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'Type'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$options</span> = <a href="http://www.php.net/explode"><span class="kw3">explode</span></a><span class="br0">&#40;</span><span class="st0">','</span>, <span class="re0">$enumData</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; Cache::<span class="me2">write</span><span class="br0">&#40;</span><span class="re0">$cacheKey</span>, <span class="re0">$options</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$options</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<span class="kw2">?&gt;</span></div>
+<p>To put that into the form I did in the controller:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$enumOptions</span> = ClassRegistry::<span class="me2">init</span><span class="br0">&#40;</span><span class="st0">'User'</span><span class="br0">&#41;</span>-&gt;<span class="me1">enumOptions</span><span class="br0">&#40;</span><span class="st0">'level'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><a href="http://www.php.net/compact"><span class="kw3">compact</span></a><span class="br0">&#40;</span><span class="st0">'enumOptions'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>and then in the form:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$form</span>-&gt;<span class="me1">input</span><span class="br0">&#40;</span><span class="st0">'level'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'options'</span> =&gt; <span class="re0">$enumOptions</span>, <span class="st0">'label'</span> =&gt; <span class="st0">'Level:'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>Enjoy and please give feedback.</p>
+<p>-- Tim Koschuetzki aka DarkAngelBGE<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4a977c9b-1bdc-44b4-b027-1a54cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2FHow_to_Fetch_the_ENUM_Options_of_a_Field_The_CakePHP_Enumerable_Behavior%3A4a977c9b-1bdc-44b4-b027-1a54cbdd56cb &amp;title=How+to+Fetch+the+ENUM+Options+of+a+Field+-+The+CakePHP+Enumerable+Behavior';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2FHow_to_Fetch_the_ENUM_Options_of_a_Field_The_CakePHP_Enumerable_Behavior%3A4a977c9b-1bdc-44b4-b027-1a54cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2FHow_to_Fetch_the_ENUM_Options_of_a_Field_The_CakePHP_Enumerable_Behavior%3A4a977c9b-1bdc-44b4-b027-1a54cbdd56cb&amp;title=How+to+Fetch+the+ENUM+Options+of+a+Field+-+The+CakePHP+Enumerable+Behavior&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2FHow_to_Fetch_the_ENUM_Options_of_a_Field_The_CakePHP_Enumerable_Behavior%3A4a977c9b-1bdc-44b4-b027-1a54cbdd56cb&amp;title=How+to+Fetch+the+ENUM+Options+of+a+Field+-+The+CakePHP+Enumerable+Behavior';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/macgyver-menu-for-cakephp-whats-the-active-menu-item:480f4dd6-c044-436e-bbde-4ed8cbdd56cb">MacGyver menu for CakePHP - What&#039;s the active menu item?</a></li>
+							<li><a href="/posts/gwoo-starts-the-first-cakephp-based-blog:480f4dd5-c668-48c7-b6d8-436ccbdd56cb">gwoo starts the first CakePHP based blog</a></li>
+							<li><a href="/posts/update-on-cakephp-google-analytics-apimodel:480f4dd5-7044-47bc-945a-4d90cbdd56cb">Update on CakePHP Google Analytics API/Model</a></li>
+							<li><a href="/posts/cakephp-argentina:4937042e-4864-48e1-98f0-6d3d4834cda3">CakePHP Argentina</a></li>
+							<li><a href="/posts/using-rest-api%e2%80%99s-as-models-in-cakephp-a-google-calendar-example:480f4dd5-02c0-464e-941c-4774cbdd56cb">Using REST Api’s as Models in CakePHP / A Google Calendar example</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/making-error-handling-for-modelsave-more-beautiful-in-cakephp:480f4dd6-7110-4706-8230-4a97cbdd56cb">Making error handling for Model::save more beautiful in CakePHP</a></li>
+							<li><a href="/posts/handling-database-connection-errors-in-cakephp:480f4dd5-9570-421a-a04d-43cdcbdd56cb">Handling database connection errors in CakePHP</a></li>
+							<li><a href="/posts/with-jquery-cakephp-to-world-domination-slides:480f4dd6-7cb8-4e84-af4f-4dc6cbdd56cb">With jQuery &amp; CakePHP to World Domination (Slides)</a></li>
+							<li><a href="/posts/quick-dessert-list-all-controllers-of-a-cakephp-application:480f4dd6-adf4-4b18-9fe8-4b99cbdd56cb">Quick dessert: List all controllers of a CakePHP application</a></li>
+							<li><a href="/posts/remember-the-days-before-spam-a-cakephp-model-for-akismet:480f4dd5-d358-4f51-ac83-45f1cbdd56cb">Remember the days before spam? A CakePHP Model for Akismet  </a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/How_to_Fetch_the_ENUM_Options_of_a_Field_The_CakePHP_Enumerable_Behavior:4a977c9b-1bdc-44b4-b027-1a54cbdd56cb">10 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/How_to_Fetch_the_ENUM_Options_of_a_Field_The_CakePHP_Enumerable_Behavior:4a977c9b-1bdc-44b4-b027-1a54cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4aa62815-f598-48ae-85f1-0179cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5f16b9055acd27c725c0e353c421c158&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.adambrett.co.uk" rel="nofollow">Adam</a>						</strong>
+						<strong>said 
+						on Sep 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Would it not have been easier (and cleaner/more portable) to add a new variable to the User Model?</p>
+<p>[code]<br />
+< ?php<br />
+</>< ?php<br />
+class User extends AppModel {<br />
+	var $name = 'User';</br><br />
+	....</br><br />
+	var $_enum = array(</br><br />
+		'level' => array(</br><br />
+			'admin' => 'Administrator'</br><br />
+			'superadmin' => 'Super Administrator'</br><br />
+			'root' => 'Root User'</br><br />
+		);</br><br />
+	);</br><br />
+	....</br><br />
+}</br><br />
+?></br><br />
+[/code]</br></></br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4aa6336c-a158-4e10-bb6e-01cccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ef07c99075c7aad8cffcf6b3b07824dd&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Eppo&nbsp;						</strong>
+						<strong>said 
+						on Sep 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hmm, it's going wrong when you write testcases!! because enum fields is not a standard or something like that... Then you get a warning!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4aa64895-d44c-4036-8e0c-029fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b774c1f807c0c0d643d84397cda091a8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							alex&nbsp;						</strong>
+						<strong>said 
+						on Sep 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yeah, nice.<br />
+You wrote your own parser for nothing.</br><br />
+Why not just to make this field tinyint, and distinguish levels in the code (using constants etc)? You said you do not need separate table.</br><br />
+Ok, good. Do not add it, use code logic. Also, having ENUMs could be areal nightmare when you change it.</br><br />
+Approach is cheap, but bad by his nature.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4aa648ea-1a48-4014-b5df-029ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=88ce51a21e17803a985c884caed7c25a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://pudr.com" rel="nofollow">picca</a>						</strong>
+						<strong>said 
+						on Sep 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>2Adam: Your approach is possible, but it is certainly not DRY. If you pass your app to anyone and he would add user role (as new enum), he should (in good app) get new role without any code change.</p>
+<p>But still I don't know Tim. I read (a lot) about enum + CakePHP and I thought the "right" solution is to have another table and relation to it. I know, you said it is unprobable that roles will be added. But now you can't use counterCache on how many admins you have. It is hard to say that every "root" get redirected to page "xy" when logged in (via another column in role-table). And so on.</p>
+<p>So I think that for simple things (like yours) it is acceptable. But generally I really would like to see related table (even for simple situations). My opinion.</p>
+<p>Would appreciate if anyone proves I'm wrong.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4aa6a62b-c8b8-43e9-8892-04b4cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Sep 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Adam: as picca said, your approach is possible, but the code should be as independent as possible from your user roles.</p>
+<p>@picca: Yes of course the best solution is the most reusable one, and that would mean a separate table, some nice counterCache declarations and possibly having some permission-related stuff also in that table if need be.</p>
+<p>As I said though in the article, I had a very simple case and I implemented permissions in a different way. I just needed a dropdown of possible user roles so I can populate my dropdown accordingly. For people that face a similarly simple problem I wanted to show how you can easily read the possible enum options. I will refactor when I have to.</p>
+<p>If I were to release a plugin with a fully-fledged auth/roles/permission system I would do it differently of course. That was not the purpose of the blogpost though.</p>
+<p>@alex: I didn't write a parser for nothing. I solved my problem right? ;)<br />
+I don't want to use constants because I want my db readable when I look at it in my favourite DB management system. How in your opinion would ENUMs be a nightmare when I change them? That's a simple UPDATE query, at least from what I see now. If I had a separate table and possible uuids it could (!) become more than that.</br></p>
+<p>@Eppo: Please explain the scenario.</p>
+<p>@all: Thanks for your feedback. It's always nice to have discussions about approaches.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4aa6c856-add4-4216-8551-062fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b774c1f807c0c0d643d84397cda091a8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							alex&nbsp;						</strong>
+						<strong>said 
+						on Sep 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@tim:<br />
+1. your solution is not really in right way</br><br />
+2. you teach other people this solution</br><br />
+readable: yes, but that's it (sometimes it's worth it, of course).</br><br />
+if you have > 10 devs, and anyone can change table structure, it's very easy to get a mess if you used not the latest version of DB structure to write your ALTER table (this is in short, but u got an idea).</br><br />
+anyway, as I said: this is cheap, but I'd rather recommend to not do like this.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4aa6cb47-3208-463f-8e43-065ecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Sep 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@alex: If I have > 10 devs I better have a damn good way to exchange DB Structure updates ... be it db migrations, a ticket in < insert your favorite ticket management system > whom everybody is subscribed to, or something else.</></p>
+<p>Anyways, if you think the solution is cheap, that's fine with me. I tried to explain when and when not to use this.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4aa6d4f9-3c14-4be0-8c54-06b3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=32378c4f76f261d63c3c3a941054e440&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.neilcrookes.com" rel="nofollow">Neil Crookes</a>						</strong>
+						<strong>said 
+						on Sep 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for sharing Tim.</p>
+<p>I've not used enum fields in my db since I've been using 1.2 as last time I checked, enums weren't supported in the Cake Schema shell, which I use quite a lot.</p>
+<p>When I used them in 1.1 apps though, the enum options were available in the model schema property (or whatever it was in 1.1) - is that no longer the case in 1.2? If the options are available, you'd not need to do the sql call to get them?</p>
+<p>Now I use a similar approach mentioned to one above where I have a property in my model called $enum, which looks something like this:</p>
+<p>protected $enum = array(<br />
+  'role' => array(</br><br />
+    'admin',</br><br />
+    'user',</br><br />
+    '...'</br><br />
+  ),</br><br />
+  'status' => array(</br><br />
+    'enabled',</br><br />
+    'disabled',</br><br />
+  ),</br><br />
+);</br></p>
+<p>and I typically store the whole string in the DB, after all, storage is cheap, so this gives me the best of both worlds, readability in the DB and ability to use the schema shell, and easily sharing new options with other devs.</p>
+<p>As for counting how many admins there are in the system, let's be honest, it's not a frequent requirement is it, and if it is, you can use some other form of caching than a counter cache.</p>
+<p>Anyway, in my controller, I have a protected method called _setEnumLists() which I call from add() and edit() actions, which sets view variables according to the plural variable version of the field name, e.g. for 'role', the variable is $roles. If it was user_level, the var would be $userLevels. This way, the form helper automatically displays a drop down for these fields.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ac66620-0608-475a-bb23-609fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fbfc3f277499ddd28cb1c80fac037900&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.jmjjg.fr/" rel="nofollow">jmjjg</a>						</strong>
+						<strong>said 
+						on Oct 02, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thank you for this behavior. I will most likely use it in one of my projects.<br />
+Since that project will use PostgreSQL as DBMS, I updated your code ( <a rel="nofollow" href="http://bin.cakephp.org/view/746957234">http://bin.cakephp.org/view/746957234</a> ) so the behavior will work with both MySQL and PostgreSQL.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ad6a234-5af4-4a39-b329-060dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=992c174c48fa4dadacb03854dbf7ade8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Manolo&nbsp;						</strong>
+						<strong>said 
+						on Oct 15, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This works? i mean, it returns a numeric index array with each enum option, but, at the time of the insert with save() cake try to insert the numeric index and not the enum option, so dont works... the array should have the same enum string as array key and value.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

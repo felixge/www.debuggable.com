@@ -1,0 +1,414 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>BaseUrl finding, Simple event broadcasting and element sorting in JS &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/baseurl-finding-simple-event-broadcasting-and-element-sorting-in-js:480f4dd6-5164-4694-9334-44dccbdd56cb">BaseUrl finding, Simple event broadcasting and element sorting in JS</a></h2>	<div class="posted-on">
+		<p>Posted on 15/3/07 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>it's been a while since my last post on JS (and in general) and I apologize for that. There is just way too much stuff for me to do right now (client work, my own web app, school finals, etc.) but most of that will be over at some point and then I'll have a thousand interesting things to blog about as well as the time for it. Meanwhile here comes some fun JS stuff I'm using in the web app I'm working on right now and I hope you'll enjoy it. When you see the '$' sign in the code then it's the <a href="http://jquery.com/">jQuery</a> library I'm absolutely in love with and not the evil prototype one ; ). All code I'll post now can be written without it, but I don't have the time to present alternative solutions right now.</p>
+<p>Alright let's get started. First of all I advocate the usage of a namespace for the functions I'll present since that makes it less likely to run into conflicts with 3rd party scripts as well as allowing for the code base to stay more maintainable. I'm assuming you are using <a href="http://cakephp.org/">CakePHP</a> so please create a file called 'common.js' in /app/webroot/js/. The other file you put in there is the latest 'jquery.js' that you downloaded from <a href="http://jquery.com/src/jquery-latest.js">jquery.com</a>. In your html layout you include jquery.js first and common.js second.</p>
+<p>The first thing I got for you is a function capable of determining the base url where your application is installed. This is very useful when doing lot's of ajax requests and you want to be able to always use '/controller/action' style url references like you do in CakePHP internally. It's also nice to know image files will always be located in '/img/...'. The way I do it is inspired by the <a href="http://script.aculo.us/">script.aculo.us lib</a> and looks like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> Common =<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; baseUrl: <span class="kw2">null</span><br />
+&nbsp; &nbsp;<br />
+&nbsp; &nbsp; , setBaseUrl: <span class="kw2">function</span><span class="br0">&#40;</span>url<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; Common.<span class="me1">baseUrl</span> = url || $<span class="br0">&#40;</span><span class="st0">'script[@src$=js/common.js]'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="me1">attr</span><span class="br0">&#40;</span><span class="st0">'src'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="me1">replace</span><span class="br0">&#40;</span><span class="re0">/js\/common.<span class="me1">js</span>$/</span>,<span class="st0">''</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; , url: <span class="kw2">function</span><span class="br0">&#40;</span>url<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw1">this</span>.<span class="me1">baseUrl</span>+url.<span class="me1">replace</span><span class="br0">&#40;</span><span class="re0">/^\/+/</span>, <span class="st0">''</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<br />
+Common.<span class="me1">setBaseUrl</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>The code should be pretty straight forward. After defining the Common object (used as a namespace) we call it's setBaseUrl function without parameters. This causes a jQuery selector to find the script element of our common.js file and use it's src attribute to determine the baseUrl. From that point on we can do calls like this in our other JS files:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$.<span class="me1">getJSON</span><span class="br0">&#40;</span>Common.<span class="me1">url</span><span class="br0">&#40;</span><span class="st0">'/tasks/view/1.json'</span><span class="br0">&#41;</span>, <span class="kw2">function</span><span class="br0">&#40;</span>Task<span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw3">alert</span><span class="br0">&#40;</span><span class="st0">'It is time to &quot;'</span>+Task.<span class="kw3">name</span>+<span class="st0">'&quot;!'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span></div>
+<p>Alright this is useful (at least I hope so), but there is more stuff to come. One thing I found myself working a lot with was collections of objects of the same type that need to exchange messages through events with one another. For example you have a class called 'Task' and all of them are managed by another object called 'TaskList'. Now let's say the User is able to click on each Task in your TaskList which causes this particular Task to get the focus (a couple of DOM elements getting an 'active' class). When one Task get's focused, naturally all other tasks need to loose their focus. Here is some code similar to what I'm using in my application right now which will make this become very easy and fail-safe:</p>
+<p>A new generic broadcastEvent function for our Common namespace. It basically loops through all listeners (array of JS objects) and sees if they have listeners for the particular task defined and call those up. It also set's the context of the listener function to the object that is listening and uses whatever additional parameters are passed to broadcastEvent for calling it:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> Common =<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; broadcastEvent: <span class="kw2">function</span><span class="br0">&#40;</span>listeners, event<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw2">var</span> params = arguments;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; $.<span class="me1">each</span><span class="br0">&#40;</span>listeners, <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">typeof</span> <span class="kw1">this</span>.<span class="me1">events</span><span class="br0">&#91;</span>event<span class="br0">&#93;</span> == <span class="st0">'function'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">events</span><span class="br0">&#91;</span>event<span class="br0">&#93;</span>.<span class="me1">apply</span><span class="br0">&#40;</span><span class="kw1">this</span>, <span class="br0">&#91;</span><span class="br0">&#93;</span>.<span class="me1">slice</span>.<span class="me1">call</span><span class="br0">&#40;</span>params, <span class="nu0">2</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>And here comes the TaskList that object that manages all Task's on the screen. It basically uses a table (element) as it's construct parameter, loops through all rows with a 'td' in them (those that are not part of the table header) and passes the table row elements as an initialization parameter to the Task object that is created for each one of it and added to a list of tasks. TaskList.broadcastEvent uses Common.broadcastEvent to allow the tasks inside the TaskList to communicate with one another easily which you'll see in the Task class.</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> TaskList = <span class="kw2">function</span><span class="br0">&#40;</span>element<span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">construct</span><span class="br0">&#40;</span>element<span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span>;<br />
+<br />
+TaskList.<span class="me1">prototype</span> =<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; element: <span class="kw2">null</span><br />
+&nbsp; &nbsp; , tasks: <span class="br0">&#91;</span><span class="br0">&#93;</span><br />
+<br />
+&nbsp; &nbsp; , construct: <span class="kw2">function</span><span class="br0">&#40;</span>element<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span> &nbsp; &nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">element</span> = $<span class="br0">&#40;</span>element<span class="br0">&#41;</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw2">var</span> self = <span class="kw1">this</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; $<span class="br0">&#40;</span><span class="st0">'tr[td]'</span>, <span class="kw1">this</span>.<span class="me1">element</span><span class="br0">&#41;</span>.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; self.<span class="me1">add</span><span class="br0">&#40;</span><span class="kw2">new</span> Task<span class="br0">&#40;</span>self, <span class="kw1">this</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; , add: <span class="kw2">function</span><span class="br0">&#40;</span>TaskObject<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">tasks</span>.<span class="me1">push</span><span class="br0">&#40;</span>TaskObject<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; , broadcastEvent: <span class="kw2">function</span><span class="br0">&#40;</span>event<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw2">var</span> params = <span class="br0">&#91;</span><span class="kw1">this</span>.<span class="me1">tasks</span>, event<span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; params.<span class="me1">push</span>.<span class="me1">apply</span><span class="br0">&#40;</span>params, <span class="br0">&#91;</span><span class="br0">&#93;</span>.<span class="me1">slice</span>.<span class="me1">call</span><span class="br0">&#40;</span>arguments, <span class="nu0">1</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; Common.<span class="me1">broadcastEvent</span>.<span class="me1">apply</span><span class="br0">&#40;</span><span class="kw2">null</span>, params<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span>;</div>
+<p>And here comes the Task class that triggers the event broadcasting and listens to events. It's constructor takes two arguments. The first one is a reference to the parent TaskList object and the second on is the table row (tr) element that hold the DOM representation of this Task. When the name of the task ('a.name') is clicked then it causes that Task to get the focus and all others to be blured (as they receive the focus event and react on it):</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> Task = <span class="kw2">function</span><span class="br0">&#40;</span>parent, element<span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">construct</span><span class="br0">&#40;</span>parent, element<span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span>;<br />
+<br />
+Task.<span class="me1">prototype</span> =<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; id: <span class="kw2">null</span><br />
+&nbsp; &nbsp; , parent: <span class="kw2">null</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; , construct: <span class="kw2">function</span><span class="br0">&#40;</span>parent, element<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">parent</span> = parent;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">element</span> = element;<br />
+&nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">bindEvents</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; , bindEvents: <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw2">var</span> self = <span class="kw1">this</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; $<span class="br0">&#40;</span><span class="st0">'td.task a.name'</span>, <span class="kw1">this</span>.<span class="me1">element</span><span class="br0">&#41;</span>.<span class="me1">bind</span><span class="br0">&#40;</span><span class="st0">'click'</span>, <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; self.<span class="kw3">focus</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; , <span class="kw3">focus</span>: <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; $<span class="br0">&#40;</span><span class="st0">'a.name, a.time'</span>, <span class="kw1">this</span>.<span class="me1">element</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">'active'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">'active'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">parent</span>.<span class="me1">broadcastEvent</span><span class="br0">&#40;</span><span class="st0">'focus'</span>, <span class="kw1">this</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; , <span class="kw3">blur</span>: <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; $<span class="br0">&#40;</span><span class="st0">'a.name, a.time'</span>, <span class="kw1">this</span>.<span class="me1">element</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">'active'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; , events:<br />
+&nbsp; &nbsp; <span class="br0">&#123;</span> &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw3">focus</span>: <span class="kw2">function</span><span class="br0">&#40;</span>Task<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>Task !== <span class="kw1">this</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">this</span>.<span class="kw3">blur</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span>;</div>
+<p>Alright that's it. The code above is of course just meant for educational purposes and not the complete code I'm using in my web app which is a little more complex and would only distract from demonstrating the Common.broadcastEvent function. So if it doesn't run it's probably because I didn't test the simplified version presented here.</p>
+<p>So let's come to my last little trick, sorting elements in JS. Javascript has a very cool function build into the Array class named sort that is very useful for doing all kinds of sorting as it allows you to define a callback for comparing the array elements yourself. It basically works like this:</p>
+<p>The following code uses jQuery to get all list items inside of a unorder list and then sorts the array using the anchor text (for simplicity, innerHTML).</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> elements = $<span class="br0">&#40;</span><span class="st0">'ul#my-list li'</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+elements.<span class="me1">sort</span><span class="br0">&#40;</span>sortByName<span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw2">function</span> sortByName<span class="br0">&#40;</span>a, b<span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>a.<span class="me1">innerHTML</span> &lt; b.<span class="me1">innerHTML</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="nu0">-1</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span>a.<span class="me1">innerHTML</span> &gt; b.<span class="me1">innerHTML</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="nu0">1</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="nu0">0</span><br />
+<span class="br0">&#125;</span></div>
+<p>But since we don't only want to sort them inside the array but also in the DOM, we need to get a little more tricky. In the simplest case this means to remove all li elements from our unordered list before sorting and them put them back into our list after we sorted them:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> elements = $<span class="br0">&#40;</span>$<span class="br0">&#40;</span><span class="st0">'ul#my-list li'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">remove</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">get</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">sort</span><span class="br0">&#40;</span>sortByName<span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">appendTo</span><span class="br0">&#40;</span><span class="st0">'#my-list'</span><span class="br0">&#41;</span>;</div>
+<p>If you don't like the train-wreck style you'd write the above like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> elements = $<span class="br0">&#40;</span><span class="st0">'ul#my-list li'</span><span class="br0">&#41;</span>.<span class="me1">remove</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+elements.<span class="me1">sort</span><span class="br0">&#40;</span>sortByName<span class="br0">&#41;</span><br />
+$<span class="br0">&#40;</span>elements<span class="br0">&#41;</span>.<span class="me1">appendTo</span><span class="br0">&#40;</span><span class="st0">'#my-list'</span><span class="br0">&#41;</span>;</div>
+<p>So of course if you work with large lists of items you might want to actually swap elements using the Array.sort callback instead of re-populating the entire list, but for this example I wanted to keep it simple. Also here is a <a href="http://demos.thinkingphp.org/element-sorting/">live demo</a> where you can check out how the method presented here works on a small list. You basically can not tell that all elements where removed and then added again.</p>
+<p>Alright, I hope you find some of the above stuff useful and if you have any questions feel free to ask them in the comments.</p>
+<p>-- Felixd<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-5164-4694-9334-44dccbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbaseurl-finding-simple-event-broadcasting-and-element-sorting-in-js%3A480f4dd6-5164-4694-9334-44dccbdd56cb &amp;title=BaseUrl+finding%2C+Simple+event+broadcasting+and+element+sorting+in+JS';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbaseurl-finding-simple-event-broadcasting-and-element-sorting-in-js%3A480f4dd6-5164-4694-9334-44dccbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbaseurl-finding-simple-event-broadcasting-and-element-sorting-in-js%3A480f4dd6-5164-4694-9334-44dccbdd56cb&amp;title=BaseUrl+finding%2C+Simple+event+broadcasting+and+element+sorting+in+JS&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbaseurl-finding-simple-event-broadcasting-and-element-sorting-in-js%3A480f4dd6-5164-4694-9334-44dccbdd56cb&amp;title=BaseUrl+finding%2C+Simple+event+broadcasting+and+element+sorting+in+JS';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/simple-global-ajax-activity-indicator-with-jquery:480f4dd6-7508-4aea-9850-4139cbdd56cb">Simple global Ajax activity indicator with jQuery</a></li>
+							<li><a href="/posts/simple-data-access-control:48b250b6-7314-48e8-8252-6efb4834cda3">Simple Data Access Control</a></li>
+							<li><a href="/posts/ten-simple-tricks-that-will-make-you-a-valuable-colleague-part-i:480f4dfe-dfe0-44f3-9af7-46a0cbdd56cb">Ten Simple Tricks That Will Make You A Valuable Colleague, Part I</a></li>
+							<li><a href="/posts/simple-and-complex-strings:480f4dfd-9cd8-4f42-82ae-4a1fcbdd56cb">Simple and Complex Strings</a></li>
+							<li><a href="/posts/simple-listshelper-for-displaying-nested-ul-ol-lists:480f4dd5-19f4-4612-9508-4797cbdd56cb">Simple ListsHelper for displaying nested ul / ol lists</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/baseurl-finding-simple-event-broadcasting-and-element-sorting-in-js:480f4dd6-5164-4694-9334-44dccbdd56cb">4 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/baseurl-finding-simple-event-broadcasting-and-element-sorting-in-js:480f4dd6-5164-4694-9334-44dccbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4de7-ca44-4396-a0ff-49d7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c55ad2933882b29f628e82b48396b2e6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://walkerhamilton.com" rel="nofollow">Walker Hamilton</a>						</strong>
+						<strong>said 
+						on Mar 30, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Felix....I know you've disappeared into the great unknown, but when you get a chance, you should fix your cakeNews site so that it doesn't display those webModel errors all the time....</p>
+<p>Also, you might consider adding some different blogs in there....(getting rid of WithCake, adding @theKeyboard, getting rid of H3rald).</p>
+<p>I have your cakenews in my bookmarks bar ( I use it all the time! )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-d86c-410a-b716-4674cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 30, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Walker Hamilton: Hm what errors is it throwing? Can't see any right now. But I can update the blogs in the next couple days I guess. I wasn't aware people are still using it ; ). (I'm pretty much on google reader these days)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-75f0-4fc4-9d0c-4a5dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c55ad2933882b29f628e82b48396b2e6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://walkerhamilton.com" rel="nofollow">Walker Hamilton</a>						</strong>
+						<strong>said 
+						on Mar 30, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Quite often (seemingly when it updates the rss cache) it throws web model errors, I'll try and show ya one.</p>
+<p>Oh, I just got it to do it: </p>
+<p>Warning: curl_setopt() [function.curl-setopt]: CURLOPT_FOLLOWLOCATION cannot be activated when in safe_mode or an open_basedir is set in /www/htdocs/w00645aa/cakenews/app/models/web_model.php on line 127</p>
+<p>Warning: curl_setopt() [function.curl-setopt]: CURLOPT_FOLLOWLOCATION cannot be activated when in safe_mode or an open_basedir is set in /www/htdocs/w00645aa/cakenews/app/models/web_model.php on line 127</p>
+<p>Yeah, I use netnewswire as my reader, but I still like to hit up your cakenews site.....i dunno, something about it....</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a1d6fdf-489c-43c5-bbc7-257d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b43c49ba645bd00c7e9d345a740d6dfe&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://randompsychology.com" rel="nofollow">Matt Hamann</a>						</strong>
+						<strong>said 
+						on May 27, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Having trouble with your first example...I'm getting the error "Uncaught Syntax error, unrecognized expression: [@src$=js/common.js]" when running the function in common.js under jQuery 1.3.2. Any idea what might be wrong?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

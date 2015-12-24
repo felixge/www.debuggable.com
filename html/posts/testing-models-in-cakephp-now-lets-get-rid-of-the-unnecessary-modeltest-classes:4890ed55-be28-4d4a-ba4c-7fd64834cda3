@@ -1,0 +1,1209 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Testing Models in CakePHP - Now let's get rid of the unnecessary ModelTest classes ! &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/testing-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes:4890ed55-be28-4d4a-ba4c-7fd64834cda3">Testing Models in CakePHP - Now let's get rid of the unnecessary ModelTest classes !</a></h2>	<div class="posted-on">
+		<p>Posted on 30/7/08 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>today I committed some stuff that will make a bigger impact on your Unit Testing development in CakePHP. It's a much cleaner way of how you are able to test models. Up until now there was always a need to create a so-called test model that extends your model-under-test in order to overwrite its $useDbConfig setting to be 'test_suite'. By that you ensured that your models run with the test_suite datasource when the tests are run.</p>
+<p>Nate proposed ClassRegistry::config(), which allows you to tell the ClassRegistry class which datasource it shall use when<br />
+ClassRegistry::init() is used the next time (and thereby a model is instantiated). So what we are doing now in the testsuite is telling the ClassRegistry to use the test_suite db config whenever a new model is instantiated via ClassRegistry::init(). Doesn't make sense to you? Well, let's look at an example.</p>
+<p>The following code is directly taken from the <a hreg="http://cookbook.cakephp.org">CookBook</a> and shows the old way of doing things:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+App::<span class="me2">import</span><span class="br0">&#40;</span><span class="st0">'Model'</span>, <span class="st0">'Article'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw2">class</span> ArticleTest <span class="kw2">extends</span> Article <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">'ArticleTest'</span>;<br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$useDbConfig</span> = <span class="st0">'test_suite'</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">class</span> ArticleTestCase <span class="kw2">extends</span> CakeTestCase <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$fixtures</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'app.article_test'</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; <span class="kw2">function</span> testPublished<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">ArticleTest</span> =&amp; <span class="kw2">new</span> ArticleTest<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$result</span> = <span class="re0">$this</span>-&gt;<span class="me1">ArticleTest</span>-&gt;<span class="me1">published</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'id'</span>, <span class="st0">'title'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$expected</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'ArticleTest'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span> <span class="st0">'id'</span> =&gt; <span class="nu0">1</span>, <span class="st0">'title'</span> =&gt; <span class="st0">'First Article'</span> <span class="br0">&#41;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'ArticleTest'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span> <span class="st0">'id'</span> =&gt; <span class="nu0">2</span>, <span class="st0">'title'</span> =&gt; <span class="st0">'Second Article'</span> <span class="br0">&#41;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'ArticleTest'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span> <span class="st0">'id'</span> =&gt; <span class="nu0">3</span>, <span class="st0">'title'</span> =&gt; <span class="st0">'Third Article'</span> <span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertEqual</span><span class="br0">&#40;</span><span class="re0">$result</span>, <span class="re0">$expected</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>So far so good. The ArticleTest model extends the imported Article model to overwrite the datasource setting. Then it loads the ArticleTest fixture to use its data throughout the test. The drawback: A whole class that does practically nothing. In a bigger system with plenty of models and plenty of tests this can contribute to your hair loss - especially when you forget to name your fixture properly or provide the $name property in the Test Model.</p>
+<p>With the new code in place, this will just work as well:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+App::<span class="me2">import</span><span class="br0">&#40;</span><span class="st0">'Model'</span>, <span class="st0">'Article'</span><span class="br0">&#41;</span>;<br />
+<span class="kw2">class</span> ArticleTestCase <span class="kw2">extends</span> CakeTestCase <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$fixtures</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'app.article'</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; <span class="kw2">function</span> testPublished<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Article</span> =&amp; ClassRegistry::<span class="me2">init</span><span class="br0">&#40;</span><span class="st0">'Article'</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$result</span> = <span class="re0">$this</span>-&gt;<span class="me1">Article</span>-&gt;<span class="me1">published</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'id'</span>, <span class="st0">'title'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$expected</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Article'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span> <span class="st0">'id'</span> =&gt; <span class="nu0">1</span>, <span class="st0">'title'</span> =&gt; <span class="st0">'First Article'</span> <span class="br0">&#41;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Article'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span> <span class="st0">'id'</span> =&gt; <span class="nu0">2</span>, <span class="st0">'title'</span> =&gt; <span class="st0">'Second Article'</span> <span class="br0">&#41;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Article'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span> <span class="st0">'id'</span> =&gt; <span class="nu0">3</span>, <span class="st0">'title'</span> =&gt; <span class="st0">'Third Article'</span> <span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertEqual</span><span class="br0">&#40;</span><span class="re0">$result</span>, <span class="re0">$expected</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>So we got rid of the ArticleTest class and can now use the normal ArticleFixture that we probably use throughout the system anyway to provide some standard data for the application. Via the $test_suite setting in your database.php file you can control where and how the test data is imported.</p>
+<p>The only change to your code: Instantiate the subject under test via ClassRegistry::init() instead of instantiating directly via the new operator.</p>
+<p>To me this seems like the proper way to do it. No need for further unnecessary classes. Everything clean and controllable. Do you agree?</p>
+<p>-- Tim Koschuetzki aka DarkAngelBGE</p>
+<p>PS: Kudos again to Nate for ClassRegistry::config() !<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4890ed55-be28-4d4a-ba4c-7fd64834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftesting-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes%3A4890ed55-be28-4d4a-ba4c-7fd64834cda3 &amp;title=Testing+Models+in+CakePHP+-+Now+let%27s+get+rid+of+the+unnecessary+ModelTest+classes+%21';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftesting-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes%3A4890ed55-be28-4d4a-ba4c-7fd64834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftesting-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes%3A4890ed55-be28-4d4a-ba4c-7fd64834cda3&amp;title=Testing+Models+in+CakePHP+-+Now+let%27s+get+rid+of+the+unnecessary+ModelTest+classes+%21&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftesting-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes%3A4890ed55-be28-4d4a-ba4c-7fd64834cda3&amp;title=Testing+Models+in+CakePHP+-+Now+let%27s+get+rid+of+the+unnecessary+ModelTest+classes+%21';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/running-tests-from-the-commandline-in-cakephp:4821f908-da38-4987-909a-25c74834cda3">Running Tests from The Commandline in CakePHP</a></li>
+							<li><a href="/posts/learning-from-the-cakephp-source-code-part-ii:480f4dd6-57fc-4715-8709-439acbdd56cb">Learning from the CakePHP source code - Part II</a></li>
+							<li><a href="/posts/make-your-life-easier-with-these-five-cakephp-quicktips:48170ee5-0cc0-4815-af60-7c264834cda3">Make your life easier with these five CakePHP Quicktips</a></li>
+							<li><a href="/posts/how-to-organize-your-cakephp-app%e2%80%99s-javascript-ii:480f4dd6-a780-45dc-bd65-4284cbdd56cb">How to organize your CakePHP App’s Javascript II</a></li>
+							<li><a href="/posts/cakephp-all-others:480f4dfe-0bb0-46bc-b668-415ccbdd56cb">CakePHP &gt; All Others</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/the-ultimate-cakephp-bootstrap-technique:480f4dd5-2bcc-40cb-b45f-4b1dcbdd56cb">The ultimate CakePHP bootstrap technique</a></li>
+							<li><a href="/posts/basic-cakephp-templating-skills:480f4dd6-4040-4c57-8c17-4606cbdd56cb">Basic CakePHP templating skills</a></li>
+							<li><a href="/posts/welcome-to-the-dark-side-of-plugins-in-cakephp:480f4dd5-0eb8-4cab-aeb3-4796cbdd56cb">Welcome to the Dark Side of Plugins in CakePHP</a></li>
+							<li><a href="/posts/cakephp-code-coverage-for-group-tests:483b2b77-c420-47e3-b337-653c4834cda3">CakePHP Code Coverage for Group Tests</a></li>
+							<li><a href="/posts/upcoming:-code-coverage-in-cakephp---test-how-well-you-test:4814f672-0d78-4585-a349-64c64834cda3">Upcoming: Code Coverage in CakePHP - Test How Well You Test</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/testing-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes:4890ed55-be28-4d4a-ba4c-7fd64834cda3">49 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/testing-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes:4890ed55-be28-4d4a-ba4c-7fd64834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-489115b5-87f0-4afd-99bf-053c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5b883d5e78e97a9cf371e0c9b458dc72&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://joselorenzo.com.ve" rel="nofollow">Jose Lorenzo</a>						</strong>
+						<strong>said 
+						on Jul 31, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Finally! I've been wating this for so long :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48915ed4-6d9c-4880-ac6b-44c74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2983b18bc7040f7f747274465d580352&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://klevo.sk" rel="nofollow">klevo</a>						</strong>
+						<strong>said 
+						on Jul 31, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great improvement!</p>
+<p>What about associated models trough hasMany, belongsTo, ...? Right now I need to do something like this in the ArticleTestCase (let's assume Article hasMany Tags):</p>
+<p>$this->ArticleTest->Tag = new TagTest();</p>
+<p>So now it should be just $this->Article->Tag =& ClassRegistry::init('Tag') ?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48918923-4200-49ab-af28-140a4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Jul 31, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Jose Lorenzo: :]</p>
+<p>klevo: No even better. Now that the ClassRegistry is configured in the testsuite to pass the test_suite datasource to any ClassResgitry::init() call, when your subject-under-test is loaded and creates its linkedModel, they will also be instantiated with the test_suite datasource.</p>
+<p>So you would really only use your models like you'd normally do... just that they run via a different datasource. :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4891a861-e39c-4d13-bd85-47724834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b344e4656bde3fe40f0e3160610ef579&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							JoaoJose&nbsp;						</strong>
+						<strong>said 
+						on Jul 31, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I use a trick to achieve this. I put in app_model.php the following code:<br />
+function __construct(){</br><br />
+    if (isset($_GET['app'])){</br><br />
+        $this->useDbConfig = 'test';</br><br />
+        $this->cacheSources = false;</br><br />
+    }</br><br />
+    parent::__construct();</br><br />
+}</br><br />
+The isset($_GET['app']) is to see if some test runs</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4891bf54-a884-4f86-a20b-5e344834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Jul 31, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>JoaoJose: Cool. :] Not needed anymore now though. :]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48962146-247c-4e70-91e6-6da74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=80bd2b4db7a84b42110191252ad94f5f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Andreas&nbsp;						</strong>
+						<strong>said 
+						on Aug 03, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is great news. I had some problems with testing Models and associated Models because of this "ModelTest"-extra-class-thing.<br />
+So I'm looking forward to test this :)</br></p>
+<p>One question: Why are you using "ArticleTest" as array key instead of "Article"? Does ClassRegistry::init() automatically set the $name-property for the model under test to "*Test"?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48971858-bd9c-4287-930d-644a4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Aug 04, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Andreas: Nah, it's a typo. I corrected it. Thank you. :]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4899ff61-3c5c-4235-bb2c-062d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f196cc1d57ca5b0f58efb3254925e6a3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://htmlpurifier.org" rel="nofollow">Edward Z. Yang</a>						</strong>
+						<strong>said 
+						on Aug 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nate and Tim should be given a medal. Hip hip hooray!</p>
+<p>(BTW, I'm running CakePHP off SVN and the new registry works like a charm).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a08d10-25a0-4fd0-9211-5cd34834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8abe2ccbe053852dfb001c975939c839&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							crux&nbsp;						</strong>
+						<strong>said 
+						on Aug 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is awesome. Thanks to Felix and Nate!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a14c3e-3eb8-4889-a071-65f44834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>crux: I had nothing to do with this, thank Tim ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a153a5-b34c-4f61-b820-0fc64834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Aug 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>crux: :(</p>
+<p>; ]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a31ea8-1dbc-4d8d-b743-2d254834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=30104aa4a7dba294464561def8b893af&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.serenitysoft.com/" rel="nofollow">Ryan J. Peterson</a>						</strong>
+						<strong>said 
+						on Aug 13, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tim/Nate,</p>
+<p>Thanks for addressing this issue, it helped out a lot. Tim, thanks for allowing me to bug you on IM with the issue until it was resolved. Keep up all the great work.</p>
+<p>~rpeterson</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a32e2b-02f8-4948-b39c-6cd74834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Aug 13, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>You are most welcome Ryan. :) Thanks for bringing it up!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48dce833-2488-4ccf-bf61-4de24834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ec320b0e979ac11e86e02bf7fef19f41&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Aitch&nbsp;						</strong>
+						<strong>said 
+						on Sep 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I've been fighting this in the background on and off for weeks trying to make my (previously working) test cases run again with my SVN head cake. </p>
+<p>I followed the instructions to the letter but just kept getting DB problems. Typically you get a message like "Error: Missing database table 'flags' for model 'Flag'"</p>
+<p>I was messing with it again this afternoon, and I don't know why it makes a difference, but I found I had to explicitly state the connection in the fixtures now, so something like below. I had caching off and all other tweaks you might expect. It was the difference between it working and not working.</p>
+<p>class FlagTestFixture extends CakeTestFixture {<br />
+  var $name = 'FlagTest';</br><br />
+  var $import = array('model' => 'Flag', 'records' => true, 'connection' => 'default');</br><br />
+} </br></p>
+<p>Without this it had previously worked, so perhaps something in the core changed ( i didn't have time to look unfortunately ) It doesn't really make sense why this behaviour might have changed</p>
+<p>I don't think the code in the original blog article is anything to do with this but I thought I would mention it in case others see the same problem, getting the fixtures right is clearly a major part of getting the test cases to work. When it does, happy days all round.</p>
+<p>PS the original article was a useful guide too - thanks</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48dd0782-d1c0-44cd-9652-45254834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Sep 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Aitch: there could be a problem with your database or test configuration.  The correct database connection for running tests is 'test_suite'.  Perhaps your fixtures aren't getting initialized correctly?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48de11b2-2244-49bc-9653-25a24834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b7417e984cc78c088882a176050cfc07&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://codetunes.com" rel="nofollow">Michał Szajbe</a>						</strong>
+						<strong>said 
+						on Sep 27, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I always thought that whole approach to testing in CakePHP was against the mantra "convention over configuration" - there was just too much to do before even writing first assert().</p>
+<p>What is presented here really helps! Thanks guys.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48eb1ea5-c394-4fa0-ad55-54e54834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6fb6e5bab35732d1ad7b1d8ecdea4aed&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Christof Damian&nbsp;						</strong>
+						<strong>said 
+						on Oct 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>With RC3 I get errors like this:</p>
+<p>Unexpected PHP error [Trying to get property of non-object] severity [E_NOTICE] in [../cake/libs/class_registry.php line 295]</p>
+<p>This is triggered by one of these lines:<br />
+- $this->ArticleTest =& new ArticleTest();</br><br />
+- $this->Article =& ClassRegistry::init('Article');</br></p>
+<p>Is this maybe related ClassRegistry changes?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48f44ddf-556c-400f-8dc9-1ff94834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ec320b0e979ac11e86e02bf7fef19f41&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Aitch&nbsp;						</strong>
+						<strong>said 
+						on Oct 14, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Christof - I see the same error on my setup too, if you find a solution, do post. The test cases all seem to be working fine for me now. I can't quite nail it down why this exception occurs.</p>
+<p>I will say that in my experience the test suite does work well, but is quite sensitive to naming of files and how you address those files, especially the $fixtures var.</p>
+<p>I have to use something like  var $fixtures = array('app.flag_test');  (note the _test suffix) and that seems to work great. The various blog entries / cakebook out there are a little inconsistent and vary slightly in how they address it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48f4550b-1b58-457b-be0d-7c1e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ec320b0e979ac11e86e02bf7fef19f41&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Aitch&nbsp;						</strong>
+						<strong>said 
+						on Oct 14, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>There is a recent thread on the cake list ("more problems with RC3 and tests") that has some good pointers</p>
+<p>As a result I upgraded to SVN head (7740) just now and the problem seems to have resolved itself - no more exception - so very happy again, everything is forgiven!!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48f465b6-b6b0-462a-8db8-7e904834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Oct 14, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Christof Damian: Why do you call $this->ArticleTest =& new ArticleTest();?</p>
+<p>@Aitch: What are the fixture names that you use?</p>
+<p>Glad it is fixed now for oyu guys, though. :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48f47fb5-0c0c-4ca3-ad5f-27764834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ec320b0e979ac11e86e02bf7fef19f41&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Aitch&nbsp;						</strong>
+						<strong>said 
+						on Oct 14, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Tim: interesting you ask about fixture names. Depending on where you read, you see a variety of approaches. If the model name is called "Flag",,,</p>
+<p>$fixtures = array('app.flag_test'); // Cookbook way<br />
+$fixtures = array('app.flag');    // Your way, as documented in article</br><br />
+$fixtures = array('flag');</br></p>
+<p>I presume if is dependent on the original filename. Cookbook way works for me, but your documented way does not.</p>
+<p>My persistent problem now is that with 7740 it definitely creates the tables, then definitely populates the (non-imported) fixture data into that table, but the test case class code methods never actually refer to it, choosing to stick with the production tables when doing queries. Presume I have to force useDBConfig or similar but this small detail is eluding me this morning.</p>
+<p>I have a structure and nomenclature something like this. Am I missing something stupid?</p>
+<p>app/tests/fixtures/cutoff_test_fixture.php</p>
+<p>class CutoffTestFixture extends CakeTestFixture {<br />
+  var $name = 'CutoffTest';</br><br />
+  var $import = 'Cutoff';</br><br />
+  var $records = array( .. handful of hand written records .. );</br><br />
+}</br></p>
+<p>app/tests/cases/models/cutoff.test.php</p>
+<p>App::Import('Model', 'Cutoff');<br />
+class CutoffTestCase extends CakeTestCase {</br></p>
+<p>  var $fixtures = array('app.cutoff_test');</p>
+<p>  function setUp() {<br />
+    $this->CutoffTest = & ClassRegistry::init('Cutoff');</br><br />
+  }</br></p>
+<p>  function testXYZ() {<br />
+    // This find returns data from production tables, not the test fixture table</br><br />
+    pr($this->CutoffTest->find('all'));</br><br />
+  }</br></p>
+<p>}</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48f4850f-0d00-4338-8288-2f5d4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Oct 14, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Aitch: </p>
+<p>Well, you aren't supposed to put a 'Test' into the fixture names. :)</p>
+<p>Have a look at some of the core fixtures, for example:</p>
+<p>FlagTreeFixture</p>
+<p>Then you load it via app.flag_tree.</p>
+<p>Secondly, in your test case you have to load the data via $this->loadFixtures('FlagTree');</p>
+<p>Also according to your naming $this->CutoffTest might refer to the fixture name and not the model name. That's why I prefer to store the subject under test (the model we want to test) in $this->Sut, which is also shorter.</p>
+<p>Please tell me if this helped any. :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48f49b88-33dc-4656-b030-3eee4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ec320b0e979ac11e86e02bf7fef19f41&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Aitch&nbsp;						</strong>
+						<strong>said 
+						on Oct 14, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The testing behaviour clearly continues to evolve and I am glad it does but it can be a bit frustrating and the various blogs etc contradict each other regularly. However the fact I keep posting here should prove whom I believe most!</p>
+<p>Your pointers were helpful and allowed me to try some other ideas Tim, and I debugged it sufficiently to make it work - thank you, i appreciate your time.</p>
+<p>The 'book' does suggest the use of "Test" in the fixture name which is why I tried to adopt that style but obviously it is not strictly necessary if you change everything else.</p>
+<p>I think your point about possible confusion of object names / CutoffTest may also be relevant, but I did not actually go and prove that.</p>
+<p>For the record, here is what I have done on SVN head 7740. I'm using HEAD as this fixes an testing exception bug discussed on the cake group list</p>
+<p>I was able to demonstrate to myself that my simple fixture was definitely populating the test DB with the hand coded data by overriding CakeTestFixture::insert, deliberately die'ing after a call to the parent method then reviewing the DB. So a simple fixture, app/tests/fixtures/cutoff_fixture.php looks something like:</p>
+<p>class CutoffFixture extends CakeTestFixture {<br />
+       var $name = 'Cutoff';</br><br />
+       var $import = 'Cutoff';</br><br />
+       var $records = array( .... hand written selection of records .... )</br><br />
+}</br></p>
+<p>For the Test Case, app/tests/cases/models/cutoff.test.php for some reason I had to force the use of test_suite again. Without it, the find results are pulled from the live (default) DB. This may be a bug, but I can't quite establish why right now.</p>
+<p>App::Import('Model', 'Cutoff');</p>
+<p>class CutoffTestCase extends CakeTestCase {    </p>
+<p>  var $fixtures = array('app.cutoff');</p>
+<p>  function start() {<br />
+    parent::start();</br><br />
+    $this->Sut = & ClassRegistry::init('Cutoff');</br><br />
+    $this->Sut->useDbConfig = 'test_suite';</br><br />
+  }</br></p>
+<p>  function testXYZ() {<br />
+    // Findings will vary depending on whether useDbConfig is set above.</br><br />
+    // If useDbConfig is omitted - get results from default (live) DB</br><br />
+    // If useDbConfig is set to test_suite, get results from $test DB config</br><br />
+    pr($this->Sut->find('all'));</br><br />
+    // assertSomething down here</br><br />
+  }</br></p>
+<p>}</p>
+<p>Anyway I hope this will be my last post today now I have this mostly working!!!!!! :-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48f4ab29-6904-44cd-afc9-07c94834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Oct 14, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Aitch: The Cookbook has not been updated to reflect the new functionality.  Please help everyone out and submit an update to it.  Thanks!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48f63c06-cc6c-4565-897a-371e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=938d1ea7258586364db6e4aa12eb821e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://userswholike.consistentandreliabledocumentations.com" rel="nofollow">fed up guy</a>						</strong>
+						<strong>said 
+						on Oct 15, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>.... is it possible that NOONE really knows what's going on in your test fuck????<br />
+i'm now really fed up with your shit!!!</br></p>
+<p>does anyone at all have a glue where the testsuite shall evolve to? What the big picture is? Or at least what the CURRENT standard is?</p>
+<p>How is it possible that you release a RC3 and crack up more than it was before??? what do you expect me? to only rely on latest svn co's and having to fuck around on my own with anything buggy that's been commited next???</p>
+<p>HELL!!! isn't it possible to release a single document that fully describes a test setup including a test class, fixture, model, controller, view?</p>
+<p>I don't have the time debugging the cake core, ... it's framework, it's a "tool" that i wanna use to build reliable applications!</p>
+<p>Thanks Tim and all others, for your many posts on testing, aso. But how shall i archive my goals with outdated cookbooks, with hints on test features that are in a dev-branch, with a broken release (RC3), aso ??? </p>
+<p>Shall i revert to RC2, or even better to RC1?</p>
+<p>.... sorry i'm just frustrated .... once again.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48f64e8c-89c4-415e-a2b2-2f114834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 15, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>fed up guy: Thank you for your constructive feedback ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48f64edf-1aec-4a9e-bb3f-1d214834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Oct 15, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>fed up guy: Hey, just talked to Nate. I will be in charge of the testing content on the cookbook from now on. Expect some good updates soon.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49298555-e804-4b7e-b802-5e074834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=57868cee928f88a60194652f9c329955&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Newbie Unit Tester&nbsp;						</strong>
+						<strong>said 
+						on Nov 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Gotta admit that I'm not finding unit test straightforward enough.<br />
+I'm new to cakephp, quite new to php and pretty new to programming altogether. </br></p>
+<p>I am already a convert though to Test Driven Development and so the very first thing I want to do with cakephp is write a unit test and so imho this should be one of the simplest and best documented parts of the framework. In fact I'm tearing my hair out and searching high and low for advice. </p>
+<p>So I'm looking forward to your updates to the cookbook, Tim, and please keep it simple for us newbies :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49298830-f058-4103-aa2f-0de64834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Nov 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Newbie Unit Tester: Don't. Just start using Cake and PHP and build some cool stuff. You are doing yourself exactly no favor by making live hard on yourself.</p>
+<p>In fact I'd not recommend test driven development unless you are fairly confident in the domain you are working in. If you are new to programming you should master the basics first.</p>
+<p>That being said, I agree with you that unit testing should be easier for beginners and good stuff is under way for that in future.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-492ab6ff-b224-4518-b860-1f0e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=57868cee928f88a60194652f9c329955&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Newbie Unit Tester&nbsp;						</strong>
+						<strong>said 
+						on Nov 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix: I'm doing this development as part of a Uni project and I do need to include unit test (don't give up on me yet - i'll get there!)</p>
+<p>I may have had a bit of a breakthrough today with testing models. Previously I was getting Error: database table not found for model and I was having to create the fields as well as the records by hand in the fixture. I think I was misunderstanding the way the tests run in cakephp. </p>
+<p>I had set up two databases: 1 for my app and 1 for test (app_test) - both defined in database.php. The app database has my tables and the app_test is empty ready for temporary test tables to be written and dropped by the unit test.</p>
+<p>I was thinking that using:<br />
+var $import = 'User';</br><br />
+in my fixture would read from the default db (app). However today looking at the function init() in class CakeTestFixture, unless as connection is specified it uses the connection test_suite. So it looks like the database used for testing also has to have the tables for testing already in existence.</br></p>
+<p>So now I can get my model unit test running by importing a model but also by specifying the connection either in the fixture:</p>
+<p>var $import = array('model' => 'User', 'connection' => 'default');</p>
+<p>or in CakeTestFixture:<br />
+$connection = isset($import['connection'])</br><br />
+    ? $import['connection']</br><br />
+    : 'default';</br></p>
+<p>So I guess I have a couple of options:<br />
+1. Go ahead with above and write the temporary test tables to my application db during testing.</br><br />
+2. Use my test database but make sure I have tables in place to match those in my application. I could also populate these tables with test records.</br></p>
+<p>Just wondering which way round you guys do it?<br />
+Thanks!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-492abaf3-c928-4e0a-affb-45764834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Nov 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Newbie Unit Tester: The way I prefer to do is your second options. Supply a test database, put the tables there (though empty) and use the fixtures for test data. We also use the fixtures for sample data in the real application.</p>
+<p>Since tests run their own fixtures IMO the live database should never be used, at least not without table prefixes.</p>
+<p>Using a separate test DB has been much smoother for us.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-492acc5c-cd00-45f3-a2f3-16a14834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=57868cee928f88a60194652f9c329955&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Newbie Unit Tester&nbsp;						</strong>
+						<strong>said 
+						on Nov 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tim: Thanks. I've removed my change from CakeTestFixture (after all the manual warns me about making changes to the core!) and used an sql script to create my tables in the test DB. I like your idea to keep the data in the fixtures - it keeps the data close to the test cases whilst they are being written.</p>
+<p>However I don't understand how you "use the fixtures for sample data in the real application" - any chance you could explain?</p>
+<p>Now I've finally got a basic model test running, it's onto the subject of this particular blog! My fixture was user_test_fixture.php. Are you recommending that fixtures be named modelname_fixture.php? If I try to do this<br />
+var $fixtures = array( 'app.user' );</br><br />
+(with corresponding user_fixture file in fixtures folder) i get:</br></p>
+<p>Fatal error: Class 'UserFixture' not found in C:\xampp\htdocs\cake\cake\tests\lib\cake_test_case.php on line 734</p>
+<p>Or if I stick with:<br />
+var $fixtures = array( 'app.user_test' );</br><br />
+(with corresponding user_test_fixture file), i get:</br></p>
+<p># Failed<br />
+Equal expectation fails as key list [0] does not match key list [0, 1] at [C:\xampp\htdocs\cake\reuser\tests\cases\models\user2.test.php line 15]</br><br />
+C:\xampp\htdocs\cake\reuser\tests\cases\models\\user2.test.php -> UserTestCase -> testEnabledUsers</br><br />
+and</br><br />
+Unexpected PHP error [Trying to get property of non-object] severity [E_NOTICE] in [C:\xampp\htdocs\cake\cake\libs\class_registry.php line 295]</br><br />
+C:\xampp\htdocs\cake\reuser\tests\cases\models\\user2.test.php -> UserTestCase -> testEnabledUsers</br></p>
+<p>Any ideas what I'm doing wrong? Thanks for your help.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-492ad32a-ed2c-4307-b741-6e994834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Nov 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Newbie Unit Tester: Well I mean that we use the fixtures for the test data also as sample data for the application Have a look at our fixtures shell (just use the search feature here on the blog). Doing ./cake fixtures add the fixture data to our live db as sample data.</p>
+<p>But as you know the fixtures are also used as test data when doing unit tests. Does that make more sense? Hereby you have *real* test data.</p>
+<p>As for naming: Yeah it must user_fixture.php. Classname UserFixture. var $name = 'User'. The you load it via var $ifxtures = array('app.user'). In your testcase you do $this->loadFixtures(array('User'));</p>
+<p>Please try that and tell me how it goes. : )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-492aedab-164c-421c-a1a8-4d854834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=57868cee928f88a60194652f9c329955&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Newbie Unit Tester&nbsp;						</strong>
+						<strong>said 
+						on Nov 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tim: Started to get that feeling that I'm getting close! Thanks for the fixturize.php script. This is what i've now done:</p>
+<p>1. Created users table including test records in the Application DB.<br />
+2. Created users table (without records) in the Test DB.</br><br />
+3. Ran Fixturize on the users table - creates user_fixture.php.</br><br />
+4. My test case looks like:</br></p>
+<p>< ?php<br />
+App::import('Model', 'User');</></p>
+<p>class UserTestCase extends CakeTestCase {<br />
+	var $fixtures = array( 'app.user' );</br></p>
+<p>	function testEnabledUsers() {<br />
+		$this->User =& ClassRegistry::init('User');</br></p>
+<p>		$result = $this->User->enabledUsers(array('id', 'email'));<br />
+		$expected = array(</br><br />
+			array('UserTest' => array( 'id' => 1, 'email' => 'andy@xyz.com' )),</br><br />
+			array('UserTest' => array( 'id' => 2, 'email' => 'joe@joe.com' ))</br><br />
+		);</br><br />
+		$this->assertEqual($result, $expected);</br><br />
+	}</br><br />
+}</br><br />
+?></br></p>
+<p>So I think I'm just missing your instruction on using $this->loadFixtures(array('User'));<br />
+but I can't figure out where this goes in the test case. I get a whole bunch of errors which I haven't filled your blog up with as I'm hoping I'm now making an obvious mistake which you'll spot! Thanks.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-492b0f54-6c1c-419a-af0c-4f6f4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Nov 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Newbie Unit Tester:</p>
+<p>Here is a test case from the workshop application that we talked about during our workshop in Raleigh in September:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;"><span class="kw2">&lt;?php</span><br />
+<span class="kw2">class</span> CommandTest <span class="kw2">extends</span> CakeTestCase <span class="br0">&#123;</span></br><br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$fixtures</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'command'</span>, <span class="st0">'snippet'</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; <span class="kw2">function</span> setUp<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">sut</span> = ClassRegistry::<span class="me2">init</span><span class="br0">&#40;</span><span class="st0">'Command'</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; <span class="br0">&#125;</span></br><br />
+</br><br />
+&nbsp; <span class="kw2">function</span> testFindCloud<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">loadFixtures</span><span class="br0">&#40;</span><span class="st0">'Snippet'</span>, <span class="st0">'Command'</span><span class="br0">&#41;</span>;</br><br />
+</br><br />
+&nbsp; &nbsp; <span class="re0">$commands</span> = <span class="re0">$this</span>-&gt;<span class="me1">sut</span>-&gt;<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'cloud'</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertTrue</span><span class="br0">&#40;</span>!<a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$commands</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; &nbsp; <span class="re0">$nestings</span> = Set::<a href="http://www.php.net/extract"><span class="kw3">extract</span></a><span class="br0">&#40;</span><span class="st0">'/Command/Snippet'</span>, <span class="re0">$commands</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertIdentical</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>, <span class="re0">$nestings</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertEqual</span><span class="br0">&#40;</span><span class="nu0">50</span>, <a href="http://www.php.net/count"><span class="kw3">count</span></a><span class="br0">&#40;</span><span class="re0">$commands</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</br><br />
+</br><br />
+&nbsp; &nbsp; <span class="re0">$commands</span> = <span class="re0">$this</span>-&gt;<span class="me1">sut</span>-&gt;<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'cloud'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'limit'</span> =&gt; <span class="nu0">15</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertEqual</span><span class="br0">&#40;</span><span class="nu0">15</span>, <a href="http://www.php.net/count"><span class="kw3">count</span></a><span class="br0">&#40;</span><span class="re0">$commands</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</br><br />
+</br><br />
+&nbsp; &nbsp; <span class="re0">$scaleMin</span> = <span class="nu0">999</span>;</br><br />
+&nbsp; &nbsp; <span class="re0">$scaleMax</span> = <span class="nu0">0</span>;</br><br />
+&nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$commands</span> <span class="kw1">as</span> <span class="re0">$c</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$c</span><span class="br0">&#91;</span><span class="st0">'Command'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'scale'</span><span class="br0">&#93;</span> &lt; <span class="re0">$scaleMin</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$scaleMin</span> = <span class="re0">$c</span><span class="br0">&#91;</span><span class="st0">'Command'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'scale'</span><span class="br0">&#93;</span>;</br><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span></br><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$c</span><span class="br0">&#91;</span><span class="st0">'Command'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'scale'</span><span class="br0">&#93;</span> &gt; <span class="re0">$scaleMax</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$scaleMax</span> = <span class="re0">$c</span><span class="br0">&#91;</span><span class="st0">'Command'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'scale'</span><span class="br0">&#93;</span>;</br><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span></br><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span></br><br />
+</br><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertEqual</span><span class="br0">&#40;</span><span class="re0">$scaleMin</span>, <span class="nu0">1</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertEqual</span><span class="br0">&#40;</span><span class="re0">$scaleMax</span>, <span class="nu0">3</span><span class="br0">&#41;</span>;</br><br />
+</br><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">sut</span>-&gt;<span class="me1">deleteAll</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Command.id &lt;&gt;'</span> =&gt; <span class="nu0">0</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; &nbsp; <span class="re0">$commands</span> = <span class="re0">$this</span>-&gt;<span class="me1">sut</span>-&gt;<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'cloud'</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertEqual</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>, <span class="re0">$commands</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; <span class="br0">&#125;</span></br><br />
+<span class="br0">&#125;</span></br><br />
+<span class="kw2">?&gt;</span></br></div>
+<p>Hope you can put it to use. : )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-492b0f73-8a8c-4450-bc80-274c4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Nov 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I just saw that the array('User') I told you is wrong. Sorry bout that. :S</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-492b1887-3fd4-4209-a08f-4d2d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=57868cee928f88a60194652f9c329955&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Newbie Unit Tester&nbsp;						</strong>
+						<strong>said 
+						on Nov 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tim: what was wrong with array('User')?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-492b33b2-9f20-4edf-8eb3-4eb24834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Nov 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>See how I use</p>
+<p>this->loadFixtures('Snippet', 'Command');</p>
+<p>instead of</p>
+<p>this->loadFixtures(array('Snippet', 'Command'));</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-492c2ebd-22bc-4f2b-8544-363b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=57868cee928f88a60194652f9c329955&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://oneyeareatingcake.blogspot.com/" rel="nofollow">Newbie Unit Tester</a>						</strong>
+						<strong>said 
+						on Nov 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tim:<br />
+I'm not having a good time :(</br><br />
+Rather than filling up your blog comments with my code, I've posted a description of the problem at:</br></p>
+<p><a rel="nofollow" href="http://oneyeareatingcake.blogspot.com/2008/11/cakephp-unit-test-model-woes.html">http://oneyeareatingcake.blogspot.com/2008/11/cakephp-unit-test-model-woes.html</a></p>
+<p>If you get a chance, it'd be great if you can see what I've got wrong.<br />
+Thanks</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-492d8f42-40b0-40ef-acea-268d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=57868cee928f88a60194652f9c329955&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://oneyeareatingcake.blogspot.com/" rel="nofollow">Newbie Unit Tester</a>						</strong>
+						<strong>said 
+						on Nov 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tim:<br />
+I've been pursuing this further via the CakePHP group:</br><br />
+<a rel="nofollow" href="http://groups.google.com/group/cake-php/browse_thread/thread/db65b8ed1f1f4172">http://groups.google.com/group/cake-php/browse_thread/thread/db65b8ed1f1f4172</a></br></p>
+<p>I do now have a working unit test but I still couldn't get yours running without errors. It seems like everyone has a different way of writing these tests and it would be nice to see some concensus from CakePHP unit testers as to theoptimum or preferred construction of a simple model unit test that would serve as a good cookbook example to a beginner (like me)!</p>
+<p>Thanks<br />
+Andy</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49300adc-8c40-41dd-96cf-0e1b4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Nov 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Newbie Unit Tester: </p>
+<p>Hey Andy, sorry you are not having a good time. Yeah I will work on the new Unit Testing Cookbook articles on the weekend.</p>
+<p>Will have a look at the google group entry now.</p>
+<p>Cheers<br />
+Tim</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49302c66-94e0-4aa2-bed2-0dc44834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=57868cee928f88a60194652f9c329955&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://oneyeareatingcake.blogspot.com/" rel="nofollow">Newbie Unit Tester</a>						</strong>
+						<strong>said 
+						on Nov 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks Tim. </p>
+<p>I've doubled the size of cake_test_case.php & cake_test_fixture.php with debug() statements to try and understand the intended functionality! :)</p>
+<p>In the meantime Matt Curry has given me a system which works but it imports a table into the fixture & it makes more sense to be able to import a model.</p>
+<p>My view of how this should/could work is that:<br />
+1. I have 2 dbs - 'default' & 'test'.</br><br />
+2. 'default' contains tables and maybe some records for my application.</br><br />
+3. 'test' is an empty db - it's purpose it to have tables and data temporarily written to it during the running of tests. The tables will be truncated and dropped at the end of tests.</br><br />
+4. In my fixture i would prefer to specify a model and then cake uses the table definition (from 'default') to be able to create necessary tables in 'test' with a test_suite_ prefix.</br><br />
+5. In my fixture i'll specify my records in arrays (that could have been built by a script like your fixturize shell).</br></p>
+<p>I think this is my preferred way of building a test but other options are in the fixture to define the table structure explicitly or to pull in existing records from the 'default' db via the model.</p>
+<p>I think all of this is very close to what you have in CakePHP. But those who I have unit tests running that i have spoken to so far all have different code to get this working. I guess i'm looking for consensus on a straightforward method that works.</p>
+<p>Thanks,<br />
+Andy</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49317c2c-a13c-44d4-9cf0-542e4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Nov 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Newbie Unit Tester: Exactly, that's my view. Either import from default with a prefix or have the tables there already and just populate truncate but dont add / drop.</p>
+<p>I hope I will find time soon to update the cookbook. ; / Glad you got a working version now.</p>
+<p>Best<br />
+Tim</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49367329-7548-40c6-8b09-4fe94834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e1ec7eb8d61fda4455510f7509723bcc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							aminalid&nbsp;						</strong>
+						<strong>said 
+						on Dec 03, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This worked for me:<br />
+<a rel="nofollow" href="http://github.com/mcurry/cakephp/tree/master/test_sample">http://github.com/mcurry/cakephp/tree/master/test_sample</a></br></p>
+<p>[quote]<br />
+The differences from the baked test files:</br><br />
+  - The fixture uses "var import" to get the schema from the original table.</br><br />
+  - The model test doesn't need a mock model.  It uses ClassRegistry::init to load the original model, but sets it to</br><br />
+  use the test db.</br><br />
+[/quote]</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4936c6d7-a16c-4696-b7f8-2ffa4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=57868cee928f88a60194652f9c329955&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://oneyeareatingcake.blogspot.com/" rel="nofollow">Newbie Unit Tester</a>						</strong>
+						<strong>said 
+						on Dec 03, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>aminalid: Yeah the same files from mcurry worked for me as well and I'm happily using it as the basis for tests I'm writing now. </p>
+<p>I've also modified Tim & Alex's 'fixturize' script so it builds fixture files which include the "var import".</p>
+<p>Still I'm looking forward to a 'recommended' way to write these tests & fixtures being updated into the cookbook :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a4380a8-4424-4f30-bf06-652a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=88ce51a21e17803a985c884caed7c25a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://pudr.com" rel="nofollow">picca</a>						</strong>
+						<strong>said 
+						on Jun 25, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Man, as always debuggable saves the day. It took me almost whole day to figure out all the nifty bugs in my app / Cake which does not allow me to use test cases. Thank you a milion times I owe you cup of the best beer in the world (Pilsen :o))</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a43814a-ee48-4001-8cbb-75704834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Jun 25, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>picca: You should come to CakeFest to drink a beer with me. ; )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a43914d-2378-45cf-bdd4-24524834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=88ce51a21e17803a985c884caed7c25a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://pudr.com" rel="nofollow">picca</a>						</strong>
+						<strong>said 
+						on Jun 25, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>2 Tim: I'd really love to. But it would simply ruin my budget. Anyway as I'm always trying to pay my debts, give me a call when you're going through Pilsen.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a439f28-ab88-42ef-a47a-66f04834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Jun 25, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Haha, nice. Yeah the last time I was there was around 12 years ago. :D Was there with my football team at that time for the Bohemia Cup. :]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

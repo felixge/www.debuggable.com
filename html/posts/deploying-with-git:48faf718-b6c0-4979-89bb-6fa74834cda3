@@ -1,0 +1,571 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Deploying with Git &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/deploying-with-git:48faf718-b6c0-4979-89bb-6fa74834cda3">Deploying with Git</a></h2>	<div class="posted-on">
+		<p>Posted on 19/10/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>So we are using <a href="http://git.or.cz/">Git</a> here at debuggable now. It takes all the pain out of deployment:</p>
+<pre class="terminal"><code>ssh &lt;server&gt;
+cd /var/www/&lt;project&gt;
+git pull</code></pre>
+<p>Done.</p>
+<p>Not easy enough? Create a deploy.sh file:</p>
+<pre class="terminal"><code>ssh &lt;server&gt; "cd /var/www/&lt;project&gt; && git pull"</code></pre>
+<p>And once you get super lazy you'll find yourself doing:</p>
+<pre class="terminal">git pull && git push && ./deploy.sh</pre>
+<p>Don't forget to get setup with <a href="http://www.puddingonline.com/~dave/publications/SSH-with-Keys-HOWTO/document/html/SSH-with-Keys-HOWTO-4.html">ssh keys</a> so, entering passwords all the time is a major PITA.</p>
+<p>If you are just starting out with all this web craziness and still depend on ftp & shared hosting, try to get a VPS somewhere. I can recommend <a href="https://www.liquidweb.com/">LiquidWeb</a> (~$60 month). If there is anything I wish I had done 3 years earlier, it is to get a server with root access - it is so worth it.</p>
+<p>How do you deploy these days?</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/48faf718-b6c0-4979-89bb-6fa74834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdeploying-with-git%3A48faf718-b6c0-4979-89bb-6fa74834cda3 &amp;title=Deploying+with+Git';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdeploying-with-git%3A48faf718-b6c0-4979-89bb-6fa74834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdeploying-with-git%3A48faf718-b6c0-4979-89bb-6fa74834cda3&amp;title=Deploying+with+Git&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdeploying-with-git%3A48faf718-b6c0-4979-89bb-6fa74834cda3&amp;title=Deploying+with+Git';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/deploying-with-git:48faf718-b6c0-4979-89bb-6fa74834cda3">25 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/deploying-with-git:48faf718-b6c0-4979-89bb-6fa74834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-48fb4807-058c-40cb-ad08-143c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=11c2deb35736393de57fbef4df4c9c46&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Peritus&nbsp;						</strong>
+						<strong>said 
+						on Oct 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>We deploy using fabric(see nongnu.org slash fab) which is a thin layer over ssh doing what you attempt to do with shell-scripts. With multi-host support!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fb4883-a2a8-424f-8445-36014834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fa8c505be7636c2838baeb6d014bb333&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Falk&nbsp;						</strong>
+						<strong>said 
+						on Oct 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>www.slicehost.com is cheaper and you can select among more distros.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fb48f0-b9cc-40a9-bb1b-14324834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fa8c505be7636c2838baeb6d014bb333&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Falk&nbsp;						</strong>
+						<strong>said 
+						on Oct 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Forgot to mention Capistrano combined with Webistrano.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fb5651-ef7c-4fb4-9236-64f84834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Falk: They look nice. I recommend LiquidWeb because they have rackspace kind of outstanding support. If you are new to managing a server, maintaining a LAMP stack can be quite intimidating : ).</p>
+<p>Peritus: Python? I got a deploy script that has the config for all my projects and since I wrote it I have full flexibility. Not sure how fabric could help me : ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fb5c04-d250-434b-b19f-66c24834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=dc51f58249aa6abec7e79abff23d294e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							GreyCells&nbsp;						</strong>
+						<strong>said 
+						on Oct 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I tend to deploy from SVN to a staging server (either on localhost or on a replica of the prod box) and then rsync from staging to prod.</p>
+<p>It may seem OTT, but allows for a 'sanity check' before actually updating a production site.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fb5eec-a930-40be-80de-4d954834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=be965afd8e05334af7ed2adc64736310&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.schreiblogade.de" rel="nofollow">Patrick</a>						</strong>
+						<strong>said 
+						on Oct 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>are there any other VPS providers you can provide which are maybe a little bit cheaper?</p>
+<p>Thanks in advance</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fb64b5-7508-4c74-9fdf-46444834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Patrick: slicehost which was recommended by Falk looks solid and is a lot cheaper then liquid web. However, I can only personally recommend liquid web since we use them for a bunch of stuff, including hosting this blog (on one of their VPS machines).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fb6873-04ec-4b0e-a00d-2ee74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cf3e32e000fc97649f486dd7d210be4a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							hbl&nbsp;						</strong>
+						<strong>said 
+						on Oct 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Same deployoment procedure is possible with every other modern VCS, i. e. with Subversion, so no reason for hyping git ;)</p>
+<p>Our deployment strategy for web apps: Staging from development environment to production is done via a Makefile action which does some configuration tasks for the production environment and all the cleanup stuff (emptying cache, etc.)</p>
+<p>All deployment actions (and some more) are defined in a Makefile (google for 'GNU make'), so we simply do a 'make app', 'make complete', 'make dev2prod', 'make clear_cache', 'make show_error_log', 'make count_lines_of_code', or 'make generate_api_docs' ... you got it :)</p>
+<p>In Makefiles you can define dependent actions, so a 'make dev2prod' requires a 'make disable_debug' before and does a 'make clear_cache' after, and so on ... Nice, isn't it?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fb7d91-1bb8-4d72-bf03-7f724834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e5572b4cf715886d0a66ee141947a3bf&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.bin-co.com/blog/" rel="nofollow">Binny V A</a>						</strong>
+						<strong>said 
+						on Oct 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I do the exact same thing - but with SVN. Dreamhost(my host) don't have git hosting yet(as far as I know).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fb8171-2b6c-43cc-99f0-475c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=32378c4f76f261d63c3c3a941054e440&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.neilcrookes.com" rel="nofollow">Neil Crookes</a>						</strong>
+						<strong>said 
+						on Oct 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I have an svn checkout on staging, then rsync to production.</p>
+<p>@felix, could your deploy.sh script also run the schema update task, then delete all the model cache files too? How do you get it to work with different owners, are your app files owned by a particular user and your tmp files owned by apache?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fb81ec-62ac-41ca-b86f-445e4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hbl: I'm not hyping git. But if you have the option to use git and use SVN instead I might have to say a few not so nice things about svn ... I will look into makefile's so, just never needed them so far for something like deployment.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fb8933-3444-45ec-a220-6cf04834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c3c5907d2d49cbe8f230115d022332a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							thomas sittig&nbsp;						</strong>
+						<strong>said 
+						on Oct 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@patrick<br />
+for us germans, i recommend teh vps services on hosteurope. they are starting by 13€/month</br></p>
+<p>to the topic<br />
+deployment is not only to put some files to a location. it is a little bit more if someone will use it in a professional way. like complex builds. run automatic tests. and so on.</br><br />
+that's why i'm stick with a common svn-vcs in combination with a good build- and deployment-system like capistrano oder continuum.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fb918c-4968-4fe9-9a36-1f534834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=52d6d1f510025c43edb1b9d19f40b055&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dieter.plaetinck.be" rel="nofollow">Dieter_be</a>						</strong>
+						<strong>said 
+						on Oct 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Does git pull into a temporary directory first (.git) and then move the new contents in the real directory all at once, or does it update file by file? (like svn).  Avoiding inconsistent code states is maybe not needed for small sites, but definitely needed for bigger sites.</p>
+<p>Also, what happens when the new code brings along a database schema update?  This is especially fun on bigger websites where alter table queries can take hours :-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fb98ec-0aac-4113-867c-14ee4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3210e1be3e4059b93c4a88309e2183a2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://kevin.vanzonneveld.net" rel="nofollow">Kevin van Zonneveld</a>						</strong>
+						<strong>said 
+						on Oct 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>To decrease the PITA of setting up ssh keys, I did a script once that helps with installing them. It's called instkey.sh and can be found over at <a rel="nofollow" href="http://kvzlib.net">http://kvzlib.net</a></p>
+<p>Usage:<br />
+ ./instkey.sh hostname [username]</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fba424-55ac-4602-ba45-6c274834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ac93f8dadcdd1c057947257e47c0150f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							nukem&nbsp;						</strong>
+						<strong>said 
+						on Oct 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p><a rel="nofollow" href="http://www.hostforweb.com">http://www.hostforweb.com</a> have a good VPS package been using them for 5 years very reliable host. 1 VPS and 1 dedicated, they run their vps on quad core.</p>
+<p>Dont expect too much from a vps they are still are shared hosting.<br />
+better get the cheap dedicated from server planet.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fbb54d-7758-4859-be89-7c944834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f89047a466ce2ab454925f9449c016b8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Christoph Tavan&nbsp;						</strong>
+						<strong>said 
+						on Oct 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>If you are looking for a very reliable root server I can really recommend www.hetzner.de . They are not cheap but offer very good support, have and have a fast and reliable connection.</p>
+<p>However AFAIK the don't offer VPS'...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fc2247-dfd4-4287-a906-1ea04834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Dieter_be: It does a 'git fetch' first which downloads all new objects (blobs, commits, trees) into the .git/objects database. Then it merges the origin/master into the local master branch. Since you normally won't have local commits on your server, the merge will be a fast forward and essentially just a very quick file replace operation without anything being in an inconsistent state for longer then a ms (if that).</p>
+<p>For a site that is still under development I sometimes just have a script that dumps my local db, scp's it up the staging server and then overwrites the old db ; ). For bigger sites you'll have to keep track of all local db changes (we use a trac ticket + comments) and then run them on the server. If your queries take hours and would slow your site down, you'll need a master / slave setup and could keep the slaves responsive during the update. But sometimes you might need to announce some downtime ...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fc68dd-c9a0-42b4-9f1d-353e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=251d1c5db61fefa04af3fd9621312174&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://jojosiao.com" rel="nofollow">Joe Siao</a>						</strong>
+						<strong>said 
+						on Oct 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>for some php developers, they are still having a hard time to understand Git. Maybe there were already used to SVN.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fc6b65-3b70-4cd6-bdca-7dbc4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Joe Siao: I'm working on something to fix that. Check for a post on it here soonish : ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fc816b-1548-4678-8a45-57154834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ed1f2578bb3d16ef49b2acea89be56f3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.fbollon.net" rel="nofollow">Frederic Bollon</a>						</strong>
+						<strong>said 
+						on Oct 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>So far, I am still using fredistrano for all my web developments (intranet + dreamhost). For those who never heard about it, its a web application that automates the deployment process from a subversion repository to your production server (quite similar to webistrano).</p>
+<p>NB: Actually, we have just released a new version with many new features. you might give it a try at <a rel="nofollow" href="http://code.google.com/p/fredistrano/.">http://code.google.com/p/fredistrano/.</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fc981a-0478-4200-aa80-770e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7bdfe70faafb0cf99d4ace20e0e70c6d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							daniel&nbsp;						</strong>
+						<strong>said 
+						on Oct 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hi Felix,</p>
+<p>it would be great if you wrote a post on what you didn't like in svn and how git helped you resolve those problems. </p>
+<p>thx, regards, dan</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fc9cf8-dc14-4ea2-ac8d-6eec4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bd983ec08684f396a53ff85a197e3e67&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.phpes.com/" rel="nofollow">Pablo</a>						</strong>
+						<strong>said 
+						on Oct 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi,</p>
+<p>We are moving to git away from svn. There is not much difference in terms of deployment if you have a good deployment process.</p>
+<p>I recommend ServerGrove - <a rel="nofollow" href="http://servergrove.com/vps">http://servergrove.com/vps</a> Great PHP support at good prices. Check it out.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fc9dd9-48e4-4247-ba13-67d64834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=27601bca8f38e75cbcf9d2dc843f0b32&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.littlehart.net/atthekeyboard" rel="nofollow">Chris Hartjes</a>						</strong>
+						<strong>said 
+						on Oct 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I use Capistrano to deploy all my apps because of the following</p>
+<p>* doesn't care what version control system you use as it supports all the biggies<br />
+* doesn't care what type of app you are deploying</br><br />
+* allows you to not only deploy, but roll back</br><br />
+* very scriptable with their deployment scripts with an incredibly minimal investment in Ruby</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fed6d3-7700-4dd4-a352-0ddc4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3f644805be1fe5f2aa7c9b72b6596bb3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Johnny&nbsp;						</strong>
+						<strong>said 
+						on Oct 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I would recommend Media Temple - mediatemple.net.  I have used their services for over 6 years including the (DV)dedicated virtual and the (GS)grid server with zero issues.  When I need something, they are on top of it very quickly.  I really can't say enough good things about them.</p>
+<p>Regarding Git or SVN, I haven't used Git but within the hour I saw a discussion of Git on Slashdot:</p>
+<p><a rel="nofollow" href="http://developers.slashdot.org/developers/08/10/21/1731223.shtml">http://developers.slashdot.org/developers/08/10/21/1731223.shtml</a></p>
+<p>.... and a short scenario comparison here:</p>
+<p><a rel="nofollow" href="http://markmcb.com/2008/10/18/3-reasons-to-switch-to-git-from-subversion/">http://markmcb.com/2008/10/18/3-reasons-to-switch-to-git-from-subversion/</a></p>
+<p>Aloha.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49008c57-4c94-445d-a7f5-77034834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4d309e8a2d32447bbd47f0e5d61800a2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Ben&nbsp;						</strong>
+						<strong>said 
+						on Oct 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Using fredistrano here too, great tool.</p>
+<p>BTW - now Slicehost has been acquired by Rackspace I'd say they are hands-down the best option for a VPS now.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

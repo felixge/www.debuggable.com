@@ -1,0 +1,307 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>How to Plugin'ize your app &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/how-to-pluginize-your-app:480f4dd5-516c-48f0-ad52-4d69cbdd56cb">How to Plugin'ize your app</a></h2>	<div class="posted-on">
+		<p>Posted on 22/6/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p>I think a lot of people, including me, are trying to create modularized websites where they can simply drop in a new folder and new functionality will start to appear on the site. The system I'm working on right now is called SpliceIt! and I've decided to use plugins as those modules. In this post I'll explain what plugins are for, how they are implemented in CakePHP and what I did to make them work according to my ideas ; ).</p>
+<p>First of all: This is no official documentation of plugins and I think I have a different understanding of how they are supposed to be used then the developers. However, I'll try to clarify this difference as good as possible so you won't be pressured into accustom my bad habbits ; ). The first part is written so _psychic_ hopefully will be able to integrate it into the <a href="http://manual.cakephp.org/chapter/21">manual chapter for plugins</a> which is empty right now, the second part will contain some unoffical things I do with plugins.</p>
+<p>Ok let's get started:</p>
+<h2>What are plugins?</h2>
+<p>If you need a picture for what a plugin is, imagine it to be a mini-app. It has it's own folder for models, views and controllers, it has it's own AppController and AppModel, it is accessed as /plugin/controller/action and it's supposed to be an independent sub application. The most important thing that plugins share with their parent app is the configuration (also database connection for that matter). Otherwise they have almost all features a copied app folder would have.</p>
+<h2>How to create a plugin?</h2>
+<p>If you want to create a plugin you have to create a new folder inside app/plugins. The name of this folder will be the name of the plugin when you access it via /plugin/controller/action in your browser, for that reason I think you should use underscored plural terms like you do for controllers as a convention (not sure if this is official so).</p>
+<p>Now that you have created this folder, create the following files / folders in it. [plugin] is the name of the plugin you are creating:</p>
+<ul>
+<li>app/plugins/[plugin]/controllers</li>
+<li>app/plugins/[plugin]/models</li>
+<li>app/plugins/[plugin]/views</li>
+<li>app/plugins/[plugin]/[plugin]_app_controller.php</li>
+<li>app/plugins/[plugin]/[plugin]_app_model.php</li>
+</ul>
+<p><strong>Notice:</strong> plugins don't have their own: tmp, webroot, vendors or config folder.</p>
+<p>Your [plugin]_app_controller.php and your [plugin]_app_model.php are the AppModel and AppController specific to the controllers/models of the plugin you create. They do extend the AppController / AppModel of your application and should look like this:</p>
+<p><strong>app/plugins/[plugin]/[plugin]_app_controller.php:</strong></p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<br />
+<span class="kw2">class</span> <span class="br0">&#91;</span>Plugin<span class="br0">&#93;</span>AppController <span class="kw2">extends</span> AppController<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// Custom [plugin]AppController code goes in here</span><br />
+<span class="br0">&#125;</span>
+</div>
+<p><strong>app/plugins/[plugin]/[plugin]_app_model.php:</strong></p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<br />
+<span class="kw2">class</span> <span class="br0">&#91;</span>Plugin<span class="br0">&#93;</span>AppModel <span class="kw2">extends</span> AppModel<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// Custom [plugin]AppModel code goes in here</span><br />
+<span class="br0">&#125;</span>
+</div>
+<p><strong>Important:</strong> AppController and AppModel are optional for a normal application, however they are <strong>not optional</strong> when you create a plugin. <em>Plugins must have their [Plugin]AppController and [Plugin]AppModel in order to work!</em></p>
+<h2>Working with plugins</h2>
+<p>Now that you have the basic structure of your plugin set up, your just a few steps away from creating your first plugin controller. The only difference between a normal controller is that it rests in a different place (app/plugins/[plugin]/controllers/[controller]_controller.php) and that it extends [Plugin]AppController. The same thing goes for Models. Check out the example:</p>
+<p><em>Plugin='Drinks', Controller='Beer':</em></p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> BeerController <span class="kw2">extends</span> DrinksAppController<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">'Beer'</span>;<br />
+&nbsp; <br />
+&nbsp; &nbsp; <span class="co1">// Controller logic goes here.</span><br />
+<span class="br0">&#125;</span></div>
+<p><em>Plugin='Drinks', Model='Beer':</em></p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> BeerModel <span class="kw2">extends</span> DrinksAppModel<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">'Beer'</span>;<br />
+&nbsp; <br />
+&nbsp; &nbsp; <span class="co1">// Model specific functions / varaibles go here</span><br />
+<span class="br0">&#125;</span></div>
+<p>There is nothing special about the ways you create views with plugins. Just create a folder app/plugins/drinks/views/beer and put your view files in there for the example from above.</p>
+<h2>Some useful tipps when working with plugins</h2>
+<p>You know the basics about plugins, but a couple more things are good to know when working with the for the first time:</p>
+<ul>
+<li>When you don't have a  [Plugin]AppController / [Plugin]AppModel you'll get missing Controller errors when trying to access a plugin controller via browser and the error message will tell you to create your controller in app/controllers</li>
+<li>You can have a default controller with the name of your plugin. If you do that you can access it via /[plugin]/action. For example a plugin named users with a controller named users can be accessed like this: /users/add if there is no plugin called AddController in your [plugin]/controllers folder</li>
+<li>Plugins will use the layouts from the app/views/layouts folder by default.</li>
+<li>You can do inter-plugin communication by using $this->requestAction('/plugin/controller/action'); in your controllers</li>
+<li>If you use requestAction, make sure controller / model names are as unique as possible. Otherwise you might get PHP "redefined class ..." errors.</li>
+</ul>
+<p>Ok, time has run up and I decided to break this post into two parts. This one was the one trying to stay with the CakePHP standards, the next one will be about my dark side plugin practices and will follow in the next 1-2 days.</p>
+<p>I hope this eases the use of plugins for people who haven't worked with them before. If you see any errors / have any suggestions please report them to me, so I can clean this post up for the manual as good as possible.</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-516c-48f0-ad52-4d69cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-pluginize-your-app%3A480f4dd5-516c-48f0-ad52-4d69cbdd56cb &amp;title=How+to+Plugin%27ize+your+app';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-pluginize-your-app%3A480f4dd5-516c-48f0-ad52-4d69cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-pluginize-your-app%3A480f4dd5-516c-48f0-ad52-4d69cbdd56cb&amp;title=How+to+Plugin%27ize+your+app&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-pluginize-your-app%3A480f4dd5-516c-48f0-ad52-4d69cbdd56cb&amp;title=How+to+Plugin%27ize+your+app';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/how-to-pluginize-your-app:480f4dd5-516c-48f0-ad52-4d69cbdd56cb">5 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/how-to-pluginize-your-app:480f4dd5-516c-48f0-ad52-4d69cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dd8-7ee4-4ebe-8f7b-4620cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fd24ab9b18c0a2aa04d70ab266eb57ae&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							RosSoft&nbsp;						</strong>
+						<strong>said 
+						on Jun 22, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>good article</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-4878-45e2-815b-4da9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3290a19bcdc2ac23dd093fffb9430e24&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://scotfl.ca" rel="nofollow">scot lewis</a>						</strong>
+						<strong>said 
+						on Jun 22, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Looking forward to the second half. I had the same idea not too long ago: take a big project and split it up into lously coupled plugins. Of course, I hit the fact that Cake plug-ins are meant to be uncoupled fairly hard. I ended up slicing the app up by using 3 letter prefixes to namespace the MVC for the individual portions. I know there's a better way, but I don't have time to find it at the moment. Hopefully you can do it for me. ;)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-cb80-44fc-b3b8-41c0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f0b8fa14cbee5edfdeeac6b8f9ad062d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://tariquesani.net/" rel="nofollow">Tarique Sani</a>						</strong>
+						<strong>said 
+						on Jun 24, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for writing this - saw it just as I was about to sit with the code to figure out how plugins worked in cakePHP. Saved me a lot of time</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-b6ec-4f15-8ac1-4788cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=deaa04e0739f4cd96470c5f5ab667206&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.xentek.net/" rel="nofollow">xentek</a>						</strong>
+						<strong>said 
+						on Apr 02, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The thing I can't figure out is how to share models with a plugin. We have a registration plugin that we use across multiple sites, but want to use some of the models in the main application too.</p>
+<p>Any idea?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-5240-4618-b9b5-4b93cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 02, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>xentek:</p>
+<p>Cake 1.1: Put loadPluginModels() above your controller declaration and it should work (Warning: You will not be able to have any Models with the same name throughout the app)</p>
+<p>Cake 1.2: Put loadModel('Plugin.Model') above your controller declaration. Naming conflicts will only occur if your main app and your plugin use a Model named 'Model'.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

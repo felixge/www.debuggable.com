@@ -1,0 +1,657 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Blog &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="paging">
+	<a href="/posts/index/page:29" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:26">26</a></span> | <span><a href="/posts/index/page:27">27</a></span> | <span><a href="/posts/index/page:28">28</a></span> | <span><a href="/posts/index/page:29">29</a></span> | <span class="current">30</span> | <span><a href="/posts/index/page:31">31</a></span> | <span><a href="/posts/index/page:32">32</a></span> | <span><a href="/posts/index/page:33">33</a></span> | <span><a href="/posts/index/page:34">34</a></span> <a href="/posts/index/page:31" class="next">Next &raquo;</a></div>
+	<div class="post">
+	<h2><a href="/posts/testing-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes:4890ed55-be28-4d4a-ba4c-7fd64834cda3">Testing Models in CakePHP - Now let's get rid of the unnecessary ModelTest classes !</a></h2>	<div class="posted-on">
+		<p>Posted on 30/7/08 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>today I committed some stuff that will make a bigger impact on your Unit Testing development in CakePHP. It's a much cleaner way of how you are able to test models. Up until now there was always a need to create a so-called test model that extends your model-under-test in order to overwrite its $useDbConfig setting to be 'test_suite'. By that you ensured that your models run with the test_suite datasource when the tests are run.</p>
+<p>Nate proposed ClassRegistry::config(), which allows you to tell the ClassRegistry class which datasource it shall use when<br />
+ClassRegistry::init() is used the next time (and thereby a model is instantiated). So what we are doing now in the testsuite is telling the ClassRegistry to use the test_suite db config whenever a new model is instantiated via ClassRegistry::init(). Doesn't make sense to you? Well, let's look at an example.</p>
+<p>The following code is directly taken from the <a hreg="http://cookbook.cakephp.org">CookBook</a> and shows the old way of doing things:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+App::<span class="me2">import</span><span class="br0">&#40;</span><span class="st0">'Model'</span>, <span class="st0">'Article'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw2">class</span> ArticleTest <span class="kw2">extends</span> Article <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">'ArticleTest'</span>;<br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$useDbConfig</span> = <span class="st0">'test_suite'</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">class</span> ArticleTestCase <span class="kw2">extends</span> CakeTestCase <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$fixtures</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'app.article_test'</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; <span class="kw2">function</span> testPublished<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">ArticleTest</span> =&amp; <span class="kw2">new</span> ArticleTest<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$result</span> = <span class="re0">$this</span>-&gt;<span class="me1">ArticleTest</span>-&gt;<span class="me1">published</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'id'</span>, <span class="st0">'title'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$expected</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'ArticleTest'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span> <span class="st0">'id'</span> =&gt; <span class="nu0">1</span>, <span class="st0">'title'</span> =&gt; <span class="st0">'First Article'</span> <span class="br0">&#41;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'ArticleTest'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span> <span class="st0">'id'</span> =&gt; <span class="nu0">2</span>, <span class="st0">'title'</span> =&gt; <span class="st0">'Second Article'</span> <span class="br0">&#41;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'ArticleTest'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span> <span class="st0">'id'</span> =&gt; <span class="nu0">3</span>, <span class="st0">'title'</span> =&gt; <span class="st0">'Third Article'</span> <span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertEqual</span><span class="br0">&#40;</span><span class="re0">$result</span>, <span class="re0">$expected</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>So far so good. The ArticleTest model extends the imported Article model to overwrite the datasource setting. Then it loads the ArticleTest fixture to use its data throughout the test. The drawback: A whole class that does practically nothing. In a bigger system with plenty of models and plenty of tests this can contribute to your hair loss - especially when you forget to name your fixture properly or provide the $name property in the Test Model.</p>
+<p>With the new code in place, this will just work as well:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+App::<span class="me2">import</span><span class="br0">&#40;</span><span class="st0">'Model'</span>, <span class="st0">'Article'</span><span class="br0">&#41;</span>;<br />
+<span class="kw2">class</span> ArticleTestCase <span class="kw2">extends</span> CakeTestCase <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$fixtures</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'app.article'</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; <span class="kw2">function</span> testPublished<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Article</span> =&amp; ClassRegistry::<span class="me2">init</span><span class="br0">&#40;</span><span class="st0">'Article'</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$result</span> = <span class="re0">$this</span>-&gt;<span class="me1">Article</span>-&gt;<span class="me1">published</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'id'</span>, <span class="st0">'title'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$expected</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Article'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span> <span class="st0">'id'</span> =&gt; <span class="nu0">1</span>, <span class="st0">'title'</span> =&gt; <span class="st0">'First Article'</span> <span class="br0">&#41;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Article'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span> <span class="st0">'id'</span> =&gt; <span class="nu0">2</span>, <span class="st0">'title'</span> =&gt; <span class="st0">'Second Article'</span> <span class="br0">&#41;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Article'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span> <span class="st0">'id'</span> =&gt; <span class="nu0">3</span>, <span class="st0">'title'</span> =&gt; <span class="st0">'Third Article'</span> <span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertEqual</span><span class="br0">&#40;</span><span class="re0">$result</span>, <span class="re0">$expected</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>So we got rid of the ArticleTest class and can now use the normal ArticleFixture that we probably use throughout the system anyway to provide some standard data for the application. Via the $test_suite setting in your database.php file you can control where and how the test data is imported.</p>
+<p>The only change to your code: Instantiate the subject under test via ClassRegistry::init() instead of instantiating directly via the new operator.</p>
+<p>To me this seems like the proper way to do it. No need for further unnecessary classes. Everything clean and controllable. Do you agree?</p>
+<p>-- Tim Koschuetzki aka DarkAngelBGE</p>
+<p>PS: Kudos again to Nate for ClassRegistry::config() !<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4890ed55-be28-4d4a-ba4c-7fd64834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftesting-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes%3A4890ed55-be28-4d4a-ba4c-7fd64834cda3 &amp;title=Testing+Models+in+CakePHP+-+Now+let%27s+get+rid+of+the+unnecessary+ModelTest+classes+%21';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftesting-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes%3A4890ed55-be28-4d4a-ba4c-7fd64834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftesting-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes%3A4890ed55-be28-4d4a-ba4c-7fd64834cda3&amp;title=Testing+Models+in+CakePHP+-+Now+let%27s+get+rid+of+the+unnecessary+ModelTest+classes+%21&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftesting-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes%3A4890ed55-be28-4d4a-ba4c-7fd64834cda3&amp;title=Testing+Models+in+CakePHP+-+Now+let%27s+get+rid+of+the+unnecessary+ModelTest+classes+%21';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/testing-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes:4890ed55-be28-4d4a-ba4c-7fd64834cda3">49 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/testing-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes:4890ed55-be28-4d4a-ba4c-7fd64834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/cakephp-workshop-in-raleigh-nc-sep-6-to-7:488a234d-39fc-4d06-9c57-65aa4834cda3">CakePHP Workshop in Raleigh, NC (Sep 6-7)</a></h2>	<div class="posted-on">
+		<p>Posted on 29/7/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>Tim and I are very thrilled to announce the very first <a href="http://debuggable.com/workshops/view/488f5ae0-4d28-486c-9844-2fa54834cda3">two-day workshop</a> for everybody who is interested in mastering the CakePHP framework. The event is a collaboration between <a href="http://debuggable.com/about">Debuggable Limited</a> and the <a href="http://www.cakefoundation.org/">Cake Software foundation</a>.</p>
+<p>Special thanks goes to <a href="http://www.creditriskmgt.com/">Credit Risk Management L.L.C.</a> for sponsoring the rooms and catering!</p>
+<h3>Overview</h3>
+<ul>
+<li><strong>Event Info:</strong> <a href="http://maps.google.com/maps?f=d&hl=en&geocode=&time=&date=&ttype=&saddr=&daddr=4140+Parklake+Ave,+Raleigh,+NC+27612+(Credit+Risk+Management,+L.L.C)&sll=35.829227,-78.642712&sspn=0.108836,0.270538&ie=UTF8&om=1&ll=36.155618,-79.145508&spn=8.476633,9.700928&z=7">Raleigh, NC</a> (4140 Parklake Ave)</li>
+<li><strong>Date:</strong> September 6 + 7 (Saturday + Sunday)</li>
+<li><strong>Seats:</strong> max 25</li>
+<li><strong>Costs:</strong> 600 USD / seat (Students pay 100 USD less)</li>
+<li><strong>Signup:</strong> <a href="http://debuggable.com/workshops/view/488f5ae0-4d28-486c-9844-2fa54834cda3">Signup page</a></li>
+</ul>
+<h3>Speakers</h3>
+<ul>
+<li>Garrett J. Woodworth (President of the Cake Software Foundation)</li>
+<li>Nate Abele (Cake Lead Developer)</strong></li>
+<li>Felix Geisendörfer (Cake Core Developer)</li>
+<li>Tim Koschützki (Cake Core Contributor)</li>
+</ul>
+<div style="width: 340px;" class="center"><img src="http://static.thinkingphp.org/img/workshop-nc-08/garrett.jpg"> <img src="http://static.thinkingphp.org/img/workshop-nc-08/nate.jpg"> <img src="http://static.thinkingphp.org/img/workshop-nc-08/felix.jpg"> <img src="http://static.thinkingphp.org/img/workshop-nc-08/tim.jpg"></div>
+<h3>What to expect</h3>
+<p>This workshop is going to be very different from standard programming workshops. There will be two tracks in two different rooms. The main track will teach you everything you need to know in order to build great applications in CakePHP. You will be introduced to the MVC Pattern, learn how to setup CakePHP projects and watch a full application being put together over the course of two days. All sessions are delivered by the core developers of CakePHP so the information you get will be top quality and allow you to do things right from the beginning. This way you will save lots of time and money in the long run.</p>
+<p>The second track is the most unique however. Instead of having a fixed schedule and sessions you will have the opportunity to directly pick the brains of the people who wrote CakePHP in a personal and informal manner. There is also a good amount of topics we are prepared to speak on like: git, javascript, cake internals and project management - just let us know what you want to learn and we will deliver : ).</p>
+<p>In the second track you will also find out about some secret cutting edge things all of us are working on, including some early insights into Cake 2.0 and other unreleased additions to the cake core.</p>
+<p>So all in all you get two days full of talks and chatting with the core developers that will be worth your while, including <a href="http://debuggable.com/posts/cakefest-orlando-2008-summary:480f4dd6-6404-4774-a771-4e8fcbdd56cb">lots of fun in the evenings</a>.</p>
+<p><img src="http://debuggable.com/img/workshops/cakefest2.jpg"></p>
+<h3>Schedule</h3>
+<h4>Saturday, September 6th, 2008</h4>
+<table class="workshop-schedule">
+<thead>
+<th>Time</th>
+<th>Speaker</th>
+<th>Session</th>
+<th>Session Description</th>
+</thead>
+<tbody>
+<tr>
+<td class="time">9:00 am -<br />
+10:00 am</td>
+<td class="speaker">Garrett</td>
+<td class="title">Introduction</td>
+<td class="descr expandable">Garrett will introduce you to the speakers and tell you a little about the history of CakePHP. You will also be provided with the information to connect to the git repository for the workshop so you can setup the application being built locally and create your own fork(s) with modifications you'd like to get reviewed / shared.</td>
+</tr>
+<tr>
+<td class="time">10:00 am -<br />
+10:30 am</td>
+<td class="title" style="text-align: center;" colspan="3">coffee break</td>
+</tr>
+<tr>
+<td class="time">10:30 am -<br />
+11:30 am</td>
+<td class="speaker">Felix</td>
+<td class="title">First steps in the kitchen</td>
+<td class="descr expandable">You will learn about the philosophy behind CakePHP which is very important for effective development. The session will also walk you through the basics of downloading / installing CakePHP, keeping up with updates and  giving you an overview over the components of CakePHP. Finally you will see how CakePHP makes it incredibly easy to display information from a database in a simple index action.</td>
+</tr>
+<tr>
+<td class="time">11:30 am -<br />
+12:30 pm</td>
+<td class="speaker">Nate</td>
+<td class="title">MVC Introduction</td>
+<td class="descr expandable">After having seen the model, controller and view components of CakePHP in action, Nate will provide you with an indepth explanation of why things are designed this way and how to properly organize your code. A true understanding of MVC is the key to enjoy writing easy to maintain applications in CakePHP.</td>
+</tr>
+<tr>
+<td class="time">12:30 pm -<br />
+1:30 pm</td>
+<td class="title" style="text-align: center;" colspan="3">lunch break</td>
+</tr>
+<tr>
+<td class="time">1:30 pm -<br />
+2:30 pm</td>
+<td class="speaker">Nate</td>
+<td class="title">Using CakePHP Models</td>
+<td class="descr expandable">In this session Nate will give you an introduction to Model layer and how to effectively query and abstract your database with it. But be warned, after this you may never have to write a single line of sql again ; ).</td>
+</tr>
+<tr>
+<td class="time">2:30 pm -<br />
+3:30 pm</td>
+<td class="speaker">Tim</td>
+<td class="title">Controllers in CakePHP</td>
+<td class="descr expandable">Now that you know how to use the Model layer, Tim will show you how to use controllers as the interface between the users of your application and the database. He will cover the CakePHP form helper as well as writing clean and effective add / edit and delete actions.</td>
+</tr>
+<tr>
+<td class="time">3:30 pm -<br />
+4:00 pm</td>
+<td class="title" style="text-align: center;" colspan="3">coffee break</td>
+</tr>
+<tr>
+<td class="time">4:00 pm -<br />
+5:00 pm</td>
+<td class="speaker">Garrett</td>
+<td class="title">Kitchen tools (CakePHP's Console)</td>
+<td class="descr expandable">In this session Garrett will show you how CakePHP's built-in command line tools can make your development more effective. A special focus will go into the bake code generator that allows you to turn a database schema into a working application automagically!</td>
+</tr>
+<tr>
+	</tbody>
+</table>
+<h4>Sunday, September 7th, 2008</h4>
+<table class="workshop-schedule">
+<thead>
+<th>Time</th>
+<th>Speaker</th>
+<th>Session</th>
+<th>Session Description</th>
+</thead>
+<tbody>
+<tr>
+<td class="time">9:00 am -<br />
+10:00 am</td>
+<td class="speaker">Tim</td>
+<td class="title">Keeping things yummy (Validation)</td>
+<td class="descr expandable">Learn how to validate form data with Cake's built-in validation rules. Learn how to write your own validation rules and implement complex business requirements within your models.</td>
+</tr>
+<tr>
+<td class="time">10:00 am -<br />
+10:30 am</td>
+<td class="title" style="text-align: center;" colspan="3">coffee break</td>
+</tr>
+<tr>
+<td class="time">10:30 am -<br />
+11:30 am</td>
+<td class="speaker">Tim</td>
+<td class="title">Unit testing in CakePHP</td>
+<td class="descr expandable">This session will cover the basics of unit testing in CakePHP. You will be walked through the process of setting up tests for some of the previously shown code and receive advice on efficient testing of your own applications.</td>
+</tr>
+<tr>
+<td class="time">11:30 am -<br />
+12:30 pm</td>
+<td class="speaker">Felix</td>
+<td class="title">Advanced Model usage</td>
+<td class="descr expandable">In this session Felix will show you how to leverage some of the most powerful model functions such as filters, behaviors and the ability to overwrite the find method.</td>
+</tr>
+<tr>
+<td class="time">12:30 pm -<br />
+1:30 pm</td>
+<td class="title" style="text-align: center;" colspan="3">lunch break</td>
+</tr>
+<tr>
+<td class="time">1:30 pm -<br />
+2:30 pm</td>
+<td class="speaker">Felix</td>
+<td class="title">Ajaxifying your Cake Site</td>
+<td class="descr expandable">In this talk Felix will show you how you to ajaxify your CakePHP application using jQuery and the new JS helper.</td>
+</tr>
+<tr>
+<td class="time">2:30 pm -<br />
+3:30 pm</td>
+<td class="speaker">Garrett</td>
+<td class="title">Kitchen helpers</td>
+<td class="descr expandable">Garrett will give you an overview about the remaining CakePHP view helpers and how to use them effectively.</td>
+</tr>
+<tr>
+<td class="time">3:30 pm -<br />
+4:00 pm</td>
+<td class="title" style="text-align: center;" colspan="3">coffee break</td>
+</tr>
+<tr>
+<td class="time">4:00 pm -<br />
+5:00 pm</td>
+<td class="speaker">Nate</td>
+<td class="title">Auth System (ACL)</td>
+<td class="descr expandable">In the last talk Nate will show you how to handle permissions for your applications actions & data using CakePHP's built-in authorization and authentification system.</td>
+</tr>
+</tbody>
+</table>
+<h3>Come and join us!</h3>
+<p>If the above sounds interesting to you, we are looking forward to see you in Raleigh:</p>
+<p><a href="http://debuggable.com/workshops/view/488f5ae0-4d28-486c-9844-2fa54834cda3">Sign up for the Raleigh workshop on September 6-7</a></p>
+<h3>Questions</h3>
+<p>If you have any questions, please feel free to email us at <a href="mailto:workshops@debuggable.com">workshops@debuggable.com</a>.</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/488a234d-39fc-4d06-9c57-65aa4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakephp-workshop-in-raleigh-nc-sep-6-to-7%3A488a234d-39fc-4d06-9c57-65aa4834cda3 &amp;title=CakePHP+Workshop+in+Raleigh%2C+NC+%28Sep+6-7%29';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakephp-workshop-in-raleigh-nc-sep-6-to-7%3A488a234d-39fc-4d06-9c57-65aa4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakephp-workshop-in-raleigh-nc-sep-6-to-7%3A488a234d-39fc-4d06-9c57-65aa4834cda3&amp;title=CakePHP+Workshop+in+Raleigh%2C+NC+%28Sep+6-7%29&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakephp-workshop-in-raleigh-nc-sep-6-to-7%3A488a234d-39fc-4d06-9c57-65aa4834cda3&amp;title=CakePHP+Workshop+in+Raleigh%2C+NC+%28Sep+6-7%29';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/cakephp-workshop-in-raleigh-nc-sep-6-to-7:488a234d-39fc-4d06-9c57-65aa4834cda3">21 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/cakephp-workshop-in-raleigh-nc-sep-6-to-7:488a234d-39fc-4d06-9c57-65aa4834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/debuggable-scraps-on-github:488f5a12-5fac-4c90-9822-56384834cda3">Debuggable Scraps on GitHub</a></h2>	<div class="posted-on">
+		<p>Posted on 29/7/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>Tim and I finally found a good way to share all the code we have been publishing on this blog in a central place as well as making it easy for people to contribute own changes to it. The solution is <a href="https://github.com/">GitHub</a>, a truly great application when it comes to hosting git repositories in a collaborative manner.</p>
+<p>How is this better than a svn project? Well, first of all the distributed nature of git makes it very easy for people to '<a href="http://github.com/guides/keeping-a-git-fork-in-sync-with-the-forked-repo">fork</a>' any given project, making their own changes to it and then asking the maintainer of the original project to 'merge' their changes. Another very neat thing is a feature by Github itself that allows to <a href="http://github.com/guides/readme-formatting">display the contents of documentation files</a> directly in the repository browser.</p>
+<p>So here is the link to the <a href="http://github.com/felixge/debuggable-scraps/tree/master">Debuggable Scraps Repository</a>.</p>
+<p>At this point we've only added the <a href="http://github.com/felixge/debuggable-scraps/tree/master/cakephp/datasources/google_analytics">Google Analytics API / data source</a> as well as a jQuery plugin called <a href="http://github.com/felixge/debuggable-scraps/tree/master/jquery/expandable">Expandable</a> that we wrote today and that will be demonstrated in an upcoming post. But over the next 2-3 days we'll try to add all missing projects as well as a bunch of other previously unreleased snippets.</p>
+<p>Hope some of you guys like the idea and will help by forking the project and contributing some changes : ).</p>
+<p>-- Felix Geisendörfer aka the_undefined</p>
+<p>PS: The name 'debuggable scraps' was chosen because all of the code in the repository is too trivial to make for an own repository yet may sometimes need some debugging ; ).<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/488f5a12-5fac-4c90-9822-56384834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdebuggable-scraps-on-github%3A488f5a12-5fac-4c90-9822-56384834cda3 &amp;title=Debuggable+Scraps+on+GitHub';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdebuggable-scraps-on-github%3A488f5a12-5fac-4c90-9822-56384834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdebuggable-scraps-on-github%3A488f5a12-5fac-4c90-9822-56384834cda3&amp;title=Debuggable+Scraps+on+GitHub&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdebuggable-scraps-on-github%3A488f5a12-5fac-4c90-9822-56384834cda3&amp;title=Debuggable+Scraps+on+GitHub';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/debuggable-scraps-on-github:488f5a12-5fac-4c90-9822-56384834cda3">4 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/debuggable-scraps-on-github:488f5a12-5fac-4c90-9822-56384834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/im-doing-you-a-huge-favor:487bb5dd-9338-41c4-99e7-3cdb4834cda3">If you have a web company in DC, I'm doing you a huge favor</a></h2>	<div class="posted-on">
+		<p>Posted on 14/7/08 by 
+		<a href="/nate">Nate Abele</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/nate_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey y'all, big news:</p>
+<p>My good friend <a href="http://jkochis.com/">Jesse Kochis</a> is moving from Boston down to DC this October, and is looking for a company (or companies, if you can talk him into it) to work with.  Aside from being a great guy, Jesse is far and away one of the most talented and capable developers I've ever had the pleasure of working with.  On top of being an adept developer and architect, his front-end skills are virtually unparalleled.</p>
+<p>In fact, Jesse and I met about the same time I was working on some new features that would come to form the basis for Cake 1.2.  He and his team of developers has been writing apps on top of Cake 1.2 since the very beginning, and his work has been influential in several aspects of 1.2's design.</p>
+<p>I've never endorsed anybody like this before, but as far as I'm concerned, this isn't so much an endorsement as it is a favor to any Washington DC-based internet companies.  If you can afford to hire someone in a senior position, you'd be crazy not to; and if you can't afford it, you need to interview him, and then re-examine your budget.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/487bb5dd-9338-41c4-99e7-3cdb4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fim-doing-you-a-huge-favor%3A487bb5dd-9338-41c4-99e7-3cdb4834cda3 &amp;title=If+you+have+a+web+company+in+DC%2C+I%27m+doing+you+a+huge+favor';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fim-doing-you-a-huge-favor%3A487bb5dd-9338-41c4-99e7-3cdb4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fim-doing-you-a-huge-favor%3A487bb5dd-9338-41c4-99e7-3cdb4834cda3&amp;title=If+you+have+a+web+company+in+DC%2C+I%27m+doing+you+a+huge+favor&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fim-doing-you-a-huge-favor%3A487bb5dd-9338-41c4-99e7-3cdb4834cda3&amp;title=If+you+have+a+web+company+in+DC%2C+I%27m+doing+you+a+huge+favor';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/im-doing-you-a-huge-favor:487bb5dd-9338-41c4-99e7-3cdb4834cda3">7 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/im-doing-you-a-huge-favor:487bb5dd-9338-41c4-99e7-3cdb4834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/programming-psychology-ii-private-methods:481ed862-b0d8-4a0e-9247-165c4834cda3">Programming Psychology II: Private methods </a></h2>	<div class="posted-on">
+		<p>Posted on 7/7/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>my previous posts about <a href="http://debuggable.com/posts/programming-psychology-return-home-early:4811de9f-ae28-49c2-a7dc-2f154834cda3">code that is easy to write vs code that is easy to read</a> and why <a href="http://debuggable.com/posts/xhtml-is-a-joke:4819bf98-4978-4027-896e-2ea44834cda3">XHTML is a joke</a> spawned a fair amount of criticism. This time I am afraid very few people are going to agree with me at all:</p>
+<blockquote><p>Private / protected methods and properties are one of the most stupid concepts of OOP.</p></blockquote>
+<p>This is a thought I first shared at <a href="http://debuggable.com/posts/cakefest-orlando-2008-summary:480f4dd6-6404-4774-a771-4e8fcbdd56cb">CakeFest Orlando</a> this year, but could not explain properly at the time.</p>
+<p>Here is the typical excuse for why any language should implement such a terrible concept:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> BankAccount<span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">private</span> <span class="re0">$balance</span> = <span class="nu0">0.00</span>;<br />
+<br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> set<span class="br0">&#40;</span><span class="re0">$newBalance</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/is_numeric"><span class="kw3">is_numeric</span></a><span class="br0">&#40;</span><span class="re0">$newBalance</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">error</span> = <span class="st0">'And I will strike down upon thee with great vengeance<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; and furious anger those who would attempt to poison and<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; destroy my bank account. [...]'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">balance</span> = <span class="re0">$newBalance</span>;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">true</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> get<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">balance</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> save<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// Great, I can now always blindly trust the value of $this-&gt;balance!</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> file_put_contents<span class="br0">&#40;</span><span class="st0">'balance'</span>, <span class="re0">$this</span>-&gt;<span class="me1">balance</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Awesome! Now nobody can mess with the balance of this account class and you don't even have to communicate the rules for using it to other programmers!<br />
+<blockquote>If you think you can manage programmers or enforce API policies with a few keywords of your programming language ... think again!</p></blockquote>
+<p>If somebody does not understand why he is not supposed to modify the balance property - he will find ways around it. And it won't be pretty, trust me. He'll directly write his values to the database and reload the object. He'll simply change your source code without warning. He'll extend the class and overwrite the set method.<br />
+<blockquote>Programmers will do just about anything to restore power you are trying to take away from them.</p></blockquote>
+<p>Now you might think: <strong>"But it really makes sense to use a private property here, nobody would ever want to work around this?"</strong>. Well maybe. And thats a big maybe. Predicting what other programmers will want to do with your code is like <a href="http://en.wikipedia.org/wiki/UUID#Random_UUID_probability_of_duplicates">playing number guessing with uuids</a>.</p>
+<p>So why not try to make the other programmers your allies? Show them what you are trying to accomplish in a semantic fashion:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> BankAccount<span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">public</span> <span class="re0">$balance</span> = <span class="nu0">0.00</span>;<br />
+<br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> validates<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/is_numeric"><span class="kw3">is_numeric</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">balance</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">error</span> = <span class="st0">'And I will strike down upon thee with great vengeance<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; and furious anger those who would attempt to poison and<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; destroy my bank account. [...]'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">true</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> save<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// Lets just make sure that nothing has gone wrong before saving</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$this</span>-&gt;<span class="me1">validates</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> file_put_contents<span class="br0">&#40;</span><span class="st0">'balance'</span>, <span class="re0">$this</span>-&gt;<span class="me1">balance</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>This approach has many advantages:</p>
+<ul>
+<li>It gets rid of the useless overhead from setter / getter functions.</li>
+<li>It communicates that you need to validate certain things before saving a record.</li>
+<li>It embraces open architectures and others can work with it right away.</li>
+<li>It makes your class more flexible since you can temporarily feed it with invalid values.</li>
+<li>It exposes a new useful method.</li>
+</ul>
+<h3>Is that it?</h3>
+<p>Despite the fact that I think that private / protected are a stupid idea to begin with, I have an even bigger issue with them:<br />
+<blockquote>The concept of private / protected properties and methods seems to be the most popular recipe for producing crappy code.</p></blockquote>
+<p>I think it's safe to say that all of us were following at least one of the patterns listed below at one point:</p>
+<ul>
+<li>Not sure where this code goes - I'll put it in a private method for now.</li>
+<li>Oh, I will refactor this later, so I temporarely put it in a private method.</li>
+<li>This is just a helper function, no need to clutter the API with it.</li>
+<li>I am sure no other class will need to access this property ... lets make it private.</li>
+</ul>
+<p>Now ask yourself how many times those decisions have lead to code you are proud of? I cannot recall a single occasion in my work as a programmer where using private / protected has helped me to write better code. In fact, these days I even judge other peoples code by it:<br />
+<blockquote>When I see more than 2-3 private / protected methods in a class I know the code I'm looking at is in poor shape.</p></blockquote>
+<p>This may sound like a big simplification, but it holds true. I've almost never seen people use private / protected in the proper (yet stupid) way they are supposed to be used.</p>
+<p>The psychology behind this is simple. Give people a way to ignore things they don't want to deal with and they will. Private / protected were not meant for that purpose, but unfortunately they encourage the worst habits in us programmers and I therefor highly recommend against using them.</p>
+<p>-- Felix Geisendörfer aka the_undefined</p>
+<p>PS: Even if you "just" use the CakePHP convention of prefixing functions with one or two underscores to indicate scope visibility you'll end up writing messy code.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/481ed862-b0d8-4a0e-9247-165c4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprogramming-psychology-ii-private-methods%3A481ed862-b0d8-4a0e-9247-165c4834cda3 &amp;title=Programming+Psychology+II%3A+Private+methods+';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprogramming-psychology-ii-private-methods%3A481ed862-b0d8-4a0e-9247-165c4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprogramming-psychology-ii-private-methods%3A481ed862-b0d8-4a0e-9247-165c4834cda3&amp;title=Programming+Psychology+II%3A+Private+methods+&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprogramming-psychology-ii-private-methods%3A481ed862-b0d8-4a0e-9247-165c4834cda3&amp;title=Programming+Psychology+II%3A+Private+methods+';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/programming-psychology-ii-private-methods:481ed862-b0d8-4a0e-9247-165c4834cda3">35 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/programming-psychology-ii-private-methods:481ed862-b0d8-4a0e-9247-165c4834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="paging">
+	<a href="/posts/index/page:29" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:26">26</a></span> | <span><a href="/posts/index/page:27">27</a></span> | <span><a href="/posts/index/page:28">28</a></span> | <span><a href="/posts/index/page:29">29</a></span> | <span class="current">30</span> | <span><a href="/posts/index/page:31">31</a></span> | <span><a href="/posts/index/page:32">32</a></span> | <span><a href="/posts/index/page:33">33</a></span> | <span><a href="/posts/index/page:34">34</a></span> <a href="/posts/index/page:31" class="next">Next &raquo;</a></div>	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

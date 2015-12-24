@@ -1,0 +1,831 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>The High Cost of Open Source  &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/the-high-cost-of-open-source:4b58e599-a9a0-4774-b3ff-302bcbdd56cb">The High Cost of Open Source </a></h2>	<div class="posted-on">
+		<p>Posted on 10/2/10 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><strong>Latest Update:</strong> The whole situation has been resolved, please read <a href="http://debuggable.com/posts/apology-to-the-csf-and-cakedc:4b743f89-ef24-4d73-9443-01a2cbdd56cb">our apology to the CSF and CakeDC</a>.</p>
+
+<p><a href="http://debuggable.com/posts/summary_of_cakefest_3_berlin:4a5ca8fe-0f50-49fe-afc3-3d584834cda3">6 months ago, I posted about a great event</a> which we helped to organize: CakeFest #3, here in our home city of Berlin. This event helped to connect developers from all over Europe, and even as far away as Australia, Tokyo and Los Angeles. There were great people, talks, and food, and everything ran extremely smoothly. By any measurement, it was a huge success.</p>
+
+<p>This did not happen by accident. A number of people made a big effort to put the event on, starting with lots of planning and communication months beforehand. Debuggable helped by finding and booking the venue, researching, and coordinating logistics here on location. We didn't make money from this, and that's okay. We wanted to support the CakePHP community by hosting another awesome event.</p>
+
+<p>Over 6 months later, <a href="http://www.gls-german-courses.de/2013.html">the GLS</a>, who provided us with first-class service and what was probably the best venue ever, has still not received payment.</p>
+
+<p>Don't be mistaken, this was not due to any errors in the organization of the event. The turnout was great, and the event was well-sponsored. The <a href="http://cakefoundation.org/">Cake Software Foundation, Inc.</a>, which collected all revenues, has already reimbursed its own organizing participants, but completely neglected to pay the venue (the bulk of the conference's expense). To make matters worse, the CSF has had their accounts frozen by the IRS.</p>
+
+<p>How do we know this? Unfortunately, we are in the middle of this mess. In our efforts to help organize the event, we signed the proposal for the location and catering. We did so in good faith, because we were working in cooperation with the CSF, and of course had all such details approved.</p>
+
+<p>When, in early October, we discovered that the venue never received payment, we initially believed it to be a mistake, and started delivering messages between the venue and <a href="http://cakedc.com/eng/team#masters">Larry E. Masters</a>, who in the meantime had taken over the position of CSF president after <a href="http://twitter.com/gwoo">Garrett Woodworth</a> had resigned. Larry told us he would take care of it.</p>
+
+<p>Weeks passed, and we talked to the GLS staff every other day, asking them for their patience, as there appeared to be "problems" with getting the payment sent. A month later, on November 10th, Larry agreed to send a token payment of USD $4500 through <a href="http://cakedc.com/">the CakeDC</a> via PayPal, which we forwarded to the venue (they do not accept PayPal).</p>
+
+<p>Unfortunately, this is still the latest update on the payment. Of the total invoice of EUR 7665, the first payment (after currency conversion and PayPal fees) only amounts to EUR 2807, leaving an outstanding balance of EUR 5058 (USD $6929).</p>
+
+<p>The venue has been incredibly patient and understanding through this whole process, but their patience has run out, and they're considering legal action against Debuggable. We signed the proposal, so technically they're not wrong: we are responsible.</p>
+
+<p>At this point it's pretty clear that the CSF has no intention of taking responsibility for this, which leaves us with some hard choices. We could argue that, by invoicing the CSF and not us, that the venue implicitly signed over the contract to the CSF. We have to admit, we briefly considered doing that. 5K is not pocket money for us, and this definitely isn't our bill.</p>
+
+<p>However, that would be wrong. Not to say that us paying this bill isn't wrong, but this is a wrong we can actually right. The venue deserves to get paid. So, we decided to go ahead and set up a plan to pay back the venue over the next few months.</p>
+
+<p>Since a few people who have been aware of the situation have asked us to provide a way for them to help, too, we have put up a page on pledgie.com:</p>
+
+<p><a href="http://pledgie.com/campaigns/8174">Donate to the CakeFest Venue Payment</a></p>
+
+<p>We greatly appreciate any support, as it helps ease our burden, but the venue will be paid regardless of the outcome of the pledge. Right now, the most likely outcome is that we'll have to take care of this on our own, but we're still holding onto the hope that this last-ditch effort of going public might help change Larry's mind.</p>
+
+<p>What's worse is his company, <a href="http://cakedc.com/">the CakeDC</a>, now has exclusive controlling interest over a project which was once driven by its community. Despite his slowness to work this out with us, he has shown no hesitation in <a href="http://www.pseudocoder.com/archives/cakephp-digest-21-whose-left">taking full advantage</a> of the <a href="http://cakephp.org/services/support">benefits of this control</a>. If the CSF's position changes in any way, we will certainly send out an update.</p>
+
+<p>--fg</p>
+
+<p>PS: There is much more to this story, the CSF shake-ups, and why the their accounts are frozen, but it goes well beyond what we can verify. In the end, it doesn't matter; this isn't about finding fault, but about taking responsibility.
+<img style="display: none;" src="http://debuggable.com/posts/tick/4b58e599-a9a0-4774-b3ff-302bcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-high-cost-of-open-source%3A4b58e599-a9a0-4774-b3ff-302bcbdd56cb &amp;title=The+High+Cost+of+Open+Source+';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-high-cost-of-open-source%3A4b58e599-a9a0-4774-b3ff-302bcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-high-cost-of-open-source%3A4b58e599-a9a0-4774-b3ff-302bcbdd56cb&amp;title=The+High+Cost+of+Open+Source+&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-high-cost-of-open-source%3A4b58e599-a9a0-4774-b3ff-302bcbdd56cb&amp;title=The+High+Cost+of+Open+Source+';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/diggcom-open-source-intellectual-property-thinkingphporg:480f4dd5-f530-4e5c-8e73-4959cbdd56cb">Digg.com, Open Source, Intellectual Property, ThinkingPHP.org</a></li>
+							<li><a href="/posts/workshop-application-source-code-and-demo:48c7c350-6cac-48b3-8816-5e114834cda3">Workshop Application (Source Code + Demo)</a></li>
+							<li><a href="/posts/5-innovative-ways-open-source-can-generate-money:480f4dd5-4084-4619-a683-427dcbdd56cb">5 Innovative Ways Open Source Can generate Money!</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/the-high-cost-of-open-source:4b58e599-a9a0-4774-b3ff-302bcbdd56cb">37 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/the-high-cost-of-open-source:4b58e599-a9a0-4774-b3ff-302bcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4b731265-ab30-42c0-b76c-7d5dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a58d2af91e41a2accfd8bcedcd7a427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Garrett Woodworth&nbsp;						</strong>
+						<strong>said 
+						on Feb 10, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix/Tim,</p>
+<p>I feel terrible  about what has happened. Though you both know I did as much as I could, I must take some responsibility, which is why I will be pledging 100EUR/month. Unfortunately, while I was involved I had no control over the funds passing through the CSF.</p>
+<p>Please accept my apologies, and know that I will continue to do everything I can to see you succeed.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b731342-b4a8-4533-a508-6e37cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ba0fb61a69175dbcb372190cb1be1347&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Larry E. Masters&nbsp;						</strong>
+						<strong>said 
+						on Feb 10, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix you know I have offered to pay the monthly amount you said you were sending this company, and on Monday I asked you for an invoice that could be paid.</p>
+<p>Garrett you are well aware of what happened here and the whole reason I asked you to resign from the Cake Software Foundation in the first please. Maybe we can make this all public when it is done in court,</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b73137c-5458-402d-9d81-01bfcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Feb 10, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix,</p>
+<p>I'm glad you guys finally decided to go public with this. What happened to you isn't fair, and while I can't take responsibility for the financial aspect, I was still involved. I'll be following Garrett and pledging 100 euros a month as well, until this is resolved.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b7316bb-ca94-4114-9cd1-128acbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 10, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Larry E. Masters: Sorry if my email to you got lost.</p>
+<p>I cannot say that you have not been trying to help us, but things have not been moving since November and this issue is not fixed by talking about it. You are still more than welcome to pay the venue in full and we'll post a formal apology for having jumped the gun too early.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b7318d9-f04c-43df-9f79-01bfcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ba0fb61a69175dbcb372190cb1be1347&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Larry E. Masters&nbsp;						</strong>
+						<strong>said 
+						on Feb 10, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix,</p>
+<p>If the CSF was able to have paid this in full it would have been done after receiving the initial invoice you sent which was 2 months late in the first place. I am not personally responsible for this payment, nor is the Cake Development Corporation, that fact I made a token payment when I did was because I thought this will all be taken care of, had the previous person in charge done their job correctly and had everything in place as it should have been then we would not be here today.</p>
+<p>You:</p>
+<p>"We agreed to pay the venue 500 EUR per month to help solve the problem. If you are honestly still interested in resolving this, start by making monthly payments of 500 EUR to us today."</p>
+<p>As I said in the email on Monday:</p>
+<p>"Felix,</p>
+<p>Send an invoice via paypal to the CSF, donations@cakefoundation.org for $500.00 and I will have a payment made to you on Monday, I can only send from the paypal account right now since the actual bank accounts are frozen."</p>
+<p>And in all of our email conversation I have asked you to have the venue contact the CSF directly which you have failed to do numerous times.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b731a4d-6748-4c86-ae9d-01bfcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2272c983b7769b7c88e0173f2ede4125&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Jon Langevin (intel352)&nbsp;						</strong>
+						<strong>said 
+						on Feb 10, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wow, this sucks. I'm unable to pay my own bills, otherwise I would contribute as well.</p>
+<p>Good luck getting this resolved Felix. Hopefully CSF will step up, take responsibility, and get this bill paid.</p>
+<p>Cheers</p>
+<p>-Jon</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b731b03-434c-4ba2-b1a1-7d5dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a58d2af91e41a2accfd8bcedcd7a427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Garrett Woodworth&nbsp;						</strong>
+						<strong>said 
+						on Feb 10, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Larry,<br />
+I can only hope that you too accept responsibility and contribute to Felix and Tim, rather than some lawyers. For the record, I resigned of my own free will because of your arrogance and unwillingness to admit mistakes, same as shown in your comments here.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b731bc7-9fcc-4dfd-8ef0-31bdcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 10, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Larry E. Masters:</p>
+<p>$500 = 364 EUR.</p>
+<p>We are not responsible for this payment either, but we are paying it.</p>
+<p>The CSF is promoting the CakeDC as the official service partner. It would be nice if the CakeDC would return the favor.</p>
+<p>The reason we published this post is because we are tired of dealing with this and running after this money.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b731c43-7be8-4dda-9152-31bdcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Feb 10, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Larry E. Masters: We told you the GLS will not contact you directly, because it's tedious for them and they have told us they won't do it, because it's much easier for them to negotiate with a company in their hometown.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b731dc6-2dc8-446f-917d-01bfcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ba0fb61a69175dbcb372190cb1be1347&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Larry E. Masters&nbsp;						</strong>
+						<strong>said 
+						on Feb 10, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix,</p>
+<p>Did I not offer to have the CSF sign an agreement with the venue directly when all of this started happening to take all the responsibility off of you? I have asked numerous times to have direct contact with the venue so the lawyers of the CSF could handle this situation, again I will ask for the direct contact information, in public this time, and ask that you post it here so everyone will know you provided that information to me.</p>
+<p>And $ was a habit, I agreed to pay what you said you were paying the venue and you would have had that on Monday has you send the invoice.</p>
+<p>I just see this as another attempt to bash me and the CakePHP project in public.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b731e05-5c54-4c8e-87d0-3192cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bae72608ed8d47ceb851898f6368e4d2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://jmcneese.wordpress.com" rel="nofollow">Joshua McNeese</a>						</strong>
+						<strong>said 
+						on Feb 10, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>wow, that is incredibly sucky, felix. :(  if i wasn't living paycheck to paycheck, i'd pledge some money as well.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b731e77-b988-4a07-96bb-3192cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Feb 10, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Larry E. Masters: This is everything but bashing you in public. And we would not dare to bash the cakephp project in public, when many of our projects depend on it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b732018-0070-4fe4-a2f9-31bdcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 10, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Larry E. Masters:</p>
+<p>You had the venue's contact information from day 1, it is on the invoice from them. But why would they sign a document putting us out of trouble? A German company they can easily go after to get their money, a US one they can't. I don't blame them.</p>
+<p>This is not an attempt to bash the CakePHP project in public. Tim and I still love CakePHP and use it everyday, we are not even involved with li3 at this point.</p>
+<p>Even if you paid 500 EUR now, who guarantees us you'll see this through? We have been in contact with you over and over again, getting plenty of good will but no action. At this point the trust is broken.</p>
+<p>Also, the venue deserves to be paid in full. The only reason we are doing a monthly payment is to not put our business in a dangerous spot.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b7347d8-2540-4af4-8f5b-3192cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a4d64bc52fe24677bacd604d01f487aa&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							websta&nbsp;						</strong>
+						<strong>said 
+						on Feb 10, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Cake use to taste so sweet!</p>
+<p>Glad to see you guys took this by the balls and made a public post. Best way to get action i recon. Hope the CSF fronts up, i'll go gift you a few $$(our exchange rate is pretty krap, but its better than nothin) for what its worth!</p>
+<p>Keep up the good work chaps.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b7359b5-e650-4a89-8bc2-0838cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=91a658c2941ac7680f5fb9bcde7217b0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							thief&nbsp;						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Cake is looking less and less appealing. it's a real pity as it was one of the best frameworks out there but the last year has seen some really unprofessional behavior, from the 1.2, 1.3, 2.0, 2.3 mess, to the lithium breakoff, and now frozen accounts and this whole ugly mess.. I think Rails will be my goto for all new projects from here on in, and I may have to start looking at Yii as a potential PHP alternative..</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b736b50-7518-43ca-a978-2761cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b92d770f2b6011471d98e23b1df9fb25&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dave Golding&nbsp;						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well, when the source code is public, hard to reign in decisions that affect the credibility of the community surrounding the code. I do think it would be wise to work out the details offline, however, since it's clear this is a serious issue. I advise those of us who are committed to the CakePHP project and its community to not comment where we have little or no knowledge, and so I offer my support, since I'm struggling through school at the moment and can't make a donation. I wish all of you the best and hope things can be reconciled.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b73810f-40ec-4719-b272-2761cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2ca60651d0a266bc1860631170c9a54a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://tariquesani.net/blog/" rel="nofollow">Tarique Sani</a>						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>God! what a mess!! - this is deeper than what I had imagined. I am soooo disappointed :-/</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b73877e-84cc-43fc-8d8d-5600cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b53341c3e0d7ee964c5585777faae5f2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://spacialeffect.com" rel="nofollow">Jon Adams</a>						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wise words, Dave. </p>
+<p>It is odd to me that, given the circumstances, the CSF didn't reach out the community for support. And, sooner. </p>
+<p>As personally and professionally invested as many of us are in CakePHP (and, all Tim and Felix have done for the community not even including CakeFest) it was and is in all of our best interest to get this dealt with as soon as possible. </p>
+<p>It's not fair to GLS, who was an excellent host, nor Debuggable, who have put their time, reputation and bank account on the line (in good faith). The CDC/CSF details don't really matter, to me, since they are clearly run by the same person. Quite simply, this situation shouldn't exist.</p>
+<p>Debuggable: really sorry to hear this. Like others I'm currently a poor loser. But I'm pledging 100 euros March and beyond until this is paid. Thanks for taking responsibility.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b739f26-3bec-4662-b685-7be1cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a58ba331bd33aada5dd87721ea3a81d4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							indiefan&nbsp;						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>i didn't go to cakefest, but i donated because i've read (and utilized) articles on your site before. And you seem like nice guys. And unlike you, that angry guy seems more concerned with PR than actually paying the bill. </p>
+<p>Hats off for taking accountability. Good luck raising the money.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b73ae96-f204-4b1e-b073-5b60cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ce539e18df8adc26ecddf0e0273ee3d8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.paddyforan.com" rel="nofollow">Paddy Foran</a>						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix,</p>
+<p>You probably don't remember me. I interviewed you and Tim about PostTask a while back. I've been following Debuggable out of my periphery since then. Even though I've largely switched to Python, coding, I still keep tabs on you guys. This is why.</p>
+<p>Any product you put out I know will be phenomenal, and it is your value as human beings, not as programmers, that will make it so.</p>
+<p>All my warmest regards.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b73c2a9-db38-46cd-a9f5-3896cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bc5a115f20a296d6c65ac25bd3045fbf&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Drum&nbsp;						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>You guys(gwoo,nate,Felix...) really want to destroy cakePHP. I don't think that's fair. I will never support or join any project with your name on it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b73c962-7118-4dc0-96ce-32a0cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Drum: This is by no means against the CakePHP project and nobody should walk away from it, because of this. It will continue to be a great framework.</p>
+<p>To everybody else: Thanks a lot for the sentiments and donations. It means a ton.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b73d044-c1c0-4edc-ab66-32a9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2eeedaefb6603e96aa644b2ffc6fc204&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Daniel&nbsp;						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>That's so disapointing! Really don't understand the offer of direct contact between the venue and CSF. Why should a company be responsible for chasing up it's money far away in another country.</p>
+<p>And even if the venue would agree some idea like that. Felix and Tim would also lose their face in their hometown if the bill would still not get payed.</p>
+<p>I love CakePHP and hope that this problem really get's solved and not just discussed...</p>
+<p>I understand that Larry has a problem too if accounts are frozen. But changing the invoice-receipient (if I did get that right) in the middle of this process really is no realistic option.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b73d071-6c88-4f94-9ea2-3fcbcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=32378c4f76f261d63c3c3a941054e440&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.neilcrookes.com" rel="nofollow">Neil Crookes</a>						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>So where has all the income from the conference tickets gone? To pay the fines from IRS?</p>
+<p>Tim & Felix, did you handle the workshop fees and costs separately, I hope you and the others at least got the revenue from that?</p>
+<p>This explains why I, as a speaker, didn't get a contribution to my travel expenses as promised on the CakeFest site.</p>
+<p>I hope it all gets sorted out soon.</p>
+<p>Will the IRS would withdraw the fines once they confirm the CSF as the correct type of organisation?</p>
+<p>If they do, then everyone can get paid and we can bury the whole mess.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b73d4b3-84cc-4463-93a3-32a0cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Neil Crookes:</p>
+<p>We did not collect any of the revenue. The money is probably still in the bank account and can't be accessed. But Larry is the only one who knows what the current status is for sure.</p>
+<p>Sorry to hear your trip did not reimbursed, let me know if we can make a small donation for that.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b73d8ee-167c-40fa-a025-32a0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=32378c4f76f261d63c3c3a941054e440&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.neilcrookes.com" rel="nofollow">Neil Crookes</a>						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>That sucks dude.</p>
+<blockquote><p>"Sorry to hear your trip did not reimbursed, let me know if we can make a small donation for that."</p></blockquote>
+<p>Hehe, thanks mate, much appreciated, but don't worry about it. I wish I was in a position to donate something decent to you guys. Let's call it quits shall we? ;-)</p>
+<p>Larry - what's going on with IRS at the moment? Are they deliberating on whether CSF is a not-for-profit organisation? Is there any reason why they won't acknowledge it is in the near future? When they do, will the fines be withdrawn and the accounts unfrozen, and the venue and the guys who did the workshop be paid?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b73d95c-27a4-4fbc-81ed-554fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bc5a115f20a296d6c65ac25bd3045fbf&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Drum&nbsp;						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Tim<br />
+Sorry, but all of this affect community and how people see cakephp framework. I just think, if this continues, the biggest loser will be the framework him self.</br><br />
+Don't get me wrong i think that justice must be served but not over the neck of cakephp.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b73e046-fcd4-4946-a85c-3fcbcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5f7d4136aa418d38d89d8b4792a03f16&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.cake-toppings.com" rel="nofollow">primeminister</a>						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>Shit man! This really sucks! I donated to you guys.<br />
+Hope everything will be solved soon.</br></p>
+<p>To all: Set aside all hate, discomfort and grudges. Put all your good will to solve this quickly. I know, because I have experienced this couple of years ago with a customer of mine.</p>
+<p>Cheers!<br />
+- Charlie</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b73f3cb-3f00-4c68-9aec-4bf5cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5d98dd6c06dc8b78e06396b3180c310a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							leo&nbsp;						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tim Koschützki:<br />
+Felix Geisendörfer: </br></p>
+<p>Wow, this is such a shame and a heck of a mess. I had a similar situation a year ago, though about *way* less money.</p>
+<p>The Website of the Cake Software Foundation <a rel="nofollow" href="http://cakefoundation.org/">http://cakefoundation.org/</a> seems like it hasn't been updated for over a year (links, members, numbers...). Overall, I think the project needs some restructuring and cleanup for all the different ressources and departments and so on. But that's another story.</p>
+<p>Hope you can sort this out in the upcoming weeks, I'll too see what I can do.</p>
+<p>Cheers from Konstanz</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b740fd8-8b7c-4e1b-a327-629fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2272c983b7769b7c88e0173f2ede4125&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Jon Langevin (intel352)&nbsp;						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Drum, I agree this (and other issues) are taking a toll on CakePHP.<br />
+But keep in mind that these issues were brought on CakePHP, by the core people involved in CakePHP. It's not the fault of Debuggable that they and the venue were wronged.</br></p>
+<p>I've already moved on from CakePHP to Yii, for performance reasons as well as stability concerns (centered around the events of the past year), and I have no intention of returning.</p>
+<p>It's a shame, as it was my favorite framework.</p>
+<p>Cheers</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b7410fc-9098-4147-98bc-0245cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a8aec7de9c48b1953e59f7d3a6100255&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							keymaster&nbsp;						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It sounds like this issue is pretty close to being solved.</p>
+<p>Larry says:</p>
+<p>"Felix you know I have offered to pay the monthly amount you said you were sending this company..."</p>
+<p>Felix, just send Larry the monthly invoices, and he'll pay them.</p>
+<p>The fact the CSF's accounts are frozen is not the biggest deal in the world. A bit of paperwork should clear things up, and then we'll all move on.</p>
+<p>Really guys, it sounds like this whole thing is being blown W-A-Y out of proportion.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b74123b-7960-478a-8b77-4bf5cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6d06070cc25762d2255e7162778b714c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Ben (from belgium)&nbsp;						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well it's really sad to hear that.</p>
+<p>I was in Berlin where I spent a good time and met great guys (and developers).<br />
+This case could really make trouble to the CakePHP framework.</br></p>
+<p>Well here we are using CakePHP for our development but we are thinking of moving because of the situation we heard in Berlin( Nate, Joel and others leaving) and what happen here.</p>
+<p>Really sad.  Hope you will get a solution for that</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b7413ac-4d58-48ca-8298-0245cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>keymaster: We've been working on this since october, and we've been promised a lot of things during that period. The trust has been broken - who guarantees the monthly invoices would work for the next 10 month?</p>
+<p>This is just as sad and inconvenient to us as it is to everybody else. But the only solution would be a full payment for the venue, and we're already half-way there now, as we'll directly forward the donations to them as they come in.</p>
+<p>If the CSF would come around, we'd post a formal apology for having jumped the gun too early. But as it looks right now, Larry is willing to spend more money on lawyers to suit us than he was willing to spend on resolving this the easy way.</p>
+<p>Again, no hard feelings here if he should change his mind - all we care about is that the venue gets the money.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b742722-0ee8-4df7-befb-5c68cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a8bc1d6d1c5d65241f3a1bb34104f461&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://chakrit.net" rel="nofollow">chakrit</a>						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>As with anything involving a group of people, things get ugly real fast. People take sides, and they are all emotional to some level. I hope that you don't stop being benevolent just because of some ugly mess.</p>
+<p>All in all, wish you the best of luck. And keep up the great work!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b7433bd-c278-47bd-b1bb-714dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bb8fdec5b5671bd7bc1001a9e4ad9b26&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://andrewkolesnikov.com" rel="nofollow">Andrew</a>						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wow, so much drama out of nowhere. Frozen accounts, unpaid bills *gets popcorn*. You guys need to reconsider your priorities. I  thought it was about making a kick-ass framework, not bad publicity.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b744166-17a0-48e4-b3ba-7cd3cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 11, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p><strong>Latest Update:</strong> The whole situation has been resolved, please read <a href="http://debuggable.com/posts/apology-to-the-csf-and-cakedc:4b743f89-ef24-4d73-9443-01a2cbdd56cb" >our apology to the CSF</a>.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b7eebae-cee4-402a-a37d-70accbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7c3f3813be69118cd3bcc61a8f709303&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://turnkeye.com" rel="nofollow">Turnkeye</a>						</strong>
+						<strong>said 
+						on Feb 19, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>> The whole situation has been resolved, please read our apology to the CSF.</p>
+<p>Glad to hear!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

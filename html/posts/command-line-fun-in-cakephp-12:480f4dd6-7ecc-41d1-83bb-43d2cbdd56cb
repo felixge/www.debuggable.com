@@ -1,0 +1,475 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Command line fun in CakePHP 1.2 &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/command-line-fun-in-cakephp-12:480f4dd6-7ecc-41d1-83bb-43d2cbdd56cb">Command line fun in CakePHP 1.2</a></h2>	<div class="posted-on">
+		<p>Posted on 16/10/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p>If you, like many others, already have dived into the <a href="https://svn.cakephp.org/repo/branches/1.2.x.x/">1.2 branch of CakePHP</a>, you've probably already made some pleasent discoveries as far as upcoming features go. One of those cool new things that'll probably ship with the 1.2 release, is a new bake script, called bake2.php. Like the old one, it can be found in /cake/scripts/ and is called via your command line. But unlike the old bake.php, which was only used to auto-generate code for you, this one follows a much cooler concept. The main idea is to have an interface to a wide variety Tasks. Those Tasks can either be part of the CakePHP core and rest in /cake/scripts/tasks or of your individual application and go into /vendors/tasks. This will help us to automate things we used to do by hand. For example if you are developing an image uploader, you probably want to clear the upload folder and database table from time to time, because it get's filled up with too much crab in the process of development. Or if you are like me, you probably want to write a DeployTask that can be used to automate the upload of your website via SVN diff and FTP ; ).</p>
+<p>So if you are curious to try out this new feature, here is how you would create a new Task:</p>
+<p>First of all, create a new php file in /vendors/tasks. We'll call ours cake_task.php right now. So after you've created the file, fire up your IDE and enter this code:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> CakeTask <span class="kw2">extends</span> BakeTask <br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> execute<span class="br0">&#40;</span><span class="re0">$params</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;CakePHP 1.2 will be very tasty!<span class="es0">\n</span><span class="es0">\n</span>&quot;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;This Task was called with&quot;</span>.<a href="http://www.php.net/count"><span class="kw3">count</span></a><span class="br0">&#40;</span><span class="re0">$params</span><span class="br0">&#41;</span>.<span class="st0">&quot; parameters.<span class="es0">\n</span>&quot;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>So, as you might have guessed, the $params parameter will contain an array with additional data that can be used by the Task to perform individual actions. In order to call our incredibly productive task, all we have to do is this (after switching to the /cake/scripts directory):</p>
+<p>php -q bake2.php cake a b c</p>
+<p>After hitting enter we'll be informed that our task was called with 3 parameters. Now even so this wasn't exactly a very useful example, I hope it was good enough for you to grasp the concept and possibilities this new feature offers, and I'm sure we'll see some good Tasks in the Bakery soon ; ).</p>
+<p>--Felix Geisendörfer aka the_undefined</p>
+<p>PS: I'll need some testers for the alpha version of the DeployTask I'm working on right now soon. So if you are willing to give it a try, let me know in the comments of this post.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-7ecc-41d1-83bb-43d2cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcommand-line-fun-in-cakephp-12%3A480f4dd6-7ecc-41d1-83bb-43d2cbdd56cb &amp;title=Command+line+fun+in+CakePHP+1.2';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcommand-line-fun-in-cakephp-12%3A480f4dd6-7ecc-41d1-83bb-43d2cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcommand-line-fun-in-cakephp-12%3A480f4dd6-7ecc-41d1-83bb-43d2cbdd56cb&amp;title=Command+line+fun+in+CakePHP+1.2&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcommand-line-fun-in-cakephp-12%3A480f4dd6-7ecc-41d1-83bb-43d2cbdd56cb&amp;title=Command+line+fun+in+CakePHP+1.2';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/yummy-cakephp-functions-you-should-know-about:480f4dd5-4528-4a53-a0ec-4aa8cbdd56cb">Yummy CakePHP functions you should know about!</a></li>
+							<li><a href="/posts/cakephp-all-others:480f4dfe-0bb0-46bc-b668-415ccbdd56cb">CakePHP &gt; All Others</a></li>
+							<li><a href="/posts/update-on-cakephp-google-analytics-apimodel:480f4dd5-7044-47bc-945a-4d90cbdd56cb">Update on CakePHP Google Analytics API/Model</a></li>
+							<li><a href="/posts/wildflower-a-cakephp-cms:48d7a0d6-ce78-4a2a-bf48-262a4834cda3">Wildflower, a CakePHP CMS</a></li>
+							<li><a href="/posts/buch-tip-webentwicklung-mit-cakephp:4912dccb-f594-4fa1-af20-6c564834cda3">Buchtipp: Webentwicklung mit CakePHP</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/migrating-from-wordpress-to-cakephp:480f4dd6-ef28-4881-b74f-4185cbdd56cb">Migrating from WordPress to CakePHP</a></li>
+							<li><a href="/posts/how-to-have-multiple-paginated-widgets-on-the-same-page-with-cakephp:48ad241e-b018-4532-a748-0ec74834cda3">How to have multiple paginated widgets on the same page with CakePHP</a></li>
+							<li><a href="/posts/make-your-life-easier-with-these-five-cakephp-quicktips:48170ee5-0cc0-4815-af60-7c264834cda3">Make your life easier with these five CakePHP Quicktips</a></li>
+							<li><a href="/posts/using-cakephp-in-external-php-systems-cmss-weblogs-etc:480f4dd5-ed94-4186-acda-4443cbdd56cb">Using CakePHP in external PHP Systems (CMS&#039;s, Weblogs, etc.)</a></li>
+							<li><a href="/posts/quick-dessert-list-all-controllers-of-a-cakephp-application:480f4dd6-adf4-4b18-9fe8-4b99cbdd56cb">Quick dessert: List all controllers of a CakePHP application</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/command-line-fun-in-cakephp-12:480f4dd6-7ecc-41d1-83bb-43d2cbdd56cb">18 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/command-line-fun-in-cakephp-12:480f4dd6-7ecc-41d1-83bb-43d2cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4de1-2ff0-47c6-937e-40a7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c20daf1cdb9a02a60a2bb54eca83c0e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							PiotrB&nbsp;						</strong>
+						<strong>said 
+						on Oct 16, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I develop medium sized app with CakePHP, and I'd like to test your DeployTask</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-7a9c-4c94-b4e5-428fcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 16, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Right on PiotrB, I'll do my best to get this alpha version rolling out ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-39d0-4752-a070-4703cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8cb6116a2db75f008d5f038a02764963&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							roliver&nbsp;						</strong>
+						<strong>said 
+						on Oct 17, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Music to my ears, I'll certainly give your deploy task a whirl</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-8b1c-409a-b305-4685cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=af31e731dc3f44620a7874d9602e5bc8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://evanities.blogspot.com" rel="nofollow">Evan Sagge</a>						</strong>
+						<strong>said 
+						on Oct 17, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wow.  This is great stuff.  I just hope they could use the new bake to provide a command-line based testing framework for cake.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-5e8c-4ae3-8f67-4128cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 17, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Evan: Good that you mention that, the Caketaser testsuite that I'm working on will get it's own command line task as well (even so the GUI version is going to be much more comfortable). If things work out nicely you'll even be able to couple it to the deploy task in order to not ship anything that hasn't been tested. Uhm, gonna have to do some work today I guess : ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-e87c-4f4b-8993-4393cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=af31e731dc3f44620a7874d9602e5bc8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://evanities.wordpress.com/" rel="nofollow">Evan Sagge</a>						</strong>
+						<strong>said 
+						on Oct 18, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>That would be awesome for CakePHP.  I know a lot of people prefer a graphical output, but really, all I need in my testing are just the text. :)</p>
+<p>Would this bake script be usable with CakePHP 1.1?  Or is it exclusively for 1.2 versions?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-ede4-4485-a365-4849cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 18, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Evan: The script will be for 1.2. However, if somebody really needs to get it working with an 1.1 install, it wouldn't require lot's of work to do so.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-dbd8-415b-a50f-4b8ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=af31e731dc3f44620a7874d9602e5bc8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://evanities.wordpress.com/" rel="nofollow">Evan Sagge</a>						</strong>
+						<strong>said 
+						on Oct 19, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>That'd really be nice.  I'm using Cake 1.1 for a project, and it's been hell deploying my app through ftp.  I'd been deliberating whether to study ant for use with my deployment, but abandoned the whole plan after I've read your previous post on it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-5f78-4710-bd6f-42b8cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 19, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yeah, manual FTP deployment is hell, especially if the client one uses (FileZilla for me) doesn't support recursive chmod (which you need for /app/tmp). I hope I'll have something up and running soon.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-f7ac-44f3-880a-414bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakebaker.42dh.com/2006/10/27/a-first-glimpse-at-two-core-bake-tasks/" rel="nofollow">cakebaker &raquo; A first glimpse at two core bake tasks</a>						</strong>
+						<strong>said 
+						on Oct 27, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Felix already wrote about the new bake2.php script. This script is rather simple, it simply executes tasks, i.e. classes with a certain interface. At the moment, there exist two such tasks in the branch of CakePHP 1.2: AppTask and DbconfigTask. Let&#8217;s have a look at them, even though they are not finished yet. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-420c-4a1c-8bd4-4ed6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=da5cae822c9f7fc858e1d713e7e6907f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.kimfransman.se" rel="nofollow">Kim Fransman</a>						</strong>
+						<strong>said 
+						on Dec 14, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi, i tested it out and it worked lika a charm, just wonderful, As always, good work Felix! All i have to now is to learn SVN a bit better. :-)  I have recently rolled out my first app in 1.1 and the thougt of Cake getting better excites me more than porn.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-5690-4038-9464-4962cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e440e709b4390f20b0cbd584f81f9f7b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							ramin&nbsp;						</strong>
+						<strong>said 
+						on Jan 03, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>In response to this comment from Felix:</p>
+<p>"Evan: The script will be for 1.2. However, if somebody really needs to get it working with an 1.1 install, it wouldn’t require lot’s of work to do so."</p>
+<p>I'm totally to CakePHP, Felix said that it's possible doing it in 1.1, anybody has any idea how? Any useful directions on this?</p>
+<p>Thanks a lot.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dee-6988-4c73-beee-49a4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://ahsanity.wordpress.com/2007/08/29/cakephp-12-the-romance-continues/" rel="nofollow">CakePHP 1.2: The Romance Continues &#8230; &laquo; Ahsan&#8217;s</a>						</strong>
+						<strong>said 
+						on Aug 29, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Command line fun in CakePHP 1.2 by Felix Geisendörfer [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df0-4ef4-4736-b550-423acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.webdevelopment2.com/finally-moved-dreamhost-quality-web-hosting/" rel="nofollow">DreamHost - Quality Web Hosting | Web Development 2.0: Web Desig</a>						</strong>
+						<strong>said 
+						on Oct 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Although I don&#8217;t really use it much, there are some times where it just comes it so handy. And with the advent of CakePHP&#8217;s Bake feature, it&#8217;s become damn near and essential tool. Prior to DreamHost I would have to Bake on my Windows environment, then upload to where I was really hosting. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df2-5a98-4115-8914-45fecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=13623f99caeecefea6a101572e5501a8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							chris&nbsp;						</strong>
+						<strong>said 
+						on Nov 07, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Is there any way to use bake via a web interface (in case you dont have access to a console on your development server?)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df2-da10-452d-a740-44d8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=746608f14ef6c9f4db5f064544a6e2f8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Irfan&nbsp;						</strong>
+						<strong>said 
+						on Nov 14, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Is there any way to use bake via a web interface (in case you dont have access to a console on your development server?) </p>
+<p>anyhelp on the above question ?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-3030-4b63-a7ef-4008cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=295ce5f72d2ead5a7ec5cc045801fbc9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Tallbrick&nbsp;						</strong>
+						<strong>said 
+						on Dec 12, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I am having trouble locating the scripts directory inside the cake folder.  Here is a link to 1.2:<br />
+https://svn.cakephp.org/repo/branches/1.2.x.x/</br></p>
+<p>I did find cake.php and bake.php in another area:<br />
+https://svn.cakephp.org/repo/branches/1.2.x.x/cake/console/libs/</br></p>
+<p>It looks like the project has deviated from the 1.2 version this post referred to back on 2006</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a5a95f4-3158-4998-b846-079d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=56afb32f48300075e663db510662eca6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://linonico.com" rel="nofollow">LiNo</a>						</strong>
+						<strong>said 
+						on Jul 13, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hello everyone, just like to ask if it is possible to bake an additional model/controller/view for a new database table to an existing project?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

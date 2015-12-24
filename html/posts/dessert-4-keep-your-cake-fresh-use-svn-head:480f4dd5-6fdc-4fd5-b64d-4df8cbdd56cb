@@ -1,0 +1,446 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Dessert #4 - Keep your Cake fresh (use SVN HEAD) &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/dessert-4-keep-your-cake-fresh-use-svn-head:480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb">Dessert #4 - Keep your Cake fresh (use SVN HEAD)</a></h2>	<div class="posted-on">
+		<p>Posted on 15/9/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>This is something you might already have found your own solutions for, but never the less I think it's a topic people will struggle with when first using CakePHP together with SVN to version their project. However, you should already have an alright understanding for SVN itself to follow this post. If not, checkout <a href="http://svnbook.red-bean.com/">this free svn book</a> for information.</p>
+<p>Ok, back to the topic. The problem is the following: You use CakePHP (or any foreign vendor, but let's keep it simple for now) to create your project and want to regulary update your version to enjoy the benifits of the frequent changes in the SVN trunk (like bug fixes, new features, etc.).</p>
+<p>There are basically 3 options you can accomblish this:</p>
+<h2>#1 Overwriting your Project Frequently</h2>
+<p>This method might be the first one you consider, but believe me it's the worst of all. The idea is basically to frequently either export the latest SVN HEAD version from the <a href="https://svn.cakephp.org/repo/trunk/cake/1.x.x.x/">CakePHP repository</a>, or to visit CakePHP.org and grab the <a href="http://cakephp.org/downloads/index/nightly/1.x.x.x">latest nightly build</a>. Aferwards you take the new version of /cake, /index.php, /.htaccess, /VERSION.txt and use them to overwrite them with the existing ones in your working copy. Afterwards you do a commit and voilá you just updated your CakePHP version.</p>
+<p><strong>Pro's:</strong></p>
+<ul>
+<li>Easy to understand</li>
+<li>If a CakePHP update breaks the application you can easily roll back</li>
+</ul>
+<p><strong>Cons's:</strong> </p>
+<ul>
+<li>Manual update required</li>
+<li>Get's hairy when you modified CakePHP core files in your working copy or when updating /app</li>
+</ul>
+<h2>#2 Use svn:externals</h2>
+<p>The next idea you might try is to use the <a href="http://svnbook.red-bean.com/en/1.2/svn.advanced.externals.html">svn:externals</a> property to directly link /cake (and eventually the other 3 files in /) to the latest SVN Version. If you use <a href="http://tortoisesvn.tigris.org/">TortoiseSVN</a> (highly recommended for Windows users) this is simply a matter of right clicking the root folder of the working copy of your application's trunks and selecting properties. Then you select the Subversion tab, choose the svn:externals from the drop down on the bottom and enter "cake https://svn.cakephp.org/repo/branches/1.2.x.x/cake" in the text field below (assuming you are using CakePHP 1.2). Make sure you have deleted /cake in your working copy, then run svn update and SVN will automatically fetch the latest SVN version of the /cake folder and put it in your working copy. Whenever you run svn update from now on, you will also get the latest changes from the trunk. I think you could also link to the 3 other files in / with this method, but I haven't tried that so far.</p>
+<p><strong>Pro's:</strong> </p>
+<ul>
+<li>Easy to setup</li>
+<li>CakePHP Updates flow in almost automatically</li>
+<li>Allows modification of CakePHP core files</li>
+</ul>
+<p><strong>Cons's:</strong> </p>
+<ul>
+<li>Modifications to CakePHP core files will not be versioned (and therefor not be available to other people using the same repository)</li>
+<li>If a CakePHP update breaks your application rolling those changes back get's a bit hairy</li>
+<li>/app can (should) not be updated this way</li>
+</ul>
+<h2>#3 Use a vendor branch</h2>
+<p>Using a <a href="http://svnbook.red-bean.com/en/1.2/svn.advanced.vendorbr.html">vendor branch</a> is probably the most advanced of all approaches, but also the most complicated compared to the other ones. The idea is basically to create a branch for every vendor your project depends on (in our case CakePHP) and to regulary update this branch with the latest version of the vendor library. After updating the vendor branch you simply merge the changes between the previous vendor branch update and the current one into your trunk and only those changes will be applied to your application. To understand this proccess a little better I would recommend you to read this <a href="http://svnbook.red-bean.com/en/1.2/svn.advanced.vendorbr.html">page about vendor branches</a> I already mentioned.</p>
+<p><strong>Pro's:</strong></p>
+<ul>
+<li>CakePHP core files can be modifed and versioned</li>
+<li>If a vendor update breaks the application you can easily roll back</li>
+<li>You can easily recieve updates to /app</li>
+</ul>
+<p><strong>Cons's:</strong></p>
+<ul>
+<li>Difficult to set up</li>
+<li>Manual update of the vendor branch required (but you could automate this)</li>
+</ul>
+<h2>Conclusion</h2>
+<p>There is not perfect way to handle this. When working on an application with a group of developers, using a vendor branch gives you most control about the entire proccess. Personally, when working on a project all by myself I often use method #2 since it's quite simple to setup and easy to maintain. The important thing is that you know about the existing options and their advantages / disadvantages so you can choose which one suits your project best. However, method #1 should be avoided if possible ; ).</p>
+<p>Another hint: Right now most changes to CakePHP go into the <a href="https://svn.cakephp.org/repo/branches/1.2.x.x/">1.2.x branch</a> and therefor the stuff above doesn't make a lot of sense if you are working with <a href="https://svn.cakephp.org/repo/branches/1.1.x.x/">1.1.x</a> right now. Currently I'm working on the new ThinkingPHP.org and another project using the 1.2.x branch and it seems pretty stable, however it's not the officially recommended version right now, so I recommend you to only do this if you are pretty familiar with CakePHP and know what you are doing.</p>
+<p><strong>Oh and before I forget:</strong> You should almost never have to modify anything inside /cake. Often people who do that and post their own fixes on Trac are wrong, and their problems can be solved in /app. However, never say never, being able to modify core files is still a nice option to have, *especially* when using those technics above for including other vendors that don't write as perfect code as the CakePHP developers do ; ).</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-4-keep-your-cake-fresh-use-svn-head%3A480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb &amp;title=Dessert+%234+-+Keep+your+Cake+fresh+%28use+SVN+HEAD%29';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-4-keep-your-cake-fresh-use-svn-head%3A480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-4-keep-your-cake-fresh-use-svn-head%3A480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb&amp;title=Dessert+%234+-+Keep+your+Cake+fresh+%28use+SVN+HEAD%29&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-4-keep-your-cake-fresh-use-svn-head%3A480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb&amp;title=Dessert+%234+-+Keep+your+Cake+fresh+%28use+SVN+HEAD%29';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/dessert-7-conventions-over-ego:480f4dd5-8154-4f7f-9de9-4a0dcbdd56cb">Dessert #7 - Conventions over Ego</a></li>
+							<li><a href="/posts/dessert-10-default-models-components-helpers:480f4dd5-b24c-4df9-ad49-4530cbdd56cb">Dessert #10 - Default Models, Components &amp; Helpers</a></li>
+							<li><a href="/posts/Cake_3_interview_with_Nate_Abele:4a665a5e-5bfc-4e42-96ee-6d284834cda3">Cake 3 interview with Nate Abele</a></li>
+							<li><a href="/posts/dessert-11-welcome-back-friendly-urls:480f4dd5-8dac-414b-b329-4dd5cbdd56cb">Dessert #11 - Welcome back, Friendly URL&#039;s</a></li>
+							<li><a href="/posts/dessert-2-become-friends-with-the-inflector:480f4dd5-1de0-45a4-b8f0-4282cbdd56cb">Dessert #2 - Become friends with the Inflector</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/dessert-1-the-7-crucials-of-crud:480f4dd5-cbcc-479c-a754-48d0cbdd56cb">Dessert #1 - The 7 crucials of CRUD</a></li>
+							<li><a href="/posts/cake-12s-set-class-eats-arrays-for-breakfast:480f4dd6-d084-4fb7-bacc-49fdcbdd56cb">Cake 1.2&#039;s Set class eats nested arrays for breakfast!</a></li>
+							<li><a href="/posts/cake-vs-zend-vs-symfony-vs-igniter:4942b243-85bc-404a-afc9-34aa4834cda3">Cake vs Zend vs Symfony vs Igniter</a></li>
+							<li><a href="/posts/dessert-12-debugging-requestaction:480f4dd5-bca4-4e86-820c-4f4dcbdd56cb">Dessert #12 - Debugging requestAction</a></li>
+							<li><a href="/posts/dessert-5-keep-a-custom-configuration-file:480f4dd5-6ee8-40ab-a6f0-413bcbdd56cb">Dessert #5 - Keep a custom configuration file</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/dessert-4-keep-your-cake-fresh-use-svn-head:480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb">13 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/dessert-4-keep-your-cake-fresh-use-svn-head:480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4ddd-37cc-4fb3-ac00-4013cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b00ea29ea6773fa1ae3bdd9c890df0d0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							seb&nbsp;						</strong>
+						<strong>said 
+						on Sep 21, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for these tips.<br />
+When I tried #2 option, I cannot do it for the 3 files (.htaccess, index.php, VERSION.txt).</br><br />
+Checking subversion manual to see that svn:externals works only for folder, not for files atm.</br><br />
+How do you updates theses files? manually?</br></p>
+<p>Can you explain more the #3 please?<br />
+for instance:</br><br />
+- folders tree before vendor branch</br><br />
+- after first vendor import</br><br />
+- and after first vendor update</br><br />
+I tried to do it with Cake 1.1.7 as initial and update to 1.2.x SVN branch.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddd-4428-45da-aa3d-4f80cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 21, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi seb, thanks for being interested in those methods. For method #2: I wasn't sure if you could do it on the individual files, so if svn doesn't allow that you have to manually update them. However, those files should ever rarely change. I only use this method for the /cake folder.</p>
+<p>For method #3, there is quite a bit about this topic written already. All I know about it I've got from here: http://svnbook.red-bean.com/en/1.2/svn.advanced.vendorbr.html so reading this should be good enough for getting you started.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddd-a084-4266-9399-4e74cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9fe1b59c2d5c5ceced86bb93ec8a4b03&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							mux&nbsp;						</strong>
+						<strong>said 
+						on Oct 05, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I guess you can have vendors folder in your svn tree and make other project link to it with the svn:external.  It is some way better then your #2/#3 method, because that method dramatically speeds up updating your projects (you update cake base files for all of them only once).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-becc-4009-a01d-44aecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=87e39dc761577c85f8356ac426f57c7a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Sonic&nbsp;						</strong>
+						<strong>said 
+						on Oct 17, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Guys,</p>
+<p>Perhaps I'm missing something but here's what I do. Please let me know if you can spot why this doesn't work.<br />
+I only keep my 'app' directory (and all subdirectories of course) under version control on my end. The CakePHP framework is kept under version control on the cakePHP servers so I don't need to do it myself. I just check out the framework itself and check out my app to the root cake directory. When I do check it out, I call it something other than 'app' so the default 'app' directory that comes with the framework is left untouched.</br><br />
+Therefore, if I want to update/commit/revert my app I run that command from inside my 'app' directory, and if I want to update/commit/revert the cakePHP framework I go up one directory and do it from there. If I have my 'app' directory named something other than 'app' then SVN will just see it as an unversioned directory and it will not be affected by any SVN commands meant for the framework files.</br></p>
+<p>How does that sound?</p>
+<p>Sonic</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-c5ac-4002-983f-400ecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 18, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sonic: Sounds workable for one person. However, if you work on a team, you would want to have on SVN repository people are checking out an in from, that contains all important files, including the CakePHP framework. And there are some other issues with your setup, like the fact that you cannot version changes that you make to your vendor (CakePHP). I know you shouldn't have to, and I rarly ever do, but having the option, especially when working with other vendors as well, is great. </p>
+<p>So depending on what you are working on you can keep this setup, but for everything more involved I could see it become a pain pretty quickly.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-cc3c-4a9e-9a6b-4a54cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=75c2c31bcca10ef21a86d5f5f49279d2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.alltheusualsuspects.co.uk" rel="nofollow">Stephen Orr</a>						</strong>
+						<strong>said 
+						on Feb 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I couldn't get the svn:externals part to work... I'm probably doing something horribly wrong though.</p>
+<p>What I have is VMware running a virtual machine, containing an installation of Ubuntu Server. Subversion is installed, so is the standard LAMP stack. I can successfully work with my files, and the cool part is, I have a post-commit hook set up in SVN so that when I commit new versions from my Windows system (whether using Komodo or TortoiseSVN), the working copy I have sitting in my /var/www directory is updated also.</p>
+<p>However this doesn't happen with the externals, for some reason, and I can't get them to actually be inserted into my repository at all (the files just don't appear at the other end). Am I doing something stupid? In the interim I've gone with method #1.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-c2f0-4bf5-9f92-4a4bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8bf66d0ce163c9b9de452d6413cc2d5f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Greg Agee&nbsp;						</strong>
+						<strong>said 
+						on May 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for the info.  I'd like to use vendor branches to sync my app with the nightly builds of 1.2, so what is the 'x' in "svn import x /my/app/dir"?  (I tried https://svn.cakephp.org/repo/trunk/cake/1.2.x.x, but svn said it doesn't exist).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-c304-4f84-887b-43dccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Greg: Not sure, maybe you need to put the dir in parentheses. Otherwise check svn --help for information. Personally I use TortoiseSVN on windows, and I'm sure there are similar tools for other OS' as well.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-bad4-4fea-b958-40bfcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8bf66d0ce163c9b9de452d6413cc2d5f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Greg Agee&nbsp;						</strong>
+						<strong>said 
+						on May 14, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix,</p>
+<p>Thanks for responding.  I found that when running an svn checkout on that path, it works fine.  I think I am using svn incorrectly as far as the import operation is concerned.  According to the manual pages, the svn import looks like "svn import [PATH] URL".  So, it appears that I cannot import from a url (as in https://svn.cakephp.org/repo/trunk/cake/1.2.x.x).  Also, the example on http://svnbook.red-bean.com/en/1.1/ch07s05.html shows the import as</p>
+<p>    $ svn import /path/to/libcomplex-1.0 \<br />
+             http://svn.example.com/repos/vendor/libcomplex/current \</br><br />
+             -m 'importing initial 1.0 vendor drop'</br></p>
+<p>which shows exactly that.  Where did they get the "/path/to/libcomplex-1.0" initially?</p>
+<p>In regards to the cake-1.2 nightly builds, how do I initially get a hold of that path from which to import into my vendors directory?  I tried running a svn checkout on the nightly into a temp folder, then imported that temp folder into my vendors directory.  But the import removed all versioning (skipped .svn folders), therefore defeating the purpose of using vendor branches, right?</p>
+<p>If you could point me in the right direction, I would really appreciate it.</p>
+<p>Thanks for your help,<br />
+Greg</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-66dc-4989-a895-407ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2007/06/17/screencast-using-vendor-branching-and-cakephp/" rel="nofollow">ThinkingPHP and beyond &raquo; Screencast: Using vendor branchin</a>						</strong>
+						<strong>said 
+						on Jun 17, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] So here I go with my very first screencast to be published. The topic is how to use vendor branching with CakePHP which is one of many ways to keep your CakePHP version up to date. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dee-7158-4a62-a5b5-4acdcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5a4937f8843e189e97c126c2cf45e8f3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Louis Lapointe&nbsp;						</strong>
+						<strong>said 
+						on Aug 09, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Greetings from Québec Felix,</p>
+<p>First, many thanks for your screecast. The merge part was a bit foggy for me. </p>
+<p>I have use a vendor branche for cake for some months now. One tiny pain I have with this way of doing things is when the core devs delete a file. The way I handle this (painfully) is to check each and every directory in winmerge and tortoisesvn-&gt;delete those files.</p>
+<p>How would you go about that? Exporting from cake means you don't know about those deleted files.</p>
+<p>It may not be very important but what if your app is using one of those deleted files? Since you didn't deleted them in trunk, there're still available to your project... This could be the source of a very *bad* surprise!</p>
+<p>Thanks again for this post and screecast,<br />
+Louis</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dee-b2dc-426d-a9dc-4a82cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 09, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Louis: There is a perl script that can help out with this:</p>
+<p>(Comment by Travis on the other blog post)</p>
+<p>svn devs provide a perl helper called svn_load_dirs : http://subversion.tigris.org/tools_contrib.html#svn_load_dirs_pl<br />
+Usage is explained in the book here: http://svnbook.red-bean.com/en/1.0/ch07s04.html</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-6220-4872-a730-4caacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://oase.uci.ru.nl/~bradaa/nerdnotes.org/index.php/2007/12/06/howto-start-your-cakephp-project-in-subversion/" rel="nofollow">nerdnotes.org</a>						</strong>
+						<strong>said 
+						on Dec 05, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p><strong>Howto start your CakePHP project in Subversion...</strong></p>
+<p>This howto will demonstrate how to start your cakephp project from scratch, taking advantage of subversions &#8220;externals definition&#8221;. The result will be a basic CakePHP directory structure with only the &#8220;/app&#8221; part under your svn ...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

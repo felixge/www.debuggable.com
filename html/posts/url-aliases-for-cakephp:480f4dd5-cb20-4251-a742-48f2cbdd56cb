@@ -1,0 +1,433 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>URL Aliases for CakePHP &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/url-aliases-for-cakephp:480f4dd5-cb20-4251-a742-48f2cbdd56cb">URL Aliases for CakePHP</a></h2>	<div class="posted-on">
+		<p>Posted on 17/5/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p>We all know that cakephp wants us to structure all our urls in the "/controller/action/params" (or "/plugin/controller/action/params") way, but sometimes you want domain.com/product or something else that would break that structure. Now you can use routes for that, but what is, if you want to create those aliases dynamically? You could dynamically create a new routes.php, but that's a rather messy approach. A better one is to do some URL rewriting yourself. Here is the solution I came up with:</p>
+<h3>Where to download</h3>
+<p>I put the code used as a snipped on CakeForge: <a href="https://cakeforge.org/snippet/detail.php?type=snippet&id=66">Get it here!</a></p>
+<h3>How to implement</h3>
+<p>I created a little php script to put in the vendor folder. Then you can edit your routes.php and rewrite controllerMissing errors to your own Controller.</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+vendor<span class="br0">&#40;</span><span class="st0">'CakeUrlAlias'</span><span class="br0">&#41;</span>;<br />
+CakeUrlAlias_Activate<span class="br0">&#40;</span><span class="re0">$from_url</span>, <span class="st0">'pages'</span>, <span class="st0">'display'</span><span class="br0">&#41;</span>;</div>
+<p>The example above would rewrite all controllerMissing errors to your pages controller. Inside this controller you would check if there is a content matching the requested page and if not, trigger the missingController error:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> __triggerMissingController<span class="br0">&#40;</span><span class="re0">$controllerName</span><span class="br0">&#41;</span> &nbsp; &nbsp;<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">cakeError</span><span class="br0">&#40;</span><span class="st0">'missingController'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'className'</span> =&gt; Inflector::<span class="me2">camelize</span><span class="br0">&#40;</span><span class="re0">$controllerName</span>.<span class="st0">&quot;Controller&quot;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'webroot'</span> &nbsp; =&gt; <span class="re0">$this</span>-&gt;<span class="me1">webroot</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'url'</span> &nbsp; &nbsp; &nbsp; =&gt; <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'base'</span> &nbsp; &nbsp; &nbsp;=&gt; <span class="re0">$this</span>-&gt;<span class="me1">base</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>(when you do this $this->triggerMissingController() you need to pass the name of the $site or whatever that couldn't be found).</p>
+<p>I hope this should help some people who are particular about the way their urls should look ; ). It's mostly ment for Search Engine Optimization since Google & Co like keyword density, and a controller name in between domain and page can be bad sometimes.</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-cb20-4251-a742-48f2cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Furl-aliases-for-cakephp%3A480f4dd5-cb20-4251-a742-48f2cbdd56cb &amp;title=URL+Aliases+for+CakePHP';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Furl-aliases-for-cakephp%3A480f4dd5-cb20-4251-a742-48f2cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Furl-aliases-for-cakephp%3A480f4dd5-cb20-4251-a742-48f2cbdd56cb&amp;title=URL+Aliases+for+CakePHP&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Furl-aliases-for-cakephp%3A480f4dd5-cb20-4251-a742-48f2cbdd56cb&amp;title=URL+Aliases+for+CakePHP';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/using-rest-api%e2%80%99s-as-models-in-cakephp-a-google-calendar-example:480f4dd5-02c0-464e-941c-4774cbdd56cb">Using REST Api’s as Models in CakePHP / A Google Calendar example</a></li>
+							<li><a href="/posts/cakenews-a-cakephp-feed-collection:480f4dd5-d7e4-4dec-831a-4b18cbdd56cb">CakeNews - A CakePHP feed collection</a></li>
+							<li><a href="/posts/cakephp-rc2-released!:486746fc-65d8-4fba-98b9-1edd4834cda3">CakePHP RC2 Released!</a></li>
+							<li><a href="/posts/3000-candles-on-the-cakephp-cake:480f4dd5-01f8-40e6-9acc-413bcbdd56cb">3000 candles on the CakePHP cake</a></li>
+							<li><a href="/posts/4-cakephp-tricks:4811ad82-32dc-4a38-bc10-36304834cda3">Two CakePHP tricks</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/bringing-the-cold-war-to-cakephp-12-the-containable-behavior:480f4dd6-2b50-4d7b-ab05-418dcbdd56cb">Bringing the cold war to CakePHP 1.2 - The Containable Behavior</a></li>
+							<li><a href="/posts/how-to-save-half-a-second-on-every-request-of-your-cakephp-app:49a69610-8648-4d65-815d-754c4834cda3">How To Save Half A Second On Every CakePHP Request</a></li>
+							<li><a href="/posts/how-to-organize-your-cakephp-apps-javascript:480f4dd6-2408-4e98-a5fc-4da3cbdd56cb">How to organize your CakePHP App&#039;s Javascript?</a></li>
+							<li><a href="/posts/cakephp-html-balancer-helper:4944c48d-7440-4f9d-8638-6e4b4834cda3">Cleaning Html with this HtmlCleaner for CakePHP</a></li>
+							<li><a href="/posts/using-cakephp-in-external-php-systems-cmss-weblogs-etc:480f4dd5-ed94-4186-acda-4443cbdd56cb">Using CakePHP in external PHP Systems (CMS&#039;s, Weblogs, etc.)</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/url-aliases-for-cakephp:480f4dd5-cb20-4251-a742-48f2cbdd56cb">10 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/url-aliases-for-cakephp:480f4dd5-cb20-4251-a742-48f2cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4de1-1ca4-4d46-8aea-4db3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e64880861c4cf588b0413787838c921&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							kashish&nbsp;						</strong>
+						<strong>said 
+						on Oct 12, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I need something like username.mywebsite.com to be implemented in cakephp.</p>
+<p>can you please help me out.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-7794-4edb-a19a-4cdccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 12, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>kashish: Setting up the sub-domains is not related to CakePHP, but to your hosting setup. Using the sub-domain as a User name can be achieved by using a beforeFilter in your AppController that checks what sub-domain was used to access the site.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-50b4-4991-bb11-47dbcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8587f0fdd3bd659b9a2e93c374a34bb5&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://jamesconstable.co.uk" rel="nofollow">James</a>						</strong>
+						<strong>said 
+						on Dec 30, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This seems to do exactly what i need but im fairly new to CakePHP and amn't sure how to implement this with a default Cake set up.</p>
+<p>Any chance of a few pointers?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-0950-4446-b8d5-45d7cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Dec 30, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>James: Well it's been a while since I've written this. These days I would recommend against the method described here and recommend you to have a look at: http://www.thinkingphp.org/2006/09/18/dessert-11-welcome-back-friendly-urls/</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-99e8-4593-8331-48f7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8587f0fdd3bd659b9a2e93c374a34bb5&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://jamesconstable.co.uk" rel="nofollow">James</a>						</strong>
+						<strong>said 
+						on Dec 30, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Cheers Felix, but what im more interested in trying to do is catch when a controller is missing and check if a friendly_url exists in the database.  This is why i wanted to catch elements for which the controller didnt exists and direct them at a custom pages controller.</p>
+<p>The url would then be used within the controller to determine which page is being viewed.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-4ac8-4163-babb-422ecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Dec 31, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yes, this is what this post is about. But please don't use this for perma links, you'll run into issues. In order to get it working you have to download the snippet from cake forge put it in /app/vendors and then follow the how to implement steps.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-761c-473a-98b3-47f2cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9a24b6a4f683c7ca58454ec1c13094b9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://bob0blog.blogspot.com/" rel="nofollow">Lorenzo Moretti</a>						</strong>
+						<strong>said 
+						on Jul 10, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hello!<br />
+Your idea is very smart (and CakePHP is really flexible :)!</br><br />
+I think this could be used to localize url for search engine optimization. For example www.domain.com/about_us could be translated, depending on user language, to an other localized url (www.domain.com/chi_siamo in Italian). I will try to develop the url localization idea further. Do you think your approach could be the right one?</br></p>
+<p>Great blog!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-3a44-444c-851a-4f28cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jul 12, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Lorenzo Moretti: Please read this post of mine: http://www.thinkingphp.org/2006/09/18/dessert-11-welcome-back-friendly-urls/</p>
+<p>This is my favorite approach towards SEO-friendly urls as of right now.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df0-2d94-4df8-bc78-420dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9818d1641e34de5f7d94c024ec4a2926&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							balthisar&nbsp;						</strong>
+						<strong>said 
+						on Oct 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is FANTASTIC! Below are a couple of implementation notes for others that may run into trouble. I just want to comment first that you shouldn't abandon this. This is a perfect solution for static pages when you don't want them buried a level down in your URL.</p>
+<p>So, here's how I got it to work for me in 1.1.17.5612:</p>
+<p>1. Put the linked-to snippet into /app/vendors/CakeUrlAlias.php</p>
+<p>2. In your routes.php, make sure you have the following before any of the routing:<br />
+    vendor('CakeUrlAlias');</br><br />
+    CakeUrlAlias_Activate($from_url, 'pages', 'display');</br></p>
+<p>3. Also in your routes.php, make sure you have the following:<br />
+     $Route-&gt;connect('/pages/display/*', array('controller' =&gt; 'pages', 'action' =&gt; 'display'));</br><br />
+     $Route-&gt;connect('/pages/*', array('controller' =&gt; 'pages', 'action' =&gt; 'display'));</br><br />
+Note that the SECOND line is already there. Make sure you insert the first line in the given order.</br></p>
+<p>4. COPY your cake/libs/controller/components/pages_controller.php into app/controllers<br />
+There are two reasons for this -- CakeUrlAlias.php only recognizes controllers in this location, plus we want to make a couple of changes and you shouldn't touch the distribution code anyway.</br></p>
+<p>5. Paste the __triggerMissingController function from above into your new, personal pages_controller.php file.</p>
+<p>6. Add this code:<br />
+     # if the page doesn't exist, trigger MISSING CONTROLLER rather than view not found.</br><br />
+     if (!file_exists(VIEWS . 'pages/' . join('/', $path) . $this-&gt;ext)) {</br><br />
+          $this-&gt;__triggerMissingController($page);</br><br />
+     }</br><br />
+right before this line:</br><br />
+        $this-&gt;render(join('/', $path));</br><br />
+near the bottom of the display function in your pages_controller.php.</br></p>
+<p>Now, you can access the static page called test.thtml as such:<br />
+/test</br><br />
+/pages/test</br><br />
+/pages/display/test</br></p>
+<p>Root works:<br />
+/</br></p>
+<p>Also "subpages" (directories) work:<br />
+/mydir/test</br><br />
+/mydir/pages/test</br><br />
+/mydir/pages/display/test</br></p>
+<p>Missing controllers will work properly.<br />
+The only negative affect is even if you use /pages/* URL's, page-not-found errors will be displayed as missing controller errors. No big deal, because as soon as you go live (debug to 0), you'll get the normal 404 page.</br></p>
+<p>I like this approach because (a) I get my static pages at root level; (b) it doesn't break the default route for pages; and (c) is allows "proper" controller/function/parameters use of the controller.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df6-c664-498c-a550-4152cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=18e4aa6d570d7b4ee4907713c51abd3e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Eldz&nbsp;						</strong>
+						<strong>said 
+						on Feb 14, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I was having some problems with the solution presented above when using explicitly routed URLs. For example, I have the following lines in the routes.php file:</p>
+<p>$Route-&gt;connect('/layouts/*', array('controller' =&gt; 'themes', 'action' =&gt; 'index'));</p>
+<p>Whenever I try to access mysite/layouts, I get a Missing Controller error. So I thought of adding another parameter in the CakeUrlAlias_Activate function where I could pass the $Route-&gt;routes array. Then instead of placing these lines at the start of routes.php, I placed them last:</p>
+<p>vendor('CakeUrlAlias');<br />
+CakeUrlAlias_Activate($from_url, 'pages', 'display', 'home', $Route-&gt;routes);</br></p>
+<p>I then modified the CakeUrlAlias.php snippet's CakeUrlAlias_Activates function into something like this:</p>
+<p>// I've added the additional parameter $routes<br />
+function CakeUrlAlias_Activate(&amp;$url, $controller = 'pages', $action = 'display', $home = 'home', $routes = null)</br><br />
+{</br><br />
+    $parts = explode('/', $url);</br></p>
+<p>    if (empty($parts) || empty($parts[0]))<br />
+    {</br><br />
+        $url = $controller.'/'.$action.'/'.$home;</br><br />
+        return;</br><br />
+    }   </br></p>
+<p>    $pluginOrController = array_shift($parts);</p>
+<p>    // Then I've also modified the function for checking if the controller exists<br />
+    if (CakeUrlAlias_ControllerExists($pluginOrController, $routes) || CakeUrlAlias_PluginExists($pluginOrController))</br><br />
+        return;</br></p>
+<p>    if (!empty($parts))<br />
+        $additional = '/'.join('/', $parts);</br><br />
+    else</br><br />
+        $additional = null;</br></p>
+<p>    $url = $controller.'/'.$action.'/'.$pluginOrController.$additional;<br />
+}</br></p>
+<p>function CakeUrlAlias_ControllerExists($name, $routes = null)<br />
+{</br><br />
+    $paths = Configure::getInstance();</br></p>
+<p>    foreach ($paths-&gt;controllerPaths as $path)<br />
+    {</br><br />
+        if(file_exists($path.$name.'_controller.php'))</br><br />
+        {</br><br />
+            return true;</br><br />
+        }</br><br />
+    }</br></p>
+<p>    // Check if there is an explicit declaration in the Routes configuration<br />
+    foreach ($routes as $path) {</br><br />
+    	if (ereg($name, $path[0])) {</br><br />
+    		return true;</br><br />
+    	}</br><br />
+    }</br></p>
+<p>    return false;<br />
+}</br></p>
+<p>That's all. I hope this would prove to be a good additional information for 'ya all. Enjoy!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

@@ -1,0 +1,652 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Exceptional Cake &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/exceptional-cake:480f4dd5-1b10-4bc8-931f-49cecbdd56cb">Exceptional Cake</a></h2>	<div class="posted-on">
+		<p>Posted on 21/10/07 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>sorry for letting you guys wait so long, but here is my promised post on how to use Exceptions in CakePHP. Before you continue reading, be warned that you'll need PHP 5 as well as CakePHP 1.2 for this code to work properly.</p>
+<p>First of all. Why did I decide to experiment with exceptions in CakePHP? Well, Object::cakeError() does an ok job at providing me with a way to render some sort of internal error while I'm debug mode. However, I think that is what its really meant for, and its not the way to go for rendering errors to the user directly. Besides you cannot really use it within a static function call, a class that is not a descendant of 'Object', nor do you have any way of "catching" an error thrown this way. All of these things can be addressed by using PHP5s support for custom Exception classes quite elegantly.</p>
+<p>But lets look at the code before I explain even further. Put this in /app/error.php:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<br />
+uses<span class="br0">&#40;</span><span class="st0">'error'</span><span class="br0">&#41;</span>;<br />
+<span class="coMULTI">/**<br />
+&nbsp;* undocumented class<br />
+&nbsp;*<br />
+&nbsp;* @package default<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+<span class="kw2">class</span> AppError <span class="kw2">extends</span> ErrorHandler<span class="br0">&#123;</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* New Exception handler, renders an error view, then quits the application.<br />
+&nbsp;*<br />
+&nbsp;* @param object $Exception AppException object to handle<br />
+&nbsp;* @return void<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; &nbsp;<a href="http://www.php.net/static"><span class="kw3">static</span></a> <span class="kw2">function</span> handleException<span class="br0">&#40;</span><span class="re0">$Exception</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$Exception</span>-&gt;<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/exit"><span class="kw3">exit</span></a>;<br />
+&nbsp; &nbsp;<span class="br0">&#125;</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* Throws an AppExcpetion if there is no db connection present<br />
+&nbsp;*<br />
+&nbsp;* @return void<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; &nbsp;<span class="kw2">function</span> missingConnection<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; throw <span class="kw2">new</span> AppException<span class="br0">&#40;</span><span class="st0">'db_connect'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp;<span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+set_exception_handler<span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'AppError'</span>, <span class="st0">'handleException'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="coMULTI">/**<br />
+&nbsp;* undocumented class<br />
+&nbsp;*<br />
+&nbsp;* @package default<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+<span class="kw2">class</span> AppException <span class="kw2">extends</span> Exception <span class="br0">&#123;</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* Details about what caused this Exception<br />
+&nbsp;*<br />
+&nbsp;* @var array<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; &nbsp;<span class="kw2">var</span> <span class="re0">$info</span> = <span class="kw2">null</span>;<br />
+<span class="coMULTI">/**<br />
+&nbsp;* undocumented function<br />
+&nbsp;*<br />
+&nbsp;* @param mixed $info A string desribing the type of this exception, or an array with information<br />
+&nbsp;* @return void<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; &nbsp;<span class="kw2">function</span> __construct<span class="br0">&#40;</span><span class="re0">$info</span> = <span class="st0">'unknown'</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/is_array"><span class="kw3">is_array</span></a><span class="br0">&#40;</span><span class="re0">$info</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="re0">$info</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'type'</span> =&gt; <span class="re0">$info</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">info</span> = <span class="re0">$info</span>;<br />
+&nbsp; &nbsp;<span class="br0">&#125;</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* Renders a view with information about what caused this Exception. $info['type'] is used to determine what<br />
+&nbsp;* view inside of views/exceptions/ is used. The default is 'unknown.ctp'.<br />
+&nbsp;*<br />
+&nbsp;* @return void<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; &nbsp;<span class="kw2">function</span> render<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$info</span> = am<span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">where</span><span class="br0">&#40;</span><span class="br0">&#41;</span>, <span class="re0">$this</span>-&gt;<span class="me1">info</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$Controller</span> = <span class="kw2">new</span> Controller<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$Controller</span>-&gt;<span class="me1">viewPath</span> = <span class="st0">'exceptions'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$Controller</span>-&gt;<span class="me1">layout</span> = <span class="st0">'exception'</span>;<br />
+&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$Dispatcher</span> = <span class="kw2">new</span> Dispatcher<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$Controller</span>-&gt;<span class="me1">base</span> = <span class="re0">$Dispatcher</span>-&gt;<span class="me1">baseUrl</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$Controller</span>-&gt;<span class="me1">webroot</span> = <span class="re0">$Dispatcher</span>-&gt;<span class="me1">webroot</span>;<br />
+&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$Controller</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><a href="http://www.php.net/compact"><span class="kw3">compact</span></a><span class="br0">&#40;</span><span class="st0">'info'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$View</span> = <span class="kw2">new</span> View<span class="br0">&#40;</span><span class="re0">$Controller</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$view</span> = @<span class="re0">$info</span><span class="br0">&#91;</span><span class="st0">'type'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/file_exists"><span class="kw3">file_exists</span></a><span class="br0">&#40;</span>VIEWS.<span class="st0">'exceptions'</span>.DS.<span class="re0">$view</span>.<span class="st0">'.ctp'</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="re0">$view</span> = <span class="st0">'unknown'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/header"><span class="kw3">header</span></a><span class="br0">&#40;</span><span class="st0">&quot;HTTP/1.0 500 Internal Server Error&quot;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$View</span>-&gt;<span class="me1">render</span><span class="br0">&#40;</span><span class="re0">$view</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp;<span class="br0">&#125;</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* Returns an array describing where this Exception occured<br />
+&nbsp;*<br />
+&nbsp;* @return array<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; &nbsp;<span class="kw2">function</span> where<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'function'</span> =&gt; <span class="re0">$this</span>-&gt;<span class="me1">getClass</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="st0">'::'</span>.<span class="re0">$this</span>-&gt;<span class="me1">getFunction</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;, <span class="st0">'file'</span> =&gt; <span class="re0">$this</span>-&gt;<span class="me1">getFile</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;, <span class="st0">'line'</span> =&gt; <span class="re0">$this</span>-&gt;<span class="me1">getLine</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;, <span class="st0">'url'</span> =&gt; <span class="re0">$this</span>-&gt;<span class="me1">getUrl</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp;<span class="br0">&#125;</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* Returns the url where this Exception occured<br />
+&nbsp;*<br />
+&nbsp;* @return string<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; &nbsp;<span class="kw2">function</span> getUrl<span class="br0">&#40;</span><span class="re0">$full</span> = <span class="kw2">true</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> Router::<span class="me2">url</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'full_base'</span> =&gt; <span class="re0">$full</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp;<span class="br0">&#125;</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* Returns the class where this Exception occured<br />
+&nbsp;*<br />
+&nbsp;* @return void<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; &nbsp;<span class="kw2">function</span> getClass<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$trace</span> = <span class="re0">$this</span>-&gt;<span class="me1">getTrace</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$trace</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'class'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp;<span class="br0">&#125;</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* Returns the function where this Exception occured<br />
+&nbsp;*<br />
+&nbsp;* @return void<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; &nbsp;<span class="kw2">function</span> getFunction<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$trace</span> = <span class="re0">$this</span>-&gt;<span class="me1">getTrace</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$trace</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'function'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp;<span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span>
+</div>
+<p>You'll also need this in your /app/config/bootstrap.php file:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">require_once</span><span class="br0">&#40;</span>APP.<span class="st0">'error.php'</span><span class="br0">&#41;</span>;</div>
+<p>Now you can do cool stuff like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> view<span class="br0">&#40;</span><span class="re0">$id</span> = <span class="kw2">null</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp;<span class="re0">$this</span>-&gt;<span class="me1">Task</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'id'</span>, <span class="re0">$id</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp;<span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$this</span>-&gt;<span class="me1">Task</span>-&gt;<span class="me1">exists</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; throw <span class="kw2">new</span> AppException<span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'type'</span> =&gt; <span class="st0">'404'</span>, <span class="st0">'id'</span> =&gt; <span class="re0">$id</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp;<span class="br0">&#125;</span><br />
+&nbsp; &nbsp;<span class="co1">// ...</span><br />
+<span class="br0">&#125;</span></div>
+<p>Or like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<a href="http://www.php.net/static"><span class="kw3">static</span></a> <span class="kw2">function</span> svnVersion<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp;<a href="http://www.php.net/static"><span class="kw3">static</span></a> <span class="re0">$version</span> = <span class="kw2">null</span>;<br />
+&nbsp; &nbsp;<span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/is_null"><span class="kw3">is_null</span></a><span class="br0">&#40;</span><span class="re0">$version</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$version</span>;<br />
+&nbsp; &nbsp;<span class="br0">&#125;</span><br />
+&nbsp; &nbsp;<br />
+&nbsp; &nbsp;<span class="re0">$version</span> = <a href="http://www.php.net/trim"><span class="kw3">trim</span></a><span class="br0">&#40;</span><a href="http://www.php.net/shell_exec"><span class="kw3">shell_exec</span></a><span class="br0">&#40;</span><span class="st0">&quot;svn info &quot;</span>.ROOT.<span class="st0">&quot; | grep 'Changed Rev' | cut -c 19-&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp;<span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$version</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; throw <span class="kw2">new</span> AppException<span class="br0">&#40;</span><span class="st0">'no_working_copy'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp;<span class="br0">&#125;</span> <span class="kw1">elseif</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/is_int"><span class="kw3">is_int</span></a><span class="br0">&#40;</span><span class="re0">$version</span><span class="br0">&#41;</span> || !<span class="br0">&#40;</span><span class="re0">$version</span> &gt; <span class="nu0">0</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; throw <span class="kw2">new</span> AppException<span class="br0">&#40;</span><span class="st0">'svn_version'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp;<span class="br0">&#125;</span><br />
+&nbsp; &nbsp;<span class="kw1">return</span> <span class="re0">$version</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Or just as simple as:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> utcTime<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp;<span class="re0">$time</span> = <a href="http://www.php.net/strtotime"><span class="kw3">strtotime</span></a><span class="br0">&#40;</span><a href="http://www.php.net/gmdate"><span class="kw3">gmdate</span></a><span class="br0">&#40;</span><span class="st0">'Y-m-d H:i:s'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp;<span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/is_numeric"><span class="kw3">is_numeric</span></a><span class="br0">&#40;</span><span class="re0">$time</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; throw <span class="kw2">new</span> AppException<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp;<span class="br0">&#125;</span><br />
+&nbsp; &nbsp;<span class="kw1">return</span> <span class="re0">$time</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>In either case you'll need a new 'exception.ctp' layout. This layout should be very simple, and ideally work even if no Models could have been loaded or other parts of your system have failed. If you have a dynamic navigation, this means either falling back to a default one, or not displaying anything but a back button.</p>
+<p>After you created that you also need a default exception view called 'unknown.ctp'. Mine looks simply like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+&lt;h1&gt;&lt;?php <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$this</span>-&gt;<span class="me1">pageTitle</span> = <span class="st0">'Oops, an internal error occured'</span>; <span class="kw2">?&gt;</span>&lt;/h1&gt;<br />
+&lt;p&gt;Sorry, but something must have gone horribly wrong in the internal workings of this application.&lt;/p&gt;</div>
+<p>For exceptions that are associated with a HTTP response status like '404', I recommend a view like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+&lt;h1&gt;<span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$this</span>-&gt;<span class="me1">pageTitle</span> = <span class="st0">'404 - Page not found'</span>; <span class="kw2">?&gt;</span>&lt;/h1&gt;<br />
+&lt;p&gt;We are sorry, but we could not locate the page you requested on our server.&lt;/p&gt;</div>
+<p>Alright this is nice ... but you can do even more! Having the unified AppError::handleException function allows you to do fun things like logging your exceptions, or even sending out notification emails to the system administrator. Oh and its also very convenient if you want to catch only certain kinds of Exceptions:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+try<span class="br0">&#123;</span><br />
+&nbsp; &nbsp;<span class="re0">$version</span> = Common::<span class="me2">svnVersion</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span> catch <span class="br0">&#40;</span>AppException <span class="re0">$Exception</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp;<span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$Exception</span>-&gt;<span class="me1">info</span><span class="br0">&#91;</span><span class="st0">'type'</span><span class="br0">&#93;</span> != <span class="st0">'no_working_copy'</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; AppError::<span class="me2">handleException</span><span class="br0">&#40;</span><span class="re0">$Exception</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp;<span class="br0">&#125;</span><br />
+&nbsp; &nbsp;<span class="re0">$version</span> = <span class="st0">'HEAD'</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>One of the things I'm currently trying to do with Exceptions is to build my <a href="http://www.posttask.com/">current application</a> so that it fails fast. By that I mean that I rather have the user see a big fat error message instead of trying to recover from failing functions. Jeff Atwood has an <a href="http://www.codinghorror.com/blog/archives/000924.html">interesting article on this subject</a> which I mostly agree with. However with web applications I feel like we can justify seeing our users see our application crashing hard much more often then with desktop software. That is because its simply much easier to fix the problem for everybody - no software update needed. If you go this path however, please make sure you have rock-solid error reporting form or an e-mail address independent from the server where the app runs on, and mention those in your exception layout.</p>
+<p>Anyway, I'm going to periodically make changes to this AppException class and eventually add support to allow people to customize its behavior (like add logging) without having to change the code itself. For now however this should give you some inspiration on how you could leverage some of that yummy PHP5 goodies that a lot of us cake folks sometimes forget about (just b/c cake is PHP4 compatible it doesn't mean our apps have to be!).</p>
+<p>Hope some of you find this useful,<br />
+-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-1b10-4bc8-931f-49cecbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fexceptional-cake%3A480f4dd5-1b10-4bc8-931f-49cecbdd56cb &amp;title=Exceptional+Cake';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fexceptional-cake%3A480f4dd5-1b10-4bc8-931f-49cecbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fexceptional-cake%3A480f4dd5-1b10-4bc8-931f-49cecbdd56cb&amp;title=Exceptional+Cake&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fexceptional-cake%3A480f4dd5-1b10-4bc8-931f-49cecbdd56cb&amp;title=Exceptional+Cake';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/cake-12s-set-class-eats-arrays-for-breakfast:480f4dd6-d084-4fb7-bacc-49fdcbdd56cb">Cake 1.2&#039;s Set class eats nested arrays for breakfast!</a></li>
+							<li><a href="/posts/new-feed-for-cake-news:480f4dd5-0378-4781-91ee-44b2cbdd56cb">New feed for Cake News</a></li>
+							<li><a href="/posts/Cake_3_interview_with_Nate_Abele:4a665a5e-5bfc-4e42-96ee-6d284834cda3">Cake 3 interview with Nate Abele</a></li>
+							<li><a href="/posts/cake-vs-zend-vs-symfony-vs-igniter:4942b243-85bc-404a-afc9-34aa4834cda3">Cake vs Zend vs Symfony vs Igniter</a></li>
+							<li><a href="/posts/dessert-4-keep-your-cake-fresh-use-svn-head:480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb">Dessert #4 - Keep your Cake fresh (use SVN HEAD)</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/exceptional-cake:480f4dd5-1b10-4bc8-931f-49cecbdd56cb">17 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/exceptional-cake:480f4dd5-1b10-4bc8-931f-49cecbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4df1-afc4-42a2-94cb-43d6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a91aa2f50dbdf047d0fd0d48a681bbd9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://myeasyscripts.com/loudbaking/cakephps-advanced-model-fields-validation/" rel="nofollow">JadB</a>						</strong>
+						<strong>said 
+						on Oct 21, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for sharing! </p>
+<p>I haven't worked with exceptions yet, but that definitely gives a good start. I also approached the error handling in cake but using a much simpler way - you really got me thinking now. Haven't really implemented my solution across the app yet, so I will try this one and see which one I am comfortable with best. Thanks again.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df1-9a04-4aee-a0e4-4d17cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.phpdeveloper.org/news/8878" rel="nofollow">PHPDeveloper.org</a>						</strong>
+						<strong>said 
+						on Oct 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p><strong>Felix Geisendorfer's Blog: Exceptional Cake...</strong></p>
+<p>...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df0-0d98-44cd-b5cb-4542cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.developercast.com/2007/10/22/felix-geisendorfers-blog-exceptional-cake/" rel="nofollow">developercast.com &raquo; Felix Geisendorfer&#8217;s Blog: Excep</a>						</strong>
+						<strong>said 
+						on Oct 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Felix Geisendorfer has posted a new blog entry he&#8217;s been promising for a while now - a look at using Exceptions in a CakePHP application:   First of all. Why did I decide to experiment with exceptions in CakePHP? Well, Object::cakeError() does an ok job at providing me with a way to render some sort of internal error while I&#8217;m debug mode. However, I think that is what its really meant for, and its not the way to go for rendering errors to the user directly. [&#8230;] [All of] these things can be addressed by using PHP5s support for custom Exception classes quite elegantly. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df1-195c-4f3d-9261-4deacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2007/10/22/assert-the-yummyness-of-your-cake/" rel="nofollow">ThinkingPHP and beyond &raquo; Assert the yummyness of your cake</a>						</strong>
+						<strong>said 
+						on Oct 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] if you liked my last post on how to use PHP5 Exceptions in CakePHP, then here is a little addition to it: [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df1-9800-4662-93b1-4664cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2f11c840ab7eccb6788ab0c4331f5dad&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakeexplorer.wordpress.com" rel="nofollow">Yevgeny</a>						</strong>
+						<strong>said 
+						on Oct 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I play with you solution and got one problem.<br />
+Some vendor application use  exceptions for interract. In this case we should not  handle Exceptions that does not instance of AppException.</br><br />
+So  need to change AppError::handleException to process only such Exception that is instance of AppException.</br><br />
+But how to rethrow unknow types exceptions i dont know (different application use many type of Exception class child).</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df1-1168-4ca3-a3b8-43d6cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yevgeny: Good point, I'll try to add this. But I'm not sure how to re-throw non AppExceptions either. Anybody?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df0-d158-4921-adf3-4e1fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6cacda6f9cdac54d60f51d6190631fd8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							nao&nbsp;						</strong>
+						<strong>said 
+						on Oct 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Yevgeny and @Felix</p>
+<p>"You can even rethrow exceptions from nested try/catch-blocks, in case you'd like to pass an Exception on to a place you have more control over its handling."</p>
+<p>http://www.andreashalter.ch/phpug/20040115/3.html</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df1-0818-47cc-a703-4af5cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6cacda6f9cdac54d60f51d6190631fd8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							nao&nbsp;						</strong>
+						<strong>said 
+						on Oct 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>you can do something like that (not tested) :http://bin.cakephp.org/view/428473160</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df1-13d8-4f14-9282-48a3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6cacda6f9cdac54d60f51d6190631fd8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							nao&nbsp;						</strong>
+						<strong>said 
+						on Oct 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Last link don't work : try this : http://bin.cakephp.org/view/1799720146</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df0-9abc-4eaf-bd15-4895cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2f11c840ab7eccb6788ab0c4331f5dad&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakeexplorer.wordpress.com" rel="nofollow">Yevgeny</a>						</strong>
+						<strong>said 
+						on Oct 26, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@NAO:<br />
+  I start from such tests. You right rethrow work well inside catch but php create new Exception object in we call throw from rethrowException function. In this case we lost all info about exception.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48737434-cf74-4a02-8756-7e084834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=35b47983f13ffde6aca25a801dd2a130&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Scott Martin&nbsp;						</strong>
+						<strong>said 
+						on Jul 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I think you need and echo or print statement on line 18 of your error.php file. It took me a while to figure out why nothing was being sent to the browser.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48806378-1544-4248-a0b2-053d4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Jul 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>There have been made a few changes to this. For example one would need to call AppController::beforeRender() to push any stuff to the view that would also display for the exception layout. Think of an exception layout that still makes use of a left column or so.</p>
+<p>We might re-release this sometime.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49264405-7728-47a3-8e06-56c94834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b43c49ba645bd00c7e9d345a740d6dfe&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.randompsychology.com" rel="nofollow">Matt Hamann</a>						</strong>
+						<strong>said 
+						on Nov 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is pretty cool, but when I try using it, I get a fatal error within app_controller.php saying 'Class Controller could not be found.' Any idea what's going on?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4926654d-b70c-4cc5-a968-17ee4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Nov 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yeah, Matt. Add this before your class AppController { .. } :</p>
+<p>App::import('Core', 'Controller');</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-492703bd-f648-4e26-8e32-0fe54834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b43c49ba645bd00c7e9d345a740d6dfe&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.randompsychology.com" rel="nofollow">Matt Hamann</a>						</strong>
+						<strong>said 
+						on Nov 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice! It's working great!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a489e3a-b940-453d-8e70-3e7b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=39f65e7fbd6ef609c0985c7ff90a3052&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://tehek.wordpress.com" rel="nofollow">TEHEK</a>						</strong>
+						<strong>said 
+						on Jun 29, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey, nice job there! Hope in future they will use something like this to do something decent with the error output to users.</p>
+<p>I'm running CakePHP 1.2.3 and I had to do some change to your code:</p>
+<p>app/error.php : Line 18</p>
+<p>Replace<br />
+$Exception->render();</br></p>
+<p>with<br />
+print $Exception->render();</br></p>
+<p>// actually, how did it work without it in the first place? O_o</p>
+<p>also thinking of adding layout switcher in case something except standard text input will be needed..</p>
+<p>THanks again!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a6b2c00-4678-4a23-bb40-0df74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=faa3d08ba02b85f180df3a9bf1af0738&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakealot.com" rel="nofollow">Kjell</a>						</strong>
+						<strong>said 
+						on Jul 25, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hehehe. I should have found this earlier! Coded just about the same thing a few hours ago. </p>
+<p>Anyway.. This is probably a good idea, too:</p>
+<p>if (Configure::read('debug')) {<br />
+	$Controller->viewPath.= DS . 'dev';</br><br />
+} else {</br><br />
+	$Controller->viewPath.= DS . 'prod';</br><br />
+}</br></p>
+<p>So you have two subfolders in "views/exceptions". One holds templates for the developers with trace and whatnot, and the other one contains templates describing the issue for mere mortals. </p>
+<p>The file_exists check should come after that and use the Controller->viewPath as path variable instead. </p>
+<p>Kjell</p>
+<p>PS: support code/pre in comments, plz :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

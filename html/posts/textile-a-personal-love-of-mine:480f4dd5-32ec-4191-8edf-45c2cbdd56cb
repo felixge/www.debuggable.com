@@ -1,0 +1,518 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Textile - A personal love of mine &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/textile-a-personal-love-of-mine:480f4dd5-32ec-4191-8edf-45c2cbdd56cb">Textile - A personal love of mine</a></h2>	<div class="posted-on">
+		<p>Posted on 22/3/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p><strong>Small Update:</strong> I just uploaded a picture of the Textile-powered documentation frando and me are working with which you can take a look at <a href="http://img529.imageshack.us/img529/7258/docs6nd.jpg">here</a>.</p>
+<p>Today I want to speak about my favourite markup, Textile. It's a very intuitive, easy to learn markup that is used to generate valid (x)html. The most awesome aspect about it is that you can stay very simple with it, but generate very complicated pages as well. </p>
+<p>For those who don't know about it yet, just check <a href="http://textism.com/tools/textile/?sample=2">this link</a> here. It has sample textile which you can change and display to try out things. It also is the website of project <a href="http://www.textpattern.com/">Textpattern</a> which was the project to invent Textile.</p>
+<p>Well, but since then Textile has been ported to different languages (like Ruby and Perl) and cloned several times. One of those php-clones is the Textile version I'm using right now, since I think its the best one of the ones out there. It's called TextilePHP and can be found <a href="http://jimandlissa.com/project/textilephp">here</a>. For questions concerning the syntax check out <a href="http://jimandlissa.com/viewcvs/viewcvs.cgi/*checkout*/textilephp/doc/index.html">the documention</a>.</p>
+<p>If you still doubt you could create all contents of a page using textile, check out my current webdesign site <a href="http://www.fg-webdesign.de">fg-webdesign.de</a>, it is powered entirely by Textile and it's a pleasure to work with. Another project I'm doing a lot of Textile for is <a href="http://cakeforge.org/projects/spliceit/">SpliceIt!</a> or to be more exact, it's documenation. Frando and I wrote a nifty little Script that would allow us to write the entire docs in Textile but view them as Html in the browser. It even has build-in support for theming. If you are still looking for a documentation alternative feel free to take a look at it in our <a href="https://cakeforge.org/plugins/scmsvn/viewcvs.php/trunk/sandbox/docs/?root=spliceit">SVN Repository</a>.</p>
+<p>So but since I like to SoftHack everything I get in my fingers I found one thing that really annoyed me about textile - the fact that you can't create links that would open in a new window. So in order to make all external links automatically open in a blank window I've written a little class that adds this behavior:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> TextileHack <span class="kw2">extends</span> Textile<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; &nbsp;* This functions overwrites the old format_link function<br />
+&nbsp; &nbsp; &nbsp;* It implements support for opening external Urls in a new window<br />
+&nbsp; &nbsp; &nbsp;*<br />
+&nbsp; &nbsp; &nbsp;* @param array $args<br />
+&nbsp; &nbsp; &nbsp;* @return string<br />
+&nbsp; &nbsp; &nbsp;*/</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> format_link<span class="br0">&#40;</span><span class="re0">$args</span><span class="br0">&#41;</span> <br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$tag</span> = parent::<span class="me2">format_link</span><span class="br0">&#40;</span><span class="re0">$args</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$tag</span> = <span class="re0">$this</span>-&gt;__split_html_tag<span class="br0">&#40;</span><span class="re0">$tag</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$url</span> = <span class="re0">$tag</span><span class="br0">&#91;</span><span class="st0">'options'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'href'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// This checks if the url starts with http or ftp which would mean it's an external url!</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/list"><span class="kw3">list</span></a><span class="br0">&#40;</span><span class="re0">$type</span><span class="br0">&#41;</span> = <a href="http://www.php.net/explode"><span class="kw3">explode</span></a><span class="br0">&#40;</span><span class="st0">'://'</span>, <span class="re0">$url</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/in_array"><span class="kw3">in_array</span></a><span class="br0">&#40;</span><span class="re0">$type</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'http'</span>, <span class="st0">'ftp'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$tag</span><span class="br0">&#91;</span><span class="st0">'options'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'target'</span><span class="br0">&#93;</span> = <span class="st0">'_blank'</span>; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;__glue_html_tag<span class="br0">&#40;</span><span class="re0">$tag</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; &nbsp;* This function takes a complete (enclosed) Html Tag and splits it into it's peaces<br />
+&nbsp; &nbsp; &nbsp;* This is usefull for manupulating Html Tags<br />
+&nbsp; &nbsp; &nbsp;*<br />
+&nbsp; &nbsp; &nbsp;* @param string $tag<br />
+&nbsp; &nbsp; &nbsp;* @return array<br />
+&nbsp; &nbsp; &nbsp;*/</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> __split_html_tag<span class="br0">&#40;</span><span class="re0">$tag</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span> &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$regex</span> = <span class="st0">'/<span class="es0">\<</span>([a-z]) ?(.*)<span class="es0">\></span>(.*)<span class="es0">\<</span><span class="es0">\/</span>[a-z]+<span class="es0">\></span>/iUs'</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/preg_match"><span class="kw3">preg_match</span></a><span class="br0">&#40;</span><span class="re0">$regex</span>, <span class="re0">$tag</span>, <span class="re0">$matches</span><span class="br0">&#41;</span>; &nbsp; &nbsp; &nbsp; &nbsp;<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$return</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span> = <span class="re0">$matches</span><span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$return</span><span class="br0">&#91;</span><span class="st0">'innerHTML'</span><span class="br0">&#93;</span> = <span class="re0">$matches</span><span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$params</span> = <span class="re0">$matches</span><span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span>; &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$regex</span> = <span class="st0">'/(([a-z]+)=&quot;(.*)&quot; ?)+/iUs'</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/preg_match_all"><span class="kw3">preg_match_all</span></a><span class="br0">&#40;</span><span class="re0">$regex</span>, <span class="re0">$params</span>, <span class="re0">$matches</span><span class="br0">&#41;</span>; &nbsp; <br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$params</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">for</span> <span class="br0">&#40;</span><span class="re0">$i</span>=<span class="nu0">0</span>; <span class="re0">$i</span>&lt;count<span class="br0">&#40;</span><span class="re0">$matches</span><span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span><span class="br0">&#41;</span>; <span class="re0">$i</span>++<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$params</span><span class="br0">&#91;</span><span class="re0">$matches</span><span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$i</span><span class="br0">&#93;</span><span class="br0">&#93;</span> = <span class="re0">$matches</span><span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$i</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$return</span><span class="br0">&#91;</span><span class="st0">'options'</span><span class="br0">&#93;</span> = <span class="re0">$params</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> &nbsp;<span class="re0">$return</span>; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; &nbsp;* This functions takes an array that was split by __split_html_tag and puts it back together<br />
+&nbsp; &nbsp; &nbsp;*<br />
+&nbsp; &nbsp; &nbsp;* @param array $tag<br />
+&nbsp; &nbsp; &nbsp;* @return string<br />
+&nbsp; &nbsp; &nbsp;*/</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> __glue_html_tag<span class="br0">&#40;</span><span class="re0">$tag</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$params</span> = <span class="st0">&quot;&quot;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$tag</span><span class="br0">&#91;</span><span class="st0">'options'</span><span class="br0">&#93;</span> <span class="kw1">as</span> <span class="re0">$key</span> =&gt; <span class="re0">$val</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$params</span> = <span class="re0">$params</span>.<span class="st0">' '</span>.<span class="re0">$key</span>.<span class="st0">'=&quot;'</span>.<span class="re0">$val</span>.<span class="st0">'&quot;'</span>; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'&lt;'</span>.<span class="re0">$tag</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>.<span class="re0">$params</span>.<span class="st0">'&gt;'</span>.<span class="re0">$tag</span><span class="br0">&#91;</span><span class="st0">'innerHTML'</span><span class="br0">&#93;</span>.<span class="st0">'&lt;/'</span>.<span class="re0">$tag</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>.<span class="st0">'&gt;'</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>I hope some people now convert to Textile as I did, because I really think it's the way to go ; ). While it might be a little bit too complicated for Joe-Average I think it's really great for sites run by people that got tired of writing Html by hand, or fidling with bad WYSIWYG-editors. It's also very nice for all of you who feel dedicated to make W3C compliant pages.</p>
+<p>Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-32ec-4191-8edf-45c2cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftextile-a-personal-love-of-mine%3A480f4dd5-32ec-4191-8edf-45c2cbdd56cb &amp;title=Textile+-+A+personal+love+of+mine';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftextile-a-personal-love-of-mine%3A480f4dd5-32ec-4191-8edf-45c2cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftextile-a-personal-love-of-mine%3A480f4dd5-32ec-4191-8edf-45c2cbdd56cb&amp;title=Textile+-+A+personal+love+of+mine&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftextile-a-personal-love-of-mine%3A480f4dd5-32ec-4191-8edf-45c2cbdd56cb&amp;title=Textile+-+A+personal+love+of+mine';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/unix-is-love:4910acf5-4914-46b2-bd75-46954834cda3">Unix is love</a></li>
+							<li><a href="/posts/how-to-transform-html-to-textile-markup-the-cakephp-textilehelper-revisited:480f4dfe-a258-4b54-a31b-4933cbdd56cb">How To Transform HTML To Textile Markup - The CakePHP TextileHelper Revisited</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/textile-a-personal-love-of-mine:480f4dd5-32ec-4191-8edf-45c2cbdd56cb">16 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/textile-a-personal-love-of-mine:480f4dd5-32ec-4191-8edf-45c2cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dd7-8880-4da3-8835-4c14cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bd6aa9d350d7679bb86439b1565a759c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Scott&nbsp;						</strong>
+						<strong>said 
+						on Mar 28, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I was just wondering what would be the easiest way if any to utilize this in a CakePHP project? It sounds really nice and I would love to start using it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-76b0-4d31-bfc9-45edcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 28, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Scott,</p>
+<p>I think this would be perfect for a TextileHelper which should be fairly easy to make. Just create the helper and put a uses() in there to load the Textile class out of the vendors folder.</p>
+<p>If you need any help, let me know.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-dfac-4cbf-9a75-4ecdcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f4112f3023c643bf2f7b32c9c5dcfcba&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakebaker.wordpress.com" rel="nofollow">Daniel Hofstetter</a>						</strong>
+						<strong>said 
+						on Mar 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>There exists a textile helper on CakeForge: http://cakeforge.org/projects/textilehelper/. I don't know if it still works with the current version of CakePHP, but it shouldn't be that difficult to adapt the code.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-59d8-454f-977d-4c05cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hm, thx for the link dhofstet, I assume it's a good place to get going. But Scott, the Textile class I'm talking about above is not the "original" one. So if this helper is for the real version you are better of changing it to use the one I suggest since it has more features and less bugs ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-aa9c-434a-b169-47aacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bd6aa9d350d7679bb86439b1565a759c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Scott&nbsp;						</strong>
+						<strong>said 
+						on Apr 05, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks both of you, I will see what I can come up with. If I have any problems I will let you know.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-8aa8-4b70-8965-4c52cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1bc5798092c1a16a355db19ab50a1a7a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://frode.danielsen.net" rel="nofollow">Frode Danielsen</a>						</strong>
+						<strong>said 
+						on Apr 12, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I agree, Textile is a cool thing. But why would you want this "SoftHack"? You state a wonderful point about Textile, the fact that it can create perfectly valid XHTML - and then you want a hack which ruins this? The "target"-attribute is not allowed in XHTML 1.0 Strict (if you want Transitional or Frameset, you could just as well use HTML4). Furthermore, such choices should be up to the user imho. And even if you'd like to "force" the user into a separate window, use unobtrusive Javascript at least. And place a visual pointer for people so they may catch up on the behaviour instead of being annoyed with new windows popping up all around.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-ae1c-4ded-a09d-4198cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 12, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Frode Danielsen:<br />
+I agree with most of what you've said. But when a client demands features and pays me well for them, then this is what I do. If I do projects for myself or for clients who care about my oppinion, I stick with the standards ; ). But opening sites in new windows is important, since it raises your chance of people staying on your site when they are finished with the one you sent them to. You have to keep in mind that most of all users are unfamiliar with tabbed browsing and rarly open things in new windows on their own ...</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-4594-4abf-8d7b-4498cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8890876a8f21d58f2f53f9f6458facc2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.linkingarts.com/" rel="nofollow">Peter Jacobson</a>						</strong>
+						<strong>said 
+						on Apr 17, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I think you can address the valid code question pretty simply, just swapping out 'rel' for 'target' and 'external' for '_blank', then adding some JavaScript as in Kevin Yank's sitepoint article "New-Window Links in a Standards-Compliant World":http://www.sitepoint.com/article/standards-compliant-world</p>
+<p>I'm looking forward to trying out this helper, thanks for posting.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de0-8938-45a5-b7d1-40dfcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=40e14f9efc4e357c0835a83856355d42&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							mux&nbsp;						</strong>
+						<strong>said 
+						on Oct 08, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I guess you know that TextilePHP is licensed under GPL. So, you MUST release ALL the sources of all your webapps that use it under GPL as well, that's what GNU is about.</p>
+<p>If you want make profit and somewhat protect your customers (yeah, security through obscurity), then use Markdown licensed under BSD (and, yes, donate!).</p>
+<p>P.s. "Errors, fill name, e-mail" message sucks. When I press back in IE, all the text disappears. It's not, well, user friendly.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de0-9a4c-46ee-b15a-4766cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 09, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Uhm, I did not realize that back then. Well seems like I'll have to write my own parser one of these days - GPL sucks.</p>
+<p>About your comment system complained: It's wordpress - you get what you pay for. I'll switch to a custom made blog application soon. But meanwhile you should consider dumping IE ...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-97f0-4cf9-bc5a-4b58cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8e8e82507a9ed82ec269b3d0308b3be9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							jacmgr&nbsp;						</strong>
+						<strong>said 
+						on Jan 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thankx for the tip.  I started using textile for documentation pages.  Can;t figure out some things that maybe you already know. Are there easy way to make a link for a URL.<br />
+This works:</br><br />
+"http://www.example.com":http://www.example.com</br><br />
+But would like a way to leave off the first quoted URL?</br></p>
+<p>Second,<br />
+what about a cake controller/action type url</br><br />
+This doesn't work</br><br />
+"Edit This post":/post/edit/23</br><br />
+This works</br><br />
+"Edit This Post":http://www.example.com/post/edit/23</br></p>
+<p>Do you know of an easy way to use it without fully specifying the http?</p>
+<p>I searched, so probably not without modifying textile, byut I thought I would ask<br />
+John</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-7fc0-4537-b798-4dc8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8e8e82507a9ed82ec269b3d0308b3be9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							jacmgr&nbsp;						</strong>
+						<strong>said 
+						on Jan 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>My bad..the second part is not a problem!!  textile is handling those fine.  Seems like my page cache was on!!  Still would like to be able to type a URL and have a typed URL become a link.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-cbcc-4399-9242-4883cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>jacmgr:</p>
+<p>#1: No, I don't think you can leave off the first quoted url in Textile.<br />
+#2: No you'd definitely would need to modify Textile for this. Or, even better: Parse incomplete url's like in your example *before* you run the Textile parser over it. If you need to know how to do this, check out this paste:</br></p>
+<p>http://bin.cakephp.org/view/1033634933</p>
+<p>It's a light weight minimalist textile helper I've written to format status messages to the User I set in the Controller of one of my applications. This should help you to get started.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-05f4-4337-8893-4572cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a244c5adba0c677587a326781fcfc2f7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://google.com" rel="nofollow">Elepn</a>						</strong>
+						<strong>said 
+						on Feb 08, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-9bac-4428-9c9b-4b84cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://small-business-wus.blogspot.com/" rel="nofollow">Small Business</a>						</strong>
+						<strong>said 
+						on Mar 07, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p><strong>Small Business...</strong></p>
+<p>all about business...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-3034-4f86-a5c4-4e31cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://sexypussyworld.info/big-dick-sucking/big-dick-sucking_22.html" rel="nofollow">big dick sucking</a>						</strong>
+						<strong>said 
+						on Mar 17, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p><strong>big dick sucking...</strong></p>
+<p>abrikoskos 1092123 Reviews on big dick sucking....</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Things To Avoid In A Team-Programming Environment &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/things-to-avoid-in-a-team-programming-environment:480f4dfe-7890-4234-8979-40f4cbdd56cb">Things To Avoid In A Team-Programming Environment</a></h2>	<div class="posted-on">
+		<p>Posted on 26/6/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><strong>I have been working within a team of programmers directly within the same office for almost three months now. It's my first experience of such a nature considering my freelancing background. I am going to share with you, what things, in my opinion, one HAS TO avoid in such an environment.</strong></p>
+<h1>Putting Parse Errors Into The Version-Control-System</h1>
+<h2>The Problem</h2>
+<p>Yes of course, this should go without explanation. However, when you are in a rush for a deadline or the person above you is nitpicking or you simply have a bad day, it can happen - you check in parse errors. I have found myself checking in parse errors as well. It's just the desire to get it finally working (!) without thinking about possible consequences. With a test server set up this is usually not a problem. It doesn't improve your reputation among the team, though.</p>
+<h2>The Solution</h2>
+<p>Relax. Test everything before you check it in. Simply refresh your current test page to see if a parse error popped up. It only takes five seconds. Five very valuable seconds. </p>
+<p>If you find yourself having a bad day, relax even more before you check something in. I have found myself willing to be the fastest in feature completion sometimes. However, well tested, slowly-developed code is a lot more worthy in the longterm.</p>
+<h1>Undeliberate Code-Replacement</h1>
+<h2>The Problem</h2>
+<p>Sometimes you are getting conflicts within your version control system, but the person you need to ask which code fragment is the correct one is in a meeting or out to lunch. What do you do? You replace the code with your good will so you can continue working, right? Wrong!</p>
+<p>This is again one of those things that only bring a quickfix for your situation, but result in pure malice in the longterm.</p>
+<h2>The Solution</h2>
+<p>Relax. Work on something else. Blog a bit ;) or work on another component. Of course in a tightly coupled system this may be a problem, but you always can do something else and wait for the person to check the conflict. The bad news is that conflicts should not happen in the first place as they are a result of miss-communication within the team. However, in a non-OOP environments it tends to happen a lot more often.</p>
+<h1>Checking In Untested Code</h1>
+<h2>The Problem</h2>
+<p>Being in a rush for a deadline you forget to test your code thoroughly or even forget to write unit tests for it alltogether. Or, even worse, you are not addicted to writing tests.</p>
+<h2>The Solution</h2>
+<p>Make an appointment with yourself to write unit tests. This appointment is just as important as the upcoming meeting with your CEO. Write them. Simple!</p>
+<p>They do not need to be under version control. They can be on your local machine and that's it. They just need to be there somewhere and get used.</p>
+<h1>Wrong Assertions Or Better "What Does It Need To Do Exactly?"</h1>
+<h2>The Problem</h2>
+<p>You find your own code (components) not returning what is expected by the clients (your colleagues) regularly. This is due to wrong assertions and unclear communication in the phase where requirements for the new code are written down.</p>
+<h2>The Solution</h2>
+<p>Well there is no ultimate solution to this, as it boils down to communication problems. The only thing I can suggest is that you think about it from an engineer's perspective: What does come in and what should go out? In which format? What should happen when the wrong thing goes in?</p>
+<p>It's these things that make <a href="http://php-coding-practices.com/category/test-driven-development/" title="Test-driven Development">Test-driven Development</a> so successful. TDD <strong>forces you</strong> think about this stuff a lot more thoroughly.</p>
+<h1>No Handling Of Exceptional Behavior</h1>
+<h2>The Problem</h2>
+<p>This goes hands in hands with the last one. You find yourself not handling exceptional behavior (the preconditions for your code are not met) on a regular basis.</p>
+<h2>The Solution</h2>
+<p>Make it a quality standard that everything you write takes care of most if not all circumstances possible in your application. If you fetch currency rates from your database and your application's output greatly depends on it, this is extremely critical stuff. Of course, the fetching from the database may go wrong, as the table may be <a href="http://dev.mysql.com/doc/refman/4.1/en/table-maintenance.html">crashed</a>. You at least need to send a critical log email to yourself if this happens. If it happens, show a friendly page to your visitors explaining that something went wrong, without telling them the truth.</p>
+<p>If you find yourself developing an application where you lose the overview about in which state the app is in, rewrite it. Simple. The risks of security issues, slow development times etc. far outweigh the time lost without new features in most cases.</p>
+<h1>Unclear Documentation Within The Code</h1>
+<h2>The Problem</h2>
+<p>Your code can be understood by you easily. However, your teammates struggle understanding your code. Your code documentation is wrong, is based on wrong assertions or is simply unclear.</p>
+<h2>The Solution</h2>
+<p>Keep your code documentation up to date with your thoughts. If you write good code that speaks for itself, less documentation is needed, which is a good thing. Other than that:</p>
+<ul>
+<li>Make it a quality standard that you use <a href="http://www.google.de/url?sa=t&ct=res&cd=1&url=http%3A%2F%2Fwww.phpdoc.org%2F&ei=PbyARqXHDIugnQOn_82bAw&usg=AFQjCNES71s9eQNI1xADTUxvpmbFJHfJwA&sig2=W-UGYOCLMyixoWCc5lNJlw">PHP Doc Comments</a> for every little class, method, function or whatever.</li>
+<li>Document the uneasy code fragments as well. Do not explain what the code does, but explain why it does what it does.</li>
+<li>Regularly ask your teammates if they understand your code. Do this especially when their code depends on yours.</li>
+</ul>
+<h1>Finding The One To Blame</h1>
+<h2>The Problem</h2>
+<p>Your team spends way too much time searching through revision logs to find out whom of the team checked in crappy code that suffers from one or more of things from above.</p>
+<h2>The Solution</h2>
+<p>Do not spend your time doing this, it's way too expensive. If everybody works for everybody, the code improves over time to a great extent. We are only humans and mistakes happen. Things in our family and friends may cause us to be unrelaxed and uncomfortable. This may ultimately cause us to "have a bad day", a definite problem from a programmer's point of you. Also some colleagues may be young and have less experience in a team environment (like me :)). Working closely together, building good relationships and "allowing" people to do mistakes eliminates the problems.</p>
+<h1>Conclusion</h1>
+<p>I have outlined only some problems that regularly occur in team environments here. However, I think they are some of the most important ones and ones that happen in many teams.</p>
+<p>The ultimate thing to prevent these problems is to relax and think about what you are doing. Program consciously so to speak. :) Then sit together with your team, make up your mind with regards to how you can improve the overall team culture and things will improve greatly.</p>
+<p>Have a good one!<br />
+Tim<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-7890-4234-8979-40f4cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthings-to-avoid-in-a-team-programming-environment%3A480f4dfe-7890-4234-8979-40f4cbdd56cb &amp;title=Things+To+Avoid+In+A+Team-Programming+Environment';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthings-to-avoid-in-a-team-programming-environment%3A480f4dfe-7890-4234-8979-40f4cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthings-to-avoid-in-a-team-programming-environment%3A480f4dfe-7890-4234-8979-40f4cbdd56cb&amp;title=Things+To+Avoid+In+A+Team-Programming+Environment&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthings-to-avoid-in-a-team-programming-environment%3A480f4dfe-7890-4234-8979-40f4cbdd56cb&amp;title=Things+To+Avoid+In+A+Team-Programming+Environment';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/programming-psychology-ii-private-methods:481ed862-b0d8-4a0e-9247-165c4834cda3">Programming Psychology II: Private methods </a></li>
+							<li><a href="/posts/programming-psychology-return-home-early:4811de9f-ae28-49c2-a7dc-2f154834cda3">Programming Psychology - Return home early</a></li>
+							<li><a href="/posts/things-to-come:480f4dd6-1fdc-40bc-abb1-4b8ecbdd56cb">Things to come</a></li>
+							<li><a href="/posts/the-linguistics-of-programming:48cfa8e1-5298-47c0-bf46-363d4834cda3">The Linguistics of Programming</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/things-to-avoid-in-a-team-programming-environment:480f4dfe-7890-4234-8979-40f4cbdd56cb">2 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/things-to-avoid-in-a-team-programming-environment:480f4dfe-7890-4234-8979-40f4cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4e04-bd04-44a5-9926-47c5cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=96a06bc304b1b14c667c494809fde137&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.sourceguardian.com" rel="nofollow">PHP Encoder</a>						</strong>
+						<strong>said 
+						on Feb 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great article! These tips are not only for PHP developers, they apply for any other language as well.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e04-f248-410c-94d5-4c7ecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Feb 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thank you. I am glad you like it. : )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

@@ -1,0 +1,503 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Migrating from WordPress to CakePHP &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/migrating-from-wordpress-to-cakephp:480f4dd6-ef28-4881-b74f-4185cbdd56cb">Migrating from WordPress to CakePHP</a></h2>	<div class="posted-on">
+		<p>Posted on 24/9/07 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>I'm currently working on migrating my blog from WordPress to a light-weight CakePHP replacement that I hope to enhance and customize to my liking easily in future. Its not like WordPress has treated me badly, if it wasn't around I'd probably never have started this blog and never gotten to where I am right now. While I'm giving out kudos, I'd also like to mention that you, the readers of this blog have been an amazingly good audience by sharing your knowledge and opinions on PHP programming with me, while also being very encouraging about the whole thing. I really feel bad when I don't get to blog, so time to do it again : ).</p>
+<p>In this post I'm simply going to throw out some snippets to show how I'm currently approaching the whole process in order to give both my insight into what works and what doesn't, while also hoping to get some people to share their insight into migrating legacy apps to CakePHP.</p>
+<p>So one of the first things I started was to do a new layout and come up with the visual screen elements that I want to integrate. The next thing I did (and still am doing) is to start a little migration script using the new Cake 1.2 console to get my data moved in the new db schema. I haven't finalized the new schema yet and kind of make it up as I go, run a migration and then implement the functionality to show the data currently available. So far I've been working on migrating the wp_posts and wp_comments table. The first thing that hit me was that WordPress is not good about conventions. For example the primary key on my wp_posts table is 'ID' while it is 'comment_ID' on the comments table. I soon realized that one of the biggest tasks would be to map old Wp table fields to ones that have different names in my new CakePHP blog. But before I go in too much detail, I'll paste the migration script I currently have and then explain it a little further:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<br />
+uses<span class="br0">&#40;</span><span class="st0">'model'</span>.DS.<span class="st0">'model'</span><span class="br0">&#41;</span>;<br />
+<span class="kw2">class</span> WpMigrationShell <span class="kw2">extends</span> Shell <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$uses</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="st0">'WpPost'</span><br />
+&nbsp; &nbsp; , <span class="st0">'WpComment'</span><br />
+&nbsp; <span class="br0">&#41;</span>;<br />
+&nbsp; <br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$times</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <br />
+&nbsp; <span class="kw2">function</span> initialize<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">times</span><span class="br0">&#91;</span><span class="st0">'start'</span><span class="br0">&#93;</span> = <a href="http://www.php.net/microtime"><span class="kw3">microtime</span></a><span class="br0">&#40;</span><span class="kw2">true</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; parent::<span class="me2">initialize</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; <span class="kw2">function</span> main<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">'Migrating WordPress posts ...'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">WpPost</span>-&gt;<span class="me1">migrate</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">'Migrating WordPress comments ...'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">WpComment</span>-&gt;<span class="me1">migrate</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">'Populating WordPress posts counter cache ...'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">WpPost</span>-&gt;<span class="me1">populateCounterCache</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">times</span><span class="br0">&#91;</span><span class="st0">'end'</span><span class="br0">&#93;</span> = <a href="http://www.php.net/microtime"><span class="kw3">microtime</span></a><span class="br0">&#40;</span><span class="kw2">true</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$duration</span> = <a href="http://www.php.net/round"><span class="kw3">round</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">times</span><span class="br0">&#91;</span><span class="st0">'end'</span><span class="br0">&#93;</span> - <span class="re0">$this</span>-&gt;<span class="me1">times</span><span class="br0">&#91;</span><span class="st0">'start'</span><span class="br0">&#93;</span>, <span class="nu0">2</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">hr</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">'Migration took '</span>.<span class="re0">$duration</span>.<span class="st0">' seconds.'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">class</span> WpMigrationModel <span class="kw2">extends</span> Model<span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$useDbConfig</span> = <span class="st0">'wordpress'</span>;<br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$newModel</span> = <span class="kw2">null</span>;<br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$map</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <br />
+&nbsp; <span class="kw2">function</span> migrate<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">newModel</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">newModel</span> = <a href="http://www.php.net/substr"><span class="kw3">substr</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">name</span>, <span class="nu0">2</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; loadModel<span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">newModel</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$Model</span> = <span class="kw2">new</span> <span class="re0">$this</span>-&gt;<span class="me1">newModel</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$Model</span>-&gt;<span class="me1">execute</span><span class="br0">&#40;</span><span class="st0">'TRUNCATE '</span>.<span class="re0">$Model</span>-&gt;<span class="me1">table</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$methods</span> = <a href="http://www.php.net/get_class_methods"><span class="kw3">get_class_methods</span></a><span class="br0">&#40;</span><span class="re0">$this</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$keys</span> = <a href="http://www.php.net/array_keys"><span class="kw3">array_keys</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">map</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$idKey</span> = <span class="re0">$keys</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$oldEntries</span> = <span class="re0">$this</span>-&gt;<span class="me1">findAll</span><span class="br0">&#40;</span><span class="kw2">null</span>, <span class="re0">$keys</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$oldEntries</span> <span class="kw1">as</span> <span class="re0">$oldEntry</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$this</span>-&gt;<span class="me1">filter</span><span class="br0">&#40;</span><span class="re0">$oldEntry</span><span class="br0">&#91;</span><span class="re0">$this</span>-&gt;<span class="me1">name</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">continue</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$id</span> = <span class="re0">$oldEntry</span><span class="br0">&#91;</span><span class="re0">$this</span>-&gt;<span class="me1">name</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$idKey</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$Model</span>-&gt;<span class="me1">create</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">map</span> <span class="kw1">as</span> <span class="re0">$oldField</span> =&gt; <span class="re0">$newField</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$value</span> = <span class="re0">$oldEntry</span><span class="br0">&#91;</span><span class="re0">$this</span>-&gt;<span class="me1">name</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$oldField</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$migrateFct</span> = <span class="st0">'migrate'</span>.Inflector::<span class="me2">camelize</span><span class="br0">&#40;</span><span class="re0">$newField</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/in_array"><span class="kw3">in_array</span></a><span class="br0">&#40;</span><span class="re0">$migrateFct</span>, <span class="re0">$methods</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$value</span> = <span class="re0">$this</span>-&gt;<span class="br0">&#123;</span><span class="re0">$migrateFct</span><span class="br0">&#125;</span><span class="br0">&#40;</span><span class="re0">$value</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$Model</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="re0">$newField</span>, <span class="re0">$value</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$Model</span>-&gt;<span class="me1">save</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/die"><span class="kw3">die</span></a><span class="br0">&#40;</span><span class="st0">'Could not save '</span>.<span class="re0">$this</span>-&gt;<span class="me1">newModel</span>.<span class="st0">' #'</span>.<span class="re0">$id</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; <span class="kw2">function</span> filter<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">true</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; <span class="kw2">function</span> migrateText<span class="br0">&#40;</span><span class="re0">$text</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/utf8_decode"><span class="kw3">utf8_decode</span></a><span class="br0">&#40;</span><span class="re0">$text</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">class</span> WpPost <span class="kw2">extends</span> WpMigrationModel<span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$useTable</span> = <span class="st0">'posts'</span>;<br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$map</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="st0">'ID'</span> =&gt; <span class="st0">'id'</span><br />
+&nbsp; &nbsp; , <span class="st0">'post_title'</span> =&gt; <span class="st0">'title'</span><br />
+&nbsp; &nbsp; , <span class="st0">'post_content'</span> =&gt; <span class="st0">'text'</span><br />
+&nbsp; &nbsp; , <span class="st0">'post_status'</span> =&gt; <span class="st0">'published'</span><br />
+&nbsp; <span class="br0">&#41;</span>;<br />
+&nbsp; <br />
+&nbsp; <span class="kw2">function</span> populateCounterCache<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$Post</span> = <span class="kw2">new</span> Post<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$Post</span>-&gt;<span class="me1">recursive</span> = <span class="nu0">-1</span>;<br />
+&nbsp; &nbsp; <span class="re0">$Post</span>-&gt;<span class="me1">Comment</span>-&gt;<span class="me1">recursive</span> = <span class="nu0">-1</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$posts</span> = <span class="re0">$Post</span>-&gt;<span class="me1">findAll</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'id'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$posts</span> <span class="kw1">as</span> <span class="re0">$post</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$Post</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="re0">$post</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$comment_count</span> = <span class="re0">$Post</span>-&gt;<span class="me1">Comment</span>-&gt;<span class="me1">findCount</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'post_id'</span> =&gt; <span class="re0">$Post</span>-&gt;<span class="me1">id</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$comment_count</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$Post</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><a href="http://www.php.net/compact"><span class="kw3">compact</span></a><span class="br0">&#40;</span><span class="st0">'comment_count'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$Post</span>-&gt;<span class="me1">save</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="kw2">function</span> filter<span class="br0">&#40;</span><span class="re0">$item</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/in_array"><span class="kw3">in_array</span></a><span class="br0">&#40;</span><span class="re0">$item</span><span class="br0">&#91;</span><span class="st0">'post_status'</span><span class="br0">&#93;</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'publish'</span>, <span class="st0">'draft'</span>, <span class="st0">'private'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">true</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="kw2">function</span> migratePublished<span class="br0">&#40;</span><span class="re0">$value</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$value</span> == <span class="st0">'publish'</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">true</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">class</span> WpComment <span class="kw2">extends</span> WpMigrationModel<span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$useTable</span> = <span class="st0">'comments'</span>;<br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$map</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="st0">'comment_ID'</span> =&gt; <span class="st0">'id'</span><br />
+&nbsp; &nbsp; , <span class="st0">'comment_post_ID'</span> =&gt; <span class="st0">'post_id'</span><br />
+&nbsp; &nbsp; , <span class="st0">'comment_author'</span> =&gt; <span class="st0">'author_name'</span><br />
+&nbsp; &nbsp; , <span class="st0">'comment_author_email'</span> =&gt; <span class="st0">'author_email'</span><br />
+&nbsp; &nbsp; , <span class="st0">'comment_author_url'</span> =&gt; <span class="st0">'author_url'</span><br />
+&nbsp; &nbsp; , <span class="st0">'comment_content'</span> =&gt; <span class="st0">'text'</span><br />
+&nbsp; <span class="br0">&#41;</span>;<br />
+&nbsp; <br />
+&nbsp; <span class="kw2">function</span> filter<span class="br0">&#40;</span><span class="re0">$item</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/static"><span class="kw3">static</span></a> <span class="re0">$Post</span>;<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$Post</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$Post</span> = <span class="kw2">new</span> Post<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$Post</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'id'</span>, <span class="re0">$item</span><span class="br0">&#91;</span><span class="st0">'comment_post_ID'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$Post</span>-&gt;<span class="me1">exists</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; <span class="kw2">function</span> migrateAuthorName<span class="br0">&#40;</span><span class="re0">$name</span><span class="br0">&#41;</span><span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/utf8_decode"><span class="kw3">utf8_decode</span></a><span class="br0">&#40;</span><span class="re0">$name</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span>
+</div>
+<p>Alright there is quite some stuff going on here so let me begin with the basics. I've decided to give all WordPress tables their own model which I prefix with 'Wp' to not overlap with the models I'm using in the new CakePHP application. Those 'Wp' models all extend a common base model which I call the WpMigrationModel. This is because I found that a lot of functionality is shared across them, especially things like mapping old 'Wp' fields to new fields for my CakePHP models as well as filtering out items I'm not interested anymore. All of this is happening in the WpMigrationModel::migrate. Another neat thing I built in is that while the algorithm loops through the fields of my new cake models, it also looks for a function <NewModel>::migrate<NewField>. If its found then the function is applied as a "filter" to the old value in WordPress. As you can see, I'm using this to convert my latin1 encoded (wtf) fields to the new utf8 encoding. I also migrate a wp varchar field called 'post_status' to a more sane / simplified tinyint field called 'published'. Once the posts / comments are migrated I finally loop through all posts again in order to populate a counter cache field called 'comment_count'. Oh and before I forget, during the migration of the post comments, I check if those post_id's are still around. This is neccessary b/c no FK restrictions were used by WordPress which lead to some lonely data islands cluttering the db.</p>
+<p>Anyway, this of course is just the beginning, but its already most of the data I'm really interested in migrating - I don't mind loosing a couple meta / whatever fields. In a next post I'll show how to replicate some legacy WordPress logic in my new cake blog. For now I've got to stop as my plane to San Francisco from the Atlanta airport is boarding ; ).</p>
+<p>-- Felix Geisendörfer aka the_undefined</p>
+<p>PS: Typos may be corrected when I get wifi again ; ).<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-ef28-4881-b74f-4185cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmigrating-from-wordpress-to-cakephp%3A480f4dd6-ef28-4881-b74f-4185cbdd56cb &amp;title=Migrating+from+WordPress+to+CakePHP';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmigrating-from-wordpress-to-cakephp%3A480f4dd6-ef28-4881-b74f-4185cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmigrating-from-wordpress-to-cakephp%3A480f4dd6-ef28-4881-b74f-4185cbdd56cb&amp;title=Migrating+from+WordPress+to+CakePHP&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmigrating-from-wordpress-to-cakephp%3A480f4dd6-ef28-4881-b74f-4185cbdd56cb&amp;title=Migrating+from+WordPress+to+CakePHP';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/a-solution-for-e-mail-sending-in-cakephp:480f4dd5-b500-4bdc-a6c5-4ef6cbdd56cb">A solution for e-mail sending in CakePHP</a></li>
+							<li><a href="/posts/cakephp-goes-10:480f4dd5-9008-4af0-b2e7-4c46cbdd56cb">CakePHP goes 1.0!</a></li>
+							<li><a href="/posts/learning-from-the-cakephp-source-code-part-ii:480f4dd6-57fc-4715-8709-439acbdd56cb">Learning from the CakePHP source code - Part II</a></li>
+							<li><a href="/posts/10-days-of-free-dessert-cakephp-tips:480f4dd5-1da4-4248-91f4-4043cbdd56cb">10 Days of free Dessert! (CakePHP Tips)</a></li>
+							<li><a href="/posts/how-to-save-half-a-second-on-every-request-of-your-cakephp-app:49a69610-8648-4d65-815d-754c4834cda3">How To Save Half A Second On Every CakePHP Request</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/handling-database-connection-errors-in-cakephp:480f4dd5-9570-421a-a04d-43cdcbdd56cb">Handling database connection errors in CakePHP</a></li>
+							<li><a href="/posts/4-cakephp-tricks:4811ad82-32dc-4a38-bc10-36304834cda3">Two CakePHP tricks</a></li>
+							<li><a href="/posts/migrating-a-database-table-for-use-with-the-cakephp-sluggable-behavior:4a2cee35-0e24-4d73-a545-3f514834cda3">Migrating a Database Table for use with the CakePHP Sluggable Behavior</a></li>
+							<li><a href="/posts/unit-testing-in-cakephp-part-1---introduction-to-unit-testing:48102610-c5d0-4398-a010-76974834cda3">Unit Testing in CakePHP Part 1 - Introduction to Unit Testing</a></li>
+							<li><a href="/posts/job-senior-cakephp-position-with-english360com:4a3bcdf2-7b28-405f-bbe1-7fb54834cda3">[JOB] Senior CakePHP position with english360.com</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/migrating-from-wordpress-to-cakephp:480f4dd6-ef28-4881-b74f-4185cbdd56cb">11 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/migrating-from-wordpress-to-cakephp:480f4dd6-ef28-4881-b74f-4185cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4def-07b4-485b-8be0-49e3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.developercast.com/2007/09/24/felix-geisendorfers-blog-migrating-from-wordpress-to-cakephp/" rel="nofollow">developercast.com &raquo; Felix Geisendorfer&#8217;s Blog: Migra</a>						</strong>
+						<strong>said 
+						on Sep 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Felix Geisendorfer is in the process of moving his blog from Wordpress to a customized &#8220;light-weight CakePHP replacement&#8221; he&#8217;s developing to be extended later on. His post shares some of the tips he found so far.   In this post I&#8217;m simply going to throw out some snippets to show how I&#8217;m currently approaching the whole process in order to give both my insight into what works and what doesn&#8217;t, while also hoping to get some people to share their insight into migrating legacy apps to CakePHP. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4def-092c-45c8-b4a6-4be1cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0361f5281f88c5af1690dc551a5b9565&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.aikon.com.ve/" rel="nofollow">Joaquin Windmüller</a>						</strong>
+						<strong>said 
+						on Sep 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey, I've been thinking on doing this for a while.</p>
+<p>The thing is that wordpress is a great software (and now with svn updates much more) and the little time I have free have kept me from trying anything. I don't know if you intend to have a plugin interface like the one wordpress has, it would be nice.</p>
+<p>Jonathan Snook's blog runs on cakephp too, so you're not the only one.</p>
+<p>I'm really interested to see what you come up with, and also to help if you need any.</p>
+<p>Good Luck.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4def-048c-40fe-b62b-4525cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e27b8a30eb8373d750ae077674799941&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://lorelei.femeref.com" rel="nofollow">femeref</a>						</strong>
+						<strong>said 
+						on Sep 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Eventhough it's in Dutch and not everything is working yet (hence the strikethroughs here and there), my blog runs on cakePHP too.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4def-9c48-4b4a-9bb1-4277cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=08e5daf0465981e1b2818c8807ebe2c9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://r8.com.ua" rel="nofollow">Sergey Storchay</a>						</strong>
+						<strong>said 
+						on Sep 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>He-he =)<br />
+I'm allready there. And extremely happy  about it.</br><br />
+Now I'm working on trackbacks and XML-RPC =)</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df0-989c-42ce-b41b-4ddbcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Joaquin: What I'll do is to set up the new blog on my dev server pretty soon and invite everybody who is interested in checking it out and trying it out. The data on there will be migrated from the "real" blog every hour or so using a cron job so the comments made on the new one will not be permanent but good enough for testing purposes.</p>
+<p>-- Felix</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df0-e5bc-4c6b-b043-4803cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8185c9ddb4f67c42a558bfe5557b9eea&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.pseudocoder.com" rel="nofollow">Matt Curry</a>						</strong>
+						<strong>said 
+						on Sep 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Another approach, which I did for a client recently, is to integrate WordPress into CakePHP.  I wish I could publish the code, but it wasn't all that hard.  </p>
+<p>Basically I dropped an installation of WordPress into Cake's webroot and did a normal install.  Then I altered wp-config.php to pull in database settings from Cake's config/database.php.  Then I made a customized wordpress template that pulls in a cake layout, essentially rendering the blog as the content_for_layout.  </p>
+<p>All the WordPress functionality (posts, trackbacks, pings, comments, pluggins...) work as normal.  The only negative is having a separate admin area.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df0-ca08-4d92-a3ef-4e68cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Matt: No I want to see no WordPress around anymore. I had a good time with it and this blog wouldn't exist if it wasn't for WordPress, but its time to move on ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df0-d2e8-4860-8411-4396cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=80acb818826f70823d6afb30d70fb5b9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://sf.jogger.pl" rel="nofollow">sf devblog</a>						</strong>
+						<strong>said 
+						on Oct 02, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Why not code igniter ? ;)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df0-84f8-477d-ac54-43eccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 02, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@sf devblog: Try CakePHP if you want to find out ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-481066a9-e248-4d71-9a47-1efb4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5bf3d56fbce3df494d829d4a4e860521&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://klevo.sk" rel="nofollow">klevo</a>						</strong>
+						<strong>said 
+						on Apr 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Felix--I am doing something similar at <a rel="nofollow" href="http://wf.klevo.sk."> It's what I am starting to use instead of Wordpress for my personal and client work.</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49ce93a2-b914-40ba-8b83-4fa74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c1dedcdf007e489edca438dbc9c442d7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							RaiulBaztepo&nbsp;						</strong>
+						<strong>said 
+						on Mar 28, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hello!<br />
+Very Interesting post! Thank you for such interesting resource!</br><br />
+PS: Sorry for my bad english, I'v just started to learn this language ;)</br><br />
+See you!</br><br />
+Your, Raiul Baztepo</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

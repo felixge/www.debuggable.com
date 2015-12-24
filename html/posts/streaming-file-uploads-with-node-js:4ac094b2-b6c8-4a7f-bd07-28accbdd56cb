@@ -1,0 +1,704 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Streaming file uploads with node.js &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/streaming-file-uploads-with-node-js:4ac094b2-b6c8-4a7f-bd07-28accbdd56cb">Streaming file uploads with node.js</a></h2>	<div class="posted-on">
+		<p>Posted on 28/9/09 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><strong>Update:</strong> I just updated the code so it works with node v0.1.18.</p>
+<p>Not excited by <a href="http://debuggable.com/posts/node_js:4ab4d9d7-b788-41d4-85c0-1b51cbdd56cb">hello world</a> in node.js? No problem. </p>
+<p>Let's say you are a <a href="http://transload.it/">startup focusing on upload technology</a> and you want the maximum level of control for your file uploads. In our case that means having the ability to directly interact with the multipart data stream as it comes in (so we can abort the upload if something isn't right, - beats the hell out of letting the user wait an hour to tell him after the upload has finished).</p>
+<p>Here is a complete example on how to accomplish this in node.js (you'll need the bleeding edge git version):</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> http = require<span class="br0">&#40;</span><span class="st0">'http'</span><span class="br0">&#41;</span>;<br />
+<span class="kw2">var</span> multipart = require<span class="br0">&#40;</span><span class="st0">'multipart'</span><span class="br0">&#41;</span>;<br />
+<span class="kw2">var</span> sys = require<span class="br0">&#40;</span><span class="st0">'sys'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw2">var</span> server = http.<span class="me1">createServer</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>req, res<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">switch</span> <span class="br0">&#40;</span>req.<span class="me1">uri</span>.<span class="me1">path</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">case</span> <span class="st0">'/'</span>:<br />
+&nbsp; &nbsp; &nbsp; display_form<span class="br0">&#40;</span>req, res<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="kw1">case</span> <span class="st0">'/upload'</span>:<br />
+&nbsp; &nbsp; &nbsp; upload_file<span class="br0">&#40;</span>req, res<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="kw2">default</span>:<br />
+&nbsp; &nbsp; &nbsp; show_404<span class="br0">&#40;</span>req, res<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+server.<span class="me1">listen</span><span class="br0">&#40;</span><span class="nu0">8000</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw2">function</span> display_form<span class="br0">&#40;</span>req, res<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; res.<span class="me1">sendHeader</span><span class="br0">&#40;</span><span class="nu0">200</span>, <span class="br0">&#123;</span><span class="st0">'Content-Type'</span>: <span class="st0">'text/html'</span><span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+&nbsp; res.<span class="me1">sendBody</span><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="st0">'&lt;form action=&quot;/upload&quot; method=&quot;post&quot; enctype=&quot;multipart/form-data&quot;&gt;'</span>+<br />
+&nbsp; &nbsp; <span class="st0">'&lt;input type=&quot;file&quot; name=&quot;upload-file&quot;&gt;'</span>+<br />
+&nbsp; &nbsp; <span class="st0">'&lt;input type=&quot;submit&quot; value=&quot;Upload&quot;&gt;'</span>+<br />
+&nbsp; &nbsp; <span class="st0">'&lt;/form&gt;'</span><br />
+&nbsp; <span class="br0">&#41;</span>;<br />
+&nbsp; res.<span class="me1">finish</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">function</span> upload_file<span class="br0">&#40;</span>req, res<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; req.<span class="me1">setBodyEncoding</span><span class="br0">&#40;</span><span class="st0">'binary'</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; <span class="kw2">var</span> stream = <span class="kw2">new</span> multipart.<span class="me1">Stream</span><span class="br0">&#40;</span>req<span class="br0">&#41;</span>;<br />
+&nbsp; stream.<span class="me1">addListener</span><span class="br0">&#40;</span><span class="st0">'part'</span>, <span class="kw2">function</span><span class="br0">&#40;</span>part<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; part.<span class="me1">addListener</span><span class="br0">&#40;</span><span class="st0">'body'</span>, <span class="kw2">function</span><span class="br0">&#40;</span>chunk<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw2">var</span> progress = <span class="br0">&#40;</span>stream.<span class="me1">bytesReceived</span> / stream.<span class="me1">bytesTotal</span> * <span class="nu0">100</span><span class="br0">&#41;</span>.<span class="me1">toFixed</span><span class="br0">&#40;</span><span class="nu0">2</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw2">var</span> mb = <span class="br0">&#40;</span>stream.<span class="me1">bytesTotal</span> <span class="re0">/ <span class="nu0">1024</span> /</span> <span class="nu0">1024</span><span class="br0">&#41;</span>.<span class="me1">toFixed</span><span class="br0">&#40;</span><span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; &nbsp; sys.<span class="kw3">print</span><span class="br0">&#40;</span><span class="st0">&quot;Uploading &quot;</span>+mb+<span class="st0">&quot;mb (&quot;</span>+progress+<span class="st0">&quot;%)<span class="es0">\0</span>15&quot;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="co1">// chunk could be appended to a file if the uploaded file needs to be saved</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+&nbsp; stream.<span class="me1">addListener</span><span class="br0">&#40;</span><span class="st0">'complete'</span>, <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; res.<span class="me1">sendHeader</span><span class="br0">&#40;</span><span class="nu0">200</span>, <span class="br0">&#123;</span><span class="st0">'Content-Type'</span>: <span class="st0">'text/plain'</span><span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; res.<span class="me1">sendBody</span><span class="br0">&#40;</span><span class="st0">'Thanks for playing!'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; res.<span class="me1">finish</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; sys.<span class="me1">puts</span><span class="br0">&#40;</span><span class="st0">&quot;<span class="es0">\n</span>=&gt; Done&quot;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">function</span> show_404<span class="br0">&#40;</span>req, res<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; res.<span class="me1">sendHeader</span><span class="br0">&#40;</span><span class="nu0">404</span>, <span class="br0">&#123;</span><span class="st0">'Content-Type'</span>: <span class="st0">'text/plain'</span><span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+&nbsp; res.<span class="me1">sendBody</span><span class="br0">&#40;</span><span class="st0">'You r doing it rong!'</span><span class="br0">&#41;</span>;<br />
+&nbsp; res.<span class="me1">finish</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>The code is rather straight forward. First of all we include the multipart.js parser which is a library that has just been added to node.js.</p>
+<p>Next we create a server listening on port 8000 that dispatches incoming requests to one of our 3 functions: display_form, upload_file or show_404. Again, very straight forward.</p>
+<p><strong>display_form</strong> serves a very short (and invalid) piece of HTML that will render a file upload form with a submit button. You can get to it by running the example (via: node uploader.js) and pointing your browser to http://localhost:8000/.</p>
+<p><strong>upload_file</strong> kicks in as soon as you select a file and hit the submit button. It tells the request object to expect binary data and then passes the work on to the multipart Stream parser. The result is a new stream object that emits two kinds of events: 'part' and 'complete'. 'part' is called whenever a new element is found within the multipart stream, you can find all the information about it by looking at  the first argument's headers property. In order to get the actual contents of this part we attach a 'body' listener to it, which gets called for each chunk of bytes getting uploaded. In our example we just use this event to render a progress indicator in our command line, but we could also append this chunk to a file which would eventually become the entire file as uploaded from the browser. Finally the 'complete' event sends a response to the browser indicating the file has been uploaded.</p>
+<p><strong>show_404</strong> is handling all unknown urls by returning an error response.</p>
+<p>As you can see, the entire process is pretty simple, yet gives you a ton of control. You can also easily use this technique to show an AJAX progress bar for the upload to your users. The multipart parser also works with non-HTTP requests, just pass it the {boundary: '...'} option into the constructor and use steam.write() to pass it some data to parse. Check out the <a href="http://github.com/ry/node/blob/master/lib/multipart.js">source of the parser</a> if you're curious how it works internally.</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4ac094b2-b6c8-4a7f-bd07-28accbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fstreaming-file-uploads-with-node-js%3A4ac094b2-b6c8-4a7f-bd07-28accbdd56cb &amp;title=Streaming+file+uploads+with+node.js';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fstreaming-file-uploads-with-node-js%3A4ac094b2-b6c8-4a7f-bd07-28accbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fstreaming-file-uploads-with-node-js%3A4ac094b2-b6c8-4a7f-bd07-28accbdd56cb&amp;title=Streaming+file+uploads+with+node.js&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fstreaming-file-uploads-with-node-js%3A4ac094b2-b6c8-4a7f-bd07-28accbdd56cb&amp;title=Streaming+file+uploads+with+node.js';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li>
+							<li><a href="/posts/parsing-a-form-in-node-js-1:4b0bff13-4244-4ebc-8455-4975cbdd56cb">Parsing form data with node.js</a></li>
+							<li><a href="/posts/node-js-dealing-with-uncaught-exceptions:4c933d54-1428-443c-928d-4e1ecbdd56cb">node.js - Dealing with uncaught exceptions </a></li>
+							<li><a href="/posts/understanding-node-js:4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb">Understanding node.js</a></li>
+							<li><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/unit-testing-with-node-js:4b647d40-34e4-435a-a880-3b04cbdd56cb">Unit testing with node.js</a></li>
+							<li><a href="/posts/dessert-5-keep-a-custom-configuration-file:480f4dd5-6ee8-40ab-a6f0-413bcbdd56cb">Dessert #5 - Keep a custom configuration file</a></li>
+							<li><a href="/posts/node_js:4ab4d9d7-b788-41d4-85c0-1b51cbdd56cb">node.js</a></li>
+							<li><a href="/posts/an-ajax-file-upload-progressbar:480f4dd5-ec84-4f60-b69f-470bcbdd56cb">An Ajax file upload progressbar</a></li>
+							<li><a href="/posts/streaming-utf-8-with-node-js:4bf28e8b-a290-432f-a222-11c1cbdd56cb">Streaming UTF-8 (with node.js)</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/streaming-file-uploads-with-node-js:4ac094b2-b6c8-4a7f-bd07-28accbdd56cb">27 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/streaming-file-uploads-with-node-js:4ac094b2-b6c8-4a7f-bd07-28accbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4ac4c7c6-510c-4f10-b9bb-4395cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=34ec3331e122721900abdd515fe52c48&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							wirtsi&nbsp;						</strong>
+						<strong>said 
+						on Oct 01, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wow, wicked stuff ... just so I get this straight, this runs on the server, right?</p>
+<p>So the advantage of this is that you can check for wrong file uploads before the upload is complete. But then on the other hand implementing all these jpg/png format checkers in javascript doesn't look too much fun.</p>
+<p>In general the whole concept of developing your webserver in javascript seems a bit odd ... or is the idea to push all this to a client based storage (gears etc) and upload it via ajax in the background?</p>
+<p>wirtsi</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ac4d8ba-9e90-4b33-8d92-440ecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 01, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>wirtsi: Yes, this runs on the server. Parsing a JPG by hand is no fun, but other stuff like using the first few bytes of a file to check it's mime type can easily be done. </p>
+<p>What's odd about developing a web service in JavaScript? I think it's wonderful as it makes it so much easier to write great AJAX applications with a desktop-like experience!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ac5a0cc-a2e0-4e49-8db5-5631cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=34ec3331e122721900abdd515fe52c48&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Wirtsi&nbsp;						</strong>
+						<strong>said 
+						on Oct 02, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Felix</p>
+<p>I still can't quite see the advantage of doing this in js ... apart from the cutting edge geek factor you are missing out on so much cool server stuff you get when using a proper framework (database access, file validation, you name it).</p>
+<p>But perhaps I haven't quite grasped it yet ... I suppose the interesting part comes when you connect this code to the client side. Instead of just printing out the progress bar on the server console you'd probably have some sort of event handling system that the client picks up. Does it help that the server speaks the client's native language (js)? And if so, how did you implement the communication between them...</p>
+<p>I hope I don't come off as too nosy :) It's just that I'm working on a system where you can upload files on the client to a gears storage (which is blazing fast since the data is only transferred locally). Gears then should push the data onto the server which turns out to be quite a pain ... with upload resumes over unreliable internet connections. So what you are showing here could really help since you'd have two js servers speaking to each other.</p>
+<p>wirtsi</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ac5cf25-814c-4aed-8157-5ad1cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 02, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>wirtsi: Thanks for the great comments! The disadvantages you listed are all very valid at this point, but I'm involved with node.js at this early stage because of the potential I see:</p>
+<p>- Share code between browser & server<br />
+- More productivity because of reduced context-switching when using just 1 programming language</br><br />
+- Easier data exchange between browser & server (JSON's natural home is JavaScript, no serialization boundaries)</br></p>
+<p>This applies to all server-side JS solutions. What is especially exciting about node.js is the it's asynchronous programming model. All and every I/O that you execute is non-blocking. That means you never have to wait for function calls to return, never have to perform actions in series that could be parallelized. Yes, you can do that with some other programming languages, but I've never seen it in such a natural and easy-to-use fashion. So if I have to guess what will allow my services to scale in future, it's exactly this kind of technology vs. the traditional blocking stuff. What ya think?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ac9b9d7-3d94-4589-9441-0eb8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=34ec3331e122721900abdd515fe52c48&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Wirtsi&nbsp;						</strong>
+						<strong>said 
+						on Oct 05, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix</p>
+<p>very interesting points ... especially for heavy ajax apps it probably helps a lot if the server works non blocking. But I wonder if you really can pull this whole thing through, there are some limits ...</p>
+<p>* The browsers ajax limit (2 afaik) limits the need for massive server parallism<br />
+* Data integrity: It's quite easy to get into all the pitfalls of thread programming ... especially with a dynamically typed language like js I can imagine really nasty interferences or deadlocks.</br><br />
+* So the server work parallel but your database still stores everything sequentially.</br><br />
+* Speaking of databases, isn't the scaling of them the trickiest part? For the webserver you thrown in a few new webservers and a loadbalancer but get a db scaled out can be quite a pain (as you can see in all this ongoing NoSql movement)</br></p>
+<p>But don't get me wrong, I'm really thrilled by the node.js approach you are taking. If you need a massively scalable system then this is probably the way to go. For your transcoding service I could imagine the load is more heavy on the video/audio compressors but these things should scale very well.</p>
+<p>Perhaps this really is the dawning of a new area in web programming. When I started coding PHP, everything was poorly documented and everybody would resolve to these really vile ways of coding. Now there's frameworks like CakePHP help you getting work done proper ... perhaps in a few years time there'll be something like this for JavaScript.</p>
+<p>wirtsi</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ac9d5d3-9104-48a2-b4bc-0f7ccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 05, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wirtsi: Node.js was not a scaling decision for us. We use it because we were actually able to replace a few thousand lines of PHP as well as message queue system with a few lines of very effective JavaScript : ). When we receive a file upload, we deal with it over the course of several minutes triggering several actions on it. It turns out the easiest way to achieve that is in one non-blocking upload-server that guides the uploaded file through the entire process. We could not have done this with PHP.</p>
+<p>Of course this is not a general-purpose use case, I still think PHP kicks node.js ass for web apps and will for a while. But there are so many other things your web app needs. For example I have a few projects that need realtime updates (a game and chat) right now, so I'm writing a cross-domain comet server in node.js - something that is very easy to do with node but would be very hard with all other technologies I know of.</p>
+<p>Anyway, I do think node.js will bring a lot to the table in terms of web applications in the near future. Some very bright people are working on frameworks for it and it will be interesting to see what they come up with : ). I'll keep you posted.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4accb7df-8c50-4cd9-bf17-2dcdcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=34ec3331e122721900abdd515fe52c48&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Wirtsi&nbsp;						</strong>
+						<strong>said 
+						on Oct 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Felix ... I picked up some ideas we discussed here and stuffed them into a blog post of my own :)</p>
+<p><a rel="nofollow" href='<a rel="nofollow" href="http://blog.mykita.com/2009/10/enqueue-form-uploads-for-better-usability/'>http://blog.mykita.com/2009/10/enqueue-form-uploads-for-better-usability/</a>">http://blog.mykita.com/2009/10/enqueue-form-uploads-for-better-usability/'>http://blog.mykita.com/2009/10/enqueue-form-uploads-for-better-usability/</p>
+<p>Let me know what you think ...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4accb997-35ec-424e-aa2d-2ddfcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>wirtsi: I can't comment on your blog (wordpress error), so I will here:</p>
+<p>Have you tried using a hidden iframe? That also allows you to submit your forms in a non-blocking manner!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4accbd19-cefc-41ae-a8af-2e06cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=34ec3331e122721900abdd515fe52c48&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Wirtsi&nbsp;						</strong>
+						<strong>said 
+						on Oct 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Stupid mod_security, I fixed that :)</p>
+<p>I had a look at the iframes solution ... it's not quite the same though, I wanted a possibility to enqueue multiple  form submits from different forms. With iframes I can't see how to do that.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4accc175-06d0-4e90-93ef-2e75cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>wirtsi: true, if that's your use case the local storage idea is pretty neat!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4aceb86f-daa4-4772-84bb-4415cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=36dc36de92c5f30de23db51d9ed22699&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							iceeer&nbsp;						</strong>
+						<strong>said 
+						on Oct 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>like Lotus Domino 8.5 server javascript</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b0b5e7f-b0bc-44b4-ac94-343ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=168fab90c3dd931358f7e26306355727&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Bakyt Niyazov&nbsp;						</strong>
+						<strong>said 
+						on Nov 24, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>tried to post a message without any html tags and getting: Only simple Html tags like: a, b, i strong, em are allowed.<br />
+Please notify me about new comments</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b0b5fb9-cfa8-455e-acca-3557cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=168fab90c3dd931358f7e26306355727&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Bakyt Niyazov&nbsp;						</strong>
+						<strong>said 
+						on Nov 24, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>(trying again) Thank you Felix! I found Node by your tweet, that is really cool! Btw I think the code must be updated slightly in order to work with the latest Node:</p>
+<p>add:<br />
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> sys = require<span class="br0">&#40;</span><span class="st0">'sys'</span><span class="br0">&#41;</span>;</div>
+<p>and then rename print function calling to use sys.print the same for puts</p>
+</br></p>				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b0c1e34-032c-4ccd-bfd5-4ea9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=309f8a10afe97e9f91f50447c0ebaa2c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Sveinung&nbsp;						</strong>
+						<strong>said 
+						on Nov 24, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I really hope CommonJS will be a success.</p>
+<p>You need to change<br />
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw3">print</span><span class="br0">&#40;</span><span class="br0">&#41;</span> to syst.<span class="kw3">print</span><span class="br0">&#40;</span><span class="br0">&#41;</span></div>
+<p> as well.</p>
+</br></p>				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b1d547a-fcd0-4dcb-90b1-0ba4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=30269682335f1fb247d71969fa715b5e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.robertosaccon.com" rel="nofollow">Roberto Saccon</a>						</strong>
+						<strong>said 
+						on Dec 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix, I took your great example and tried it to extend, so files get saved at the server, but the uploaded files come out completely wrong. I think this is of general interest and posted my attempt at the google group:</p>
+<p><a rel="nofollow" href="http://groups.google.com/group/nodejs/browse_thread/thread/2643e1b474b85a15">http://groups.google.com/group/nodejs/browse_thread/thread/2643e1b474b85a15</a></p>
+<p>Do you have any recommendation how to approach that ?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b26f403-d5a0-4ba2-ad2f-52eecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=dd5b568124acaf04217f1af451de2141&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							junior programmer&nbsp;						</strong>
+						<strong>said 
+						on Dec 15, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>what's your view on node.js vs erlang? A lot of the concepts in node.js seem to be very similar to that of Erlang.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b29a79d-323c-4316-ad9c-43c2cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3a61ba58acf86e12ffb0fcf245b73c42&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://freeadplanet.com" rel="nofollow">Matt Kukowski</a>						</strong>
+						<strong>said 
+						on Dec 17, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>With the proliferation of the Web and Web Apps verse traditional local Apps, using JavaScript on the server is a very natural fit. </p>
+<p>Why? Because, if your going to program JavaScript in the browser, translating those skills onto the Server will make for better JavaScript programmers.</p>
+<p>Google Chrome OS, HTML5 and all these maturing and powerful Web technologies are going to transform the entire computing industry. The browser will ( and already is ) 'The Kill App'.</p>
+<p>So, using JavaScript with V8 should help push the speed limit there as well, regarding the V8 engine.</p>
+<p>Also, if there is a way to do it in Python or Ruby, I would probably take the JavaScript route, since mastering it on the Server only allows me to master it in the browser.</p>
+<p>As, far as the non-blocking issue goes when speaking to Databases, I'm sure these 'problems' will get ironed out, by making commit style injections into them, or adding a blocking thread for just that connection. I don't know the details.</p>
+<p>Anyhow, JavaScript is a very interesting language, being Event based, a clean language and Object Orientated.</p>
+<p>It will definetely be interesting to see how far NODE.JS will go.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b2a0aaa-be68-4297-ada3-550bcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Dec 17, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>junior programmer: I think node will be able to compete with erlang on common protocols such as HTTP. However, erlang has some really incredible features for dealing with binary streams which we may or may not be able to bring to node directly. We'll see, but its certainly an interesting comparison from multiple points of view (ease of use, performance, etc.)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b6326ee-048c-42e7-abef-060ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=670efd06d01b46e668fb284f1258add9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.componentix.com" rel="nofollow">Vladimir Grichina</a>						</strong>
+						<strong>said 
+						on Jan 29, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>While your post shows well how to receive uploaded file, it doesnt show at all how to save it (and it is not really trivial with Node, as event-based I/O is a bit unusual). So I wrote a post about <a rel="nofollow" href="http://www.componentix.com/blog/9">handling uploads and writing to file with Node.js</a>.</p>
+<p>I think it should be useful to the readers of this post.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b645afb-8f28-4b09-8c01-57c6cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 30, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Vladimir Grichina: Cool. If you want to make your code even shorter check out the file module:</p>
+<p><a rel="nofollow" href="http://github.com/ry/node/blob/master/lib/file.js">http://github.com/ry/node/blob/master/lib/file.js</a></p>
+<p>It is currently not documented (the API might change), but it takes care of queuing your posix calls.</p>
+<p>HTH,<br />
+-- Felix</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b6b2195-f340-4db0-80f1-2408cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=670efd06d01b46e668fb284f1258add9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.componentix.com" rel="nofollow">Vladimir Grichina</a>						</strong>
+						<strong>said 
+						on Feb 04, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix, thanks, this is great suggestion.</p>
+<p>I think I would try it and write another blog post.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b9c1957-f64c-4b21-8405-591bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7bfd7f57a1ada2b34eef98750b3864df&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Hendrik&nbsp;						</strong>
+						<strong>said 
+						on Mar 13, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,<br />
+it seems stream.Bytes* is no longer available in the latest node release.</br><br />
+Is there any alternative way to get the current uploaded file's size?</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b9c1c5d-6280-4a28-8762-2109cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 13, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hendrik: yeah, the req.headers['content-length'] has the total size and you have to sum of the chunks yourself as they come in.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b9c244e-efe8-4d35-8b5a-340fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7bfd7f57a1ada2b34eef98750b3864df&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Hendrik&nbsp;						</strong>
+						<strong>said 
+						on Mar 13, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for the quick reply.<br />
+The headers['content-length'] seems to be different from the uploaded file size.</br><br />
+When I upload a file I sum the bytesWritten in a file.write() callback and the number matches the actual file size, but the headers['content-length'] always comes up with a higher value, most likely due to including the boundary and other data as well(?), whereas the previous stream.bytesTotal seems to have been the exact file size as well.</br></p>
+<p>I got the upload working and files are saved properly, but I am still trying to figure out how to get an uploaded file's size in order to calculate the remaining data.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b9caee9-557c-4f55-ab61-7888cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 14, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yes, content-length includes the full size of the HTTP message with boundaries, and all.</p>
+<p>But no, the previous stream.bytesTotal did not adress that issue specifically. I'd actually advice you to just emit a fake 100% progress event once you hit the end of the multipart stream.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4baaac19-5884-4f10-8e9d-3effcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=670efd06d01b46e668fb284f1258add9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.componentix.com" rel="nofollow">Vladimir Grichina</a>						</strong>
+						<strong>said 
+						on Mar 25, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<blockquote cite="Felix Geisendörfer"><p>
+Vladimir Grichina: Cool. If you want to make your code even shorter check out the file module:</p>
+<p><a rel="nofollow" href="http://github.com/ry/node/blob/master/lib/file.js">http://github.com/ry/node/blob/master/lib/file.js</a>
+</p></blockquote>
+<p>Felix, as there is no such code in Node now, and event handling was also revised, what would you suggest to do now?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4bac4ee6-895c-4dc5-a57a-1c5ccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 26, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Vladimir Grichina: Use fs.createWriteStream.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

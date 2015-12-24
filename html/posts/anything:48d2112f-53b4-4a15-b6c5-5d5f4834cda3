@@ -1,0 +1,514 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>PHP code generator &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/php-code-generator:48d2112f-53b4-4a15-b6c5-5d5f4834cda3">PHP code generator</a></h2>	<div class="posted-on">
+		<p>Posted on 18/9/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>this is post #29 of my <a href="http://debuggable.com/posts/time-to-grow-again-or-loose-money:48ab3665-2054-4e55-b13f-0c104834cda3">30 day challenge</a>. Yes, I know its a little late, but I just got out of the plane from NYC to Berlin. Turns out nobody asked for the 50 EUR so far, too bad ; ).</p>
+<p>Anyway, if you find yourself writing PHP code that writes PHP code, you might appreciate a little class I just wrote. You can use it like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$Code</span> = <span class="kw2">new</span> PhpCode<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$Code</span>-&gt;<span class="me1">write</span><span class="br0">&#40;</span><span class="st0">'$foo = array(%d, %d, %d);'</span>, <span class="nu0">1</span>, <span class="nu0">2</span>, <span class="nu0">3</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$Code</span>-&gt;<span class="me1">open</span><span class="br0">&#40;</span><span class="st0">'foreach ($foo as $bar) {'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$Code</span>-&gt;<span class="me1">write</span><span class="br0">&#40;</span><span class="st0">'echo $bar'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$Code</span>-&gt;<span class="me1">close</span><span class="br0">&#40;</span><span class="st0">'}'</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$Code</span>-&gt;<span class="me1">compile</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>And in return you will get</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$foo</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="nu0">1</span>, <span class="nu0">2</span>, <span class="nu0">3</span><span class="br0">&#41;</span>;<br />
+<span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$foo</span> <span class="kw1">as</span> <span class="re0">$bar</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$bar</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>So what it does it essentially provides you with a wrapper for sprintf and also automatically does all the code indention for you so you don't have to go crazy with putting "\t"'s everywhere.</p>
+<p>Anyway here is the code of the class:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> PhpCode<span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$lines</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$mode</span> = <span class="st0">'append'</span>;<br />
+<br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> compile<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$out</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$depths</span> = <span class="nu0">0</span>;<br />
+&nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">lines</span> <span class="kw1">as</span> <span class="re0">$line</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$line</span><span class="br0">&#91;</span><span class="st0">'block'</span><span class="br0">&#93;</span> == <span class="st0">'close'</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$depths</span>--;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$out</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <a href="http://www.php.net/str_repeat"><span class="kw3">str_repeat</span></a><span class="br0">&#40;</span><span class="st0">&quot;<span class="es0">\t</span>&quot;</span>, <span class="re0">$depths</span><span class="br0">&#41;</span>.<span class="re0">$line</span><span class="br0">&#91;</span><span class="st0">'code'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$line</span><span class="br0">&#91;</span><span class="st0">'block'</span><span class="br0">&#93;</span> == <span class="st0">'open'</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$depths</span>++;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/join"><span class="kw3">join</span></a><span class="br0">&#40;</span><span class="st0">&quot;<span class="es0">\n</span>&quot;</span>, <span class="re0">$out</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> write<span class="br0">&#40;</span><span class="re0">$code</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$args</span> = <a href="http://www.php.net/func_get_args"><span class="kw3">func_get_args</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">inject</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'code'</span> =&gt; <a href="http://www.php.net/vsprintf"><span class="kw3">vsprintf</span></a><span class="br0">&#40;</span><span class="re0">$code</span>, <a href="http://www.php.net/array_slice"><span class="kw3">array_slice</span></a><span class="br0">&#40;</span><span class="re0">$args</span>, <span class="nu0">1</span><span class="br0">&#41;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'block'</span> =&gt; <span class="kw2">false</span>,<br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> newLine<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">inject</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'code'</span> =&gt; <span class="st0">''</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'block'</span> =&gt; <span class="st0">'open'</span>,<br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> open<span class="br0">&#40;</span><span class="re0">$code</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$args</span> = <a href="http://www.php.net/func_get_args"><span class="kw3">func_get_args</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">inject</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'code'</span> =&gt; <a href="http://www.php.net/vsprintf"><span class="kw3">vsprintf</span></a><span class="br0">&#40;</span><span class="re0">$code</span>, <a href="http://www.php.net/array_slice"><span class="kw3">array_slice</span></a><span class="br0">&#40;</span><span class="re0">$args</span>, <span class="nu0">1</span><span class="br0">&#41;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'block'</span> =&gt; <span class="st0">'open'</span>,<br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> close<span class="br0">&#40;</span><span class="re0">$code</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$args</span> = <a href="http://www.php.net/func_get_args"><span class="kw3">func_get_args</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">inject</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'code'</span> =&gt; <a href="http://www.php.net/vsprintf"><span class="kw3">vsprintf</span></a><span class="br0">&#40;</span><span class="re0">$code</span>, <a href="http://www.php.net/array_slice"><span class="kw3">array_slice</span></a><span class="br0">&#40;</span><span class="re0">$args</span>, <span class="nu0">1</span><span class="br0">&#41;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'block'</span> =&gt; <span class="st0">'close'</span>,<br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> prepend<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">mode</span> = <span class="st0">'prepend-once'</span>;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> inject<span class="br0">&#40;</span><span class="re0">$line</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">switch</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">mode</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">case</span> <span class="st0">'append'</span>:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/array_push"><span class="kw3">array_push</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">lines</span>, <span class="re0">$line</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">case</span> <span class="st0">'prepend'</span>:<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">case</span> <span class="st0">'prepend-once'</span>:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/array_unshift"><span class="kw3">array_unshift</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">lines</span>, <span class="re0">$line</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">mode</span> == <span class="st0">'prepend-once'</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">mode</span> = <span class="st0">'append'</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Let me know what you think, suggestions are more than welcome!</p>
+<p>-- Felix Geisendörfer aka the_undefined</p>
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/48d2112f-53b4-4a15-b6c5-5d5f4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fphp-code-generator%3A48d2112f-53b4-4a15-b6c5-5d5f4834cda3 &amp;title=PHP+code+generator';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fphp-code-generator%3A48d2112f-53b4-4a15-b6c5-5d5f4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fphp-code-generator%3A48d2112f-53b4-4a15-b6c5-5d5f4834cda3&amp;title=PHP+code+generator&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fphp-code-generator%3A48d2112f-53b4-4a15-b6c5-5d5f4834cda3&amp;title=PHP+code+generator';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/problems-with-repeatitive-source-code-or-better-dont-repeat-yourself:480f4dfd-ac70-4f1b-907b-4eb4cbdd56cb">Problems with repetitive source code or better: Don&#039;t repeat yourself</a></li>
+							<li><a href="/posts/learning-from-the-cakephp-source-code-part-i:480f4dd6-28d0-445e-a1dc-4ceacbdd56cb">Learning from the CakePHP source code - Part I</a></li>
+							<li><a href="/posts/learning-from-the-cakephp-source-code-part-ii:480f4dd6-57fc-4715-8709-439acbdd56cb">Learning from the CakePHP source code - Part II</a></li>
+							<li><a href="/posts/i-will-insult-your-code!:48ac91d1-ca78-4e95-ad66-1e854834cda3">I will insult your code!</a></li>
+							<li><a href="/posts/should-i-refactor-this-piece-of-code:480f4dd6-eafc-4fd3-9302-4f44cbdd56cb">Should I refactor this piece of code?</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/php-code-generator:48d2112f-53b4-4a15-b6c5-5d5f4834cda3">16 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/php-code-generator:48d2112f-53b4-4a15-b6c5-5d5f4834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-48d222e4-dc44-4a36-be41-6e914834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=825ca9355017c7fd236ededf4bec1665&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Lucian Lature&nbsp;						</strong>
+						<strong>said 
+						on Sep 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It seems that the RSS feeds are broken.<br />
+I receive this into my Thunderbird: <a rel="nofollow" href="http://debuggable.com/posts/48d2112f-53b4-4a15-b6c5-5d5f4834cda3">http://debuggable.com/posts/48d2112f-53b4-4a15-b6c5-5d5f4834cda3</a> .</br><br />
+Pls take a look at this.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d24a03-6d34-4d61-b1d3-3cb54834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Sep 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>is it too late? I'm claiming those 50 bucks!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d263d3-49f4-42a4-9b55-26994834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=669144d1ab0a861af5d54175371bc586&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://mark-story.com" rel="nofollow">Mark Story</a>						</strong>
+						<strong>said 
+						on Sep 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Neat stuff Felix.  I've always detested inserting piles of \t and \n into code generation code.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d2649b-d4d0-460e-b706-25684834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>rafaelbandeira3: Yes, you have to claim the money before I get the post up and point out the time delay. You guys have to do your job as well ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d2677e-ab34-4b20-aca8-746a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Sep 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>blah... ;-)<br />
+ok, ok...</br></p>
+<p>now, not that I tried or ever had a good why to generate my own PHP, but your solution is really elegant.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d27011-afe8-46f3-9058-5fc34834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=581b604efc725a97fed54605b989b8ba&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakephp.org" rel="nofollow">gwoo</a>						</strong>
+						<strong>said 
+						on Sep 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This might be a nice way to make scaffold/bake templates more readable.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d29500-2da0-4996-b0d6-27174834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Sep 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I was thinking now... wouldn't it be less verborragic if it could be parsed by regex, or line-by-line?</p>
+<p>$Code->compile('class %sController extends AppController {<br />
+function paginate() {</br><br />
+return getPaginatedData();</br><br />
+}</br><br />
+}');</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d29e7b-d114-4985-8994-14fa4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Sep 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@rafaelbandeira3 Oh... so kinda like <a rel="nofollow" href="http://us2.php.net/token_get_all">http://us2.php.net/token_get_all</a> ?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d2f478-3994-4ad0-99ce-479e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Sep 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Nate Abele hum... it's not what I thought, but it's even better! Let's say you managed learning all those tokens - or not, maybe just a few of them to let you know when a block was opened and when it was closed - and based on them one can go calculating it's indentation.<br />
+Of course it should be enclosed in a class like Felix's approach, the would be reduce all verborragic and overhead - ok I don't really bother about overhead, but anyway...</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d32d61-e2d0-4979-ae5b-1ee14834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ac97b5f71c623d60aa7e8f534908dd75&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Silver Knight&nbsp;						</strong>
+						<strong>said 
+						on Sep 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I also had the same problem with the RSS feeds as Lucian Lature had.  The named parameters are not coming through correctly.  I was still able to get to the articles properly by manually editing the URLs as follows:</p>
+<p><a rel="nofollow" href="http://debuggable.com/posts/48d2112f-53b4-4a15-b6c5-5d5f4834cda3">http://debuggable.com/posts/48d2112f-53b4-4a15-b6c5-5d5f4834cda3</a><br />
+to</br><br />
+<a rel="nofollow" href="http://debuggable.com/posts/anything:48d2112f-53b4-4a15-b6c5-5d5f4834cda3">http://debuggable.com/posts/anything:48d2112f-53b4-4a15-b6c5-5d5f4834cda3</a></br></p>
+<p>The addition of a name for the parameter (I just used a single letter) caused the site to do a proper lookup for each article and changed the URL appropriately.</p>
+<p>HTH someone...</p>
+<p>In case such a thing ever happens again, Felix or Tim or whoever writes the code for this blog should maybe have the Posts controller do a lookup on the article based on the UUID if a bare UUID is passed instead of a named parameter UUID so that the problem is automagically fixed on the fly.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d345cf-9f98-43cd-9454-757b4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Lucian Lature, Silver Knight: I messed with the regular RSS feed when implementing the new one for comments - sorry about that.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d4e429-b480-45f5-bb4d-55894834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9cfddd0f040820854b41ce8d39a968e1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.mouseover.be" rel="nofollow">Bart</a>						</strong>
+						<strong>said 
+						on Sep 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Funny post! The code you provide is actually longer than the code it produces :) But maybe it's just the example...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d68df7-efcc-43ea-bc94-06a44834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Sep 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Might also be cool if it could automagically detect indentation levels once it detects a foreach, for, switch, if, function, class, etc.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d9dcc8-e8e0-4e3b-a8b4-1e874834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=782ed167b5c2c2563480ad62727f6b08&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.kolchose.org" rel="nofollow">Simon</a>						</strong>
+						<strong>said 
+						on Sep 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>To check the code against syntax errors you could implement something like this: <a rel="nofollow" href="http://www.php.net/manual/en/function.php-check-syntax.php#77318">http://www.php.net/manual/en/function.php-check-syntax.php#77318</a> .</p>
+<p>There is also a nice PEAR package to get the required PHP version for a pice of code: <a rel="nofollow" href="http://pear.php.net/package/PHP_CompatInfo">http://pear.php.net/package/PHP_CompatInfo</a> .</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a505fa2-9f78-480e-9fd2-075f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9a7a241b2c2c226655bba7b50c386973&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							nathan&nbsp;						</strong>
+						<strong>said 
+						on Jul 05, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>this would provide a slick interface for creating php files directly from database queries. i would suggest creating a set of method that act as open(), but would be shorthand, like $code->foreach('foo','bar'), $code->class('foo','bar') ('class foo extends bar {'), $code->if('foo') and so forth. Also $code->comment('bar!')</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b0b2250-1d50-43c6-a1d4-2eabcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99eb977dcb8107eb754d657cf4071f04&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Driersunrendy&nbsp;						</strong>
+						<strong>said 
+						on Nov 24, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Je vous conseille de visiter le site, sur lequel il y a beaucoup d'articles sur cette question.  <a rel="nofollow" href="http://lettresdudroit.com">viagra sur le net</a> acheter du viagra <a rel="nofollow" href=<a rel="nofollow" href="http://lettresdudroit.com>acheter">http://lettresdudroit.com>acheter</a> viagra generique</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

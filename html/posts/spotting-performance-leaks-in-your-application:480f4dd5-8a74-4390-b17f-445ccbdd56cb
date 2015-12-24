@@ -1,0 +1,551 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Spotting performance leaks in your application &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/spotting-performance-leaks-in-your-application:480f4dd5-8a74-4390-b17f-445ccbdd56cb">Spotting performance leaks in your application</a></h2>	<div class="posted-on">
+		<p>Posted on 18/6/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Today I was implementing a new and critical functionality into SpliceIt! that allows plugins to register global hooks like beforeFilter, afterFilter, etc. in order to make their own changes to the AppController (SpliceItAppController), even when they are not beeing requested. That way you can simply drop in a menu plugin, and your layout will automatically have the variable $menu set, even so the user didn't request any action from the menu plugin itself.</p>
+<p>Anyway, when I implemented the first version I noticed a good performance loss right away, which I didn't like very much. So I had to figure out which part of my code was responsible for giving my processor such a hard time ; ). In order to do this I wrote a useful little singleton class that allows you to start, pause and resume multiple timers throughout your app in order to see what parts are eating up what performance.</p>
+<p>Usage is very simple, after you've included the class with require/vendor/whatever you can use it like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+Performance::<span class="me2">startTimer</span><span class="br0">&#40;</span><span class="st0">'Sleep Walking'</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/sleep"><span class="kw3">sleep</span></a><span class="br0">&#40;</span><span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+Performance::<span class="me2">pauseTimer</span><span class="br0">&#40;</span><span class="st0">'Sleep Walking'</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/sleep"><span class="kw3">sleep</span></a><span class="br0">&#40;</span><span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+Performance::<span class="me2">resumeTimer</span><span class="br0">&#40;</span><span class="st0">'Sleep Walking'</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/sleep"><span class="kw3">sleep</span></a><span class="br0">&#40;</span><span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+<br />
+Performance::<span class="me2">debugTimersPercantage</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Outputs an array like this:</span><br />
+<span class="co1">// Array</span><br />
+<span class="co1">// &nbsp;(</span><br />
+<span class="co1">// &nbsp; &nbsp; &nbsp; [sleep walking] =&gt; 1.99932789803 (52.04%)</span><br />
+<span class="co1">// &nbsp; &nbsp; &nbsp; [_total] =&gt; 3.84202480316 (100%)</span><br />
+<span class="co1">// &nbsp;)</span></div>
+<p>Want to play around with it yourself? Here is the code:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> Performance<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$_timers</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$time_start</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; * Returns a singleton instance of the Performance class<br />
+&nbsp; &nbsp; *<br />
+&nbsp; &nbsp; * @return unknown<br />
+&nbsp; &nbsp; */</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> &amp;getInstance<span class="br0">&#40;</span><span class="br0">&#41;</span> <br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/static"><span class="kw3">static</span></a> <span class="re0">$instance</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$instance</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$instance</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span> = <span class="kw2">&amp;new</span> Performance;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$instance</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; * In the constructor we check if we already know the time our Application started (by checking for<br />
+&nbsp; &nbsp; * the variable $TIME_START like cakephp set's it. Or we use the current time as our starttime.<br />
+&nbsp; &nbsp; *<br />
+&nbsp; &nbsp; * @return Performance<br />
+&nbsp; &nbsp; */</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> Performance<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/global"><span class="kw3">global</span></a> <span class="re0">$TIME_START</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$TIME_START</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">time_start</span> = <span class="re0">$TIME_START</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span> <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">time_start</span> = <span class="re0">$this</span>-&gt;<span class="me1">getMicrotime</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; * Starts a new timer $key. If such a timer has already been started it's going to be reset to 0.<br />
+&nbsp; &nbsp; *<br />
+&nbsp; &nbsp; * @param string $key<br />
+&nbsp; &nbsp; */</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> startTimer<span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$_this</span> =&amp; Performance::<span class="me2">getInstance</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$key</span> = <a href="http://www.php.net/strtolower"><span class="kw3">strtolower</span></a><span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span>;&nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$_this</span>-&gt;_timers<span class="br0">&#91;</span><span class="re0">$key</span><span class="br0">&#93;</span> = <span class="re0">$_this</span>-&gt;<span class="me1">getMicrotime</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; * Pauses the timer $key. You can resume it using Performance::resumeTimer()<br />
+&nbsp; &nbsp; *<br />
+&nbsp; &nbsp; * @param string $key<br />
+&nbsp; &nbsp; */</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> pauseTimer<span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$_this</span> =&amp; Performance::<span class="me2">getInstance</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$key</span> = <a href="http://www.php.net/strtolower"><span class="kw3">strtolower</span></a><span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$_this</span>-&gt;_timers<span class="br0">&#91;</span><span class="re0">$key</span><span class="br0">&#93;</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="re0">$_this</span>-&gt;<span class="me1">getTimer</span><span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span>&nbsp;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; * Resumes the timer $key if it had been paused before. If not nothing happens, and if such a timer<br />
+&nbsp; &nbsp; * doesn't exists it get's created via Performance::startTimer() automatically.<br />
+&nbsp; &nbsp; *<br />
+&nbsp; &nbsp; * @param string $key<br />
+&nbsp; &nbsp; */</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> resumeTimer<span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$now</span> = Performance::<span class="me2">getMicrotime</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$_this</span> =&amp; Performance::<span class="me2">getInstance</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$key</span> = <a href="http://www.php.net/strtolower"><span class="kw3">strtolower</span></a><span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$_this</span>-&gt;<span class="me1">isKeySet</span><span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$_this</span>-&gt;<span class="me1">startTimer</span><span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$timerStart</span> = <span class="re0">$_this</span>-&gt;_timers<span class="br0">&#91;</span><span class="re0">$key</span><span class="br0">&#93;</span>;&nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/is_array"><span class="kw3">is_array</span></a><span class="br0">&#40;</span><span class="re0">$timerStart</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$_this</span>-&gt;_timers<span class="br0">&#91;</span><span class="re0">$key</span><span class="br0">&#93;</span> = <span class="re0">$now</span>-<a href="http://www.php.net/array_pop"><span class="kw3">array_pop</span></a><span class="br0">&#40;</span><span class="re0">$timerStart</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; * Removes the timer $key from the list of timers<br />
+&nbsp; &nbsp; *<br />
+&nbsp; &nbsp; * @param unknown_type $key<br />
+&nbsp; &nbsp; */</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> removeTimer<span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$_this</span> =&amp; Performance::<span class="me2">getInstance</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$key</span> = <a href="http://www.php.net/strtolower"><span class="kw3">strtolower</span></a><span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span>;&nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/array_key_exists"><span class="kw3">array_key_exists</span></a><span class="br0">&#40;</span><span class="re0">$key</span>, <span class="re0">$_this</span>-&gt;_timers<span class="br0">&#41;</span> === <span class="kw2">true</span><span class="br0">&#41;</span> <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/unset"><span class="kw3">unset</span></a><span class="br0">&#40;</span><span class="re0">$_this</span>-&gt;_timers<span class="br0">&#91;</span><span class="re0">$key</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span>&nbsp;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; * Get's the current amount of time ellapsed for timer $timer.<br />
+&nbsp; &nbsp; *<br />
+&nbsp; &nbsp; * @param string $key<br />
+&nbsp; &nbsp; * @return float<br />
+&nbsp; &nbsp; */</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> getTimer<span class="br0">&#40;</span><span class="re0">$key</span>, <span class="re0">$now</span> = <span class="kw2">null</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$now</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$now</span> = Performance::<span class="me2">getMicrotime</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$_this</span> =&amp; Performance::<span class="me2">getInstance</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$key</span> = <a href="http://www.php.net/strtolower"><span class="kw3">strtolower</span></a><span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span>; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$timerStart</span> = <span class="re0">$_this</span>-&gt;_timers<span class="br0">&#91;</span><span class="re0">$key</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/is_array"><span class="kw3">is_array</span></a><span class="br0">&#40;</span><span class="re0">$timerStart</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/array_pop"><span class="kw3">array_pop</span></a><span class="br0">&#40;</span><span class="re0">$timerStart</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span> <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$now</span> - <span class="re0">$timerStart</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; * Get's a list of all registered timers and their current amount of ellapsed time.<br />
+&nbsp; &nbsp; *<br />
+&nbsp; &nbsp; * @return array<br />
+&nbsp; &nbsp; */</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> getTimers<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$now</span> = Performance::<span class="me2">getMicrotime</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$_this</span> =&amp; Performance::<span class="me2">getInstance</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$timers</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$_this</span>-&gt;_timers <span class="kw1">as</span> <span class="re0">$key</span> =&gt; <span class="re0">$timer</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$timers</span><span class="br0">&#91;</span><span class="re0">$key</span><span class="br0">&#93;</span> = <span class="re0">$_this</span>-&gt;<span class="me1">getTimer</span><span class="br0">&#40;</span><span class="re0">$key</span>, <span class="re0">$now</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$timers</span><span class="br0">&#91;</span><span class="st0">'_total'</span><span class="br0">&#93;</span> = <span class="re0">$now</span>-<span class="re0">$_this</span>-&gt;<span class="me1">time_start</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$timers</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; * Returns the percantage that the timer $key has taken up in time compared<br />
+&nbsp; &nbsp; * to the total execution time of the script (see the constructor to make sure<br />
+&nbsp; &nbsp; * this works).<br />
+&nbsp; &nbsp; *<br />
+&nbsp; &nbsp; * @param string $key<br />
+&nbsp; &nbsp; * @param float $now<br />
+&nbsp; &nbsp; * @param float $timer<br />
+&nbsp; &nbsp; * @return float<br />
+&nbsp; &nbsp; */</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> getTimerPercantage<span class="br0">&#40;</span><span class="re0">$key</span>, <span class="re0">$now</span> = <span class="kw2">null</span>, <span class="re0">$timer</span> = <span class="kw2">null</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$now</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$now</span> = Performance::<span class="me2">getMicrotime</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$_this</span> =&amp; Performance::<span class="me2">getInstance</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$timer</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$timer</span> = <span class="re0">$_this</span>-&gt;<span class="me1">getTimer</span><span class="br0">&#40;</span><span class="re0">$key</span>, <span class="re0">$now</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$timer</span>.<span class="st0">' ('</span>.<a href="http://www.php.net/round"><span class="kw3">round</span></a><span class="br0">&#40;</span><span class="br0">&#40;</span><span class="br0">&#40;</span><span class="re0">$timer</span><span class="br0">&#41;</span>/<span class="br0">&#40;</span><span class="re0">$now</span>-<span class="re0">$_this</span>-&gt;<span class="me1">time_start</span><span class="br0">&#41;</span>*<span class="nu0">100</span><span class="br0">&#41;</span>, <span class="nu0">2</span><span class="br0">&#41;</span>.<span class="st0">'%)'</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; * Get's a list of all timers together with the time percantage they have used up.<br />
+&nbsp; &nbsp; * The total may add up to over 100% if some of the timers have been running at the<br />
+&nbsp; &nbsp; * same time.<br />
+&nbsp; &nbsp; *<br />
+&nbsp; &nbsp; * @return array<br />
+&nbsp; &nbsp; */</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> getTimersPercantage<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$now</span> = Performance::<span class="me2">getMicrotime</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$_this</span> =&amp; Performance::<span class="me2">getInstance</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$timers</span> = <span class="re0">$_this</span>-&gt;<span class="me1">getTimers</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$percantageTimers</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$timers</span> <span class="kw1">as</span> <span class="re0">$key</span> =&gt; <span class="re0">$timer</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$percantageTimers</span><span class="br0">&#91;</span><span class="re0">$key</span><span class="br0">&#93;</span> = <span class="re0">$_this</span>-&gt;<span class="me1">getTimerPercantage</span><span class="br0">&#40;</span><span class="re0">$key</span>, <span class="re0">$now</span>, <span class="re0">$timer</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$percantageTimers</span>;&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; * Checks if the timer $key exists or not.<br />
+&nbsp; &nbsp; *<br />
+&nbsp; &nbsp; * @param unknown_type $key<br />
+&nbsp; &nbsp; * @return unknown<br />
+&nbsp; &nbsp; */</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> isKeySet<span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$_this</span> =&amp; Performance::<span class="me2">getInstance</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$key</span> = <a href="http://www.php.net/strtolower"><span class="kw3">strtolower</span></a><span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/array_key_exists"><span class="kw3">array_key_exists</span></a><span class="br0">&#40;</span><span class="re0">$key</span>, <span class="re0">$_this</span>-&gt;_timers<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span>&nbsp;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; * A convenience function for debug(Performance::getTimer($key));<br />
+&nbsp; &nbsp; *<br />
+&nbsp; &nbsp; * @param string $key<br />
+&nbsp; &nbsp; */</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> debugTimer<span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; debug<span class="br0">&#40;</span>Performance::<span class="me2">getTimer</span><span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; * A convenience function for debug(Performance::getTimers($key));<br />
+&nbsp; &nbsp; *<br />
+&nbsp; &nbsp; * @param string $key<br />
+&nbsp; &nbsp; */</span>&nbsp; <br />
+&nbsp; &nbsp; <span class="kw2">function</span> debugTimers<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; debug<span class="br0">&#40;</span>Performance::<span class="me2">getTimers</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; * A convenience function for debug(Performance::getTimerPercantage($key));<br />
+&nbsp; &nbsp; *<br />
+&nbsp; &nbsp; * @param string $key<br />
+&nbsp; &nbsp; */</span>&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw2">function</span> debugTimerPercantage<span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; debug<span class="br0">&#40;</span>Performance::<span class="me2">getTimerPercantage</span><span class="br0">&#40;</span><span class="re0">$key</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; * A convenience function for debug(Performance::getTimersPercantage($key));<br />
+&nbsp; &nbsp; *<br />
+&nbsp; &nbsp; * @param string $key<br />
+&nbsp; &nbsp; */</span>&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw2">function</span> debugTimersPercantage<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; debug<span class="br0">&#40;</span>Performance::<span class="me2">getTimersPercantage</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span>&nbsp;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; * Returns the microtime in seconds as a float. I know php5 / cakephp already have this function,<br />
+&nbsp; &nbsp; * but I wanted a maximum of reusability for this class.<br />
+&nbsp; &nbsp; *<br />
+&nbsp; &nbsp; * @return float<br />
+&nbsp; &nbsp; */</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> getMicrotime<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/array_sum"><span class="kw3">array_sum</span></a><span class="br0">&#40;</span><a href="http://www.php.net/explode"><span class="kw3">explode</span></a><span class="br0">&#40;</span><a href="http://www.php.net/chr"><span class="kw3">chr</span></a><span class="br0">&#40;</span><span class="nu0">32</span><span class="br0">&#41;</span>, <a href="http://www.php.net/microtime"><span class="kw3">microtime</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span>&nbsp;<br />
+<span class="br0">&#125;</span></div>
+<p>The license for it is MIT. Another thing I'd like to point out, is the fact that some of the code was inspired/derived from CakePHP's ClassRegistry class which you can find inside cake/libs/class_registry.php.</p>
+<p>If you like the class or find a bug, any feedback is welcome ; ).</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-8a74-4390-b17f-445ccbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fspotting-performance-leaks-in-your-application%3A480f4dd5-8a74-4390-b17f-445ccbdd56cb &amp;title=Spotting+performance+leaks+in+your+application';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fspotting-performance-leaks-in-your-application%3A480f4dd5-8a74-4390-b17f-445ccbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fspotting-performance-leaks-in-your-application%3A480f4dd5-8a74-4390-b17f-445ccbdd56cb&amp;title=Spotting+performance+leaks+in+your+application&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fspotting-performance-leaks-in-your-application%3A480f4dd5-8a74-4390-b17f-445ccbdd56cb&amp;title=Spotting+performance+leaks+in+your+application';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/quick-dessert-list-all-controllers-of-a-cakephp-application:480f4dd6-adf4-4b18-9fe8-4b99cbdd56cb">Quick dessert: List all controllers of a CakePHP application</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/spotting-performance-leaks-in-your-application:480f4dd5-8a74-4390-b17f-445ccbdd56cb">7 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/spotting-performance-leaks-in-your-application:480f4dd5-8a74-4390-b17f-445ccbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dd8-d60c-4cf6-8321-44fccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fd24ab9b18c0a2aa04d70ab266eb57ae&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							RosSoft&nbsp;						</strong>
+						<strong>said 
+						on Jun 18, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It gives me  an error, I think that line 163 should be $_this instead of $this </p>
+<p>return $timer.' ('.round((($timer)/($now-$_this-&gt;time_start)*100), 2).'%)';</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-97f4-427f-a6b0-4e95cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fd24ab9b18c0a2aa04d70ab266eb57ae&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							RosSoft&nbsp;						</strong>
+						<strong>said 
+						on Jun 18, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>BTW, that's an useful class, thanks</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-f9e0-4133-a5d2-410bcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 18, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey RosSoft, thanks for pointing that out, I corrected it in the code above. Oh and I'm glad you find the class useful ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-baa0-4d21-b913-4e88cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b35f2bfa2f978632c7730f9fae10440d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							David Rodger&nbsp;						</strong>
+						<strong>said 
+						on Jun 22, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Why not this...?</p>
+<p>function Performance()<br />
+{</br><br />
+       if (!empty($this-&gt;time_start)) {</br><br />
+             $this-&gt;time_start = $this-&gt;getMicrotime();</br><br />
+       }</br><br />
+}</br></p>
+<p>Since the Performance object is a singleton, the class variable $time_start ought to persist as long as the object.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-33e0-46e3-838e-4088cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 22, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>David Rodger: As I designed this class, $time_start is supposed to contain the time the application has started and not the time the class has first been instanced. Now when the $TIME_START variable isn't available (it is set by cakephp), then I fall back to the earliest time I can be sure of, that the app has already been running (the time the class has been created/accessed for the first time for that matter).</p>
+<p>I want it to be like this because if you have only one timer and want to see if the functionality it tracks is reasonably fast, you can't rely on the absolute time the function takes, because you have nothing to compare it to. So for that reason I compare my functions with the total execution time of my app in order to see if they are efficent or not as this will be a reasonable indicator with all hardware.</p>
+<p>Hope that clarifies it ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-e1f4-44f3-bc89-4ca9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f0b8fa14cbee5edfdeeac6b8f9ad062d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://tariquesani.net/" rel="nofollow">Tarique Sani</a>						</strong>
+						<strong>said 
+						on Jun 25, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Why not simply use selective profiling of Xdebug?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-9694-40b0-bdbc-43c1cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 25, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Because I've never heard of xdebug before and sometimes you can't install extensions on the server you have to work with. That's about it, feel free to use whatever suits your needs best.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

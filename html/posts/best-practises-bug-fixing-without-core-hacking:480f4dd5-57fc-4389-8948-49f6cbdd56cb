@@ -1,0 +1,510 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Best Practises: Bug Fixing without Core Hacking &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/best-practises-bug-fixing-without-core-hacking:480f4dd5-57fc-4389-8948-49f6cbdd56cb">Best Practises: Bug Fixing without Core Hacking</a></h2>	<div class="posted-on">
+		<p>Posted on 1/2/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p><b>Update:</b> I fixed a minor bug in the code. I don't think it changes anything but I've forgot to pass some variable as a reference which it should be passed as. I also corrected the code snippet below.</p>
+<p>One thing I've been confronted with since the first time I've used CakePHP is that there where bugs that I would need to fix in order to make my apps work. Now I could have just gone into the file and change the stuff around, but the problem was that all these fixes would be lost with the next update, no matter if the problem still existed or not.</p>
+<p>So what I found was that most of the Problems can be traced back to Model, Controller, View (and Helpers). Here is where Cake's very good architecture comes in handy, since you can just use classes that extend your "Fix-Classes". But how does one exactly do that? Since I think it's something a lot of people will come across I've created a little Zip package called FlexiFix which contains a vendor folder with a fix_controller, fix_model and fix_view and ... (this was the most difficult thing), a folder called "helper" where you can put in files that will overwrite existing helpers like Html, but extend the original ones.</p>
+<p>So if you want to try out my little package the download it here: <a href="/downloads/flexifix 0.2.zip">(flexifix 0.2.zip)</a> [3,57 kbyte].</p>
+<p>If you want to do it yourself but are interested in the way I overwrite exisiting helper classes have a look at this snippet out of fix_view.php:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> &amp;_loadHelpers<span class="br0">&#40;</span>&amp;<span class="re0">$loaded</span>, <span class="re0">$helpers</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span>&nbsp;&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$loadedHelpers</span> = &amp;parent::_loadHelpers<span class="br0">&#40;</span><span class="re0">$loaded</span>, <span class="re0">$helpers</span><span class="br0">&#41;</span>;&nbsp; &nbsp; &nbsp; <br />
+<br />
+&nbsp; &nbsp; <span class="re0">$fixHelperFolder</span> = <span class="kw2">&amp;new</span> Folder<span class="br0">&#40;</span>VENDORS.DS.<span class="st0">'flexifix'</span>.DS.<span class="st0">'helpers'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$fixHelperFiles</span> = <span class="re0">$fixHelperFolder</span>-&gt;<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'^.*<span class="es0">\.</span>php$'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$emptyLoaded</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$fixHelperFiles</span> <span class="kw1">as</span> <span class="re0">$num</span> =&gt; <span class="re0">$file</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/list"><span class="kw3">list</span></a><span class="br0">&#40;</span><span class="re0">$helperName</span>, <span class="re0">$ext</span><span class="br0">&#41;</span> = <a href="http://www.php.net/explode"><span class="kw3">explode</span></a><span class="br0">&#40;</span><span class="st0">'.'</span>, <span class="re0">$file</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$helperName</span> = Inflector::<span class="me2">camelize</span><span class="br0">&#40;</span><span class="re0">$helperName</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$fixHelperName</span> = <span class="st0">'Fix'</span>.<span class="re0">$helperName</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">require_once</span> VENDORS.DS.<span class="st0">'flexifix'</span>.DS.<span class="st0">'helpers'</span>.DS.<span class="re0">$file</span>; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$fixHelper</span> = &amp;parent::_loadHelpers<span class="br0">&#40;</span><span class="re0">$emptyLoaded</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="re0">$fixHelperName</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$loadedHelpers</span><span class="br0">&#91;</span><span class="re0">$helperName</span><span class="br0">&#93;</span> = <span class="re0">$fixHelper</span><span class="br0">&#91;</span><span class="re0">$fixHelperName</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/unset"><span class="kw3">unset</span></a><span class="br0">&#40;</span><span class="re0">$fixHelper</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$loadedHelpers</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>I hope this helps people to seperate their own bug fixes from the applications they write and therefore making updating an easier part of life.</p>
+<p>--Felix<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-57fc-4389-8948-49f6cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbest-practises-bug-fixing-without-core-hacking%3A480f4dd5-57fc-4389-8948-49f6cbdd56cb &amp;title=Best+Practises%3A+Bug+Fixing+without+Core+Hacking';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbest-practises-bug-fixing-without-core-hacking%3A480f4dd5-57fc-4389-8948-49f6cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbest-practises-bug-fixing-without-core-hacking%3A480f4dd5-57fc-4389-8948-49f6cbdd56cb&amp;title=Best+Practises%3A+Bug+Fixing+without+Core+Hacking&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbest-practises-bug-fixing-without-core-hacking%3A480f4dd5-57fc-4389-8948-49f6cbdd56cb&amp;title=Best+Practises%3A+Bug+Fixing+without+Core+Hacking';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/mac-tip-fixing-postfix-after-time-machine-restore:480f4dd6-dfc0-45fc-95ee-4de5cbdd56cb">Mac Tip: Fixing Postfix after Time Machine restore</a></li>
+							<li><a href="/posts/hacking-everything-the-good-way:480f4dd5-5a0c-46b5-97da-4597cbdd56cb">Hacking everything (the good way)</a></li>
+							<li><a href="/posts/hacking-a-commercial-airport-wlan:480f4dd5-50a0-40c6-aa60-4afccbdd56cb">Hacking a commercial airport WLAN</a></li>
+							<li><a href="/posts/Fixing_a_bad_commit_in_git:4aafbda3-ac2c-49b8-b041-1bc9cbdd56cb">Fixing non-atomic commits in git</a></li>
+							<li><a href="/posts/hacking-the-wires:48ae63ea-9888-482f-9a28-44684834cda3">Hacking the Wires</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/best-practises-bug-fixing-without-core-hacking:480f4dd5-57fc-4389-8948-49f6cbdd56cb">19 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/best-practises-bug-fixing-without-core-hacking:480f4dd5-57fc-4389-8948-49f6cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dd7-ef18-4ae7-a367-4095cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7fca546408cc6d46ab158f06baed2535&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nate&nbsp;						</strong>
+						<strong>said 
+						on Feb 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>If you have a patch for Cake, why not just submit it with a ticket and help everyone else out, too?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-bd68-441d-841a-4a4dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fd24ab9b18c0a2aa04d70ab266eb57ae&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							RosSoft&nbsp;						</strong>
+						<strong>said 
+						on Feb 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey! this is good. I'm gonna try it. But please report all the bugs you found</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-3e38-4351-9af4-4174cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f4112f3023c643bf2f7b32c9c5dcfcba&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakebaker.wordpress.com" rel="nofollow">Daniel Hofstetter</a>						</strong>
+						<strong>said 
+						on Feb 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I think it is a good solution when you want to distribute your application like rdBloggery and you don't want to force the people to patch their cake installation. </p>
+<p>Personally, I fix bugs directly in the core as updating and merging is almost always very easy thanks to tools like Subclipse.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-db74-4acb-ba29-4009cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nate: Well this doesn't mean that you don't submit tickets. It just means that you can go from one stable releases to the next without having to merge the trunk every night. This way you only fix the stuff you really need to have working right now without beeing afraid of breaking your app by changing function definitions. Personally I think life can be much easier if you run with the same code base for a while (~2 weeks) and don't always move the ground that you are trying to build on ^^.</p>
+<p>RosSoft: I will, np.</p>
+<p>Daniel Hofstetter: Well, if you are confortable with SVN and merge/diff/patch tools then that is propably just as good as what I am doing. But for everybody like me who doesn't have enough experience with SVN to reall rely on it this and likes the idea of using stable branches, this should be as fast and easy as what you are doing.</p>
+<p>Another thing I like about extending things instead of hacking them is that you can add functionality to helpers that will maybe never become part of the core, but really are a part to ajax, js, html, etc. in your mind.</p>
+<p>PS: I'm interested in feedback of people who tried it out.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-72b0-4875-8247-4d0fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fd24ab9b18c0a2aa04d70ab266eb57ae&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							RosSoft&nbsp;						</strong>
+						<strong>said 
+						on Feb 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Definitively it is useful. I have a lot of troubles with IIS and fix_controller.php is the best place to hack the core.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-f3e4-466a-803f-4bd9cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>RosSoft: I'm glad it helps you getting cake to run for you properly and you can avoid the use of core hacks. (PhpNut_ banns people who hack the core ^^).</p>
+<p>I just updated flexifix to 0.2 which is just a very minor bug fix. I've forgot an <i>&</i>-sign somewhere. Oh well, not it is in ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-3058-44bc-9e28-42c2cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fd24ab9b18c0a2aa04d70ab266eb57ae&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							RosSoft&nbsp;						</strong>
+						<strong>said 
+						on Feb 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>OK after updating to RC4, finally I have removed the hacks of the core and moved to flexifix the rest of hacks that remains</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-8b44-4f7c-a874-4086cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>RosSoft: If you find yourself in the situation of needing to "hack" something that can't be done with flexifix let me know about it and I'll see what I can do. Otherwise have fun baking ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-85b4-4bc6-b27c-40ffcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4e3ed95df080a431a41316795a3dc978&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://nemontemi.wordpress.com" rel="nofollow">Kiyoshi</a>						</strong>
+						<strong>said 
+						on Feb 10, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Your solution reminded me to my problem that is: I have some code from other programmer that I want to use in my app, and it uses AppController to make some system-wide verifications.<br />
+The problem is that I don't want to merge his Appcontroler inside mine because both code is still under development, and it should get a lot of conflicts to me and he.</br><br />
+I thought in some kind of "abstraction layer", as you are used to think of, of his application, that can communicate with mine, without to make merges, but it can visible to all my application, and eventually I can make some customizations.</br></p>
+<p>Do you have any idea?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-9f00-4e9f-b949-40bbcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 10, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Kiyoshi: You should really come in IRC and hang out in #cakephp and/or #cakemmm since that's the best way for solving problems like this. My nickname there is the_undefined and if you type this name in I get an sound alert so you'll grab my attention : ).</p>
+<p>One idea before: If function-names & parameters are still changing you could make a function-router that will solve problems that are results of changing function names. Depending on how OOP the code is you could either overload() the classes or create a function that you use like com('function', $param1, $param2, etc.); and wenn development bekcomes more stable you do a regex_replace on those calls in your php-documents and replace them with normal function calls. Uhm but that's just a thought, no idea how practically I'd be. I' would need to know more about the two projects to come up with something more concrete, so come on irc! : P</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-0968-4530-acaf-45eacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fd24ab9b18c0a2aa04d70ab266eb57ae&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							RosSoft&nbsp;						</strong>
+						<strong>said 
+						on Feb 14, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Flexifix is great, but now I need to override the file tags.ini.php, but I want to override only a few tags (I don't want to copy all the file)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-eb58-456c-890d-4636cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6cacda6f9cdac54d60f51d6190631fd8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Naonak&nbsp;						</strong>
+						<strong>said 
+						on Jun 15, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>&amp;_loadHelpers(&amp;$loaded, $helpers) is bugged.</p>
+<p>Only first fixhelper is loaded because :</p>
+<p>  9.   foreach($fixHelperFiles as $num =&gt; $file);</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-dfc0-4c03-a8fe-46a6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6cacda6f9cdac54d60f51d6190631fd8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Naonak&nbsp;						</strong>
+						<strong>said 
+						on Jun 15, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>My comment was strip, so :</p>
+<p>  9. foreach($fixHelperFiles as $num =&gt; $file); // here  ";"<br />
+10. {</br></p>
+<p>If removed, it cause infinite loops because already loaded helpers aren't pass to parent method.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-e49c-464d-9067-41d9cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 15, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sry, I can't follow your logic, could you explain this using a couple more words? I This class has worked good for me so far, even so I seldom used it. What exact problem did you have when using it? What errors?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-a720-4e37-aad5-410dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=674b69c920925cab2c94bbcbf6132046&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Mark&nbsp;						</strong>
+						<strong>said 
+						on Aug 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ros, I just can't get the helper functionality to work on php5 and the most recent stable distro of cake.</p>
+<p>fix_view.php is being included by the vendor code, but the function   function &amp;_loadHelpers( &amp;$loaded, $helpers )   is never being executed. This makes sense to me. </p>
+<p>How is this function supposed to be called?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-f6a8-46d4-a970-4d49cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=674b69c920925cab2c94bbcbf6132046&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Mark&nbsp;						</strong>
+						<strong>said 
+						on Aug 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>sorry, scratch that last comment.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-482a7994-ec50-4ba7-b6cc-66054834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b63c2d00125474973e2c1919f610fd92&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							RainChen&nbsp;						</strong>
+						<strong>said 
+						on May 14, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>why deprecate this? I think it's great. Or is there a better way to extend the helper without core hacking ?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4830ae86-b558-4497-ba57-05914834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2a6fb076ed91d29c6c5275b2bc1c6885&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Pixelastic&nbsp;						</strong>
+						<strong>said 
+						on May 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'm actually wondering how to override the FormHelper::file() and the only way I've found so far is copying the entire cake/libs/view/helpers/form.php to app/view/helpers/form.php and make the changed needed here.</p>
+<p>I would love a better solution for overriding core helpers, and as you're marking this post as deprecated I wonder if you've come with a better solution ?</p>
+<p>P.S : In fact, I don't really need to override this method, I can find a workaround by playing around with the before/between/after options but I would appreciate an other way if you know one.</p>
+<p>Thanks,</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4830b07e-6d80-4f3d-b69d-45ac4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2a6fb076ed91d29c6c5275b2bc1c6885&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Pixelastic&nbsp;						</strong>
+						<strong>said 
+						on May 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Oh, and btw, the Flexifix link is broken, I can't try your way</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

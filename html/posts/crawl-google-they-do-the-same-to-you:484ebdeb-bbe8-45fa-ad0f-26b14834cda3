@@ -1,0 +1,311 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Crawl Google, they do the same to you ; ) &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/crawl-google-they-do-the-same-to-you:484ebdeb-bbe8-45fa-ad0f-26b14834cda3">Crawl Google, they do the same to you ; )</a></h2>	<div class="posted-on">
+		<p>Posted on 10/6/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p><a href="http://marcgrabanski.com/">Marc Grabanski</a> just had the great idea of using google to help with the migration of your site to a new domain / url schema. Just get a list of all pages google has indexed from your site and then use that as your basis for checking if your migration worked or not. This is very convenient because you do not have to know all your own urls yourself, and you'll only get the relevant ones (if they are not in google they are unlikely to have traffic).</p>
+<p>So here is some quick code for crawling Google instead of being crawled by them in CakePHP:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> GoogleIndexShell <span class="kw2">extends</span> Shell <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">function</span> main<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; App::<span class="me2">import</span><span class="br0">&#40;</span><span class="st0">'HttpSocket'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <a href="http://www.php.net/list"><span class="kw3">list</span></a><span class="br0">&#40;</span><span class="re0">$site</span><span class="br0">&#41;</span> = <span class="re0">$this</span>-&gt;<span class="me1">args</span>;<br />
+&nbsp; &nbsp; <span class="re0">$Socket</span> = <span class="kw2">new</span> HttpSocket<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$links</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$start</span> = <span class="nu0">0</span>;<br />
+&nbsp; &nbsp; <span class="re0">$num</span> = <span class="nu0">100</span>;<br />
+&nbsp; &nbsp; <span class="kw1">do</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$r</span> = <span class="re0">$Socket</span>-&gt;<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'http://www.google.com/search'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'hl'</span> =&gt; <span class="st0">'en'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'as_sitesearch'</span> =&gt; <span class="re0">$site</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'num'</span> =&gt; <span class="re0">$num</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'filter'</span> =&gt; <span class="nu0">0</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'start'</span> =&gt; <span class="re0">$start</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/preg_match_all"><span class="kw3">preg_match_all</span></a><span class="br0">&#40;</span><span class="st0">'/href=&quot;([^&quot;]+)&quot; class=&quot;?l&quot;?/is'</span>, <span class="re0">$r</span>, <span class="re0">$matches</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/die"><span class="kw3">die</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">'Error: Could not parse google results'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$links</span> = <a href="http://www.php.net/array_merge"><span class="kw3">array_merge</span></a><span class="br0">&#40;</span><span class="re0">$links</span>, <span class="re0">$matches</span><span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$start</span> = <span class="re0">$start</span> + <span class="re0">$num</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">while</span> <span class="br0">&#40;</span><a href="http://www.php.net/count"><span class="kw3">count</span></a><span class="br0">&#40;</span><span class="re0">$matches</span><span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span><span class="br0">&#41;</span> &gt;= <span class="re0">$num</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$links</span> = <a href="http://www.php.net/array_unique"><span class="kw3">array_unique</span></a><span class="br0">&#40;</span><span class="re0">$links</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><a href="http://www.php.net/sprintf"><span class="kw3">sprintf</span></a><span class="br0">&#40;</span><span class="st0">'-&gt; Found %d links on google:'</span>, <a href="http://www.php.net/count"><span class="kw3">count</span></a><span class="br0">&#40;</span><span class="re0">$links</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">hr</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><a href="http://www.php.net/join"><span class="kw3">join</span></a><span class="br0">&#40;</span><span class="st0">&quot;<span class="es0">\n</span>&quot;</span>, <span class="re0">$links</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Usage is as simple as running:</p>
+<pre class="terminal">./cake google_index debuggable.com</pre>
+<p>Which should produce an output like this:</p>
+<pre class="terminal">Welcome to CakePHP v1.2.0.7125 beta Console
+---------------------------------------------------------------
+App : app
+Path: /Users/felix/dev/www/php5/debuggable/app
+---------------------------------------------------------------
+-> Found 293 links on google:
+---------------------------------------------------------------
+<a href="http://debuggable.com/">http://debuggable.com/</a>
+<a href="http://debuggable.com/contracting">http://debuggable.com/contracting</a>
+<a href="http://debuggable.com/contact">http://debuggable.com/contact</a>
+<a href="http://debuggable.com/workshops">http://debuggable.com/workshops</a>
+<a href="http://debuggable.com/open-source/fixtures-shell">http://debuggable.com/open-source/fixtures-shell</a>
+<a href="http://debuggable.com/open-source/google-analytics-api">http://debuggable.com/open-source/google-analytics-api</a>
+<a href="http://debuggable.com/posts/thinking-what:480f4dd5-5f1c-4d37-99b0-4768cbdd56cb">http://debuggable.com/posts/thinking-what:480f4dd5-5f1c-4d37-99b0-4768cbdd56cb</a>
+<a href="http://debuggable.com/posts/jquerycamp07:480f4dd6-8d40-44e1-8551-4a58cbdd56cb">http://debuggable.com/posts/jquerycamp07:480f4dd6-8d40-44e1-8551-4a58cbdd56cb</a>
+...
+</pre>
+<p>Oh and if you want to see more shell sample code, also check out our <a href="http://debuggable.com/open-source/fixtures-shell">FixtureShell</a> and the <a href="http://debuggable.com/posts/fixturesshell-share-your-test-data:481c6041-392c-4757-85c1-7cc74834cda3">blog post for it</a>.</p>
+<p>-- Felix Geisendörfer aka the_undefined</p>
+<p>PS: Please note that this is a quick hack, and any non-trivial change in the markup google uses will break. This is only meant for temporary usage.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/484ebdeb-bbe8-45fa-ad0f-26b14834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcrawl-google-they-do-the-same-to-you%3A484ebdeb-bbe8-45fa-ad0f-26b14834cda3 &amp;title=Crawl+Google%2C+they+do+the+same+to+you+%3B+%29';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcrawl-google-they-do-the-same-to-you%3A484ebdeb-bbe8-45fa-ad0f-26b14834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcrawl-google-they-do-the-same-to-you%3A484ebdeb-bbe8-45fa-ad0f-26b14834cda3&amp;title=Crawl+Google%2C+they+do+the+same+to+you+%3B+%29&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcrawl-google-they-do-the-same-to-you%3A484ebdeb-bbe8-45fa-ad0f-26b14834cda3&amp;title=Crawl+Google%2C+they+do+the+same+to+you+%3B+%29';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/Google_Chrome_for_Mac:4aaa8f79-859c-4792-aa13-4c6ccbdd56cb">Google Chrome for Mac</a></li>
+							<li><a href="/posts/cakephp-bleeding-edge-google-group:480f4dd6-73e4-487a-9c7d-4b86cbdd56cb">CakePHP Bleeding Edge - Google Group</a></li>
+							<li><a href="/posts/using-rest-api%e2%80%99s-as-models-in-cakephp-a-google-calendar-example:480f4dd5-02c0-464e-941c-4774cbdd56cb">Using REST Api’s as Models in CakePHP / A Google Calendar example</a></li>
+							<li><a href="/posts/update-on-cakephp-google-analytics-apimodel:480f4dd5-7044-47bc-945a-4d90cbdd56cb">Update on CakePHP Google Analytics API/Model</a></li>
+							<li><a href="/posts/google-analytics-php-api-cakephp-model:480f4dd5-b2a4-452a-b4ed-4f3fcbdd56cb">Google Analytics PHP Api (CakePHP Model)</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/new-google-analytics-api:480f4dd6-c59c-445f-8ce0-4202cbdd56cb">New Google Analytics API / DataSource!</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/crawl-google-they-do-the-same-to-you:484ebdeb-bbe8-45fa-ad0f-26b14834cda3">6 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/crawl-google-they-do-the-same-to-you:484ebdeb-bbe8-45fa-ad0f-26b14834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-484ed5d1-6040-4d19-82a5-74a54834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=72adbe20a0084cf8c66b22abc0f71cd1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Kim Biesbjerg&nbsp;						</strong>
+						<strong>said 
+						on Jun 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Cool! Just as I'm about to finish a cake website that is going to replace an old one! Any tips for redirecting these urls to the new ones? I usually do it in htaccess.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-484f0bc0-44a4-4df1-8a15-1ff14834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=edfc4a8478edaf01fe35371a5e895ff4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Khaled&nbsp;						</strong>
+						<strong>said 
+						on Jun 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great post ... I didn't expect to be simple like that ... thanks Felix</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-484f9b70-d968-4471-9f9a-776b4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Kim: mod_rewrite is a good choice if you don't have lot of urls (&lt; 1000?). For everything else I would catch CakePHPs error404 using an AppError handler and then check a table called legacy_urls for the correct mapping.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-484fdf08-4624-4476-85bb-071d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=aed4764c437801c47c596131f070e44e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://marcgrabanski.com" rel="nofollow">Marc</a>						</strong>
+						<strong>said 
+						on Jun 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This worked beautifully by the way.  Thanks a lot.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4851f564-e1ec-44b3-8db5-24bc4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=72adbe20a0084cf8c66b22abc0f71cd1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.kosmosgrafisk.dk" rel="nofollow">Kim Biesbjerg</a>						</strong>
+						<strong>said 
+						on Jun 13, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix: Right, might actually make a useful plugin for my CMS. Fill the database with indexed urls and have a user interface where you can map the indexed url to the corresponding content on the new site. Great! Thanks for the code snippet - Really enjoy your posts!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4869d66f-11b0-4646-a9cf-76774834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7cff787e2dd47c966c8aec25c32fca45&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.ourexplorer.com" rel="nofollow">Jean</a>						</strong>
+						<strong>said 
+						on Jul 01, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Cool indeed.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

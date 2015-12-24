@@ -1,0 +1,411 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Simple global Ajax activity indicator with jQuery &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/simple-global-ajax-activity-indicator-with-jquery:480f4dd6-7508-4aea-9850-4139cbdd56cb">Simple global Ajax activity indicator with jQuery</a></h2>	<div class="posted-on">
+		<p>Posted on 27/6/07 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>I'm currently doing something very cool which I intend to write about in great detail later on. I'm refactoring all JS for my current web app (the secret one that was supposed to launch like 3 month ago ^^) from an MVC-ish class approach to jQuery plugins. It's gorgeous!. My code is getting smaller, easier to read and more robust. I really can't await writing a more lengthy post about this topic and why I believe that JS is one of the hottest languages these days but requires a different mindset then what we are used to from PHP and other scripting languages.</p>
+<p>Anyway, back to the topic. One of the things I just refactored was the code I use to display a little ajax activity indicator so Users know when the app is working on somethings for them. Since the result is a pretty generic little script I thought it might be interesting for others to look at:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$<span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> $headline = $<span class="br0">&#40;</span><span class="st0">'h1:first'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; $<span class="br0">&#40;</span>document<span class="br0">&#41;</span>.<span class="me1">ajaxSend</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; $headline<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">'activity'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">'activity'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; $<span class="br0">&#40;</span>document<span class="br0">&#41;</span>.<span class="me1">ajaxStop</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; $headline.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">'activity'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span>;</div>
+<p>Notes: I don't use the $headline variable out of PHP habits but as a mean to indicate jQuery objects throughout my application. The 'removeClass' call in the ajaxSend closure is neccessary since otherwise you might add the 'activity' class twice to the $headline if two requests are going on at the same time which is something I usually try to avoid.</p>
+<p>In the application you can then see a little <a href="http://www.napyfab.com/ajax-indicators/">ajax spinner</a> show up whenever requests are taking place:</p>
+<p><img src="http://img516.imageshack.us/img516/6512/activityln3.png" style="border: 1px solid #000;"></p>
+<p>I hope some of you find this little snippet useful ; ).</p>
+<p>Some unrelated news: I don't know how many unique downloads my <a href="http://www.thinkingphp.org/2007/06/17/screencast-using-vendor-branching-and-cakephp/">svn screencast</a> received but my stats say it swallowed around 250 GB in traffic which is sort of nuts. When I found out about it I was kind of scared for a second but then remembered that I recently upgraded my web hosting plan to one where I have unlimited traffic - which saved me 100 euros in bandwidth fees ; ).</p>
+<p>So stay tuned for upcoming stuff like the finished <a href="http://www.thinkingphp.org/2007/06/14/containable-20-beta/">Containable behavior</a>, some other code and posts I got in my backlog as well as the launch of my little web application.</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-7508-4aea-9850-4139cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsimple-global-ajax-activity-indicator-with-jquery%3A480f4dd6-7508-4aea-9850-4139cbdd56cb &amp;title=Simple+global+Ajax+activity+indicator+with+jQuery';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsimple-global-ajax-activity-indicator-with-jquery%3A480f4dd6-7508-4aea-9850-4139cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsimple-global-ajax-activity-indicator-with-jquery%3A480f4dd6-7508-4aea-9850-4139cbdd56cb&amp;title=Simple+global+Ajax+activity+indicator+with+jQuery&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsimple-global-ajax-activity-indicator-with-jquery%3A480f4dd6-7508-4aea-9850-4139cbdd56cb&amp;title=Simple+global+Ajax+activity+indicator+with+jQuery';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/an-ajax-file-upload-progressbar:480f4dd5-ec84-4f60-b69f-470bcbdd56cb">An Ajax file upload progressbar</a></li>
+							<li><a href="/posts/encode-html-entities-with-jquery:480f4dd6-13cc-4ce9-8071-4710cbdd56cb">Encode HTML entities with jQuery</a></li>
+							<li><a href="/posts/rightjs-1-5-6-8-times-faster-than-jquery:4b1fc009-1940-4d26-bdc6-0af2cbdd56cb">RightJS 1.5: 6-8 times faster than jQuery</a></li>
+							<li><a href="/posts/jquery-madness-at-the-workshop-in-raleigh,-nc,-sepetember-6th---7th:48a9b405-7574-495b-b75e-2d284834cda3">jQuery Goodness at the Workshop in Raleigh, NC, September 6th - 7th</a></li>
+							<li><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/jac-comment-box-auto-completer-jquery-plugin:48ce581c-a2ac-48ed-9a27-2c4c4834cda3">Jac: Comment box name auto completer (jQuery plugin)</a></li>
+							<li><a href="/posts/getting-serious-with-jquery-adding-custom-css-selectors:480f4dd6-e834-4cf6-a5cc-478ccbdd56cb">Getting serious with jQuery - Adding custom CSS selectors</a></li>
+							<li><a href="/posts/uhhhwat-introduction-to-the-jquery-community:480f4dd6-c598-474e-a57a-44e7cbdd56cb">&quot;uhhh.......WAT?&quot; - Introduction to the jQuery community</a></li>
+							<li><a href="/posts/simple-listshelper-for-displaying-nested-ul-ol-lists:480f4dd5-19f4-4612-9508-4797cbdd56cb">Simple ListsHelper for displaying nested ul / ol lists</a></li>
+							<li><a href="/posts/ten-simple-tricks-that-will-make-you-a-valuable-colleague-part-i:480f4dfe-dfe0-44f3-9af7-46a0cbdd56cb">Ten Simple Tricks That Will Make You A Valuable Colleague, Part I</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/simple-global-ajax-activity-indicator-with-jquery:480f4dd6-7508-4aea-9850-4139cbdd56cb">13 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/simple-global-ajax-activity-indicator-with-jquery:480f4dd6-7508-4aea-9850-4139cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dec-9e80-4e38-9fa8-4394cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Jun 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Good stuff!</p>
+<p>Also that ajax indicators list is great. Thanks for sharing!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-630c-4838-aa8c-42fccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5695d132647061781c8f95becd2ddb0f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Grant Cox&nbsp;						</strong>
+						<strong>said 
+						on Jun 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>For future screencasts perhaps have a direct link to download the FLV.  I watched it once, then closed the browser tab.  I went to show a colleague and it re-downloaded the lot (I hadn't even closed the browser).  And finally I downloaded the FLV myself for future reference.</p>
+<p>So that's 360MB from me :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-74d4-4988-b8ae-4110cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Grant: Haha, I guess you were not the only one playing this game ; ). A download link is a good idea so. Will add one now.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-d7dc-4543-aaf5-4139cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2a4f4f2259921a89fbb16f44034f395a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.marianoiglesias.com.ar" rel="nofollow">Mariano Iglesias</a>						</strong>
+						<strong>said 
+						on Jun 28, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix, the link to the Containeable behavior is wrong. Also, you DO plan to change the name as we discussed, right? ;)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-f544-41e9-bb23-42fbcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 28, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Mariano: Link fixed. Other then that: The force DOES NOT help YOU when trying to manipulate ME ... : ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-4274-46e1-a768-4640cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b330a513c819d44531aedbd3fcd8e64a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Welja&nbsp;						</strong>
+						<strong>said 
+						on Jun 28, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I am very curious about you're JS approach because now that i finally 'mastered' php and cake, the cool JS stuff is a bit of a messy heap in my projects. So i hope that you find the time soon :)</p>
+<p>Why not put the screencasts on YouTube? </p>
+<p>Thanks for the great posts, i always read you're stuff!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-55cc-4c58-a76a-414acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=62fafe9955806fcf6e6e882787de7698&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.housebolt.com" rel="nofollow">Garret</a>						</strong>
+						<strong>said 
+						on Jun 28, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yahoo has a great Javascript lecture video series over at Yahoo UI. http://developer.yahoo.com/yui/theater/. Douglas Crockford, Yahoo's resident javascript expert gives the lectures. They're a bit dry at points but I learned a ton of things about javascript that I didn't already know.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-be10-4e5b-bcdc-44edcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ac93f8dadcdd1c057947257e47c0150f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Francis&nbsp;						</strong>
+						<strong>said 
+						on Jun 28, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hello,<br />
+I am interested about your host unlimited bandwidth? care to share?</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-c27c-412e-9a4c-4497cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jul 03, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Welja: Quality. I don't think YouTube let's you have good quality 800x600 video on their site.</p>
+<p>Garret: I watched some of those, definitely recommend them too. But Crockford is not that great of a public speaker as he is a JS guru ; ).</p>
+<p>Francis: It's a German company called all-inkl.com and they're truly awesome. It's shared hosting but it withstood 2 digg.com front page hits, they're support is *outstanding^3* and accessing them in the USA is super fast as well (see this site). So go ahead an <a href="http://all-inkl.com/eng/index.php?cna=webhosting&cnb=tarifuebersicht&PHPSESSID=eac16c9d8cd1778251f985ba591bd253" rel="nofollow">check them out here</a>, I use their 7,95 € / month package.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-cf88-49e1-ae55-41bccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=dc51f58249aa6abec7e79abff23d294e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							GreyCells&nbsp;						</strong>
+						<strong>said 
+						on Jul 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix</p>
+<p>I'm with Welja - the JS structure in my apps are shameful and I desperately need some help to wrench control from the dark side.</p>
+<p>With a teaser like: "It's gorgeous!", it's positively cruel to not follow the great FOSS tradition - release early, release often :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-1404-4443-9138-494fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=28f33a796cf361ed95326de67bee16e3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Phil&nbsp;						</strong>
+						<strong>said 
+						on Nov 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi,</p>
+<p>I included your "Global AJAX activity indicator" script in the  section of my PHP script as:</p>
+<p>$(function() {<br />
+    var $headline = $('h1:first');</br><br />
+    $(document).ajaxSend(function() {</br><br />
+        $headline</br><br />
+            .removeClass('activity')</br><br />
+            .addClass('activity');</br><br />
+    });</br><br />
+    $(document).ajaxStop(function() {</br><br />
+        $headline.removeClass('activity')</br><br />
+    });</br><br />
+});</br></p>
+<p>The PHP page takes almost 16 to 17 secs to load....and while it's loading, it does not show up the "ajax spinner" as an activity going on.</p>
+<p>I also tried calling the script's function in the  as :</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-496fb432-41c0-4d4f-bd42-45e74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5c8e61f63aeced42a39e1444c4894d0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							bit&nbsp;						</strong>
+						<strong>said 
+						on Jan 15, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey, here's an idea, jQuery script kiddie: instead of using removeClass() in the send function, you can use one of the first and most basic statements in programming, an IF STATEMENT. Amazing isn't it?</p>
+<p>You jQuery groupies have lost all touch with good programming. Some of you I suspect have never even used javascript on it's own!</p>
+<p>You call your code small and robust as if you don't need to add to it a huge 4-5kb library, filled with functions you don't use.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-496fb7aa-fb8c-48d8-8943-5ee24834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 15, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>bit: Thanks for your suggestion.</p>
+<p>What is good programming? Making everything as fast as possible? Or making everything as simple as possible? Your suggestion is indeed valid and one could say that CPU cycles are being wasted here. So if you are going to use this in a senario with more then ... I guess 30 AJAX requests / second you should indeed go ahead and apply your optimization! Cheers mate, stay happy ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

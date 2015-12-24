@@ -1,0 +1,464 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Are we done yet? &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/are-we-done-yet:499342c9-0494-434e-97fb-3e4b4834cda3">Are we done yet?</a></h2>	<div class="posted-on">
+		<p>Posted on 11/2/09 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>If you have worked with progress indicators in the past you might have had the same thought that always makes you wonder.</p>
+<p>Should I write:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$done</span> == <span class="re0">$total</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// We are done, move on</span><br />
+<span class="br0">&#125;</span></div>
+<p>or should I write:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$done</span> &gt;= <span class="re0">$total</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// We are done, move on</span><br />
+<span class="br0">&#125;</span></div>
+<p>that is the question!</p>
+<p>Today I went for the '==' route because the $done variable should never be bigger than the $total one.</p>
+<p>I think this comes right down to your development philosophy: Should weird conditions in your application that seem "harmless" be silently ignored or should they cause a crash?</p>
+<p>I guess I'm the <a href="http://www.codinghorror.com/blog/archives/000576.html">fail often fail early</a> type.</p>
+<p>What type are you?</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/499342c9-0494-434e-97fb-3e4b4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fare-we-done-yet%3A499342c9-0494-434e-97fb-3e4b4834cda3 &amp;title=Are+we+done+yet%3F';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fare-we-done-yet%3A499342c9-0494-434e-97fb-3e4b4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fare-we-done-yet%3A499342c9-0494-434e-97fb-3e4b4834cda3&amp;title=Are+we+done+yet%3F&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fare-we-done-yet%3A499342c9-0494-434e-97fb-3e4b4834cda3&amp;title=Are+we+done+yet%3F';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/are-we-done-yet:499342c9-0494-434e-97fb-3e4b4834cda3">19 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/are-we-done-yet:499342c9-0494-434e-97fb-3e4b4834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-49934679-36fc-4769-8c2e-45c14834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Feb 11, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'd say you're missing the third option. ;-) Which is to be resilient, or failure-tolerant.  Be cognizant of the edge cases or possibilities for failure, but account for them *and recover*.  In reality, most exceptional conditions that a web application could run into are *recoverable*, even things like unavailable database connections.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-499353d1-9784-4854-b45c-37334834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 11, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nate: “Broken gets fixed. Shoddy lasts forever.”</p>
+<p><a rel="nofollow" href="http://designaday.tumblr.com/post/75496791/truism">http://designaday.tumblr.com/post/75496791/truism</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-499355e1-a37c-423a-952f-572a4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Feb 11, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yeah, but read it to the end where he says "Do it right the first time".  That does not mean do it wrong and call that 'done'.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4993656d-46a0-4303-8bc3-5c5b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=13fc2ba842d7f10e2e98e7a24dd8a14f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.waltdesign.com/" rel="nofollow">Walter Wimberly</a>						</strong>
+						<strong>said 
+						on Feb 11, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I go the first route, but its more habit as when I started coding, you couldn't trust floating point numbers to be correct, and I got smacked early on in programing because of that, the machine read a .05 as .049996... I guess that is one of those learn from your mistakes and I practice it forever, "just in case". (C program on an 16bit processor if anyone remembers those.)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4993656e-96c8-4c6d-b6e4-64a84834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ee19521b6ffa4187371641b6e409d9bc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://php-me.blogspot.com" rel="nofollow">dooltaz</a>						</strong>
+						<strong>said 
+						on Feb 11, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I would go with the >= plain and simple. Why would you build in unnecessary potential for failures that you may never catch once it is released.  I've caught errors like that 2 months after deployment, which made our sites perform poorly.</p>
+<p>Hope for Good Data, Program for Bad Data. No matter what, it still must work.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49937adf-87f8-4f2a-8dcd-1c324834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fb3a3dcfb9e30579cd34020ef35bc979&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://robwilkerson.org" rel="nofollow">Rob Wilkerson</a>						</strong>
+						<strong>said 
+						on Feb 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'm a fail loud, fail proud kind of guy.  I think Nate's point is inarguable, but it's not always realistic. Things get missed. In your example, I assume that there's no known reason why $done should be greater than $total and that you can't conceive of the edge case that would make it so. Doesn't mean you're right, but it's what you have to work with.</p>
+<p>If that's the case, I'd rather have it fail hard and fast so I can analyze the failure and fix the root cause rather than allow it go on doing the right thing for the wrong reason and possibly mask a more harmful issue.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4993a2bf-3eb0-40cb-a796-74794834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f0b8fa14cbee5edfdeeac6b8f9ad062d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://sanisoft.com/blog/" rel="nofollow">Tarique Sani</a>						</strong>
+						<strong>said 
+						on Feb 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Question - would you make the same choice if it was a while loop instead of an if condition?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4993e369-7b8c-4a41-be3e-747c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=88ce51a21e17803a985c884caed7c25a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							picca&nbsp;						</strong>
+						<strong>said 
+						on Feb 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Absolutely the ">=" option. I was told that I should never test this case on "==". Why? Simply because every source code with at least two lines of code (notice that your code fulfils this condition) has at least one bug. And I have to disagree with Rob. "fail hard and fast" depends on how will your app react. I'll assume that it's possible that there is a situation when it's easier to find the bug if that condition passes. Anyway if there is any possibility that your logic will fail at this point (someone adds record to database by hand), make a test if(a>b){}elseif(a==b){}</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4993fe29-3444-4de9-a145-4c7a4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tarique Sani: Good question, if it comes to potentially crashing other requests due to a wild-running while loop I'd use >= for sure. Every script shall cause as much damage as it is capable of causing to the user but non onto its fellow scripts or something - Linux Man Page, 3:10 : p.</p>
+<p>picca: In my case the user would never see an upload progress indicator finish. This is what I want to happen. Because I consider this case very much fucked up, and if it's just gonna end up in some log file I'll no really fix it ; p.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49940b8d-1390-47ab-9ac7-5f654834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fb3a3dcfb9e30579cd34020ef35bc979&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://robwilkerson.org" rel="nofollow">Rob Wilkerson</a>						</strong>
+						<strong>said 
+						on Feb 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>picca makes a good point and, though we still disagree, I should have been clear about my definition of "fail". Failure is a hard and fast _stop_, not an application running itself into the ground via an infinite loop or resource-sucking process of some sort. If the latter is a possibility, then much more care is required (and that could be the case in this example). </p>
+<p>That said, I'm still not a fan of what I'll call "fuzzy programming" - coding for edge cases that should never happen seems like an awfully slippery slope to me. If that kind of case _does_ happen, I want to know that it happened and why it happened so I can understand the behavior pattern and adjust my app for that pattern.  In this case, there's a reason that $done exceeded $total and it might have repercussions beyond this particularly conditional.</p>
+<p>Or maybe I'm just paranoid.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49940ebe-5160-49dc-8455-36854834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=612ad7c3adee43c41ee3e88affe94472&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							NOSLOW&nbsp;						</strong>
+						<strong>said 
+						on Feb 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Rob, I agree with the "I want to know that it happened" during development. When it reaches production, I'm not so sure. Should we log it and hope to fix it later? Felix knows this never happens ;) </p>
+<p>Speaking of progress indicators, if you're writing them for Windows, you must follow the MS standard 95/5 rule: The last 5% of the progress should take 95% of the time :P</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49940f91-7f6c-4035-be13-7f804834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7734ebd348b963ff3e89994cf8838f5b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Steffen&nbsp;						</strong>
+						<strong>said 
+						on Feb 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>If you want stable software, use stable conditions, use >=. First thing you are taught at an computer science apprenticeship.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49941074-2d38-471a-bb2c-64e64834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fb3a3dcfb9e30579cd34020ef35bc979&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://robwilkerson.org" rel="nofollow">Rob Wilkerson</a>						</strong>
+						<strong>said 
+						on Feb 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>NOSLOW, I guess I'm of a mind that production might be the only place you _really_ begin to exercise those edge cases.  Unit tests are good, QA is good, but the rubber meets the road in production. That's where real people with no preconceived notions about how the application _should_ function (or maybe just different ones) use the app. In my experience, users often use apps quite differently from the way they were conceived by developers. </p>
+<p>If my app isn't meeting their need, I think it's important to know why and adjust for that. If I mask problems, I may be missing important patterns of usage in addition to obscure issues I didn't consider.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-499410d9-507c-46c0-8fa0-4c864834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Steffen: In Visual Basic the way to write "Stable" Software like this was to add a line "On Error Resume Next" on top: p.</p>
+<p>On an unrelated note: Is anybody using the new email subscribe feature for blog comments? Does it work?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49941167-b2a0-4213-b573-4c864834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fb3a3dcfb9e30579cd34020ef35bc979&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://robwilkerson.org" rel="nofollow">Rob Wilkerson</a>						</strong>
+						<strong>said 
+						on Feb 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@felix: It works. :-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49941183-6420-4f34-b825-36854834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Rob Wilkerson: Sweet! "On Comment Write Next"</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49941221-57c8-419e-96dd-36854834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fb3a3dcfb9e30579cd34020ef35bc979&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://robwilkerson.org" rel="nofollow">Rob Wilkerson</a>						</strong>
+						<strong>said 
+						on Feb 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@felix - </p>
+<p>One enhancement request: how about adding a link to the post and its comments to the email. I don't see such a link so I have to find my way back here. :-)</p>
+<p>Apologies for the continued digression. Please continue with your regularly scheduled programmming.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-499412bb-e4f4-43ad-8cce-64e74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f0b8fa14cbee5edfdeeac6b8f9ad062d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://sanisoft.com/blog/" rel="nofollow">Tarique Sani</a>						</strong>
+						<strong>said 
+						on Feb 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@felix and how about a link to unsubscribe as well :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-499412f1-8e10-401a-91de-64e34834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tarique Sani: Unsubscribe? Why would you want to do that? : ). I'll add it soon - sorry for the inconvenience meanwhile. : p</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

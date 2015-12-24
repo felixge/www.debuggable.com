@@ -1,0 +1,505 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Blog &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="paging">
+	<a href="/posts/index/page:14" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:11">11</a></span> | <span><a href="/posts/index/page:12">12</a></span> | <span><a href="/posts/index/page:13">13</a></span> | <span><a href="/posts/index/page:14">14</a></span> | <span class="current">15</span> | <span><a href="/posts/index/page:16">16</a></span> | <span><a href="/posts/index/page:17">17</a></span> | <span><a href="/posts/index/page:18">18</a></span> | <span><a href="/posts/index/page:19">19</a></span> <a href="/posts/index/page:16" class="next">Next &raquo;</a></div>
+	<div class="post">
+	<h2><a href="/posts/embracing-the-cloud-locating-resources:49ad7256-9698-49a9-8186-16014834cda3">Embracing the Cloud - Locating Resources</a></h2>	<div class="posted-on">
+		<p>Posted on 3/3/09 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>With the rise of affordable cloud computing (especially services like EC2 and S3) we need to learn to apply additional skills to our craft. One of those is using <a href="http://en.wikipedia.org/wiki/Hashtable">Hashtables</a> to locate resources in our system.</p>
+<p>Here is an example. Lets say your application stores image files uploaded by its users. At some point your hard disk is filling up. Now you have two choices.</p>
+<ul>
+<li>Add another hard drive</li>
+<li>Distribute the files amongst multiple servers</li>
+</ul>
+<p>Choice A is called "<a href="http://en.wikipedia.org/wiki/Scaling_(computer_network)#Scale_vertically_.28scale_up.29">Vertical Scaling</a>" and usually easier. Choice B is "<a href="http://en.wikipedia.org/wiki/Scaling_(computer_network)#Scale_horizontally_.28scale_out.29">Horizontal Scaling</a>". Horizontal scaling is obviously the future, since the <a href="http://www.gotw.ca/publications/concurrency-ddj.htm">free lunch is over</a>.</p>
+<p>So once you decided you want to be serious and not place your bets on vertical scaling, you face a problem. On any given server X how do I know which server holds File Y? The answer is simple, you look it up using a hash function. Since the rise of <a href="http://en.gravatar.com/">Gravatar</a> and <a href="http://git.or.cz/">Git</a>, cryptographic hash functions, especially <a href="http://en.wikipedia.org/wiki/MD5">MD5</a> and <a href="http://en.wikipedia.org/wiki/SHA_hash_functions">SHA1</a>, have become popular general-purpose hashing functions of choice.</p>
+<p>So if you previously stored your file urls in the database like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span> = <span class="st0">'http://example.org/files/'</span>. <span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'id'</span><span class="br0">&#93;</span>;<br />
+storeAt<span class="br0">&#40;</span><span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span>, <a href="http://www.php.net/file_get_contents"><span class="kw3">file_get_contents</span></a><span class="br0">&#40;</span><span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'path'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>You would rewrite it to look like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> url<span class="br0">&#40;</span><span class="re0">$file</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$servers</span> = <a href="http://www.php.net/file_get_contents"><span class="kw3">file_get_contents</span></a><span class="br0">&#40;</span><span class="st0">'http://resources.example.org/file_servers.json'</span><span class="br0">&#41;</span>.<br />
+&nbsp; <span class="re0">$servers</span> = json_decode<span class="br0">&#40;</span><span class="re0">$servers</span>, <span class="kw2">true</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="re0">$sha1</span> = <a href="http://www.php.net/sha1_file"><span class="kw3">sha1_file</span></a><span class="br0">&#40;</span><span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'path'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$servers</span> <span class="kw1">as</span> <span class="re0">$key</span> =&gt; <span class="re0">$server</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/preg_match"><span class="kw3">preg_match</span></a><span class="br0">&#40;</span><span class="re0">$key</span>, <span class="re0">$sha1</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$server</span> . <span class="st0">'/'</span> . <span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'id'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; throw <span class="kw2">new</span> Exception<span class="br0">&#40;</span><span class="st0">'invalid server list'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span> = url<span class="br0">&#40;</span><span class="re0">$file</span><span class="br0">&#41;</span>;<br />
+storeAt<span class="br0">&#40;</span><span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span>, <a href="http://www.php.net/file_get_contents"><span class="kw3">file_get_contents</span></a><span class="br0">&#40;</span><span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'path'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>And store a file called file_servers.json on resources.example.org:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="br0">&#123;</span><br />
+&nbsp; <span class="st0">&quot;/^[a-l]/&quot;</span>: <span class="st0">&quot;http://bob.files.example.org&quot;</span>,<br />
+&nbsp; <span class="st0">&quot;/^[l-z]/&quot;</span>: <span class="st0">&quot;http://john.files.example.org&quot;</span>,<br />
+<span class="br0">&#125;</span></div>
+<p>If you now cache the file_servers.json list on each machine and make sure resources.example.org is available, you can scale to pretty much infinity.</p>
+<p>How does it work? Simple. We wrote a hash function called url() which will assign a unqiue location to each newly uploaded file. This works by computing the sha1 fingerprint for the file. Then we pick a server based on the leading characters of the sha1, using the ranges defined in file_servers.json.</p>
+<p>If you need to remove full servers or add new ones, you simply modify file_servers.json file.</p>
+<p>The probably largest and most sophisticated implementation of the concept above seems to be <a href="http://en.wikipedia.org/wiki/Amazon_S3">Amazon S3</a> right now.</p>
+<p>The jury is still out if they will manage to win the upcoming cloud war, but there are exciting times ahead of us. The recession is putting many companies, big and small, in need of saving costs through innovation. So what renewable energies and fuel efficient cars are for other industries, is  what cloud computing is to us.</p>
+<p>Think that cloud computing is not going to help with your current clients and applications? Invest an hour to put your clients static files (and uploads) in Amazon S3 and downgrade his shared hosting account. He now needs less storage, bandwidth and CPU power and gets redundant backup as a bonus.</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/49ad7256-9698-49a9-8186-16014834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fembracing-the-cloud-locating-resources%3A49ad7256-9698-49a9-8186-16014834cda3 &amp;title=Embracing+the+Cloud+-+Locating+Resources';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fembracing-the-cloud-locating-resources%3A49ad7256-9698-49a9-8186-16014834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fembracing-the-cloud-locating-resources%3A49ad7256-9698-49a9-8186-16014834cda3&amp;title=Embracing+the+Cloud+-+Locating+Resources&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fembracing-the-cloud-locating-resources%3A49ad7256-9698-49a9-8186-16014834cda3&amp;title=Embracing+the+Cloud+-+Locating+Resources';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/embracing-the-cloud-locating-resources:49ad7256-9698-49a9-8186-16014834cda3">11 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/embracing-the-cloud-locating-resources:49ad7256-9698-49a9-8186-16014834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/how-to-save-half-a-second-on-every-request-of-your-cakephp-app:49a69610-8648-4d65-815d-754c4834cda3">How To Save Half A Second On Every CakePHP Request</a></h2>	<div class="posted-on">
+		<p>Posted on 26/2/09 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>as an application comes closer and closer to its launch date, not having cared about performance during development becomes more and more of a problem.<br />
+There are several ways to improve the performance of your CakePHP application. The first thing one would think about is generally caching of your views and database queries. However, during development stage implementing caching can cause a lot of confusion and phantom bugs. In short, it might waste your time which is better put into features. Any performance improvement that does not effect how data is retrieved, stored and cached is welcome. If it affects your entire site and not only parts of it, it's all the better.</p>
+<p>With the help of <a href="http://mark-story.com/">Mark Story's</a> excellent <a href="http://thechaw.com/debug_kit">CakePHP DebugKit</a> I got the idea of disabling Cake's reverse route lookup to gain performance. Almost half a second per request for link-heavy sites.</p>
+<h2>The Hack</h2>
+<p>As you use the HtmlHelper to create links with the helper's link() method, you throw an url in the form of an array at Router::url() everytime. With the complex routes parsing done for every $html->link() call, this becomes a big issue for link-heavy sites. There will be the most overhead if you have a lot of routes installed. So I thought if it's easily possible to override the behaviour for standard urls that don't need routes parsing. A classical example would be:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$html</span>-&gt;<span class="me1">link</span><span class="br0">&#40;</span><span class="st0">'Check this Article'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'controller'</span> =&gt; <span class="st0">'articles'</span>, <span class="st0">'action'</span> =&gt; <span class="st0">'view'</span>, <span class="re0">$article</span><span class="br0">&#91;</span><span class="st0">'Article'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'id'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>Since this link is dynamic (depending on the article id) it does not need routes parsing (most of the time, more on that later). There are others, like 4 parameters, 2 parameters, pagination links that have named params in the url .. or only one parameter if only the 'controller' is present and you want to access the index action, etc. I have tinkered a little and wrote some code that we are using in most of our projects now and it has worked out quite well. In fact it is saving almost <strong>half a second</strong> for every request:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;"><span class="kw2">&lt;?php</span><br />
+<span class="kw2">class</span> AppHelper <span class="kw2">extends</span> Helper <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">function</span> url<span class="br0">&#40;</span><span class="re0">$url</span> = <span class="kw2">null</span>, <span class="re0">$full</span> = <span class="kw2">false</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$Router</span> =&amp; Router::<span class="me2">getInstance</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$Router</span>-&gt;__params<span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$Router</span><span class="br0">&#41;</span> &amp;&amp; !<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$Router</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'requested'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$params</span> = <span class="re0">$Router</span>-&gt;__params<span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$params</span> = <a href="http://www.php.net/end"><span class="kw3">end</span></a><span class="br0">&#40;</span><span class="re0">$Router</span>-&gt;__params<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$params</span><span class="br0">&#91;</span><span class="st0">'admin'</span><span class="br0">&#93;</span><span class="br0">&#41;</span> &amp;&amp; <span class="re0">$params</span><span class="br0">&#91;</span><span class="st0">'admin'</span><span class="br0">&#93;</span> &amp;&amp; !<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'admin'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'admin'</span><span class="br0">&#93;</span> = <span class="re0">$params</span><span class="br0">&#91;</span><span class="st0">'admin'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/is_array"><span class="kw3">is_array</span></a><span class="br0">&#40;</span><span class="re0">$url</span><span class="br0">&#41;</span> &amp;&amp; <a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'controller'</span><span class="br0">&#93;</span><span class="br0">&#41;</span> &amp;&amp; !<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'page'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'action'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'action'</span><span class="br0">&#93;</span> = <span class="st0">'index'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$admin</span> = <span class="st0">''</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'admin'</span><span class="br0">&#93;</span><span class="br0">&#41;</span> &amp;&amp; <span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'admin'</span><span class="br0">&#93;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$admin</span> = Configure::<span class="me2">read</span><span class="br0">&#40;</span><span class="st0">'Routing.admin'</span><span class="br0">&#41;</span> . <span class="st0">'/'</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/strpos"><span class="kw3">strpos</span></a><span class="br0">&#40;</span><span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'action'</span><span class="br0">&#93;</span>, <span class="re0">$admin</span> . <span class="st0">'_'</span><span class="br0">&#41;</span> === <span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'action'</span><span class="br0">&#93;</span> = <a href="http://www.php.net/substr"><span class="kw3">substr</span></a><span class="br0">&#40;</span><span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'action'</span><span class="br0">&#93;</span>, <a href="http://www.php.net/strlen"><span class="kw3">strlen</span></a><span class="br0">&#40;</span><span class="re0">$admin</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/unset"><span class="kw3">unset</span></a><span class="br0">&#40;</span><span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'admin'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/unset"><span class="kw3">unset</span></a><span class="br0">&#40;</span><span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'plugin'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$count</span> = <a href="http://www.php.net/count"><span class="kw3">count</span></a><span class="br0">&#40;</span><span class="re0">$url</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="nu0">4</span> == <span class="re0">$count</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'/'</span> . <span class="re0">$admin</span> . <span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'controller'</span><span class="br0">&#93;</span> . <span class="st0">'/'</span> . <span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'action'</span><span class="br0">&#93;</span> . <span class="st0">'/'</span> . <span class="re0">$url</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span> . <span class="st0">'/'</span> . <span class="re0">$url</span><span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="nu0">3</span> == <span class="re0">$count</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'id'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$url</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span> = <span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'id'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'/'</span> . <span class="re0">$admin</span> . <span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'controller'</span><span class="br0">&#93;</span> . <span class="st0">'/'</span> . <span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'action'</span><span class="br0">&#93;</span> . <span class="st0">'/'</span> . <span class="re0">$url</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="nu0">2</span> == <span class="re0">$count</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'/'</span> . <span class="re0">$admin</span> . <span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'controller'</span><span class="br0">&#93;</span> . <span class="st0">'/'</span> . <span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'action'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="nu0">1</span> == <span class="re0">$count</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'/'</span> . <span class="re0">$admin</span> . <span class="re0">$url</span><span class="br0">&#91;</span><span class="st0">'controller'</span><span class="br0">&#93;</span> . <span class="st0">'/index'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="kw1">return</span> parent::<span class="me2">url</span><span class="br0">&#40;</span><span class="re0">$url</span>, <span class="re0">$full</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<span class="kw2">?&gt;</span></div>
+<h2>How does it work?</h2>
+<p>As you can see, it's simply overriding the default behaviour for Helper::url() in your AppHelper. It goes through the classical cases and builds out the url via lightweight string concatenation. Not a beauty, but fast.</p>
+<p>What it really does is <strong>breaking the reverse routing</strong> feature. That means if you specify such a route:</p>
+<p>Router::connect('/login', array('controller' => 'auth', 'action' => 'login'));</p>
+<p>Then create a link with $html->link('Login Now!', array('controller' => 'auth', 'action' => 'login')), the link url will not automagially transform into '/login' anymore. This is pretty bad, however if your site hardcodes the urls used in routes, this is not a problem. This means that instead of providing array('controller' => 'auth', 'action' => 'login'), you just do '/login', which I always do for specific pages since there aren't so many of them. So the hack helps for non-dynamic cases.</p>
+<h2>Usage</h2>
+<p>To use the code, acknowledge it's more like a site-specific optimization. By the way, for those of you who think I should just go ahead and contribute a patch to CakePHP that will make it possible to disable reverse route lookup, I talked to Nate already. He said he is in the process of rewriting the Routing for Cake 1.3 and it will be much faster. In the meantime, this might help you.</p>
+<p>Copy and paste the url() function to your AppHelper class in app_helper.php. Try it out and see if it works for you. Obviously, it doesn't affect all cases and is pretty specific to how we write urls. However, it falls back to the normal url parsing if no appropriate case is found. Any suggestions, bug reports and contributions are welcome.</p>
+<h2>Disclaimer:</h2>
+<p>In no way do I claim that this code will work as well for you as it does for us. It's specific to how urls are written using $html->link() and you might screw over your app by using this. Take extra caution when using it - especially with reverse route lookup - and make sure to test your app thoroughly.</p>
+<p>-- Tim Koschuetzki aka DarkAngelBGE<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/49a69610-8648-4d65-815d-754c4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-save-half-a-second-on-every-request-of-your-cakephp-app%3A49a69610-8648-4d65-815d-754c4834cda3 &amp;title=How+To+Save+Half+A+Second+On+Every+CakePHP+Request';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-save-half-a-second-on-every-request-of-your-cakephp-app%3A49a69610-8648-4d65-815d-754c4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-save-half-a-second-on-every-request-of-your-cakephp-app%3A49a69610-8648-4d65-815d-754c4834cda3&amp;title=How+To+Save+Half+A+Second+On+Every+CakePHP+Request&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-save-half-a-second-on-every-request-of-your-cakephp-app%3A49a69610-8648-4d65-815d-754c4834cda3&amp;title=How+To+Save+Half+A+Second+On+Every+CakePHP+Request';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/how-to-save-half-a-second-on-every-request-of-your-cakephp-app:49a69610-8648-4d65-815d-754c4834cda3">17 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/how-to-save-half-a-second-on-every-request-of-your-cakephp-app:49a69610-8648-4d65-815d-754c4834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/are-we-done-yet:499342c9-0494-434e-97fb-3e4b4834cda3">Are we done yet?</a></h2>	<div class="posted-on">
+		<p>Posted on 11/2/09 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>If you have worked with progress indicators in the past you might have had the same thought that always makes you wonder.</p>
+<p>Should I write:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$done</span> == <span class="re0">$total</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// We are done, move on</span><br />
+<span class="br0">&#125;</span></div>
+<p>or should I write:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$done</span> &gt;= <span class="re0">$total</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// We are done, move on</span><br />
+<span class="br0">&#125;</span></div>
+<p>that is the question!</p>
+<p>Today I went for the '==' route because the $done variable should never be bigger than the $total one.</p>
+<p>I think this comes right down to your development philosophy: Should weird conditions in your application that seem "harmless" be silently ignored or should they cause a crash?</p>
+<p>I guess I'm the <a href="http://www.codinghorror.com/blog/archives/000576.html">fail often fail early</a> type.</p>
+<p>What type are you?</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/499342c9-0494-434e-97fb-3e4b4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fare-we-done-yet%3A499342c9-0494-434e-97fb-3e4b4834cda3 &amp;title=Are+we+done+yet%3F';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fare-we-done-yet%3A499342c9-0494-434e-97fb-3e4b4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fare-we-done-yet%3A499342c9-0494-434e-97fb-3e4b4834cda3&amp;title=Are+we+done+yet%3F&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fare-we-done-yet%3A499342c9-0494-434e-97fb-3e4b4834cda3&amp;title=Are+we+done+yet%3F';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/are-we-done-yet:499342c9-0494-434e-97fb-3e4b4834cda3">19 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/are-we-done-yet:499342c9-0494-434e-97fb-3e4b4834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/disable-strict-host-checking-for-git-clone:49896ff3-0ac0-4263-9703-1eae4834cda3">Disable strict host checking for git clone</a></h2>	<div class="posted-on">
+		<p>Posted on 4/2/09 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>while playing with automated machine configuration in EC2 for a few minutes this morning, I stumbled across a little hurdle. One of the items in my init script was the cloning of a git repository from GitHub.</p>
+<p>This normally isn't a very difficult task to automate. However, it can become so if you see the following message:</p>
+<pre class="terminal">
+$ git clone git@github.com:debuggable/secret-project.debuggable.com.git
+Initialized empty Git repository in /var/git/secret-project.debuggable.com/.git/
+The authenticity of host 'github.com (65.74.177.129)' can't be established.
+RSA key fingerprint is 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48.
+Are you sure you want to continue connecting (yes/no)?
+</pre>
+<p>Interactive questions like this can be really annoying when it comes to automation. Luckily there is an easy fix available.</p>
+<pre class="terminal">
+$ echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+</pre>
+<p>This will add a configuration line to your ~/.ssh/config script that will silently ignore the authenticity of github.com.</p>
+<p>-- Felix Geisendörfer aka the_undefined</p>
+<p>PS: If the topic of passing ssh options to your git commands is interesting to you, make sure to also check out this <a href="http://git.or.cz/gitwiki/GitTips#head-09f587b7791b46d995947704f9ddc4958dff54c3">git wiki page</a>.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/49896ff3-0ac0-4263-9703-1eae4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdisable-strict-host-checking-for-git-clone%3A49896ff3-0ac0-4263-9703-1eae4834cda3 &amp;title=Disable+strict+host+checking+for+git+clone';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdisable-strict-host-checking-for-git-clone%3A49896ff3-0ac0-4263-9703-1eae4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdisable-strict-host-checking-for-git-clone%3A49896ff3-0ac0-4263-9703-1eae4834cda3&amp;title=Disable+strict+host+checking+for+git+clone&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdisable-strict-host-checking-for-git-clone%3A49896ff3-0ac0-4263-9703-1eae4834cda3&amp;title=Disable+strict+host+checking+for+git+clone';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/disable-strict-host-checking-for-git-clone:49896ff3-0ac0-4263-9703-1eae4834cda3">6 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/disable-strict-host-checking-for-git-clone:49896ff3-0ac0-4263-9703-1eae4834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/restarting-a-php-command-line-script:4988968d-b9d0-4fe8-af30-05544834cda3">Restarting a command line PHP script</a></h2>	<div class="posted-on">
+		<p>Posted on 3/2/09 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>ever wrote a PHP script that acts as a daemon? No? Read <a href="http://kevin.vanzonneveld.net/techblog/article/create_daemons_in_php/">Kevin's</a> excellent post on the topic as well as <a href="http://www.van-steenbeek.net/?q=php_pcntl_fork">this one explaining the low-level plumbing</a>.</p>
+<p>If you already have, you might have run into the scenario where you want the script to restart itself. For example you might have changed the code of the script after it started running, and you want to replace the current process with one running the new code.</p>
+<p>After a bit of trial and error, I present my glorious hack:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<a href="http://www.php.net/die"><span class="kw3">die</span></a><span class="br0">&#40;</span><a href="http://www.php.net/exec"><span class="kw3">exec</span></a><span class="br0">&#40;</span><a href="http://www.php.net/join"><span class="kw3">join</span></a><span class="br0">&#40;</span><span class="st0">' '</span>, <span class="re0">$GLOBALS</span><span class="br0">&#91;</span><span class="st0">'argv'</span><span class="br0">&#93;</span><span class="br0">&#41;</span> . <span class="st0">' &gt; /dev/null &amp;'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>Feel free to share your own war stories and suggestions regarding PHP scripts acting as daemons : ).</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4988968d-b9d0-4fe8-af30-05544834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frestarting-a-php-command-line-script%3A4988968d-b9d0-4fe8-af30-05544834cda3 &amp;title=Restarting+a+command+line+PHP+script';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Frestarting-a-php-command-line-script%3A4988968d-b9d0-4fe8-af30-05544834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frestarting-a-php-command-line-script%3A4988968d-b9d0-4fe8-af30-05544834cda3&amp;title=Restarting+a+command+line+PHP+script&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frestarting-a-php-command-line-script%3A4988968d-b9d0-4fe8-af30-05544834cda3&amp;title=Restarting+a+command+line+PHP+script';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/restarting-a-php-command-line-script:4988968d-b9d0-4fe8-af30-05544834cda3">7 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/restarting-a-php-command-line-script:4988968d-b9d0-4fe8-af30-05544834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="paging">
+	<a href="/posts/index/page:14" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:11">11</a></span> | <span><a href="/posts/index/page:12">12</a></span> | <span><a href="/posts/index/page:13">13</a></span> | <span><a href="/posts/index/page:14">14</a></span> | <span class="current">15</span> | <span><a href="/posts/index/page:16">16</a></span> | <span><a href="/posts/index/page:17">17</a></span> | <span><a href="/posts/index/page:18">18</a></span> | <span><a href="/posts/index/page:19">19</a></span> <a href="/posts/index/page:16" class="next">Next &raquo;</a></div>	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

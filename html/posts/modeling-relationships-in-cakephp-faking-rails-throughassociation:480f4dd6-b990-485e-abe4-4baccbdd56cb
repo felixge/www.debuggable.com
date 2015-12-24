@@ -1,0 +1,1213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Modeling relationships in CakePHP (faking Rails' ThroughAssociation) &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/modeling-relationships-in-cakephp-faking-rails-throughassociation:480f4dd6-b990-485e-abe4-4baccbdd56cb">Modeling relationships in CakePHP (faking Rails' ThroughAssociation)</a></h2>	<div class="posted-on">
+		<p>Posted on 26/10/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Ok, this has been something I found very delightful when I first heard about it (see this <a href="http://blog.scribestudio.com/articles/2006/07/09/david-heinemeier-hansson-railsconf-2006-keynote-address">speech by DHH</a> and <a href="http://www.loudthinking.com/lt-files/worldofresources.pdf">slides</a>). But somehow I didn't really manage to blog about so far, which means it's about time to do this right now. The topic can be simply discribed as: How to implement <a href="http://wiki.rubyonrails.org/rails/pages/ThroughAssociations">ThroughAssociations</a> (as they are known in Ruby on Rails) in CakePHP. The idea behind it is pretty simple: Often you have two Models that are associated with each other where setting the associations themself via hasAndBelongsToMany isn't quite enough for what you try to to. Let's say you have Users and Groups and you want to not only store what Users belong to what groups, as you would normally do with a join table and a hasAndBelongsToMany relationship, but you would also like to track when a User became a Member of a certain group and maybe even add a note about this. If you try to add additional fields to your Users or Group tables you'll certainly run into issues very soon, because this information simply does not belong into any of those Models. Same goes for creating the relationship (i.e. adding a User to a Group) with the Controllers. There is no way to do this in a CRUDful way. You'll have to add odball functions like UsersController::add_to_group() or in other words create messy code.</p>
+<p>I don't like to break the CRUD pattern, so when I first heard about the concept of modeling relationship I instantly fell in love with it. Basically what this is all about, is to create a Model and a Controller for your relationships. So in our Users<-HABTM->Groups example we would simply create an additonal Memberships Model. Our new relationship would be: User->hasMany->Groups through Membership. And Group->hasMany->Users through Membership. Now unfortunatly CakePHP doesn't support the through association, but there is a simple workaround to this. Instead of using the through operator we do this:</p>
+<p>User->hasMany->Membership<br />
+Group->hasMany->Membership<br />
+Membership->belongsTo->User<br />
+Membership->belongsTo->Group</p>
+<p>Because of CakePHP's recursive associations, we achieve a similar effect as the trough operator would have in Rails. Now the cool thing is that you can add additional fields to your memberships table like 'id', 'created', 'updated', 'note' and others.</p>
+<p>In case you want to see it working, I setup a little scaffolding demo here:<br />
+<a href="http://demos.thinkingphp.org/relationship_modeling/">http://demos.thinkingphp.org/relationship_modeling/</a></p>
+<p>I'll probably have to take it down due to Spam soon, but meanwhile feel free to browse around and to perform non-destructive operations. I didn't add any validation, nor a check for forbidding double Memberships, but this would be easy.</p>
+<p>In case you are interested in the code, here it comes:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> User <span class="kw2">extends</span> AppModel<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">&quot;User&quot;</span>; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$hasMany</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Membership'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> Group <span class="kw2">extends</span> AppModel<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">&quot;Group&quot;</span>;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$hasMany</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Membership'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> Membership <span class="kw2">extends</span> AppModel<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">&quot;Membership&quot;</span>;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$belongsTo</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'User'</span>, <span class="st0">'Group'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> UsersController <span class="kw2">extends</span> AppController<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">&quot;Users&quot;</span>;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$scaffold</span>;<br />
+<span class="br0">&#125;</span></div>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> GroupsController <span class="kw2">extends</span> AppController<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">&quot;Groups&quot;</span>;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$scaffold</span>; &nbsp; &nbsp;<br />
+<span class="br0">&#125;</span></div>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> MembershipsController <span class="kw2">extends</span> AppController<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">&quot;Memberships&quot;</span>;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$scaffold</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>And not to forget the SQL Dump:<br />
+[sql]CREATE TABLE `groups` (<br />
+  `id` int(11) NOT NULL auto_increment,<br />
+  `name` varchar(11) default NULL,<br />
+  PRIMARY KEY  (`id`)<br />
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;</p>
+<p>CREATE TABLE `memberships` (<br />
+  `id` int(11) NOT NULL auto_increment,<br />
+  `user_id` int(11) default NULL,<br />
+  `group_id` int(11) default NULL,<br />
+  `created` datetime default NULL,<br />
+  `updated` datetime default NULL,<br />
+  `note` text,<br />
+  PRIMARY KEY  (`id`)<br />
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;</p>
+<p>CREATE TABLE `users` (<br />
+  `id` int(11) NOT NULL auto_increment,<br />
+  `name` varchar(255) default NULL,<br />
+  PRIMARY KEY  (`id`)<br />
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;[/sql]</p>
+<p>Alright, I hope this is similiar enough to the ThroughAssociation in Rails to scale, in case there are some RoR folks listening, let me know if I missed something.</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-b990-485e-abe4-4baccbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmodeling-relationships-in-cakephp-faking-rails-throughassociation%3A480f4dd6-b990-485e-abe4-4baccbdd56cb &amp;title=Modeling+relationships+in+CakePHP+%28faking+Rails%27+ThroughAssociation%29';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmodeling-relationships-in-cakephp-faking-rails-throughassociation%3A480f4dd6-b990-485e-abe4-4baccbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmodeling-relationships-in-cakephp-faking-rails-throughassociation%3A480f4dd6-b990-485e-abe4-4baccbdd56cb&amp;title=Modeling+relationships+in+CakePHP+%28faking+Rails%27+ThroughAssociation%29&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmodeling-relationships-in-cakephp-faking-rails-throughassociation%3A480f4dd6-b990-485e-abe4-4baccbdd56cb&amp;title=Modeling+relationships+in+CakePHP+%28faking+Rails%27+ThroughAssociation%29';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/your-cakephp-applications-homepage:49428953-d2ec-4362-b82e-1ee34834cda3">Your CakePHP application&#039;s Homepage</a></li>
+							<li><a href="/posts/gwoo-starts-the-first-cakephp-based-blog:480f4dd5-c668-48c7-b6d8-436ccbdd56cb">gwoo starts the first CakePHP based blog</a></li>
+							<li><a href="/posts/making-error-handling-for-modelsave-more-beautiful-in-cakephp:480f4dd6-7110-4706-8230-4a97cbdd56cb">Making error handling for Model::save more beautiful in CakePHP</a></li>
+							<li><a href="/posts/update-on-cakephp-google-analytics-apimodel:480f4dd5-7044-47bc-945a-4d90cbdd56cb">Update on CakePHP Google Analytics API/Model</a></li>
+							<li><a href="/posts/starting-a-cakephp-community-website-website-framework:480f4dd5-179c-4ff2-be55-4b7acbdd56cb">Starting a CakePHP community website / Website Framework</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/drake-drupal-cakephp-is-making-progress:480f4dd5-7218-454c-92a0-4f44cbdd56cb">Drake (Drupal + CakePHP) is making progress</a></li>
+							<li><a href="/posts/cakephp-rc2-released!:486746fc-65d8-4fba-98b9-1edd4834cda3">CakePHP RC2 Released!</a></li>
+							<li><a href="/posts/controller-testing-in-cakephp:480f4dd5-c62c-4ec2-9a05-422dcbdd56cb">Controller testing in CakePHP</a></li>
+							<li><a href="/posts/slides-for-my-cakephp-unit-testing-talk:480f4dfe-4880-4b82-9a52-4bd8cbdd56cb">Slides for my CakePHP Unit Testing Talk</a></li>
+							<li><a href="/posts/yummy-cakephp-functions-you-should-know-about:480f4dd5-4528-4a53-a0ec-4aa8cbdd56cb">Yummy CakePHP functions you should know about!</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/modeling-relationships-in-cakephp-faking-rails-throughassociation:480f4dd6-b990-485e-abe4-4baccbdd56cb">51 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/modeling-relationships-in-cakephp-faking-rails-throughassociation:480f4dd6-b990-485e-abe4-4baccbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4de1-9360-4274-ab79-4e59cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=913676ade654d201c72300fa2345843b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://klunejko.net" rel="nofollow">Konrad Klunejko</a>						</strong>
+						<strong>said 
+						on Oct 26, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nifty, this might come in handy for my next project. Keep them coming Felix! :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-489c-4046-abf7-4ba8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.phpdeveloper.org/news/6579" rel="nofollow">PHPDeveloper.org</a>						</strong>
+						<strong>said 
+						on Oct 26, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p><strong>Felix Geisendorfer's Blog: Modeling relationships in CakePHP (faking Rails ThroughAssociation)...</strong></p>
+<p>...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-78a4-490c-a580-4e5bcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakephp.org/" rel="nofollow">Nate</a>						</strong>
+						<strong>said 
+						on Oct 26, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is already halfway implemented in Cake 1.2, but only for MySQL, i.e.:</p>
+<p>class User extends AppModel {</p>
+<p>    var $hasAndBelongsToMany = array("Group" =&gt; array("with" =&gt; "Memberships"));<br />
+}</br></p>
+<p>And the join table fields will be selected as 'Memberships' within the association.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-16d4-4048-ab0c-48ddcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 26, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>That's great news, guess I should spent more time on Trac ; ). I'm not quite sure if I like the 'with' field, 'through' seems more intuitive to me, but I can life with it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-9284-45e2-b20e-4431cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=af31e731dc3f44620a7874d9602e5bc8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://evanities.wordpress.com" rel="nofollow">Evan</a>						</strong>
+						<strong>said 
+						on Oct 26, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>pretty cool.  i've been asking about this in the google mailing list a few months back. thanks for the idea.</p>
+<p>i hope 1.2 gets into a stable version soon.  there are lots of nifty stuff there that i want to use, things such as this through association and behaviors (acts_as in rails, nice), but i don't want to migrate to it yet.  i was never fond of being on the bleeding edge with edgerails, and i'd never risk using cakephp 1.2 on production apps. (at the risk of sounding too much of a rails copycat, it would make sense to call it edge cake.  after all there's bake, from rake. :) )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-af54-4ddd-afe2-40c0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2ab31489a58f527712d75f36c446a465&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Marcelo de Moraes Serpa&nbsp;						</strong>
+						<strong>said 
+						on Oct 26, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Very nice Felix. Thanks for sharing. I hope Cake 1.2 formally supports this feature :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-f6a8-4def-a96e-45adcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://richardathome.wordpress.com/2006/10/27/links-for-2006-10-27/" rel="nofollow">links for 2006-10-27 &laquo; Richard@Home</a>						</strong>
+						<strong>said 
+						on Oct 27, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] ThinkingPHP and beyond » Modeling relationships in CakePHP (faking Rails’ ThroughAssociation) Modelling ThroughAssociations in CakePHP (tags: cakephp associations model) [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-6970-4bc6-aab6-4d7dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2a2e528a2c071129acaf3c9b3b72708c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							henthoca&nbsp;						</strong>
+						<strong>said 
+						on Nov 08, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I've use something similar to this for a three-way join table.  Like, Users-Resources-Rights. For example, User bob has admin Rights for a classroom Resource. Sort of like a Person to Permissions to Object, coupled association.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-382c-4ff9-8ef7-47d0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f630d74d6d57cd02fa9d62956751d527&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.t8d.de" rel="nofollow">Andreas Stephan</a>						</strong>
+						<strong>said 
+						on Nov 22, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi there,<br />
+nice work. Saved me some trouble. Of course I ran into new problems ;)</br><br />
+How do you get cake to actually perform an update statement instead of an insert for the new tables, if they have a combined primary key. Let's say you want to save the assocation between users and tags and want to add the count of each tag for each user. I made up a table for this, which contains a combined primary key user_id/tag_id and an additional count column. However cake just does not recognize the primary key. It performs new Inserts no matter if the user_id/tag_id combination is already present or not. Is there any way to solve this using CRUD or do I have to use custom SQL?</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-33f4-4f8f-ba90-497ccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Nov 23, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Andreas Stephan: Do not, I repeat, do not use primary composite keys, ever. They are evil and will only cause you trouble ; ). Give your table an id field which is primary and auto incrementing, and take care of forbidding double-entries by yourself. To me that's the best way to go (not only in CakePHP, but in general).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-8b34-4516-ab90-4178cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c55ad2933882b29f628e82b48396b2e6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://walkerhamilton.com" rel="nofollow">Walker Hamilton</a>						</strong>
+						<strong>said 
+						on Jan 16, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Heya Felix,</p>
+<p>Do you have any clue about when/if core will start supporting:</p>
+<p>This through association.<br />
+HABTM searching where a condition is in the foreign model.</br></p>
+<p>Just wondering on these bits. right now, I've been using your faking hacks to get where I need to go....</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-6070-4fd7-b1a5-42b3cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 16, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Walker: The 'with'-association mentioned by nate is working perfectly in Cake 1.2. I'm using it in a project and didn't have a single issue with it. However, keep in mind that in order to really model a relationship you'll still need a Model/Controller for the HABTM table.</p>
+<p>Other then that, I'm using an association like this in my Gallery Model:</p>
+<p>var $hasAndBelongsToMany  = array('Picture' => array('with' => 'GalleryPicture'));</p>
+<p>Let me know if this works for you.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-ded0-4fc3-8ca8-41cfcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c55ad2933882b29f628e82b48396b2e6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://walkerhamilton.com" rel="nofollow">Walker Hamilton</a>						</strong>
+						<strong>said 
+						on Jan 16, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yeah! I definitely appreciate the 'with'.</p>
+<p>As for the Model/Controller for the HABTM table, that the one piece of the puzzle that I'm more than eager to get rid of.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-7960-4446-a133-4282cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4f99b5eb6e9b9a9d08891011cdeb13d8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Bryan Buchs&nbsp;						</strong>
+						<strong>said 
+						on Jan 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix: in your "Gallery-&gt;GalleryPicture</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-7058-461c-8e53-4affcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4f99b5eb6e9b9a9d08891011cdeb13d8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Bryan Buchs&nbsp;						</strong>
+						<strong>said 
+						on Jan 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[... agh, my comment got cut off]</p>
+<p>Anyways, in the example, are bot the Gallery and Picture models $HABTM "with"?</p>
+<p>What's the correct association for the GalleryPicture model? $belongsTo both?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-2c8c-40c4-9aac-4e39cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Bryan: Yeah, I use this for my GalleryPicture Model:</p>
+<p>var $belongsTo = array('Gallery', 'Picture');</p>
+<p>For my Picture Model however, I only use 1 association:</p>
+<p>var $hasMany = array('CachedPicture' => array('dependent' => true));</p>
+<p>This is because I never need to know what Gallery a picture belongsTo if I've not requested it as part of a set of GalleryPictures. Otherwise I'd use a similiar HABTMwith association as for my Gallery Model.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-005c-4760-bcfd-484bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=414555f3e067163ab1c571ceaea95350&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://heberm.googlepages.com/" rel="nofollow">Heber</a>						</strong>
+						<strong>said 
+						on Jan 29, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Usefull information!!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-24b0-4b3f-9a24-4977cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0447a967940da04aed92debd6b30217c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.bistr-o-mathik.org" rel="nofollow">Florian Jung</a>						</strong>
+						<strong>said 
+						on Mar 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Unfortunately I had to find this out by myself. I'm using this kind of approach in my CMS to associate content elements to the navigation nodes thereby sorting them into different slots (main content, sidebar, ...) defined in the layout. So my connectors belong to *three* tables instead of just two. I don't know if this would be possible with TroughAssociations but this "workaround" seems to be much more flexible to me.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-cd9c-4176-8ee8-4277cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4f99b5eb6e9b9a9d08891011cdeb13d8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://bbuchs.f2o.org" rel="nofollow">Bryan Buchs</a>						</strong>
+						<strong>said 
+						on Mar 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ideally, the Through/With functionality will be ironed out in 1.2, but in the meantime I needed to use it on a current project. The only problem I'm having is that if I delete a "User", the associated record in the "Membership" isn't deleted along with it. </p>
+<p>My solution was to include some logic in my controller - FindAllBy on my Membership model, then delete the found ids before deleting the User.</p>
+<p>Is there a more efficient way to do that?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-d2b0-44ff-9ebb-43b9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4f99b5eb6e9b9a9d08891011cdeb13d8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://bbuchs.f2o.org" rel="nofollow">Bryan Buchs</a>						</strong>
+						<strong>said 
+						on Mar 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sorry, nevermind... I had a foreignKey relationship defined in MySQL that was causing the problem.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-7d24-4404-8e2f-47c4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://jpsykes.com/43/from-march-16th-to-20th-i-looked-at" rel="nofollow">jpsykes &raquo; From March 16th to 20th I looked at&#8230;</a>						</strong>
+						<strong>said 
+						on Mar 21, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Modeling relationships in CakePHP (faking Rails’ ThroughAssociation) [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-b8b0-485e-a624-4ecdcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=eb44091716ca34ba89b79f0f98783db1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Damien&nbsp;						</strong>
+						<strong>said 
+						on May 01, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'm sure this is a stupid question, but that fact alone doesn't usually stop me!</p>
+<p>Having spent ages on one part of my system getting HABTM to play nicely, I then realised that I needed to join the tables in some queries in order to use the relationship in a useful way. The technique described here seems to be just the thing.</p>
+<p>However, I'm stuck on how to get the controller for one model (e.g. User) to add the appropriate row into the join table (e.g. Membership). Since I was using HABTM I'm currently trying to pass an array of Membership/Membership ids and use $this-&gt;User-&gt;save($this-&gt;data) - but that's just not working :(</p>
+<p>Oh well, on with the struggle. I just thought it may be worth posting here in case anyone can point out the error of my ways and/or to highlight that such stupid people exist ;)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-fad0-44aa-83a1-435ecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 07, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Damien: I'm not sure I understand your problem properly, but you are welcome to either write it up here (using cakebin for code: http://bin.cakephp.org/add/damien) more lengthy or even better on the mailing list / #cakephp. HTH, Felix</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ded-5f80-4262-bc5a-487dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=078bdad82d6ae364b4536a7f0105be31&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.newtnotes.com" rel="nofollow">JDSilveronnelly</a>						</strong>
+						<strong>said 
+						on Jul 12, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>First of all, thanks for the article! It helped a LOT.</p>
+<p>Just to clarify on one snippet, quote above: "break the CRUD pattern"? Isn't the "pattern" really "MVC"?  CRUD isn't really a "pattern" at all, at least not in the sense used here, in that, *any* select,insert,update,delete goings ons fall into the CRUD scope. If aou use straight up procedural code or CakePHP framework.</p>
+<p>I realize it may sound nitpicky, but I just want to clarify...</p>
+<p>Also, one thing that is NOT clear, still. How would you tackle the problem of changing a lot of memberships at once? Say, all memberships for a particular User?  Something like, from a user interface perspective, a view that shows the Users name, and then a list of all their memberships.  There are checkboxes next to each Membership. Check all, then click the "DELETE" submit button.</p>
+<p>To extend this, since the Membership does not really contain the Group information, it really should be presented as a list of all possible Groups for any User, with checkboxes next to each. Plus, if the User has a Membership relationship with a particular Group, that Group is highlighted somehow.</p>
+<p>How would you go about programming this using CakePHP? I mean, it sounds like this should be a User oriented CakePHP view, but you are really making changes to the Membership model, and not either User or the Group models.  CakePHP (at least as described in the manual, and in scaffolded MVCs), assumes that you are working on one instance of a model at a time.  So how would one build a data array of all the checkboxes that can then be processed, in a loop, as each item in the array being data for the Memberships model?</p>
+<p>I hope that is clear! whew!</p>
+<p>I have a very similar problem, and I figured out a solution, and it works, but I don't know if it is the best, most Cake-y way to do it.</p>
+<p>I'm writing up an article that describes what my solution was. I hope to get it up within a week or so. Then I'll come back for abuse.</p>
+<p>Thanks!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ded-954c-440d-989c-484ccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jul 16, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>JDSilveronnelly:  Sorry I'm a little too busy to give you full support here. But what you are looking for might be in Cake 1.2 -> Model::updateAll / Model::deleteAll.</p>
+<p>HTH, Felix</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ded-84f4-47e9-8614-41f0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c88dda0965a2ed9fdd8aed77ef8605e8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Luke Barker aka battez&nbsp;						</strong>
+						<strong>said 
+						on Jul 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>in the SQL for a case using 'with' , the join table - should I give it a primary ID of its own, or use the 2 foreign keys as it is with a typical HABTM join table (unless I am mistaken). </p>
+<p>Also, thanks for this discussion everyone - was very glad to find it today!!</p>
+<p>Luke</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ded-c4a4-4344-b774-49adcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c88dda0965a2ed9fdd8aed77ef8605e8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Luke Barker aka battez&nbsp;						</strong>
+						<strong>said 
+						on Jul 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I saw on the group that you say to use ID (which is my instinct too, as thats what I ve always done ) but the manual just is thin on HABTM examples. So I did that and it seesm to work OK, I get duplicates but I can add a beforeSave, I think? You mention some extra bits of code but I wasnt certain what you mean though?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ded-3438-4c42-a073-41eacbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jul 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Luke: Use an 'id' field in your join table, the manual is a good start and you'll see it greatly expand rather soon, but for now take my word for it.</p>
+<p>What dupplicates do you get? If you use MySql5 you can make add a UNIQUE index to your 2 FK fields which will prevent dupplicates. Do you use a dedicated Model for the HABTM table? If so you can use beforeSave in it to your liking for records saved with it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ded-6c38-41f2-8bca-4d5ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c88dda0965a2ed9fdd8aed77ef8605e8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Luke Barker aka battez&nbsp;						</strong>
+						<strong>said 
+						on Jul 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hey Felix, thats great. Thanks for the quick response!</p>
+<p>Yes I was getting duplicates - I hadn't set the unique key - think I will do that, as well as add the beforeSave, in which I will check if there is already an entry in the db. </p>
+<p>Also, I understand your point of the manual -- the 1.2 alpha manual stops right at the HABTM example :) and I noticed with a more typical HABTM one, that I hadnt put in an ID that the scaffold still looks for an ID - which never used to happen so I imagine they have built in to use IDs for HABTM tables now. </p>
+<p>Thanks </p>
+<p>Luke</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ded-abb8-4819-9044-487bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c88dda0965a2ed9fdd8aed77ef8605e8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Luke Barker aka battez&nbsp;						</strong>
+						<strong>said 
+						on Jul 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>sorry - I should have said I am using the latest nightly build of 1.2 and that a notice error was given by scaffold (and BAKE IIRC (think they must use same templates?) )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-4430-463d-b352-4997cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c88dda0965a2ed9fdd8aed77ef8605e8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Luke Barker aka battez&nbsp;						</strong>
+						<strong>said 
+						on Jul 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Oh, I should add that I found it tricky getting the modelnames and form of name for "with"=&gt; "JoinTablename"</p>
+<p>do I have it right that for </p>
+<p>Plants and Rooms - the join table is called plants_rooms in MySQL, then the model filenames are</p>
+<p>plant.php, room.php and plants_room.php, and then the model is<br />
+class PlantsRoom extends AppModel {</br></p>
+<p>	var $name = "PlantsRoom"</p>
+<p>like that and in plant.php :</p>
+<p> var $hasAndBelongsToMany = array(<br />
+			"Room'" =? array("with" =&gt; "PlantsRoom"</br></p>
+<p>it throws errors if I dont have this style, at least ;)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ded-ad34-48df-82ca-425bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a9a42175e3befabbb676789158139e05&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://clockinfo.com/" rel="nofollow">Bill Stoddard</a>						</strong>
+						<strong>said 
+						on Aug 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great article! I was doing a similar thing without even knowing what it was called. (I just knew that it was like a hasAndBelongsToMany association join table with extra fields) Here is an example table (for PostgreSQL):</p>
+<p>CREATE TABLE numeric_specs (<br />
+	id SERIAL PRIMARY KEY,</br><br />
+	numeric_spec_name_id INTEGER NOT NULL REFERENCES numeric_spec_names    ON UPDATE RESTRICT ON DELETE RESTRICT,</br><br />
+	item_id INTEGER NOT NULL REFERENCES items ON UPDATE RESTRICT ON DELETE RESTRICT,</br><br />
+	source_id INTEGER NOT NULL REFERENCES sources ON UPDATE RESTRICT ON DELETE RESTRICT,</br><br />
+	sorting_date TIMESTAMP NOT NULL,</br><br />
+	display_date	TEXT NOT NULL,</br><br />
+	value NUMERIC(20,4) NOT NULL,</br><br />
+	numeric_spec_unit_id INTEGER NOT NULL REFERENCES numeric_spec_units ON UPDATE RESTRICT ON DELETE RESTRICT</br><br />
+) WITHOUT OIDS;</br><br />
+CREATE UNIQUE INDEX</br><br />
+	numeric_specs_ak ON</br><br />
+	numeric_specs(numeric_spec_name_id, item_id, sorting_date);</br></p>
+<p>To avoid the duplicate problem, there is a unique index on three of the columns (the foreign keys to the two tables that are being associated as a many to many or hasAndBelongsToMany relationship, plus the sorting_date field so that I can have different values for different dates).</p>
+<p>I created a model for this table so I can insert, update and delete numeric_specs.</p>
+<p>I believe that it would work the same way if I have made the terms in the UNIQUE INDEX be the foreign key, and made id be UNIQUE NOT NULL SERIAL.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ded-d4b8-4423-9b16-4573cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a9a42175e3befabbb676789158139e05&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://clockinfo.com/" rel="nofollow">Bill Stoddard</a>						</strong>
+						<strong>said 
+						on Aug 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Correction: I meant "Primary Key" in the last sentence of the post, not foreign  key. Sorry.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-63cc-4565-8eeb-4721cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f74027d0b26dfba239ba5f771da57c7b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							JT&nbsp;						</strong>
+						<strong>said 
+						on Dec 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Just what I needed.</p>
+<p>Was scratching my head over how to relate Company, Person and Job Title.  A Person can have a number of jobs, a company a number of people and a Person/Company combination can have a job title.</p>
+<p>I added an additional model called EmploymentContract which linked the two tables and carried a job title attribute. Bingo</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-9e34-490a-b912-4c8ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a51a12aa87e368e0cae150a1d3669e1c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Alex&nbsp;						</strong>
+						<strong>said 
+						on Jan 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thank you for the Article, Felix.</p>
+<p>However it is still unlcear to me how to populate extra HABTM fields (useing the new "with"-associations). </p>
+<p>How would you save data e.g. into the "created" and "updated" fields in your memberships model if you would use HABTM associations. How does the array has to look like?</p>
+<p>To save HABTM you would normally just call</p>
+<p>$this-&gt;data['Group']['Group'] = array($this-&gt;Group-&gt;id);<br />
+Then call $this-&gt;User-&gt;save($this-&gt;data); </br></p>
+<p>There is a example here http://www.cakephp.org/files/OCPHP.pdf</p>
+<p>Is Post model (Post HABTM TAG with TaggedPost; additional field is "date":</p>
+<p>function beforeSave() {<br />
+if(!empty($this-&gt;data[‘Tag’])) {</br><br />
+$this-&gt;TaggedPost-&gt;save($this-&gt;data[‘Tag’]);</br><br />
+}</br><br />
+}</br></p>
+<p>How exactly would the array $this-&gt;data[‘Tag’] look like?</p>
+<p>Could you give an example?</p>
+<p>TIA,<br />
+Alex</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-4224-4122-90e1-4f19cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 31, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Alex: You save and manage your HABTM data with its own model. So instead of trying to save your Group with the User model, use the Group model. Same goes for the Tag instead of TaggedPost. HTC</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-5dac-440f-b451-4422cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a51a12aa87e368e0cae150a1d3669e1c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Alex&nbsp;						</strong>
+						<strong>said 
+						on Feb 01, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix: DOH! Bingo! Thx a lot. </p>
+<p>I always tried to follow the docs which explains how to save HABTM:</p>
+<p>"...populate $this-&gt;data[‘OtherModel’][‘OtherModel’] with an array containing the ID (or IDs) of the records you want to associate to, and save the current model, making sure that $this-&gt;data[‘ThisModel’][‘id’] is in place. ..."</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-b328-419c-88b9-45cacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.luizz.it/53/cakephp/habtm-lassociazione-hasandbelongtomany" rel="nofollow">HABTM: l&#8217;associazione HasAndBelongToMany | Luizz</a>						</strong>
+						<strong>said 
+						on Feb 05, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Modeling relationships in CakePHP (faking Rails ThroughAssociation) [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df6-cc94-4cde-80bb-4bbfcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8cf0e5f62082661b4efabb27576df2f2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.eeee.com" rel="nofollow">Chewbaca6000</a>						</strong>
+						<strong>said 
+						on Feb 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is such a common situation in any real application, it really confounds any real developer how the TOYBOYS at cakephp have never dealt/documented it. Total embarrasment.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df6-584c-4ccb-9f04-4006cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Chewbaca6000: Send me an email to felix@thinkingphp.org so we can get the necessary information added to the manual and to show you some of the commitment and energy that exists in this community ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ba6306-2d74-4fd3-9970-6d924834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=42dada27e3e05e67a2f1fab37c6fbe7b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							fornetti&nbsp;						</strong>
+						<strong>said 
+						on Aug 31, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I do not believe this</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48c92246-fda0-41fe-a20f-0e694834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6fb5764da400818a1292541e82b757b3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.moongster.com" rel="nofollow">Stan Moong</a>						</strong>
+						<strong>said 
+						on Sep 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi, I'm a little bit confused when it comes to creating the physical tables.  I understand that we can set associations from CakePHP.</p>
+<p>Can I do this?</p>
+<p>CREATE  TABLE IF NOT EXISTS `jobDurations_posts` (<br />
+  `post_id` INT UNSIGNED NOT NULL ,</br><br />
+  `jobDuration_id` INT UNSIGNED NOT NULL ,</br><br />
+  PRIMARY KEY (`post_id`, `jobDuration_id`) ,</br><br />
+  INDEX fk_posts_has_jobDurations_posts (`post_id` ASC) ,</br><br />
+  INDEX fk_posts_has_jobDurations_jobDurations (`jobDuration_id` ASC) ,</br><br />
+  CONSTRAINT `fk_posts_has_jobDurations_posts`</br><br />
+    FOREIGN KEY (`post_id` )</br><br />
+    REFERENCES `posts` (`id` )</br><br />
+    ON DELETE NO ACTION</br><br />
+    ON UPDATE NO ACTION,</br><br />
+  CONSTRAINT `fk_posts_has_jobDurations_jobDurations`</br><br />
+    FOREIGN KEY (`jobDuration_id` )</br><br />
+    REFERENCES `jobDurations` (`id` )</br><br />
+    ON DELETE NO ACTION</br><br />
+    ON UPDATE NO ACTION);</br></p>
+<p>Or should I use this instead?</p>
+<p>CREATE  TABLE IF NOT EXISTS `jobDurations_posts` (<br />
+  `post_id` INT UNSIGNED NOT NULL ,</br><br />
+  `jobDuration_id` INT UNSIGNED NOT NULL ,</br><br />
+  PRIMARY KEY (`post_id`, `jobDuration_id`) );</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d2179f-7684-45f5-85ea-5dba4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=896fadcdbe4ece09fbffc678dba4a134&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							namrata&nbsp;						</strong>
+						<strong>said 
+						on Sep 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>thanks for the post</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d53523-ee10-4434-8d9d-7ea64834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a8a367ce05db4f7331c843b77363e6a9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dedalus4&nbsp;						</strong>
+						<strong>said 
+						on Sep 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi guys!</p>
+<p>I've a question about HABTM associations.</p>
+<p>I've 3 tables:</p>
+<p>- articles<br />
+- characteristics</br><br />
+- articles_characteristics</br></p>
+<p>"articles_characteristics" is a table that I've created for join articles and characteristics.</p>
+<p>I need that in the table characteristics I can add a new column called "value".<br />
+When inserting a new article, my purpose is to compile the table "articles_characteristics" with this occourrency:</br></p>
+<p>               acticles_id   |   characteristics_id   |   value</p>
+<p>For each article, I've a set of characteristics by insert.<br />
+es:</br></p>
+<p>article: id:1, type:car<br />
+char_0: color -> white</br><br />
+char_1: engine -> electric</br><br />
+char_2: traction -> 4x4</br></p>
+<p>this is the structure of the tables involved:</p>
+<p>articles:</p>
+<p>     id     |    type<br />
+    ------------------</br><br />
+      1     |    car</br></p>
+<p>characteristics: (are stored the generic characteristics assignable to articles)</p>
+<p>     id     |    description<br />
+    -------------------------</br><br />
+      1     |    color</br><br />
+      2     |    engine</br><br />
+      3     |    traction</br></p>
+<p>At the end of the insert into the table "articles_characteristics", I'd like have this situation:</p>
+<p>articles:<br />
+       id        |        type</br><br />
+    ----------------------------------</br><br />
+        0        |        ball</br><br />
+        1        |        car      < --(last inserted)        </p>
+<p>articles_characteristics:</p>
+<p>     articles_id     |    chacteristics_id    |    value<br />
+    -----------------------------------------------------------</br><br />
+          1          |          1             |    white</br><br />
+          1          |          2             |    electric</br><br />
+          1          |          3             |    4x4</br></p>
+<p>Data are inserted in unique session, as multiple rows (a lot of characteristics for each article).</p>
+<p>The question is: is cakephp able to insert data in the table articles_characteristics how do I need by HABTM associations?</p>
+<p>Thanks in advance!!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-496bb209-d868-4b7e-ab15-07774834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ea8a23fb97be561b5d434789eb21ed0e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Evgeny Trefilov&nbsp;						</strong>
+						<strong>said 
+						on Jan 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I have 2 models with habtm to each other. If I edit one item in any model (i.e. name field), when saving cakephp deletes all associations to other model in join table. weird... </p>
+<p>I can workaround this, retrieving associations data and putting it into $this->data, but does it make sense, if I only want to edit details of item? </p>
+<p>I'd go with approach in this article, rather than using habtm.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-496bb4cb-be44-44bb-8dfc-37d64834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ea8a23fb97be561b5d434789eb21ed0e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Evgeny Trefilov&nbsp;						</strong>
+						<strong>said 
+						on Jan 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>uh well, had an input in view which caused all the grief ) have to blame myself. </p>
+<p>another question then - what if I want to edit only associations between models? I have found 2 functions at bakery, addAssoc and deleteAssoc, but maybe cakePhp supports it at the core and I just can't find? say, I have id's of items in both models, and I want to associate them, but without creating model for join table...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-499447e7-0f98-4234-a3c3-675e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ae31f958007ddb80bab149b017df74d8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Wayne&nbsp;						</strong>
+						<strong>said 
+						on Feb 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>What is the syntax for multiple hasandbelongstomany relationships?</p>
+<p>A user has multiple interests<br />
+and</br><br />
+the same user has multiple committees</br><br />
+and</br><br />
+the same user has multiple skills</br></p>
+<p>What does the var $hasandbelongstomany array( ... ); look like in the user model?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49944d19-07c8-41c3-911d-47a94834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ae31f958007ddb80bab149b017df74d8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Wayne&nbsp;						</strong>
+						<strong>said 
+						on Feb 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>What is the syntax for multiple hasandbelongstomany relationships?</p>
+<p>I figured it out!</p>
+<p>var $hasAndBelongsToMany =array('Interest' =><br />
+                          array('className' => 'Interest',					        'joinTable' => 'interests_users',</br><br />
+                                'foreignKey' => 'user_user_id',</br><br />
+                                'associationForeignKey' => 'interest_id',</br><br />
+			        'unique' => true,</br><br />
+				'conditions' => '',</br><br />
+				'fields' => '',</br><br />
+				'order' => '',</br><br />
+				'limit' => '',</br><br />
+				'offset' => '',</br><br />
+				'finderQuery' => '',</br><br />
+				'deleteQuery' => '',</br><br />
+				'insertQuery' => '' ),</br></p>
+<p>				'Committee' =><br />
+                          array('className' => 'Committee',</br><br />
+			        'joinTable' => 'committees_users',</br><br />
+                                'foreignKey' => 'user_user_id',</br><br />
+                                'associationForeignKey' => 'committee_id',</br><br />
+			        'unique' => true,</br><br />
+			        'conditions' => '',</br><br />
+			        'fields' => '',</br><br />
+			        'order' => '',</br><br />
+			        'limit' => '',</br><br />
+			        'offset' => '',</br><br />
+			        'finderQuery' => '',</br><br />
+			        'deleteQuery' => '',</br><br />
+			        'insertQuery' => '' ),</br></p>
+<p>		                'Skill' =><br />
+                          array('className' => 'Skill',</br><br />
+                                'joinTable' => 'skills_users',</br><br />
+                                'foreignKey' => 'user_user_id',</br><br />
+                                'associationForeignKey' => 'officejob_id',</br><br />
+				'unique' => true,</br><br />
+				'conditions' => '',</br><br />
+				'fields' => '',</br><br />
+				'order' => '',</br><br />
+				'limit' => '',</br><br />
+				'offset' => '',</br><br />
+				'finderQuery' => '',</br><br />
+				'deleteQuery' => '',</br><br />
+				'insertQuery' => '' )</br><br />
+				 );</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b69396-9c0c-470a-941c-266a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2410571fda891ba0a8b610c85c546e1d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Jakob&nbsp;						</strong>
+						<strong>said 
+						on Mar 10, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Is this current? Or is the "with" parameter good enough by now?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a0441df-99ec-419d-845e-75704834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=768010cd0fff838f5e2867f4170276f8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.deudtens.com" rel="nofollow">Deudtens</a>						</strong>
+						<strong>said 
+						on May 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>"I didn't add any validation, nor a check for forbidding double Memberships, but this would be easy." < - Ok, tell me ;)</p>
+<p>I am trying to forbid double membership, can you put me on a lead how to do that ?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a3b2975-c8b4-4e09-ae75-6f444834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0869521c730aaef926cebbb5f95e4263&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.xpertspot.com" rel="nofollow">nasir</a>						</strong>
+						<strong>said 
+						on Jun 19, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>How can i use the Composite Key ?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

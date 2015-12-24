@@ -1,0 +1,466 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Suppressing suppressing PHP errors with emptiness &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/suppressing-suppressing-php-errors-with-emptiness:4980895f-b66c-4855-9c12-750d4834cda3">Suppressing suppressing PHP errors with emptiness</a></h2>	<div class="posted-on">
+		<p>Posted on 28/1/09 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>PHP's language constructors that disguise as functions are a bitch! I didn't know that empty() does not throw errors when accessing non-existing array keys, but it's actually in the <a href="http://www.php.net/empty">manual</a>. Thanks to everybody who pointed it out!</p>
+<p>So please consider my <a href="http://debuggable.com/posts/suppressing-php-errors-for-fun-and-profit:49806be9-f1a4-41a7-a3bb-7ff84834cda3">previous post</a> garbage as far as the actual example is concerned. The proper solution is:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$step</span><span class="br0">&#91;</span><span class="st0">'options'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'merge'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="co1">// do stuff</span><br />
+<span class="br0">&#125;</span></div>
+<p>However, my threat of eventually using @ and breaking with other "best practices" remains. I will use whatever solution solves more problems for me then it creates ; ).</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4980895f-b66c-4855-9c12-750d4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsuppressing-suppressing-php-errors-with-emptiness%3A4980895f-b66c-4855-9c12-750d4834cda3 &amp;title=Suppressing+suppressing+PHP+errors+with+emptiness';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsuppressing-suppressing-php-errors-with-emptiness%3A4980895f-b66c-4855-9c12-750d4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsuppressing-suppressing-php-errors-with-emptiness%3A4980895f-b66c-4855-9c12-750d4834cda3&amp;title=Suppressing+suppressing+PHP+errors+with+emptiness&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsuppressing-suppressing-php-errors-with-emptiness%3A4980895f-b66c-4855-9c12-750d4834cda3&amp;title=Suppressing+suppressing+PHP+errors+with+emptiness';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/suppressing-php-errors-for-fun-and-profit:49806be9-f1a4-41a7-a3bb-7ff84834cda3">Suppressing PHP errors for fun and profit</a></li>
+							<li><a href="/posts/handling-database-connection-errors-in-cakephp:480f4dd5-9570-421a-a04d-43cdcbdd56cb">Handling database connection errors in CakePHP</a></li>
+							<li><a href="/posts/dessert-8-render-custom-errors:480f4dd5-6fcc-4a19-8da5-46c2cbdd56cb">Dessert #8 - Render custom errors</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/suppressing-suppressing-php-errors-with-emptiness:4980895f-b66c-4855-9c12-750d4834cda3">16 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/suppressing-suppressing-php-errors-with-emptiness:4980895f-b66c-4855-9c12-750d4834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4980a404-c38c-4d6e-9bb5-170c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=855c563b618c9b12a9c4f38c4ac26ebe&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							zerterone&nbsp;						</strong>
+						<strong>said 
+						on Jan 28, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>why not using :<br />
+if(array_key_exists('merge', $step['options']) ){</br><br />
+which look more like what you were trying to achieve ie. checking the presence of the key "merge" ? though you might want to check its content in this case empty() alone is better use obviously.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4980a672-7a40-4dee-9722-75ae4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ee19521b6ffa4187371641b6e409d9bc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://php-me.blogspot.com" rel="nofollow">dooltaz</a>						</strong>
+						<strong>said 
+						on Jan 28, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>If you go with the array_key_exists, I would suggest making a convenience function. You can even throw in the !empty().</p>
+<p>if(ake('merge', $step['options']) ){</p>
+<p>function ake($key, $ary) {<br />
+  $is_there = array_key_exists($key, $ary);</br><br />
+  return $is_there && !empty($ary[$key]);</br><br />
+}</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4980a9d0-2b78-449f-a8fc-570f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=eeb0b9b3a6040ce0009943c564bf5500&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.renangoncalves.com" rel="nofollow">Renan Gonçalves (aka renan.saddam)</a>						</strong>
+						<strong>said 
+						on Jan 28, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@dooltaz<br />
+I think your function is a little redundant, since array_key_exists($key, $ary) && !empty($ary[$key]) is the same as only !empty($ary[$key]).</br><br />
+Remember that empty already check if the key exists on the array.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4980b33a-bd1c-408f-99a1-0d5e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=669144d1ab0a861af5d54175371bc586&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://mark-story.com" rel="nofollow">Mark Story</a>						</strong>
+						<strong>said 
+						on Jan 28, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I think that empty is probably the best solution in this case.  You have to be careful with empty() though, as it is can be a slippery function, if all you want to do is check the key's existence, then array_key_exists is the best tool, even isset() will return false if the key is set and === null.  empty() is ideal when you want type coerce and swallow any possible errors.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4980c255-452c-4233-9e57-64ce4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 28, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I need to check if the key is true(ish) and dismiss all other scenarios. The key may be set to false in which case I don't care that it is set as all (ruling out array_key_exists).</p>
+<p>So I'll stick with empty() : ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4980ccbd-9c98-46cb-96bc-37ba4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8d2386f902d1d12c3cc0ac107310eac2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							the_defined :)&nbsp;						</strong>
+						<strong>said 
+						on Jan 28, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix, the use of the @-operator is one of the biggest flaws in CakePHP. We should not spread this further, as this does NOT solve any problem at all!!</p>
+<p>Explanation: If you run a serious production site (debug=0) you would not want to use setErrorReporting(0) in your application, since all errors are swallowed. You would depend entirely on the users reporting bugs (or go with bugs). </p>
+<p>You would like to redirect you error messages into a file (See and fix: trac.cakephp.org/ticket/5660 *please, please, please, its only a few lines*)</p>
+<p>If you are doing this, every error that is suppressed with the @-operator would get redirected into the error-file anyway, leading to confusion (See: trac.cakephp.org/ticket/3877)</p>
+<p>Another point is performance. Suppressing an error, does not stop it from happening. Throwing the error and then suppressing it is unnecessary heavy-weight lifting for the PHP-Interpreter, which seriously affects performance, if done in a loop for example.</p>
+<p>The list could go on</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4980d122-c730-4ad3-806f-057c4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Jan 28, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>the_defined :): I can practically count on one hand the number of times the @ operator is used in Cake.  Of those times, most of them are pretty inconsequential, i.e. console tools.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4980ef35-5fb0-46c4-8838-7d824834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=be6b592f53c3f4b026c7b8d48942111a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cake.ruzz.org" rel="nofollow">ruzz</a>						</strong>
+						<strong>said 
+						on Jan 28, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>while ugly and verbose, for clarity and avoiding getting attached to a solution that only sometimes works (you may catch yourself doing this even when you care about more than truthiness). I have opted for the longer</p>
+<p>if (array_key_exists('key', $array) && $array['key']))</p>
+<p>which gives you pretty fine control and is still readable, still understandable, and simply adding a not operator to the second part of the conditional lets you work off false values instead.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4981839c-6ca4-480a-becf-769d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c88dda0965a2ed9fdd8aed77ef8605e8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Luke aka boobyW&nbsp;						</strong>
+						<strong>said 
+						on Jan 29, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>my favourite feature of empty is its semantic readability :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49818a9d-cdb0-431e-81fb-77104834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d6fdf940b04bf59c9420a08d142e7281&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							jcartledge&nbsp;						</strong>
+						<strong>said 
+						on Jan 29, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I feel like I'm missing something. In my php 5.2.6 trying to access an array index on an unset variable raises a notice. If the variable is set (type and value don't matter) no notice, warning or error is raised. Try it:</p>
+<p>~$ php -a<br />
+Interactive shell</br></p>
+<p>php > error_reporting(E_ALL);<br />
+php > echo $step['options']['merge'];</br></p>
+<p>Notice: Undefined variable: step in php shell code on line 1<br />
+php > $step = 0;</br><br />
+php > echo $step['options']['merge'];</br><br />
+php ></br></p>
+<p>Under what circumstances could this result in a warning? Have I completely missed your point?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-498341e6-94b0-408d-860a-3db94834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=15b35dff00e725e20deb75c8612ea08d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.dwgadf.de" rel="nofollow">ohcibi</a>						</strong>
+						<strong>said 
+						on Jan 30, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@jcartledge if step is an array...</p>
+<p>ohcibi@amsterdam:~$ php -a<br />
+Interactive shell</br></p>
+<p>php > error_reporting(E_ALL);<br />
+php > $a = array();</br><br />
+php > echo $a['non']['existent']['index'];</br></p>
+<p>Notice: Undefined index:  non in php shell code on line 1</p>
+<p>Call Stack:<br />
+   17.6711      71180   1. {main}() php shell code:0</br></p>
+<p>Dump $_SERVER<br />
+Dump $_GET</br><br />
+Dump $_POST</br><br />
+Dump $_COOKIE</br><br />
+Dump $_FILES</br><br />
+Dump $_ENV</br><br />
+Dump $_SESSION</br><br />
+Dump $_REQUEST</br><br />
+php ></br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49836d87-e4b0-441a-aa66-549f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=703a9c6b08cb66bd119732bed8b60f13&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Rob&nbsp;						</strong>
+						<strong>said 
+						on Jan 30, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>empty() is best for your case</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4984a1fb-cb08-46a8-948c-664e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=be6b592f53c3f4b026c7b8d48942111a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cake.ruzz.org" rel="nofollow">ruzz</a>						</strong>
+						<strong>said 
+						on Jan 31, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I found this and I thought it was wildly appropriate. Its from a Python article, part of a snippet called the Zen of Python, but I still think it's right :)</p>
+<p>"Special cases aren't special enough to break the rules.<br />
+Although practicality beats purity.</br><br />
+Errors should never pass silently.</br><br />
+Unless explicitly silenced."</br></p>
+<p><a rel="nofollow" href="http://python.net/~goodger/projects/pycon/2007/idiomatic/handout.html">http://python.net/~goodger/projects/pycon/2007/idiomatic/handout.html</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49851ed7-30e4-44d0-8c71-25834834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d6fdf940b04bf59c9420a08d142e7281&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							jcartledge&nbsp;						</strong>
+						<strong>said 
+						on Feb 01, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@ohcibi - thanks, it's a notice. All the discussion was of errors and/or warnings. I wouldn't generally expend this much effort silencing a notice, although the !empty() solution has the benefit of reading better than the original.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49878d18-da74-47b9-bb7d-457c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ee19521b6ffa4187371641b6e409d9bc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://php-me.blogspot.com" rel="nofollow">dooltaz</a>						</strong>
+						<strong>said 
+						on Feb 03, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Renan - Good point, but I'd rather not throw away the convenience function idea so quickly. One issue I run across quite often is I want to simply compare a value in an array to another value. For instance:</p>
+<p>if (!empty($config['User']['username']) && $config['User']['username'] == 'admin') { ... Do Something ... }</p>
+<p>This is a lot of typing. You could build an eq($config['User']['username'], 'admin') function that does the same comparison.</p>
+<p>Just a thought.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b9b46a-9c64-4bda-b54e-474a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=dadd5f2cb8745fc8e7db687f98310bbe&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://frosas.net/" rel="nofollow">Francesc Rosàs</a>						</strong>
+						<strong>said 
+						on Mar 13, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I "solved" it by simply ignoring it in set_error_handler() callback function:</p>
+<p>function my_error_handler(...)<br />
+{</br><br />
+    if (strpos($message, 'Undefined index: ') === 0) return;</br><br />
+    ...</br><br />
+}</br></p>
+<p>It worked for me for years and it has the plus of not only working for trueish checks.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

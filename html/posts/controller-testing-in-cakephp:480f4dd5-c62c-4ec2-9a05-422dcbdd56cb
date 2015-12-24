@@ -1,0 +1,381 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Controller testing in CakePHP &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/controller-testing-in-cakephp:480f4dd5-c62c-4ec2-9a05-422dcbdd56cb">Controller testing in CakePHP</a></h2>	<div class="posted-on">
+		<p>Posted on 24/8/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p>Besides making crazy plans about becoming a pro blogger, redesigning ThinkingPHP and coding on some personal projects for the last couple of days, I've actually found out some more interesting stuff regarding testing in CakePHP as well.</p>
+<p>My first idea was to do unit testing on Controllers. I made a little comment about it <a href="http://www.thinkingphp.org/2006/08/17/agility-divide-and-conquer-what/#comment-8031">here</a>  and uploaded some of <a href="http://cakephp.org/pastes/show/8803bd09150cb65cc7da63f92cdbc828">my experimental code</a> for that. In the beginning it looked very promising. I was able to mock Models & Components and add them to the Controller. But the deeper I got into it, the more I realized:</p>
+<p><strong>Unit Testing with Controllers is insane</strong></p>
+<p>When I started I liked the idea of mocking all the Models & Components, and have them act in certain ways to see how the controller reacts. I still think it would be nice to have, ... but I found that it's not practical at all. When you have a controller with just one Model and one Component, you already have a lot of overhead managing this two mocks, now imagine several bigger Controllers with several Models & Components. You would end up writing 4-5x as much code for unit tests as you would actually write for you application. That's the point for me where "theory about testing" has to go and agility has to kick in.</p>
+<p>Looking over at railsland (*sigh*), I saw that them <a href="http://manuals.rubyonrails.com/read/chapter/28">taking a different approach</a>. Instead of testing the Controller as a unit, they would actually dispatch an url and then perform the tests on the most important things manipulated by the controller: assigns, cookies, sessions & flash. They also have a nice set of XML parsing toys to analyze the view output. That way you can perform your testing in a much overhead-reduced & natural manner. But of course it comes at the prices of testing a coupled system instead of a single unit. But then again, it's very agile and should provide reasonable tests to monitor the health of your application so you can easily refactor.</p>
+<h3>Bringing it to the world of CakePHP</h3>
+<p>For the last couple of days I've been puzzled by the question of how this could work within CakePHP. The problem was to dispatch an url and get access to the instance of the Controller afterwards. About an hour ago I had an idea: What would happen if I would write an extended Dispatcher and steal the instance from there? It took me a couple minutes until I realized that this is probably a very clean & easy approach and started to write some code. So far it worked out great. Using <a href="http://www.thinkingphp.org/2006/08/15/the-ultimate-cakephp-bootstrap-technique/">my new CakePHP bootstraping method</a> that I presented a couple days ago, I was able to write test cases like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> PostsControllerTest <span class="kw2">extends</span> ControllerTest<br />
+<span class="br0">&#123;</span> &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="kw2">function</span> test_index<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$response</span> = <span class="re0">$this</span>-&gt;<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">'/posts/index'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$vars</span> &nbsp; &nbsp; = <span class="re0">$this</span>-&gt;<span class="me1">controllerVars</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">assertTrue</span><span class="br0">&#40;</span><a href="http://www.php.net/is_array"><span class="kw3">is_array</span></a><span class="br0">&#40;</span><span class="re0">$vars</span><span class="br0">&#91;</span><span class="st0">'posts'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>, <span class="st0">'Posts array is set'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>If you are courious, that's how my TestDispatcher looked like, but keep in mind that there is some more code in the ControllerTest class which calls the TestDispatcher (and is set as a reference in $TestCase) to make everything run smoothly:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> TestDispatcher <span class="kw2">extends</span> Dispatcher <br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$TestCase</span> = <span class="kw2">null</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw2">function</span> dispatch<span class="br0">&#40;</span><span class="re0">$url</span>, <span class="re0">$additionalParams</span>=<a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$additionalParams</span><span class="br0">&#91;</span><span class="st0">'return'</span><span class="br0">&#93;</span> = <span class="nu0">1</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> parent::<span class="me2">dispatch</span><span class="br0">&#40;</span><span class="re0">$url</span>, <span class="re0">$additionalParams</span><span class="br0">&#41;</span>; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw2">function</span> _invoke <span class="br0">&#40;</span>&amp;<span class="re0">$controller</span>, <span class="re0">$params</span>, <span class="re0">$missingAction</span> = <span class="kw2">false</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$return</span> = parent::_invoke<span class="br0">&#40;</span><span class="re0">$controller</span>, <span class="re0">$params</span>, <span class="re0">$missingAction</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">TestCase</span>-&gt;<span class="me1">Controller</span> =&amp; <span class="re0">$controller</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$return</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw2">function</span> cakeError<span class="br0">&#40;</span><span class="re0">$method</span>, <span class="re0">$messages</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">TestCase</span>-&gt;<span class="me1">cakeError</span> = <span class="re0">$method</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<h3>Where to go?</h3>
+<p>The next logical step for me is to refactor the testing code I use right now and add a couple of other functions to it. Once I'm done with this, I'll upload it as a PoC on this blog and everybody who's intersted is free to try it out. Depending on the feedback from you guys and the response of the people working on the new offical test suite, I'll try to bring it into a real test suite that we can use for testing our CakePHP apps in future.</p>
+<p>--Felix Geisendörfer aka the_undefined</p>
+<p>PS: I think it's still possible to mock single Models & Components by overwriting their instances in the Controller in the TestDispatcher::_invoke() function.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-c62c-4ec2-9a05-422dcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcontroller-testing-in-cakephp%3A480f4dd5-c62c-4ec2-9a05-422dcbdd56cb &amp;title=Controller+testing+in+CakePHP';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcontroller-testing-in-cakephp%3A480f4dd5-c62c-4ec2-9a05-422dcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcontroller-testing-in-cakephp%3A480f4dd5-c62c-4ec2-9a05-422dcbdd56cb&amp;title=Controller+testing+in+CakePHP&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcontroller-testing-in-cakephp%3A480f4dd5-c62c-4ec2-9a05-422dcbdd56cb&amp;title=Controller+testing+in+CakePHP';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/cakephp-html-balancer-helper:4944c48d-7440-4f9d-8638-6e4b4834cda3">Cleaning Html with this HtmlCleaner for CakePHP</a></li>
+							<li><a href="/posts/migrating-from-wordpress-to-cakephp:480f4dd6-ef28-4881-b74f-4185cbdd56cb">Migrating from WordPress to CakePHP</a></li>
+							<li><a href="/posts/command-line-fun-in-cakephp-12:480f4dd6-7ecc-41d1-83bb-43d2cbdd56cb">Command line fun in CakePHP 1.2</a></li>
+							<li><a href="/posts/the-ultimate-cakephp-bootstrap-technique:480f4dd5-2bcc-40cb-b45f-4b1dcbdd56cb">The ultimate CakePHP bootstrap technique</a></li>
+							<li><a href="/posts/cakephp-and-acl-why-is-it-so-difficult:480f4dd5-ae90-4ac6-a29a-4caccbdd56cb">CakePHP and Acl - Why is it so difficult?</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/normalizing-cakephp-model-records:48b7ed7f-9498-4b9c-8734-6f014834cda3">Normalizing CakePHP model records</a></li>
+							<li><a href="/posts/your-cakephp-applications-homepage:49428953-d2ec-4362-b82e-1ee34834cda3">Your CakePHP application&#039;s Homepage</a></li>
+							<li><a href="/posts/cakephp-all-others:480f4dfe-0bb0-46bc-b668-415ccbdd56cb">CakePHP &gt; All Others</a></li>
+							<li><a href="/posts/finally-1.2-rc1:48471bad-4aec-4c46-8f2d-5e984834cda3">Finally - CakePHP 1.2 RC1 is out!</a></li>
+							<li><a href="/posts/what-is-a-test-case-especially-in-cakephp:4a2e86b5-015c-4536-aec1-5cf04834cda3">What is a Testcase - especially in CakePHP?</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/controller-testing-in-cakephp:480f4dd5-c62c-4ec2-9a05-422dcbdd56cb">9 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/controller-testing-in-cakephp:480f4dd5-c62c-4ec2-9a05-422dcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4ddb-7e50-430f-b50e-4466cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=720a677756da76903bec783c6534a0b2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://divinedominion.art-fx.org" rel="nofollow">Christian Tietze</a>						</strong>
+						<strong>said 
+						on Sep 10, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sounds promising! I wanted to try TDD with Cake, but the documentation was near to non-existant, the wiki example didn't really help me out as well.<br />
+The problem for me, someone new to TDD and TDD + Cake (or RAD Frameworks in general) it's not easy to figure out what exactly I have to do in the test cases.</br></p>
+<p>I go to /my_new_application/app/tests/app/controllers/blogpost.test.php and what I think about first is: how am I supposed to use the real controller or the blogpost model in here? How do I get the data I want, so I can test them for real?<br />
+Is it possible to test my whole application? Like fetching user data out of sessions or cookies or writing them after logging in? Am I supposed to use SimpleTests built in "browser" classes to do the testing?</br></p>
+<p>The more I think about it, the more I just go nuts. I can't join the IRC because my Wireless LAN breaks the connection (same with ICQ) due to a very, VERY bad signal here and the internet has nothing left for a "TDD+Cake" beginner like me. Should I use Rails to get used to TDD in RAD Frameworks and then copy the techniques to Cake? I don't think that this really makes sense.<br />
+In C# I first tried TDD. It was a simple Debug.Assert(someVar, someValue); and everything went fine. I was even able to enhance the Assert output window, created some debugging classes myself etc., but in Cake I'm supposed to use something like "/my_new_application/app/tests/app/controllers/blogpost.test.php" without any access to my controller, my model or anything else?!</br><br />
+OK, C# will "exclude" the Debug stuff in final release of the application whilst PHP can't, but hey, what am I about to do THEN?</br></p>
+<p>I think that's everything I have to say about my first steps with Cake and TDD. Or my first attempts of making my first steps with Cake and TDD. I mean, all I have is something like testing the Inflector class which has absolutely NOTHING to do with my very own application.<br />
+Should I applause now?</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-c6f8-4995-ae6e-423bcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 11, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Christian,</p>
+<p>the truth is that CakePHP's testing suite is not suitable for testing your entire application yet. You can do some simple tests with Models but that's about it. Both, me and dhofstet are working on a testsuite that allows you to test controllers and the rest of the application as well. While his is based of the official testsuite, I started mine from scratch since I want to do some things different. However, at some point in the next weeks you'll see release alongside with tutorials for most likely both testsuites and I guess the users will decide which test style they prefer. Meanwhile you should not try to do TDD since you'll be overwelmed with the complexity of a new framework, simpletest and the integration of both which isn't completly done yet. Just give it some time and go on with the normal route ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddd-c728-423d-8d6b-4d65cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=720a677756da76903bec783c6534a0b2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://divinedominion.art-fx.org" rel="nofollow">Christian Tietze</a>						</strong>
+						<strong>said 
+						on Sep 23, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for the reply.</p>
+<p>Yeah well, I think there's no option... But I'd like to see articles spread around the community which cover good coding practices when using cake. I mean, if there's no real TDD possible, one should consider another method to not make the programming a pain. I'd love to write articles, but I still lack cake-experience.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddd-71f0-4c20-9143-4c17cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 23, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Christian,</p>
+<p>My work on the CakeTaster testsuite has a pretty high priority. I think the first PoC for early adopters will be released soon, so don't give up on it quite yet ; ).</p>
+<p>One thing it'll also come with is a neat little interface, here is an early screenshot in case you care:</p>
+<p>http://img291.imageshack.us/img291/5674/caketasterfr1.png</p>
+<p>And once you get some more experience with CakePHP and my new blog is online, I'll consider the option of having other people contribute articles, etc., so if you would be interested in that, let me know.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-de24-41e5-a913-4f54cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b0599b755b2262d9a946be691666c2ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://shaver.off.net/diary/" rel="nofollow">shaver</a>						</strong>
+						<strong>said 
+						on Oct 16, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey, Felix.</p>
+<p>Any update on getting your ControllerTest up as a PoC?  We're in the throes of some relatively involved controller testing right now, and it sounds like your setup could help us a ton.  Thanks!</p>
+<p>Mike</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-b87c-4d14-bdfe-4587cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 16, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>shaver: Well, hmm seems like I never got around to release a PoC and started to work on a real solution to the problem instead ; ). But it's all good - I'm close to release an alpha version of the resulting testsuite called caketaster and it will be uploaded on here soon ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-83d8-4649-90b0-4179cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b0599b755b2262d9a946be691666c2ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://shaver.off.net/diary/" rel="nofollow">shaver</a>						</strong>
+						<strong>said 
+						on Oct 16, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>We're currently working from a modified version of a cakephp.org/pastes thing you put up some time ago, so please don't feel compelled to polish it on my account! :)</p>
+<p>Looking forward to seeing CakeTester!  Thanks again,</p>
+<p>Mike</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-7274-4d25-b136-49e0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=69b2ef4bce76b5b27c94e898976dc6d8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							matt&nbsp;						</strong>
+						<strong>said 
+						on Apr 28, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great stuff,</p>
+<p>Did you ever get any further with this?  There seems to be some momentum behind testing in Cake, it'd be great to see this included.</p>
+<p>matt</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-c858-4d16-a340-478fcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 28, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>matt: I finally published the PoC at some point last year: http://www.thinkingphp.org/2006/11/16/release-early-release-often-caketaster/ but have not worked on it since then. When my time allows it I will try to make a point for integrating similar testing capabilities into the cake test suite natively.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

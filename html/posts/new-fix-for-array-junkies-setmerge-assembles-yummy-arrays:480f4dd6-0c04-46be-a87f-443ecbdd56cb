@@ -1,0 +1,515 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>New fix for array junkies: Set::merge assembles yummy arrays &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/new-fix-for-array-junkies-setmerge-assembles-yummy-arrays:480f4dd6-0c04-46be-a87f-443ecbdd56cb">New fix for array junkies: Set::merge assembles yummy arrays</a></h2>	<div class="posted-on">
+		<p>Posted on 5/4/07 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hi folks,</p>
+<p>long time - no post, as always - I suck. I intend to make up for it with a screencast on unit testing in the next days, but meanwhile I want to talk about my favourite data type in PHP again: Arrays. For those of you just tuning in, I already wrote about how <a href="http://www.thinkingphp.org/2007/02/24/cake-12s-set-class-eats-arrays-for-breakfast/">Cake 1.2’s Set class eats nested arrays for breakfast</a> a while ago and if you haven't read this post yet, go ahead and do it now ; ). Todays post features a brand new Set function called merge that was a side product of me working on a cool new cake class. If you've done a lot of array work in the past, you've probably have come in situations where you wanted to merge to arrays into a new one. Usually that's a no-brainer in PHP by simply using the <a href="http://de3.php.net/array_merge">array_merge function</a> (or the CakePHP wrapper 'am'):</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$a</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="st0">'user'</span> =&gt; <span class="st0">'jim'</span>,<br />
+&nbsp; &nbsp; <span class="st0">'pass'</span> =&gt; <span class="st0">'secret'</span>,<br />
+&nbsp; &nbsp; <span class="st0">'friends'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'bob'</span>, <span class="st0">'tom'</span>, <span class="st0">'paul'</span><span class="br0">&#41;</span><br />
+<span class="br0">&#41;</span>;<br />
+<span class="re0">$b</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="st0">'pass'</span> =&gt; <span class="st0">'new-password'</span>,<br />
+&nbsp; &nbsp; <span class="st0">'last_login'</span> =&gt; <span class="st0">'today'</span><br />
+<span class="br0">&#41;</span>;<br />
+debug<span class="br0">&#40;</span><a href="http://www.php.net/array_merge"><span class="kw3">array_merge</span></a><span class="br0">&#40;</span><span class="re0">$a</span>, <span class="re0">$b</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="coMULTI">/* Output:<br />
+<br />
+Array<br />
+(<br />
+&nbsp; &nbsp; [user] =&gt; jim<br />
+&nbsp; &nbsp; [pass] =&gt; new-password<br />
+&nbsp; &nbsp; [friends] =&gt; Array<br />
+&nbsp; &nbsp; &nbsp; &nbsp; (<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [0] =&gt; bob<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [1] =&gt; tom<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [2] =&gt; paul<br />
+&nbsp; &nbsp; &nbsp; &nbsp; )<br />
+<br />
+&nbsp; &nbsp; [last_login] =&gt; today<br />
+)<br />
+*/</span></div>
+<p>In about 90%++ of all cases, this will be the usual way one uses to merge two (or more) arrays into a new one. However, sometimes array_merge is not going to cut it. That'll mostly be because it does not behave recursive and merging nested arrays can lead to unexpected results:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$a</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="st0">'User'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'name'</span> =&gt; <span class="st0">'jim'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'pass'</span> =&gt; <span class="st0">'secret'</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><br />
+<span class="br0">&#41;</span>;<br />
+<span class="re0">$b</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="st0">'User'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'pass'</span> =&gt; <span class="st0">'new-pw'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'last_login'</span> =&gt; <span class="st0">'new-pass'</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><br />
+<span class="br0">&#41;</span>;<br />
+debug<span class="br0">&#40;</span><a href="http://www.php.net/array_merge"><span class="kw3">array_merge</span></a><span class="br0">&#40;</span><span class="re0">$a</span>, <span class="re0">$b</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="coMULTI">/* Output:<br />
+<br />
+Array<br />
+(<br />
+&nbsp; &nbsp; [User] =&gt; Array<br />
+&nbsp; &nbsp; &nbsp; &nbsp; (<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [pass] =&gt; new-pw<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [last_login] =&gt; new-pass<br />
+&nbsp; &nbsp; &nbsp; &nbsp; )<br />
+<br />
+)<br />
+<br />
+*/</span></div>
+<p>This is a little counter-intuitive at least to me. I'd expect only the User.pass key to be overwritten the User.last_login one to be added. But instead array_merge just overwrites the entire 'User' key with $b's value for it. Now wait, isn't there a function called <a href="http://de2.php.net/array_merge_recursive">array_merge_recursive</a> for this some of you might object? Well of course there is. However to me it's behavior is even more counter-intuitive then the one of array_merge:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$a</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="st0">'user'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'name'</span> =&gt; <span class="st0">'jim'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'pass'</span> =&gt; <span class="st0">'secret'</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><br />
+<span class="br0">&#41;</span>;<br />
+<span class="re0">$b</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="st0">'user'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'pass'</span> =&gt; <span class="st0">'new-pw'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'last_login'</span> =&gt; <span class="st0">'new-pass'</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><br />
+<span class="br0">&#41;</span>;<br />
+debug<span class="br0">&#40;</span><a href="http://www.php.net/array_merge_recursive"><span class="kw3">array_merge_recursive</span></a><span class="br0">&#40;</span><span class="re0">$a</span>, <span class="re0">$b</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="coMULTI">/* Output:<br />
+<br />
+Array<br />
+(<br />
+&nbsp; &nbsp; [user] =&gt; Array<br />
+&nbsp; &nbsp; &nbsp; &nbsp; (<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [name] =&gt; jim<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [pass] =&gt; Array<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [0] =&gt; secret<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [1] =&gt; new-pw<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; )<br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [last_login] =&gt; new-pass<br />
+&nbsp; &nbsp; &nbsp; &nbsp; )<br />
+<br />
+)<br />
+*/</span></div>
+<p>Now this time all 3 User fields show up in the new array, which is good. If one looks at the User.pass however, one will notice that instead of overwriting $a's value with the one of $b array_merge_recursive has taken both of them and thrown 'em into a indexed array. To me, that's really not what I want most of the times. My main need is to have complex array structures that hold default values (conventions) that I can then overwrite easily on demand (configuration) when calling a function.</p>
+<h2>Introducing Set::merge</h2>
+<p>So here comes Set::merge which works like one would expect array_merge_recursive to work before actually trying it out:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$a</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; <span class="st0">'user'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="st0">'name'</span> =&gt; <span class="st0">'jim'</span>,<br />
+&nbsp; &nbsp; <span class="st0">'pass'</span> =&gt; <span class="st0">'secret'</span><br />
+&nbsp; <span class="br0">&#41;</span><br />
+<span class="br0">&#41;</span>;<br />
+<span class="re0">$b</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; <span class="st0">'user'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="st0">'pass'</span> =&gt; <span class="st0">'new-pw'</span>,<br />
+&nbsp; &nbsp; <span class="st0">'last_login'</span> =&gt; <span class="st0">'new-pass'</span><br />
+&nbsp; <span class="br0">&#41;</span><br />
+<span class="br0">&#41;</span>;<br />
+debug<span class="br0">&#40;</span>Set::<span class="me2">merge</span><span class="br0">&#40;</span><span class="re0">$a</span>, <span class="re0">$b</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="coMULTI">/* Output:<br />
+<br />
+<br />
+Array<br />
+(<br />
+&nbsp; &nbsp; [user] =&gt; Array<br />
+&nbsp; &nbsp; &nbsp; &nbsp; (<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [name] =&gt; jim<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [pass] =&gt; new-pw<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [last_login] =&gt; new-pass<br />
+&nbsp; &nbsp; &nbsp; &nbsp; )<br />
+<br />
+)<br />
+*/</span></div>
+<p>Another important thing to know about the behavior is how it deals with numerically index array items:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$a</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="st0">'Users'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'jim'</span>, <span class="st0">'bob'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'count'</span> =&gt; <span class="nu0">2</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><br />
+<span class="br0">&#41;</span>;<br />
+<span class="re0">$b</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="st0">'Users'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'lisa'</span>, <span class="st0">'tina'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'count'</span> =&gt; <span class="nu0">4</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><br />
+<span class="br0">&#41;</span>;<br />
+debug<span class="br0">&#40;</span>Set::<span class="me2">merge</span><span class="br0">&#40;</span><span class="re0">$a</span>, <span class="re0">$b</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="coMULTI">/* Output:<br />
+<br />
+Array<br />
+(<br />
+&nbsp; &nbsp; [Users] =&gt; Array<br />
+&nbsp; &nbsp; &nbsp; &nbsp; (<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [0] =&gt; jim<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [1] =&gt; bob<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [count] =&gt; 4<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [2] =&gt; lisa<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [3] =&gt; tina<br />
+&nbsp; &nbsp; &nbsp; &nbsp; )<br />
+<br />
+)<br />
+*/</span></div>
+<p>I could provide you a lot more examples but it basically comes down to the following Set::merge behavior:</p>
+<p>Set::merge loops through all items of all arrays provided to it, and if it ...</p>
+<ul>
+<li>... hits an array value: Acts recursively and merges it's value over the ones of the previous values for the current key</li>
+<li>... hits an integer key: Recognizes it as a numerically indexed key and pushes the current value at the end ($a[]) of the current key value</li>
+<li>... didn't do the above: Overwrites the value of previous arrays for the current key with the new one.</li>
+</ul>
+<p>Oh and the function will also typecast non-array parameters into arrays for you.</p>
+<p>So if all of this still leave you unsure about the way this function works you probably should check out the <a href="https://trac.cakephp.org/browser/branches/1.2.x.x/cake/tests/cases/libs/set.test.php">Unit Test Case for Set::merge</a>. It should show you pretty much every imaginable aspect of how the function can be used (including passing other Set class instances to it).</p>
+<p>Alright, I hope you my fellow array junkies are going to get a little kick out of this one. Other then that stay tuned for the promised unit testing screencast in case you are interested in getting started with the light side of the force as far as programming goes ; ).</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-0c04-46be-a87f-443ecbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnew-fix-for-array-junkies-setmerge-assembles-yummy-arrays%3A480f4dd6-0c04-46be-a87f-443ecbdd56cb &amp;title=New+fix+for+array+junkies%3A+Set%3A%3Amerge+assembles+yummy+arrays';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnew-fix-for-array-junkies-setmerge-assembles-yummy-arrays%3A480f4dd6-0c04-46be-a87f-443ecbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnew-fix-for-array-junkies-setmerge-assembles-yummy-arrays%3A480f4dd6-0c04-46be-a87f-443ecbdd56cb&amp;title=New+fix+for+array+junkies%3A+Set%3A%3Amerge+assembles+yummy+arrays&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnew-fix-for-array-junkies-setmerge-assembles-yummy-arrays%3A480f4dd6-0c04-46be-a87f-443ecbdd56cb&amp;title=New+fix+for+array+junkies%3A+Set%3A%3Amerge+assembles+yummy+arrays';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/better-array-syntax-for-php:484d6517-a700-4af3-a62f-64544834cda3">Better array syntax for PHP: Here&#039;s your chance to weigh in</a></li>
+							<li><a href="/posts/donate-your-php-arrays:49811879-9c6c-4985-8850-76c54834cda3">Donate your PHP arrays!</a></li>
+							<li><a href="/posts/modelsave-now-returns-an-array:480f4dd6-0a7c-4026-ad5a-49c8cbdd56cb">Model::save() now returns an array!</a></li>
+							<li><a href="/posts/cake-12s-set-class-eats-arrays-for-breakfast:480f4dd6-d084-4fb7-bacc-49fdcbdd56cb">Cake 1.2&#039;s Set class eats nested arrays for breakfast!</a></li>
+							<li><a href="/posts/turning-javascript-s-arguments-object-into-an-array:4ac50ef8-3bd0-4a2d-8c2e-535ccbdd56cb">Turning JavaScript&#039;s arguments object into an array </a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/new-fix-for-array-junkies-setmerge-assembles-yummy-arrays:480f4dd6-0c04-46be-a87f-443ecbdd56cb">12 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/new-fix-for-array-junkies-setmerge-assembles-yummy-arrays:480f4dd6-0c04-46be-a87f-443ecbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4de7-ff54-4b1c-9c5d-4224cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1110db1acfac38e8bed4b117074bcaac&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blenderstyle.com" rel="nofollow">Matt Bowden (BlenderStyle)</a>						</strong>
+						<strong>said 
+						on Apr 05, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great post! PHP's array_merge and array_merge_recursive have always frustrated me, but now that I see how great Cake 1.2's Set class is (again), I'll look into more. I have you're previous post about the Set class saved, and I'm going to save this one too. Thanks, Felix.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-b050-47da-a492-43a9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.developercast.com/2007/04/06/felix-geisendorfers-blog-new-fix-for-array-junkies-setmerge-assembles-yummy-arrays/" rel="nofollow">developercast.com &raquo; Felix Geisendorfer&#8217;s Blog: New f</a>						</strong>
+						<strong>said 
+						on Apr 06, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] In a new post today, Felix Geisendorfer shares a method for merging together nested arrays correctly with a little help from functionality in the CakePHP framework. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-e8e4-451b-888c-4386cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b86a91c873215ee2357101f54047d8fe&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dubocdesign.com/spip.php?article198" rel="nofollow">jean-Rémy Duboc</a>						</strong>
+						<strong>said 
+						on Apr 30, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>http://dubocdesign.com/spip.php?article198 :</p>
+<p>"Felix Geisendörfer explains us how to use the Set class from the 1.2 version of CakePHP. It proved to be very useful, for instance, associated with the Xml class, to handle a RSS file [...]"</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-fcc4-479d-a363-4af5cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.assembleron.com/2007/05/26/developer-links-for-26052007/" rel="nofollow">The Programming and Management Blog &raquo; Developer Links for </a>						</strong>
+						<strong>said 
+						on May 26, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] New fix for array junkies [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-a974-4176-b032-4148cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e68ee9e9173dc37292638e77d72e0e66&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://buick-skylark-repairs.bodyshophonda.cn/acura-springfield-massachusetts.html" rel="nofollow">Miltiades</a>						</strong>
+						<strong>said 
+						on Feb 05, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Cool.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-e9c8-4bf5-970c-469dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a9378539ee7e189d06a0a51d90a56489&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://sd-car-auction.bmwupgrades.cn/1946-chevrolet-pickup-truck-manual.html" rel="nofollow">Myron</a>						</strong>
+						<strong>said 
+						on Feb 05, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Cool.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-ec68-4a0c-bd23-485ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8e5ec53bf8942b267a3c91451bb94180&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://bmw-smg-330i.chevroletengine.cn/underground-2-cars-list.html" rel="nofollow">Kimon</a>						</strong>
+						<strong>said 
+						on Feb 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>interesting</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-718c-4649-bd7d-4d80cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b25150f804ce1b2f7d87bdc4df878995&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://car-accident-damages.eletriccar.cn/wet-carpet-mildew-odor-jeep.html" rel="nofollow">Panayotis</a>						</strong>
+						<strong>said 
+						on Feb 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Cool.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df6-0df8-444a-80b2-4d5ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=667ec9efdb212bf798e020cf9db3be20&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://subaru-discussion-board.fordfleet.cn/ford-focus-zx3-head-lights.html" rel="nofollow">Lazaros</a>						</strong>
+						<strong>said 
+						on Feb 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df6-6c00-48be-8b4d-4d3bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6a54ac3ccd1f276ccbdd6227a83359e1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://32-body-ford.fordzephyr.cn/america-muscle-car-parts.html" rel="nofollow">Nick</a>						</strong>
+						<strong>said 
+						on Feb 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sorry :(</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-4760-4ccc-af45-4df7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://traviscline.com/blog/2008/04/08/recurisve-hash-merging-in-javascript/" rel="nofollow">traviscline.com : recurisve hash merging in javascript</a>						</strong>
+						<strong>said 
+						on Apr 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] jQuery.extend(true, hash1, hash2) is like CakePHP&#8217;s Set::merge() (an explanation of Set::merge by Felix Geisendörfer is here) [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-cbf4-4bd8-b323-47d9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://traviscline.com/blog/2008/04/08/recursive-hash-merging-in-javascript/" rel="nofollow">traviscline.com : recursive hash merging in javascript</a>						</strong>
+						<strong>said 
+						on Apr 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] jQuery.extend(true, hash1, hash2) is like CakePHP&#8217;s Set::merge() (an explanation of Set::merge by Felix Geisendörfer is here) [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

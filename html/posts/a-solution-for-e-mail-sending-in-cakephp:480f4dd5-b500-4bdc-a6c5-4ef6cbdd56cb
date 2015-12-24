@@ -1,0 +1,932 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>A solution for e-mail sending in CakePHP &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/a-solution-for-e-mail-sending-in-cakephp:480f4dd5-b500-4bdc-a6c5-4ef6cbdd56cb">A solution for e-mail sending in CakePHP</a></h2>	<div class="posted-on">
+		<p>Posted on 5/8/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p><strong>Warning:</strong> This code has been produced in the time between 2am and 6am *without* the influence of coffee. Usage on your own risk ; ).</p>
+<p>One of the things when I always felt like I wasn't quite following the DRY(don't repeat yourself)-concept when working with CakePHP was sending out emails. I always ended up with pretty long controller functions for every mail, since I tried to use CakePHP's View class to render my mail templates, and I always had to create the $header and a couple other things.<br />
+Now even worse was, that when I finished one of those mail() actions, I felt like it wasn't very reusable, even within the application. Something like reminder messages might need to be send from several Controllers/Actions, which wasn't really confortable to do.</p>
+<p>So the last couple of days I've been thinking about the best way to approach mailing in cakephp. I always felt that an E-Mail was something to model, so I felt like implementing it as a Model. On the other Site, I wanted the ability to use the CakePHP render() functionality for my mail templates, which would be easier to do from within a Component (Controller).</p>
+<p>Today I finally decided to see if Rails provided a native way for e-mailing and I was pleasently surprised when I found the documention of their <a href="http://wiki.rubyonrails.org/rails/pages/ActionMailer">ActionMailer class</a>. Their solution to the Problem is to use a kind of hybrid between a Model and a Controller, which provides the base class for one or more app-wide mailer-models. This basically means that you create a new class in your app/models path, and extend the ActionMailer. After that you start putting your own mail (domain) logic into this Model which then can be used from within any Controller to send the kinds of mails you define. One special thing about this mail models is, that they have their own folder named after them inside views, just like a controller, where their mail templates rest.</p>
+<p>I liked the concept, so I took it as an inspiration for an ActionMailer for CakePHP. The usage turns out to be as simple as this:</p>
+<p>app/models/app_mailer.php</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+vendor<span class="br0">&#40;</span><span class="st0">'action_mailer'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw2">class</span> AppMailer <span class="kw2">extends</span> ActionMailer<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">&quot;AppMailer&quot;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw2">function</span> contact_form<span class="br0">&#40;</span><span class="re0">$contact_info</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span> &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Standard Mail stuff</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">addRecipient</span><span class="br0">&#40;</span><span class="st0">'contact@business.com'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">setSubject</span><span class="br0">&#40;</span><span class="st0">'Web Form Contact'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">setSender</span><span class="br0">&#40;</span><span class="re0">$contact_info</span><span class="br0">&#91;</span><span class="st0">'email'</span><span class="br0">&#93;</span>, <span class="re0">$contact_info</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Custom variables for our mail template</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'name'</span>, <span class="re0">$contact_info</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'email'</span>, <span class="re0">$contact_info</span><span class="br0">&#91;</span><span class="st0">'email'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'phone'</span>, <span class="re0">$contact_info</span><span class="br0">&#91;</span><span class="st0">'phone'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'message'</span>, <span class="re0">$contact_info</span><span class="br0">&#91;</span><span class="st0">'message'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'ip'</span>, env<span class="br0">&#40;</span><span class="st0">'REMOTE_ADDR'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'browser'</span>, env<span class="br0">&#40;</span><span class="st0">'HTTP_USER_AGENT'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>app/controllers/mail_controller.php</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> MailController <span class="kw2">extends</span> AppController<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">&quot;Mail&quot;</span>;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$uses</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'AppMailer'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw2">function</span> contact<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Notice the 'send_' prefix in front of our AppMailer function!</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">AppMailer</span>-&gt;<span class="me1">send_contact_form</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">data</span><span class="br0">&#91;</span><span class="st0">'Contact'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="co1">// Mail was sent successfully </span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span> <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Some error occured</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>app/views/app_mailer/contact_form.thtml</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+&lt;b&gt;Name:&lt;/b&gt; <span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$name</span>; <span class="kw2">?&gt;</span> (<span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$ip</span>; <span class="kw2">?&gt;</span>)&lt;br/&gt;<br />
+&lt;b&gt;Mail:&lt;/b&gt; <span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$email</span>; <span class="kw2">?&gt;</span>&lt;br/&gt;<br />
+&lt;b&gt;Phone:&lt;/b&gt; <span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$phone</span>; <span class="kw2">?&gt;</span><br />
+&lt;b&gt;Browser:&lt;/b&gt; <span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$browser</span>; <span class="kw2">?&gt;</span>&lt;br/&gt;<br />
+&lt;hr&gt;</div>
+<p>That's it. Highly resuable and easy to integrate. </p>
+<p>Now I do have to admit that the ActionMailer could use a couple additional functions like attachments and multi-part email handling as well as integration with alternative mail engines (not only php's mail() function). But other then that, it might already worth for you to take a look at it.</p>
+<h3>Download</h3>
+<p>Download <a href="http://cakeforge.org/snippet/detail.php?type=snippet&id=121">the code</a> (v. 0.7.3) at CakeForge and put it into app/vendors/action_mailer.php.</p>
+<p><strong>Note:</strong> I just updated the code with some bug fixes, the new version is 0.7.3.</p>
+<h3>Usage</h3>
+<p>Have a look at the AppMailer example above. You need to have a folder inside views with the underscored name of your mailer (app_mailer in the example). In this folder you have to put the templates for your Mailer functions (like you do with controller actions). Each function represents one type of e-mail your application sends out.</p>
+<p>In your Controller include the Mailer model you've created by using the var $uses; array. After that you can send your e-mails by calling $this->{Mailer}->send_{mail_function}();. Instead of<br />
+'send_' as a prefix to all your functions, you can also use 'deliver_'.</p>
+<p><strong>Important:</strong> In order for the ActionMailer to work you will have to create a new layout in your app/views/layouts folder called mail.thtml. You can change this name by overwriting ActionMailer::layout.</p>
+<h3>Build-in functions</h3>
+<p>As of right now, the following functions can be used inside the Mailer model:</p>
+<p><strong>ActionMailer::addRecipient($email, $name = null):</strong> Add's an email adress (and eventually name) to the list of recipients. Info: I had some problems using $name on my Win32 dev box, you might want to leave it blank in the beginning.</p>
+<p><strong>ActionMailer::setRecipient($email, $name = null):</strong> Just like addRecipient, the only difference is that it will remove all previously set recipients before adding the new one.</p>
+<p><strong>ActionMailer::setHeader($name, $value):</strong> Set's an http header for the email that is sent. Use it like this: ActionMailer::setHeader('Content-type', 'text/html');</p>
+<p><strong>ActionMailer::set($one, $two = null):</strong> Set's a variable to make it available to the mail template. Similiar to Controller::set();</p>
+<p><strong>ActionMailer::setSender($email, $name = null):</strong> Set's the FROM field of the email. Problems like mentioned with addRecipient do not seem to appear.</p>
+<p><strong>ActionMailer::setSubject($subject):</strong> Set's the subject of the email.</p>
+<p><strong>ActionMailer::reset($subject):</strong> Resets header, recipients, sender and data of an email. Automatically called before send_{functions} are being executed.</p>
+<h3>One more thing</h3>
+<p>Some people might think this is a horrible solution as it violates some of the fundamental MVC rules. I agree, it does do that, but I also think that it is legitamate in terms of DRY and RAD'ness and doesn't seem to conflict with the other things going on in ones application. So therefor I believe this is one of the things where compromises have to be made for the greater good ; ). Anyway, if you can think of a better solution, let me know, and I'll see what I can do.</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-b500-4bdc-a6c5-4ef6cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-solution-for-e-mail-sending-in-cakephp%3A480f4dd5-b500-4bdc-a6c5-4ef6cbdd56cb &amp;title=A+solution+for+e-mail+sending+in+CakePHP';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-solution-for-e-mail-sending-in-cakephp%3A480f4dd5-b500-4bdc-a6c5-4ef6cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-solution-for-e-mail-sending-in-cakephp%3A480f4dd5-b500-4bdc-a6c5-4ef6cbdd56cb&amp;title=A+solution+for+e-mail+sending+in+CakePHP&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-solution-for-e-mail-sending-in-cakephp%3A480f4dd5-b500-4bdc-a6c5-4ef6cbdd56cb&amp;title=A+solution+for+e-mail+sending+in+CakePHP';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/how-to-do-group-by-conditions-in-model-find()-calls:483fdc1c-8454-4593-a55e-37244834cda3">How to do Group By conditions in Model find() calls in the CakePHP RC1</a></li>
+							<li><a href="/posts/cakephp-1.2-stable-come-and-help:4829b3ac-903c-4f56-94dc-27af4834cda3">CakePHP 1.2 Stable! Come and help</a></li>
+							<li><a href="/posts/cakephp-authsome-debuggable-s-xmas-gift:4b34b4e6-9ca4-4673-bea6-4776cbdd56cb">CakePHP Authsome - Debuggable&#039;s Xmas Gift</a></li>
+							<li><a href="/posts/learning-from-the-cakephp-source-code-part-i:480f4dd6-28d0-445e-a1dc-4ceacbdd56cb">Learning from the CakePHP source code - Part I</a></li>
+							<li><a href="/posts/using-rest-api%e2%80%99s-as-models-in-cakephp-a-google-calendar-example:480f4dd5-02c0-464e-941c-4774cbdd56cb">Using REST Api’s as Models in CakePHP / A Google Calendar example</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/cakephp-argentina:4937042e-4864-48e1-98f0-6d3d4834cda3">CakePHP Argentina</a></li>
+							<li><a href="/posts/wildflower-a-cakephp-cms:48d7a0d6-ce78-4a2a-bf48-262a4834cda3">Wildflower, a CakePHP CMS</a></li>
+							<li><a href="/posts/google-analytics-php-api-cakephp-model:480f4dd5-b2a4-452a-b4ed-4f3fcbdd56cb">Google Analytics PHP Api (CakePHP Model)</a></li>
+							<li><a href="/posts/agile-web-development-with-cakephp:480f4dd5-c234-445a-b907-4876cbdd56cb">Agile web development (with CakePHP)</a></li>
+							<li><a href="/posts/with-jquery-cakephp-to-world-domination-slides:480f4dd6-7cb8-4e84-af4f-4dc6cbdd56cb">With jQuery &amp; CakePHP to World Domination (Slides)</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/a-solution-for-e-mail-sending-in-cakephp:480f4dd5-b500-4bdc-a6c5-4ef6cbdd56cb">39 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/a-solution-for-e-mail-sending-in-cakephp:480f4dd5-b500-4bdc-a6c5-4ef6cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dd9-af18-461d-9f0f-4476cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f4112f3023c643bf2f7b32c9c5dcfcba&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakebaker.wordpress.com" rel="nofollow">Daniel Hofstetter</a>						</strong>
+						<strong>said 
+						on Aug 05, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The solution looks nice, but I am a bit confused with the folders you use. Shouldn't the controller be in the controllers folder? And the "view" in app/views/mail/contact_form.thtml? </p>
+<p>And I don't see the reason why you introduced the "send_" prefix. I don't like it ;-)  Why don't you use the same function names as in the "model"?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-3b34-4a8a-a5ce-4c9ecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 05, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Daniel,</p>
+<p>yes, I used a wrong path for the MailController, I corrected it above. Regarding the view: I didn't show the view of the MailControlller::contact() action but from the AppMailer::contact_form() function. The controller view would be inside app/views/mail/contact.thtml, I just skipped it. But the AppMailer has it's own view folder, since it's a Controller/Model hybrid.</p>
+<p>Concerning the 'send_' prefix: I think you could also call:<br />
+$this->AppMailer->reset();</br><br />
+$this->AppMailer->contact_form($this->data['Contact']);</br><br />
+$this->AppMailer->send();</br></p>
+<p>or:<br />
+$this->send('contact_form', $this->data['Contact']);</br></p>
+<p>But do you want to? I think the 'send_'/'deliver_' prefix is a convenient shortcut helping the RAD'ness in your app ; ). Any comments on it besides that *g*?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-6188-4f9b-abc8-4bbfcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5d1f85e494c2003561cd1a846d6765e0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							h&nbsp;						</strong>
+						<strong>said 
+						on Aug 05, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Have you tried using phpmailer which has all the additional functions like inline attachments etc. You could aslo use fck editor for composing the messages.</p>
+<p>(http://wiki.cakephp.org/tutorials:sending_email_with_phpmailer)</p>
+<p><strong>Note:</strong> This comment was on the wrong post, I moved it to the correct one.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-f31c-4225-8c3b-4ecdcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 05, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>h: You know, a while ago I was really into taking all those 3rd party scripts, writing a little cake interface for them, and getting the job done very fast. It was DRY, RAD and still ... causing a lot of problems.</p>
+<p>One of the first problems were libraries that would use conflicts with functions in CakePHP. MagpieRSS (an RSS reader/parser) for example used it's own debug() function, so I had to go in and uncomment it. Now when updating libraries like that, I always had to repeat those (sometimes tidious) steps in order to make things work. I hated it.</p>
+<p>Another thing was bloat: A lot of those libraries where really great and did everything I needed, but they where just way to big, making my app more and more bloated, even so I was just using a fraction of their functionality.</p>
+<p>The probably most annoying thing were licenses. Most OS scripts I found where either GPL or LGPL, which means more or less restrictive (especially GPL which is no free software license to me). Very few of them, like CakePHP, were licensed under my favourite and least restrictive license, MIT (or BSD). Since one of my sideprojects is a commercial application that is maybe going to be sold several times, I need as much rights over the code I'm using as possible.</p>
+<p>Oh and before I forget: Some of those 3rd party libraries are poorly written and extremly hard to debug. I don't claim that my code is perfect, but I know what it does, it's following the (old) CakePHP coding standards, and I have a better feeling when using it. With those 3rd party apps you just never know when you're creating a Security vulnerbility in your code unless you go through them very carefuly.</p>
+<p>So last but not least: Since I started writing my own solutions for things like e-mail/rss parsing/etc. I've improved my knowledge about this technologies a good bit, and looking at all the trouble I had with the 3rd party libs, I've not been slowed down by it a lot. I'll still ocassionally use foreign code in my app's when necessary, but whenever I can, I'll write my own one ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-34c0-4606-a929-402fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5ca73837e1f4e2886aebdf1eff648265&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Chris Renner&nbsp;						</strong>
+						<strong>said 
+						on Aug 05, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This may border on a philosophical debate, but it seems to me email really belongs in a component, not a model/controller. Vary rarely are my email-sending chores as simple as a contact page, and at least in my current project, none of them come from their own urls—they're all part of other actions on other controllers elsewhere in the app. Email is an action, not a model.</p>
+<p>Now, I understand that requestAction could do it in this case, or (ick!) manually instantiating ActionMailer, but this really seems like a job for a component. (It'll certainly break the MVC less).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-998c-40de-b6f3-4c18cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 05, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Chris Renner: Thanks for your comment. I've thought about using a component as well, let me explain you why I didn't do it:</p>
+<p>A component is esentially an enhancment for a (specific) controller since it's normaly directly linked to it by using the startup() function. Now you could create all of your email functionality inside a component, no question about it. But for each type of e-mail your application sends out, you would have to setup the email details inside your controller actions. Now if you have the same kind of kind of email and want to send it from different controller actions, you would esentially repeat yourself by replicating the setup (from, to, subject, etc.).<br />
+But when you really look at it, sending emails is it's own Domain by itself, that should be encapsulated seperatly from your controller logic. Having all your email specific code in one common Model (or maybe more), makes it much easier for you to maintain your mailing code. It keeps you from repeating yourself, provides you with a very nice convention, and makes adding a new type of email very fast.</br></p>
+<p>I also don't get why you say that requestAction would be needed for the ActionMailer. You simply include your Mailer Model (i.e. AppMailer) in the var $uses; array of your controllers, and call it's functions by using the 'send_' prefix and any kind of parameters needed to send the email.</p>
+<p>Again: sending an email is an action, and therfore triggered from within the controller. The email itself is something that can (and should) be modeled, and therfor goes into it's own Model class.</p>
+<p>Maybe you can give me a scenario where a component approach would be easier to handle then the Controller/Model hybrid one (as it's being done in Rails as well).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-c1c4-4db5-9cf3-437fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=42c5bbf957f3ac0385fb5694d40992ef&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.wizardworx.co.za" rel="nofollow">Mladen Mihajlovic</a>						</strong>
+						<strong>said 
+						on Aug 05, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Have you see the mail template solution that Rossoft did? http://rossoft.wordpress.com/2006/07/01/mail-templates/</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-abd0-4470-afba-4e41cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 05, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Mladen Mihajlovic: Yes I did. I don't like additional markup's in my views, especially not when they are essentially containing Model/Controller logic. His solution also depends on the PHPMailer, which I try to avoid for the reasons mentioned above.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-24bc-477f-b790-4d20cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e7ec2e6e9a72b31c5115a11658525c10&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Brandon&nbsp;						</strong>
+						<strong>said 
+						on Aug 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Also, line 299 of action_mailer.php:</p>
+<p>$this-&gt;render ('contact_form');</p>
+<p>Should be:<br />
+$this-&gt;render ($fct);</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-5bfc-4bf4-8f49-4abccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 07, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Brandon: Now, that does make me look sort of stupid, doesn't it? : P. I fixed it and uploaded the new version to CakeForge.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-9a5c-480a-984c-4c1ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakebaker.wordpress.com/2006/08/07/an-idea-for-sending-emails-with-cakephp/" rel="nofollow">cake baker &raquo; An idea for sending emails with CakePHP</a>						</strong>
+						<strong>said 
+						on Aug 07, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] On the weekend, Felix Geisendörfer (aka the_undefined) presented an email solution for CakePHP based on the ActionMailer class from Ruby on Rails. It inspired me to think about this topic. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dda-2a2c-46e3-ac74-4ca0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=54ce3b69b3e2ca8f7a4de2d55501f0f2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dominic C&nbsp;						</strong>
+						<strong>said 
+						on Aug 18, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Can we add a live chat to my site?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dda-32b8-4274-8b6d-4c9acbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 18, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Dominic C: What are you talking about? Are you some kind of weird spam bot ; ) ?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-a0d0-4b1a-a05e-4e8ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4852ffadb767067e78b0b9b6377d1958&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Joel&nbsp;						</strong>
+						<strong>said 
+						on Aug 31, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I installed action_mailer.php to the app/vendors directory, created my model in models/mailer.php, and included the action_mailer vendor file, but this is the error I'm getting:</p>
+<p>Fatal error: Method ActionMailer::__call() must take exactly 2 arguments in /Applications/MAMP/htdocs/SportsLeader/app/vendors/action_mailer.php on line 374</p>
+<p>So, I removed the third argument in ActionMailer::__call and I don't get that error.  What gives?  Am I breaking the code by doing this?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-9a50-4d64-9127-439fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=299a899790e493870c7e3d7c45e6516d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://synthesis.sbecker.net" rel="nofollow">Scott Becker</a>						</strong>
+						<strong>said 
+						on Sep 08, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix - I come from the Rails arena and I say keep it AS IS! (except adding a few things like multipart functionality.) </p>
+<p>I *like* your current implementation, its simple and clean - and best of all, just like Rails, hehe. </p>
+<p>I initially thought it was weird that Rails mailer classes were models, when they're kinda/sorta controllers, but hey, it just WORKS. And no need to complicate the syntax. Less is more. send_ = beauty.</p>
+<p>This also belongs in CakePHP core, IMO.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-445c-49f1-8bbc-4b8ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c79a8ace3b455ac9bc09b2610f443803&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							steve&nbsp;						</strong>
+						<strong>said 
+						on Sep 15, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix, is there a reason why you did not follow the Cake naming convention in naming the MailController? If I understand correctly, the controllers are named plural. So I'd think that it might be named as mails_controller.php (MailsController) even though I'm not quite sure if there is a plural for mail.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddc-43f8-4c86-93e8-44d9cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 15, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>steve: Actually no. I just needed a Controller name for the example to post here and thougtht "MailController" would do. You are probably correct that "MailsController" would be more cakish. And since PhpNut_ is working on an E-Mails component for 1.2.x anyway, there should be an integrated method for sending mails in the framework soon as well.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-383c-45c6-96ff-49c0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://robozen.wordpress.com/2006/10/05/cakephp-the-lazy-mans-ruby-on-rails/" rel="nofollow">CakePHP: The Lazy Man&#8217;s Ruby on Rails &laquo; RoboZen</a>						</strong>
+						<strong>said 
+						on Oct 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] That said, you can use it anyway with a nifty surrogate technology called CakePHP. I&#8217;ve had a chance to start toying with it, and so far the down side I see is the absence of built-in database migrations (although a somewhat primitive migrations snippet is available here). There is also no pre-packaged equivalent to Rails&#8217; ActionMailer, and I don&#8217;t yet know whether the independently developed solution is any good. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de0-c6a8-471d-88d4-4243cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=26ce9e68c80d13bdb7d5fc5503170325&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Fraisouille&nbsp;						</strong>
+						<strong>said 
+						on Oct 08, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It took me time to make it work ...<br />
+Do not forget to put  into your mail.thtml layout and the .thtml from your app_mailer function will be rendered ...</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de0-5000-4bc5-8312-46cccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=26ce9e68c80d13bdb7d5fc5503170325&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Fraisouille&nbsp;						</strong>
+						<strong>said 
+						on Oct 08, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hey it removed my code ...<br />
+just put echo $content_for_layout;</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-27a8-4700-a29f-4a26cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=80881a182f50f7a2760cfc961d5e902e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							KesheR&nbsp;						</strong>
+						<strong>said 
+						on Oct 24, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>DAMN, I was becoming crazy. What Fraisoulle says just above is VERY IMPORTANT! I missed it. What kind of stupid am I? Don't answer.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-8f1c-4348-a11c-4269cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=40e14f9efc4e357c0835a83856355d42&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							max&nbsp;						</strong>
+						<strong>said 
+						on Nov 07, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix, don't get dizzy, but your current code has some stupid mistakes, enough for me to get it blamed as "errorneous 3rd party libraries". Really, each next programmer thinks he/she is smarter then "them". =)</p>
+<p>notable: line 105-110 at v.0.7.3 (btw, it still has 0.7.2 in header)<br />
+        if (!is_array($one))</br><br />
+        {</br><br />
+            $data = array($one =&gt; $two);</br><br />
+        }</br></p>
+<p>        $this-&gt;data = array_merge($this-&gt;data, $data);<br />
+        return $data;</br></p>
+<p>should be replace with something like this:<br />
+        if (!is_array($one))</br><br />
+        {</br><br />
+            $data = array($one =&gt; $two);</br><br />
+            $this-&gt;data = array_merge($this-&gt;data, $data);</br><br />
+        } else {</br><br />
+            $this-&gt;data = array_merge($this-&gt;data, $one);</br><br />
+        }</br><br />
+        return $this-&gt;data;</br></p>
+<p>Anyway, I like your implementation, beacuse of<br />
+1. it is small and thus easily reviewable. Yep, 'h',  It has no attachments, thought I don't need it and thus I don't need to fix any possible errors out there.</br></p>
+<p>2. it has rudimentary 'anti-822-headers-injection' routines, which is the thing I lacked in PHPMailer however codebloated it was. Strictly speaking this is not standard compliant implementation, meaning it does not support header folding syntax, but hey, that's pretty enough for most cases. </p>
+<p>3. it look reusable. Really, creating special mail controllers and accessing them via requestAction is kind of shooting your leg off. And creating components really doesn't save you from code duplication: to be properly used you anyway should layout your component input data. So, reuse is really possible when you incapsulate this data in some model, say 'user', 'order' and then, 'user registration email', 'order confirmation email' really look like subclasses/flyweights of those models. </p>
+<p>The only pitfall I see is that this model coupling may not be applicable with grouplists or forums, and, yes, attachments also fell out of this scheme - because it is really aggregation/presentation issue.</p>
+<p>Good job!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-a72c-423c-897c-4319cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=40e14f9efc4e357c0835a83856355d42&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							max&nbsp;						</strong>
+						<strong>said 
+						on Nov 07, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>one more bug:<br />
+	    if (!isset($headers['Content-type']))</br><br />
+	       $this-&gt;setHeader('Content-type', 'text/html; charset=utf-8');</br><br />
+==&gt;</br><br />
+	    if (!isset($this-&gt;headers['Content-type']))</br><br />
+	       $this-&gt;setHeader('Content-type', 'text/html; charset=utf-8');</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-5e70-4e1c-bffd-49f1cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5ca73837e1f4e2886aebdf1eff648265&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Chris Renner&nbsp;						</strong>
+						<strong>said 
+						on Nov 14, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Just wanted to let you know I uploaded version 0.7.4 to cakeforge, fixing the headers bug.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-1d80-4f51-92f3-421dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=43ab02c237b70aae1e0c61586e9e03a6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://othy.wordpress.com" rel="nofollow">CraZyLeGs</a>						</strong>
+						<strong>said 
+						on Dec 22, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hmm Nice..<br />
+I think Mailing is one of those things that are Programmer'taste's specific.</br><br />
+Good for you if you learnt things while developping it, and yes, there are some bloated 3rd party libs outta there, but hey, not all of them, hopefully! or else, people that are outside the Cake world would thing it's bloated! Oh Ma!</br></p>
+<p>Anyway, I believe Swift Mailer is a nice Mailing class, really clean IP.<br />
+and added a swiftMailer Component to bakery</br><br />
+The component:</br><br />
+http://bakery.cakephp.org/articles/view/192</br></p>
+<p>The docs:<br />
+http://bakery.cakephp.org/articles/view/193</br></p>
+<p>It basically allows to views, or wrap a body msg with a layout, embed images on the fly etc. useful for a newsLetter, for example.<br />
+That is just my taste at the moment.</br></p>
+<p>Regards</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-a3b8-4dc9-8350-4a01cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c28cbc5ff5f63a4fa191af3bb49a36a7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://nateklaiber.com" rel="nofollow">Nate K</a>						</strong>
+						<strong>said 
+						on Feb 08, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Greetings Felix!<br />
+I have recently moved to using CakePHP for many of my projects, and was happy to see that in the 1.2 release there is now an email component. What do you think of the new email component - in comparison to your method?</br></p>
+<p>Hope all is well....</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-6eb0-4d19-ab1d-45c5cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 08, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nate K: Rock n' Roll nate! I was hoping you'd do that ; ). Anyway, the Cake 1.2 email component is much superior to my attempt here and I highly recommend you to use it! Good to see you around ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-0558-4a83-af90-4551cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b627f1a14f01e4f3a78c0b9f1251b2e3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Doan Cao Nghia&nbsp;						</strong>
+						<strong>said 
+						on Mar 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>i have use this code. email was send but no send data in contact_form.thtml. why ?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de8-3f44-4584-8748-4192cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4254015e918ff3fe2691cd0e6f0f6740&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							josh&nbsp;						</strong>
+						<strong>said 
+						on Apr 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'm getting the same error as Joel<br />
+Using the latest version from cakeforge v. 0.7.4)</br><br />
+I also removed the third argument in ActionMailer::__call like he suggested and it seems to work fine, but not sure what other effects this has.</br></p>
+<p>Fatal error: Method ActionMailer::__call() must take exactly 2 arguments in /cakeapps/company/vendors/action_mailer.php on line 374</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-52d4-4941-8e03-429ccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 28, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>josh: This might be due to some recent changes in CakePHP. However if you check out Cake 1.2 there is an excellent new EmailComponent which I would recommend you.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-9a30-4481-bd35-42b3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5ca73837e1f4e2886aebdf1eff648265&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Chris Renner&nbsp;						</strong>
+						<strong>said 
+						on Jun 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I uploaded a new version (0.7.5) to cakeforge, fixing a bug when trying to set an array of data.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-ba98-48ac-be40-42f4cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Chris: cool - thx.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-59c8-4cc9-aa77-473ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5ca73837e1f4e2886aebdf1eff648265&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Chris Renner&nbsp;						</strong>
+						<strong>said 
+						on Jun 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>By the way, with that last bugfix, I think it's now entirely possible to change ActionMailer to extend AppModel instead of Object, and use validation and other model features on it. If you're not actually saving to DB, you'll still need to set $useTable to false.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dee-3c68-432f-9b0c-4ecdcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c6133abebb0cdf592703fc5a61a7238e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Leonardo&nbsp;						</strong>
+						<strong>said 
+						on Aug 16, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi, frist great work, and second I could nor make it work, I follow your instructions, and I got this error.(using version 0.7.5 )<br />
+Fatal error: Method ActionMailer::__call() must take exactly 2 arguments</br><br />
+the same above, so I delete the third parameter in that function and the error went away, but now there is  another, I think, it shows</br><br />
+"Missing Layout</br></p>
+<p>You are seeing this error because the layout file can't be found or doesn't exist.</p>
+<p>Notice: If you want to customize this error message, create app\views/errors/missing_layout.thtml.</p>
+<p>Fatal: Confirm you have created the file :"<br />
+What file ????</br><br />
+And I did not undertand what was trying to say the commente above</br><br />
+"Fraisouille said,</br></p>
+<p>It took me time to make it work …<br />
+Do not forget to put into your mail.thtml layout and the .thtml from your app_mailer function will be rendered …"</br><br />
+could you explain this better?</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dee-369c-413d-b2fc-4e04cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 16, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Leonardo: If you are using cake 1.2 please try out the new EmailComponent - it's much better then this solution. From what you wrote I cannot really figure out what is going wrong. It has also been over a year that I wrote this post.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df2-7c74-4d4c-bd1d-46dccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d139b176336b7efb26d8aabe38a57fcf&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://danhughes.org" rel="nofollow">Dan Hughes</a>						</strong>
+						<strong>said 
+						on Nov 09, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Leonardo: You need a "mail.thtml" file in your layouts folder.  I went very simple, so all my contains is : "".</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df2-9a10-46a2-a7ae-4bb9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d139b176336b7efb26d8aabe38a57fcf&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://danhughes.org" rel="nofollow">Dan Hughes</a>						</strong>
+						<strong>said 
+						on Nov 09, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Very clever of me.  Mine contains "echo $content_for_layout;" within php tags.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df4-ca18-4b58-9962-4250cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blogdotphp.ru/cakephp-best-article" rel="nofollow">Blog.Php about cakePHP &raquo; Полезные ссылки по cakePHP</a>						</strong>
+						<strong>said 
+						on Jan 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Отправка почты [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a0410b1-fa4c-4371-89ac-17184834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b8aa6c0efeeddf4998d5c52305772fca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							sagar&nbsp;						</strong>
+						<strong>said 
+						on May 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Your solutions are superb and help me a lot to work thru cake....Thanks</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

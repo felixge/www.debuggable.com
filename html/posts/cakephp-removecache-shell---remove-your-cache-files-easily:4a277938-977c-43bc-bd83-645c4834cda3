@@ -1,0 +1,446 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>CakePHP RemoveCache Shell - Remove Your Cache Files Easily &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/cakephp-removecache-shell---remove-your-cache-files-easily:4a277938-977c-43bc-bd83-645c4834cda3">CakePHP RemoveCache Shell - Remove Your Cache Files Easily</a></h2>	<div class="posted-on">
+		<p>Posted on 4/6/09 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>it's been a while since the last post here on Debuggable. However, this ends now and apart from this very post here we have something bigger brewing for you as well. So please stay tuned a little longer. :)</p>
+<p>Anyways, on to some Caching fun.</p>
+<h2>The Motivation</h2>
+<p>1. When you work with large projects you can end up with a ton of cache files (models, db cache, etc.) as well as view caching files. When you try removing them with:</p>
+<p>cd /app/tmp/cache/models && rm -f cake_*</p>
+<p>and </p>
+<p>cd /app/tmp/cache/views && rm -f *</p>
+<p>.. you can end up with with the "argument list too long" error easily.</p>
+<p>2. Also, executing two commands sucks - we are lazy after all. Now you could pull out some fancy bash fun to pipe file names. Have a look at this:</p>
+<p>find . -type f | awk '!/empty/ {print "rm", $0}' | bash</p>
+<p>The problem is, when you run this in /app/tmp it will not only remove cache files, but also files in /tmp/sessions, /tmp/logs and so on. If you ask me, the command is complex enough, so no need to add more funny stuff there to take this into account.</p>
+<p>(For you peeps who want to see this, I bugged Felix to tell me: find . -type f | awk '!/empty$|^.\/logs|^.\/sessions/ {print "rm", $0}' | bash)</p>
+<p>3. Once you are on windows, you do not have a powerful bash to your side.</p>
+<p>I thought a simple call to a CakePHP shell can do the trick as well and doesn't force you to waste half a minute to remember and type in the proper bash command.</p>
+<h2>The Solution</h2>
+<p>The RemoveCache shell allows you to remove your cae cache files easily. It takes two parameter:</p>
+<ul>
+<li>A boolean to control if you want to remove standard cache files (models, db cache, etc.)</li>
+<li>A regex pattern to control which view cache files to remove</li>
+</ul>
+<p>Here are some common usage scenarios:</p>
+<p>Usage: cake remove_cache &lt;std_cache_boolean&gt; &lt;pattern_to_match_viewcache_files&gt;<br />
+Usage: cake remove_cache 				// removes all cache files<br />
+Usage: cake remove_cache 0 				// removes only view cache files<br />
+Usage: cake remove_cache 0 home 		// removes only the view cache file for your homepage<br />
+Usage: cake remove_cache 0 articles_ 	// removes all view cache files for your articles controller<br />
+Usage: cake remove_cache 1 /letter_z$/ 	// removes all std cache files and view cache files ending with 'letter_z'</p>
+<p>I did not put in a pattern for standard cache files, because most of the time you cannot remember your cache keys anyways and most of the time it doesn't harm if a cache file is invalidated to rebuilt the cache. If someone wants a pattern for that too, because they have long-taking queries, just comment and I will add it.</p>
+<p>By default, the shell looks in your standard /app/tmp directory (plus subfolders) to find the cache files. If you have a shared Cake installation or any other fancy setup, please adjust the cache paths in the inititalize() method.</p>
+<h2>The Code</h2>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;"><span class="kw2">&lt;?php</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* Remove Cache Shell<br />
+&nbsp;*<br />
+&nbsp;* This shell allows you to remove cache files easily and provides you with a couple configuration options.<br />
+&nbsp;* If run with no command line arguments, RemoveCache removes all your standard cache files (db cache, model cache, etc.)<br />
+&nbsp;* as well as your view caching files.<br />
+&nbsp;*<br />
+&nbsp;*<br />
+&nbsp;* RemoveCache Shell : Removing your Cache<br />
+&nbsp;* Copyright 2009, Debuggable, Ltd. (http://debuggable.com)<br />
+&nbsp;*<br />
+&nbsp;* Licensed under The MIT License<br />
+&nbsp;* Redistributions of files must retain the above copyright notice.<br />
+&nbsp;*<br />
+&nbsp;* @filesource<br />
+&nbsp;* @copyright &nbsp; &nbsp; Copyright 2009, Debuggable, Ltd. (http://debuggable.com)<br />
+&nbsp;* @link &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project<br />
+&nbsp;* @license &nbsp; &nbsp; &nbsp; http://www.opensource.org/licenses/mit-license.php The MIT License<br />
+&nbsp;*/</span><br />
+<span class="kw2">class</span> RemoveCacheShell <span class="kw2">extends</span> Shell <span class="br0">&#123;</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* undocumented function<br />
+&nbsp;*<br />
+&nbsp;* @return void<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; <span class="kw2">function</span> initialize<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; parent::<span class="me2">initialize</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">settings</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'view_cache_path'</span> =&gt; APP . <span class="st0">'tmp'</span> . DS . <span class="st0">'cache'</span> . DS . <span class="st0">'views'</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'std_cache_paths'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; APP . <span class="st0">'tmp'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; APP . <span class="st0">'tmp'</span> . DS . <span class="st0">'cache'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; APP . <span class="st0">'tmp'</span> . DS . <span class="st0">'models'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; APP . <span class="st0">'tmp'</span> . DS . <span class="st0">'persistent'</span><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* undocumented function<br />
+&nbsp;*<br />
+&nbsp;* @return void<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; <span class="kw2">function</span> main<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$args</span> = <span class="re0">$this</span>-&gt;<span class="me1">args</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$stdCache</span> = !<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$args</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="br0">&#41;</span> || <span class="re0">$args</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$viewCachePattern</span> = <a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$args</span><span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span><span class="br0">&#41;</span> ? <span class="re0">$args</span><span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span> : <span class="st0">'.*'</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$stdCache</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;_cleanStdCache<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;_cleanViewCache<span class="br0">&#40;</span><span class="re0">$viewCachePattern</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* Cleans the standard cache, ie all model caches, db caches, persistent caches<br />
+&nbsp;* Files need to be prefixed with cake_ to be removed<br />
+&nbsp;*<br />
+&nbsp;* @return void<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; <span class="kw2">function</span> _cleanStdCache<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$paths</span> = <span class="re0">$this</span>-&gt;<span class="me1">settings</span><span class="br0">&#91;</span><span class="st0">'std_cache_paths'</span><span class="br0">&#93;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$paths</span> <span class="kw1">as</span> <span class="re0">$path</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$folder</span> = <span class="kw2">new</span> Folder<span class="br0">&#40;</span><span class="re0">$path</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$contents</span> = <span class="re0">$folder</span>-&gt;<span class="me1">read</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$files</span> = <span class="re0">$contents</span><span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$files</span> <span class="kw1">as</span> <span class="re0">$file</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/preg_match"><span class="kw3">preg_match</span></a><span class="br0">&#40;</span><span class="st0">'/^cake_/'</span>, <span class="re0">$file</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">continue</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="re0">$path</span> . DS . <span class="re0">$file</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; @<a href="http://www.php.net/unlink"><span class="kw3">unlink</span></a><span class="br0">&#40;</span><span class="re0">$path</span> . DS . <span class="re0">$file</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* Cleans all view caching files. Takes a pattern to match files against.<br />
+&nbsp;*<br />
+&nbsp;* @param string $pattern <br />
+&nbsp;* @return void<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; <span class="kw2">function</span> _cleanViewCache<span class="br0">&#40;</span><span class="re0">$pattern</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$path</span> = <span class="re0">$this</span>-&gt;<span class="me1">settings</span><span class="br0">&#91;</span><span class="st0">'view_cache_path'</span><span class="br0">&#93;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$pattern</span><span class="br0">&#123;</span><span class="nu0">0</span><span class="br0">&#125;</span> != <span class="st0">'/'</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$pattern</span> = <span class="st0">'/'</span> . <span class="re0">$pattern</span> . <span class="st0">'/i'</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="re0">$folder</span> = <span class="kw2">new</span> Folder<span class="br0">&#40;</span><span class="re0">$path</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$contents</span> = <span class="re0">$folder</span>-&gt;<span class="me1">read</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$files</span> = <span class="re0">$contents</span><span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$files</span> <span class="kw1">as</span> <span class="re0">$file</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/preg_match"><span class="kw3">preg_match</span></a><span class="br0">&#40;</span><span class="re0">$pattern</span>, <span class="re0">$file</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">continue</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="re0">$path</span> . DS . <span class="re0">$file</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; @<a href="http://www.php.net/unlink"><span class="kw3">unlink</span></a><span class="br0">&#40;</span><span class="re0">$path</span> . DS . <span class="re0">$file</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* undocumented function<br />
+&nbsp;*<br />
+&nbsp;* @return void<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; <span class="kw2">function</span> help<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">'Debuggable Ltd. Remove Cache Shell - http://debuggable.com'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">hr</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">'Important: Configure your paths in the shell<span class="es0">\'</span>s initialize() function.'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">hr</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">'This shell allows you to remove cache files easily and provides you with a couple configuration options.'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">'If run with no command line arguments, RemoveCache removes all your standard cache files (db cache, model cache, etc.) '</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">'as well as your view caching files.'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">''</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">'Set the first parameter to 0 (zero), to not remove standard cache files.'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">'Set a regex pattern for the second argument, to match viewcache files to delete.'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">hr</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">&quot;Usage: cake remove_cache &lt;std_cache_boolean&gt; &lt;pattern_to_match_viewcache_files&gt;&quot;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">&quot;Usage: cake remove_cache <span class="es0">\t</span><span class="es0">\t</span>// removes all cache files&quot;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">&quot;Usage: cake remove_cache 0 <span class="es0">\t</span><span class="es0">\t</span>// removes only view cache files&quot;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">&quot;Usage: cake remove_cache 0 home <span class="es0">\t</span>// removes only the view cache file for your homepage&quot;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">&quot;Usage: cake remove_cache 0 articles_ <span class="es0">\t</span>// removes all view cache files for your articles controller&quot;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">&quot;Usage: cake remove_cache 1 /letter_z$/ <span class="es0">\t</span>// removes all std cache files and view cache files ending with 'letter_z'&quot;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">out</span><span class="br0">&#40;</span><span class="st0">''</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<span class="kw2">?&gt;</span></div>
+<p>Enjoy! Feedback welcome.</p>
+<p>-- Tim Koschuetzki aka DarkAngelBGE<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4a277938-977c-43bc-bd83-645c4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakephp-removecache-shell---remove-your-cache-files-easily%3A4a277938-977c-43bc-bd83-645c4834cda3 &amp;title=CakePHP+RemoveCache+Shell+-+Remove+Your+Cache+Files+Easily';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakephp-removecache-shell---remove-your-cache-files-easily%3A4a277938-977c-43bc-bd83-645c4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakephp-removecache-shell---remove-your-cache-files-easily%3A4a277938-977c-43bc-bd83-645c4834cda3&amp;title=CakePHP+RemoveCache+Shell+-+Remove+Your+Cache+Files+Easily&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakephp-removecache-shell---remove-your-cache-files-easily%3A4a277938-977c-43bc-bd83-645c4834cda3&amp;title=CakePHP+RemoveCache+Shell+-+Remove+Your+Cache+Files+Easily';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/cakephp-pluralize-helper:480f4dfe-fbf8-464a-95da-4764cbdd56cb">CakePHP Pluralize Helper</a></li>
+							<li><a href="/posts/cakenews-a-cakephp-feed-collection:480f4dd5-d7e4-4dec-831a-4b18cbdd56cb">CakeNews - A CakePHP feed collection</a></li>
+							<li><a href="/posts/unit-testing-in-cakephp-part-1---introduction-to-unit-testing:48102610-c5d0-4398-a010-76974834cda3">Unit Testing in CakePHP Part 1 - Introduction to Unit Testing</a></li>
+							<li><a href="/posts/issues-with-output-buffering-in-cakephp:480f4dd5-b4fc-42a7-a5ab-4544cbdd56cb">Issues with output buffering in CakePHP</a></li>
+							<li><a href="/posts/drake-drupal-cakephp-is-making-progress:480f4dd5-7218-454c-92a0-4f44cbdd56cb">Drake (Drupal + CakePHP) is making progress</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/learning-from-the-cakephp-source-code-part-ii:480f4dd6-57fc-4715-8709-439acbdd56cb">Learning from the CakePHP source code - Part II</a></li>
+							<li><a href="/posts/how-to-save-half-a-second-on-every-request-of-your-cakephp-app:49a69610-8648-4d65-815d-754c4834cda3">How To Save Half A Second On Every CakePHP Request</a></li>
+							<li><a href="/posts/how-table-migrations-in-cakephp-12-can-save-your-life:480f4dfe-d040-488e-8b2d-4369cbdd56cb">How Table Migrations In CakePHP 1.2 Can Save Your Life</a></li>
+							<li><a href="/posts/cakephp-1.2-stable-come-and-help:4829b3ac-903c-4f56-94dc-27af4834cda3">CakePHP 1.2 Stable! Come and help</a></li>
+							<li><a href="/posts/with-jquery-cakephp-to-world-domination-slides:480f4dd6-7cb8-4e84-af4f-4dc6cbdd56cb">With jQuery &amp; CakePHP to World Domination (Slides)</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/cakephp-removecache-shell---remove-your-cache-files-easily:4a277938-977c-43bc-bd83-645c4834cda3">6 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/cakephp-removecache-shell---remove-your-cache-files-easily:4a277938-977c-43bc-bd83-645c4834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4a27a7f4-f984-431e-b2ea-3d994834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3210e1be3e4059b93c4a88309e2183a2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://kevin.vanzonneveld.net" rel="nofollow">Kevin van Zonneveld</a>						</strong>
+						<strong>said 
+						on Jun 04, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey there Tim,</p>
+<p>Not that this could work on windows or anything, but the following should tackle dealing with both "argument list too long" and non-unix characters (print0 will delimit files with the 0 character, so you won't have to escape spaces or any other 'crazy' chars):</p>
+<p>find YOUR/WEB/DIR/app/tmp/cache/ -type f -print0 | xargs -r -0 rm</p>
+<p>It's actually a simplified version from what PHP uses to clean up session garbage files (see /etc/cron.d/php5)</p>
+<p>If anyone has PHP on Windows they should probably be able to figure out the Windows equivalent for this cleanup command.</p>
+<p>Just FYI. I do not intend this to replace the RemoveCache Shell or anything.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a27f99f-2e50-4261-92da-54eb4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=612ad7c3adee43c41ee3e88affe94472&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							NOSLOW&nbsp;						</strong>
+						<strong>said 
+						on Jun 04, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tim,</p>
+<p>Glad to see a new post! It's certainly been a while. </p>
+<p>Any reason why you didn't use the core's clearCache function (<a rel="nofollow" href="http://api.cakephp.org/file/basics.php#function-clearCache)?">http://api.cakephp.org/file/basics.php#function-clearCache)?</a> I include a link to a controller action in my app's admin menu to clear the cache while logged in as admin (actually, I automatically call it at admin login as well because in production, admin always logs in immediately following an update, a time when you need the cache cleared).</p>
+<p>I'll stay tuned!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a280b70-dbe4-40b8-a6d5-7f2f4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Jun 04, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hah good call NOSLOW. Yeah I forgot about it in this shell - shame on me.</p>
+<p>However, I think the shell is still slightly more flexible when it comes to custom cache paths. Remember how you can set up your cache directory in core.php?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a28ac0f-6464-49b5-a5f0-779a4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Jun 05, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Here is an alternative by jperras wrapped into a plugin:</p>
+<p><a rel="nofollow" href="http://thechaw.com/cache">http://thechaw.com/cache</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a2a7c8e-4e84-433e-bb28-1f754834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4ab185c23be3076c02c2b7b7f48062d1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://chr.ishenry.com" rel="nofollow">Chris Henry</a>						</strong>
+						<strong>said 
+						on Jun 06, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>For most of my projects, I have created a class made up entirely of constants that are the root to my keys.  For example:</p>
+<p>const PRODUCT_ = 'product_'; // + id</p>
+<p>This provides a nice reference to the types of keys I have, and a programmatic way of getting to them.  You can group them in arrays, then iterate through them to build out various interfaces for examining their contents, clearing groups, or adding the id to clear single keys.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a2b4054-ee2c-4b3a-a8da-3d884834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e65e69930868f80c0188397b2264a95&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Chad Weaber&nbsp;						</strong>
+						<strong>said 
+						on Jun 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I did something similar awhile back for our application. We use a shared cake and app directory, and each site we create on the server has it's on tmp and webroot directory. Each site will have different cache files so we couldn't globalize this.</p>
+<p>To delete the cache on the entire server I use the following:<br />
+----</br><br />
+find / -type f \( -iname "cake_model_*" -or -iname "cake_*" ! -iname "cake_core_*" \) -user 99 >/home/cake_cache.txt</br><br />
+cat /home/cake_cache.txt | while read line</br><br />
+do</br><br />
+        rm -f $line</br><br />
+done</br><br />
+----</br></p>
+<p>Worked out pretty good so far. I'm sure there is a way to simplify this though.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

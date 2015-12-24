@@ -1,0 +1,466 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Starting a CakePHP community website / Website Framework &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/starting-a-cakephp-community-website-website-framework:480f4dd5-179c-4ff2-be55-4b7acbdd56cb">Starting a CakePHP community website / Website Framework</a></h2>	<div class="posted-on">
+		<p>Posted on 27/1/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p>So I've been thinking of two things recently. One of them was that it would be cool to have a <strong>CakePHP community</strong> website like <a href="http://drupal.org/">Drupal</a> has one, where people can ask questions, publish (ready to use) code. The other one is to create a <b>Website Framework</b> with CakePHP (more about this below).</p>
+<h3>CakePHP Community</h3>
+<p>I know cakephp basically supports all of this already but I feel like something more community based would be benifitial. Don't get me wrong, CakeForge and CakeSnippets are great but I think there is a gap between those that demands to be filled. Otherwise every one of us will implement Image Galleries, Content Managment, RSS, etc. over and over again and while it might be faster then it would be without CakePHP it's still wasted time for most of us. So here is where my 2nd thought kicks in, creating a CakePHP Website Framework.</p>
+<h3>CakePHP Website Framework</h3>
+<p>So if I use the term "Website Framework" I don't mean a CMS. I mean something that would be in between a PHP Framework and a CMS. Basically all it would do is to help "<strong>modularize</strong>" CakePHP controllers, models, components and vendor classes into modules that you would call <em>Image Gallery, Page Manager, Localization Editor or Tagging / Comment Tool</em>. This means it would be a very lightweight set of a couple controllers/modules that would support installation, upgrade and activation/deactivation of modules hosted on a central site. Of course this means the entire thing would need to follow certain standards, so some things like "User Managment, Right Managment, Sessions, etc." would need to follow clear rules and most likely be "standard modules" used by the other ones. But I think this would really be something to speed up development even more, and if you want to build a website you could choose from hundreds of modules to start with and be done very fast. Have a look a <a href="http://drupal.org/project/Modules">Drupal's Module Site</a> for getting an idea of how much <b>code should be reused</b>.</p>
+<h4>Module Design</h4>
+<p>I've already spent a little bit of time by thinking of how to approach the "Module Design". I think every module should be designed so you can overwrite any function of it with your own code, without having to hack the module itself. So all modules would be derived from one common <strong>class "Module"</strong>. So whenever a module is used the Website Framework will look for a php file called like modules/gallery/custom-gallery.php and check if there is a class CustomGallery to use instead of Gallery itself. This way you'd have very costumizable modules attractive to Programmers and not suffering from the bloat of providing the customization to the end user (like Drupal does).</p>
+<h3>Outlook</h3>
+<p>Right now I don't have the time for writing either the community site nor the website framework all by myself in CakePHP. Now while I'll propably be able to get the community thing going with my Drupal/CakePHP solution I'd be interested to hear about people's oppinion about the Website Framework and see if there is enough interest to start a common project. Every comment on this post will be appriciated!</p>
+<p><strong>Update:</strong> I've just talked to gwoo about my ideas and he told me about an upcoming feature for 1.0 called <em>plugins</em>. As I understood him they are going to be a folder based seperation for "controllers, models, components, view etc." into little "mini-apps". So thinking about this feature, my module design would propably base on these "plugins" since they are the first step of organzing all the MVC parts by their user-related functions.<br />
+He also suggested not calling the entire thing a "Website Framwork" but rather a WoS (Website Operation System), or based on my 2nd idea MMS (Website Managment System) using the name CakeMMMMMs. What do you think?</p>
+<p>--Felix aka the_undefined</p>
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-179c-4ff2-be55-4b7acbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fstarting-a-cakephp-community-website-website-framework%3A480f4dd5-179c-4ff2-be55-4b7acbdd56cb &amp;title=Starting+a+CakePHP+community+website+%2F+Website+Framework';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fstarting-a-cakephp-community-website-website-framework%3A480f4dd5-179c-4ff2-be55-4b7acbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fstarting-a-cakephp-community-website-website-framework%3A480f4dd5-179c-4ff2-be55-4b7acbdd56cb&amp;title=Starting+a+CakePHP+community+website+%2F+Website+Framework&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fstarting-a-cakephp-community-website-website-framework%3A480f4dd5-179c-4ff2-be55-4b7acbdd56cb&amp;title=Starting+a+CakePHP+community+website+%2F+Website+Framework';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/yummy-cakephp-functions-you-should-know-about:480f4dd5-4528-4a53-a0ec-4aa8cbdd56cb">Yummy CakePHP functions you should know about!</a></li>
+							<li><a href="/posts/cakephp-argentina:4937042e-4864-48e1-98f0-6d3d4834cda3">CakePHP Argentina</a></li>
+							<li><a href="/posts/10-days-of-free-dessert-cakephp-tips:480f4dd5-1da4-4248-91f4-4043cbdd56cb">10 Days of free Dessert! (CakePHP Tips)</a></li>
+							<li><a href="/posts/how-to-have-multiple-paginated-widgets-on-the-same-page-with-cakephp:48ad241e-b018-4532-a748-0ec74834cda3">How to have multiple paginated widgets on the same page with CakePHP</a></li>
+							<li><a href="/posts/basic-cakephp-templating-skills:480f4dd6-4040-4c57-8c17-4606cbdd56cb">Basic CakePHP templating skills</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/testing-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes:4890ed55-be28-4d4a-ba4c-7fd64834cda3">Testing Models in CakePHP - Now let&#039;s get rid of the unnecessary ModelTest classes !</a></li>
+							<li><a href="/posts/how-to-paginate-a-search-using-the-cakephp-framework:48fc5f77-38d0-41e0-b711-77c64834cda3">How to paginate a CakePHP search over a HABTM relation without hacking the core</a></li>
+							<li><a href="/posts/gwoo-starts-the-first-cakephp-based-blog:480f4dd5-c668-48c7-b6d8-436ccbdd56cb">gwoo starts the first CakePHP based blog</a></li>
+							<li><a href="/posts/bringing-the-cold-war-to-cakephp-12-the-containable-behavior:480f4dd6-2b50-4d7b-ab05-418dcbdd56cb">Bringing the cold war to CakePHP 1.2 - The Containable Behavior</a></li>
+							<li><a href="/posts/how-table-migrations-in-cakephp-12-can-save-your-life:480f4dfe-d040-488e-8b2d-4369cbdd56cb">How Table Migrations In CakePHP 1.2 Can Save Your Life</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/starting-a-cakephp-community-website-website-framework:480f4dd5-179c-4ff2-be55-4b7acbdd56cb">15 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/starting-a-cakephp-community-website-website-framework:480f4dd5-179c-4ff2-be55-4b7acbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dd7-9ee8-4cfe-841b-4a21cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f4112f3023c643bf2f7b32c9c5dcfcba&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakebaker.wordpress.com" rel="nofollow">Daniel Hofstetter</a>						</strong>
+						<strong>said 
+						on Jan 28, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>1. Yes, I think it would be useful to have such a community page. I am willing to support such a project.<br />
+2. I am a little bit confused about the idea of the WoS project. I don't understand what the goal of this project should be. Is it a directory of modules? Or is it about writing reusable modules? Or about integrating a module infrastructure into Cake? Please clarify!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-fc90-409a-9a07-4f35cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 28, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It's good to hear that you are interested in a community page, I think we should talk a little bit about it on #cakephp.</p>
+<p>Regarding your second point: A module basically would be one "Zip Package" that contains all MVC files + a new class for the Module itself like GalleryModule. The WoS itself would create an admin secured page where you can add, remove or deactivate modules. It would be very similiar to a module in Drupal, the main difference beeing that the module is customized by the programmer and not by the end-user which takes out a lot of bloat.</p>
+<p>To make this clearer: A module will always make up one single "part" of a website, be it a Gallery, a Guestbook, a Blog, or whatever. All of the module function will be possible to overwrite much like you do with app_controller or app_model right now.</p>
+<p>The most important thing is that there need to be 2-3 "standard modules" included in the WoS that will take care of  user authentication, right managment (propably ACL) and possibly Theming in order to ease working with multiple templates for the same things.</p>
+<p>I hope this was a little bit more explanatory to you ; ).</p>
+<p>--Felix aka the_undefined</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-3274-495f-b4d1-404dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8d07c93cb4fc80a7c62e50cbac7da9c6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://osmap.org" rel="nofollow">automagically</a>						</strong>
+						<strong>said 
+						on Jan 31, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hello.  Your ideas are good.  The CakePHP site, I think, is mostly for cake in general, like the development of itself, so I think it might always be general, just for the sanity of the developers.  I give lots of respect to them just for answering all the noob questions in the chatroom all day.  More people need to be proficient in cake if more ways to receive help are made available.</p>
+<p>A framework, which I interpret as some sort of CMS, is currently my goal with learning CakePHP.  I currently use Drupal, but want something similar in CakePHP.  Not exactly similiar though, for example, I want more control than a 3 column layout.  In fact I don't want any of the layout determined on admin settings.  I just want to be able to switch themes, and control which themes are available to the users, if any.  I'm also trying to write my classes so they are compatable with amfphp.  I basically want like you said, a user managment system, theme system, extra plugin compatable, and one admin section for everything.  So far I have a primitive User registration script.  I havn't figured out sessions and cookies yet, so you can't login yet.  Theres lots of things that are important in user managment though, such as multiple types of validation, login validation, email validation, change email validation, password recovery, and so forth.  It would be great if one user management system did it all.  A really good system could be implemented into anything, this CMS, that Framework, this mailing list, etc, without any major changes.</p>
+<p>One thing important to me is a way to have it work with multiple sites, like Drupal does.  I would do it different than they do.  Instead of a sites folder, with other folders in it named after the site, I have all settings in one file for each site.  Then there would be no need for shady folder names, like sub.site.com.folder, which I havn't gotten 100% working yet.  One config file is alot better than 3 folders, and 3 config files, which I currently have with Drupal.  I currently have 3 domains with the same drupal site, same database but different prefixes, all different themes, certain modules enabled for some and not the other, etc.</p>
+<p>I like the idea of CakeMMM for a name.  I'd leave off the extra M's and the s.  CakeMMM sounds like something Homer Simpson would say, so it's ok with me!  I was gonna say MMMCake, but it doesn't look as good.  Sounds like a good project!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-adcc-4e73-b995-4bcacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e44f3a8a6156dfd525208cc7e335c814&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://xcite-online.de/blog" rel="nofollow">Frando</a>						</strong>
+						<strong>said 
+						on Feb 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey everyone...</p>
+<p>that's kinda weird, I had exactly the same idea a couple of days ago ..<br />
+so I agree to everything written here and am willing to do what I can to push this project forward!</br></p>
+<p>Just to summarize, I think CakeMMM needs 4 basic parts:</p>
+<p>-a user managment<br />
+-a module system</br><br />
+-a theming system</br><br />
+-a common admin interface (for theming and acitvating/deactivating modules, other modules should be able to add some configuration options)</br></p>
+<p>It might be useful to have some standart action names for controllers of the included modules, e.g. "activate" and "deactivate" or "administer" ..</p>
+<p>So hey,<br />
+now we're already three people who believe in CakeMMM, so we just gotta do it ;)</br><br />
+I'm pretty sure, as cake is still a rather young project but already getting lots of attention, that there will quite soon be a community around CakeMMM ...</br></p>
+<p>best regards,<br />
+Frando</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-2f00-4a37-b33a-4023cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Alright people! I think the next thing we will need is a place where we can discuss our ideas and create a reasonable outline for the project that will set up rules and things we want CakeMMM (offical working title as of now ^^!) to do and which we don't want it to do.<br />
+Then we need a Subversion Server for it, but I think we should be able to host the project on CakeForge since it's really a Cake related application.</br></p>
+<p>But I think the most notable one is that this is shold not be the Cake Version of Drupal. It's a Developer System not a User one. Which means the system will be very spartanic itself and only handle the 4 points frando mentioned, but will allow a maximum of flexibilty. </p>
+<p>So it will be able to do the same things Drupal does, but really based on modules and not on built-in stuff. So for example a "menu" would definitly be something left to a module and not be part of the core.</p>
+<p>Another that idea I had was if it would make sense to have something like an "core abstraction layer" which would basically mean that stuff like theming, user managment and so on would work with "one common class" all modules of this kind extend, but would allow to have different user managment "modules" for different sites. So for example one should be able to modify the "Model" of the User-System in order to make it retrieve the Data via a REST or SOAP interface from another site for example. But I'm not sure about how practically that would be, but it's defnitly something worth to discuss.</p>
+<p>So regarding the place to discuss: We could either set up a mail group, have an irc channel or use a wiki. What would you guys prefer?</p>
+<p>--Felix</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-9ff4-436a-ad7e-4804cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8d07c93cb4fc80a7c62e50cbac7da9c6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://osmap.org" rel="nofollow">automagically</a>						</strong>
+						<strong>said 
+						on Feb 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yes I agree, its not a CMS, but can be one, depending on the plugins used.  I threw some of my ideas together while I was sitting in college today.  I not an expert in this stuff, but maybe some of the ideas will be useful.  http://pigeontech.com/files/CakeMMM.html</p>
+<p>As for a place to develop, maybe a simple drupal site with forum module.  I can create a subdomain if you are unable, but don't think I could handle user uploading or anything like that.  I think the first step would be to get things in writing, or even drawings, so you know how things (like plugins) work together, what rules they have with each other, etc.  Talk to ya later :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-64cc-4812-8535-4101cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e44f3a8a6156dfd525208cc7e335c814&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://xcite-online.de/blog" rel="nofollow">Frando</a>						</strong>
+						<strong>said 
+						on Feb 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sounds good!</p>
+<p>Just installed a basic drupal page for us ..<br />
+have a look on http://xcite-online.de/cakeMMM/</br></p>
+<p>just register and I give you all required privileges.</p>
+<p>you could also think about which other modules we should activate.</p>
+<p>best regards,<br />
+frando</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-b5b8-4e45-aa37-4236cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Frando: That's awesome, we'll use it from now on as our offical center ; ).</p>
+<p>automagically: Thx for taking the time to write down your thoughts. I looked at it and I agree with a lot of what you wrote. But I think it's a little bit to big already as of what modules you think should be in the package. For example Content would be an additional module and not part of CakeMMM itself. Disregarding the fact that we propably would be the first to programm something like this, and definitly publish it, it still shouldn't be part of the core.</p>
+<p>But let's continue our idea collection on frando's site ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-d44c-47ad-9ba7-4ce3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4e3ed95df080a431a41316795a3dc978&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://nemontemi.wordpress.com" rel="nofollow">Kiyoshi</a>						</strong>
+						<strong>said 
+						on Feb 10, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I really liked these ideas.<br />
+I've been in need to that system like to CakeMMM, but a simpler way: I needed to put some other project's code in my app, because the author was joining our project, and we wanted to do this without merge the two codes... so I needed a way to make customizations to the strange code, but I didn't want to do it directly in it.</br></p>
+<p>Felix, your way of view, thinking in a abstraction layer, is very interesting. Even more for a framework.<br />
+In my view, the pieces of code (and I tend to code everything this way) should be solid, and have an interface, just like that what you call abstraction layer, which is, in single words, a communication way to the outside.</br><br />
+This view can create a lot of reusable, modular and generic code.</br><br />
+Trying to make code this way, always claims to the best of the programming pratices, like OO; and adopting software engineering concepts, like planning, documenting, etc.</br><br />
+Finally, this gets open source (and I like more free software) movement stronger.</br></p>
+<p>As result, we get good code, a community, sharing, learning, more good code, larger community, and so...</p>
+<p>Besides all this blablabla, can I contribute to Cake community site and CakeMMM?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-fcb0-4962-99ff-4e5acbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 10, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Kiyoshi,</p>
+<p>thanks for your comment. You are definitly welcome to contribute to CakeMMM. Today I want to get the first Wiki pages ready that will provide the first clear and public overview about the way CakeMMM is going to work. I'll be hanging out in #cakephp and #cakemmm all day today so we should meet there and talk a little bit. I've done quite ome thinking with frando the last days so I think it's about time to get stuff written down. I also want to turn in the request for project/svn hosting at CakeForge today.</p>
+<p>See you in IRC or mail me at FelixGe [at] web [dot] de</p>
+<p>--Felix aka the_undefined</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-200c-4e21-b781-4b34cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2c2af30f274111f9d5050c5e76f27dba&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://olhoaberto.martelozero.com" rel="nofollow">andrezero</a>						</strong>
+						<strong>said 
+						on May 14, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>it's shame there was no follow-up to this one.. at least I can't find it</p>
+<p>i was going to add that Localization should be another basic feature of the MMM but...</p>
+<p>:-(</p>
+<p>do you know of any similar activity going on elsewhere?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-3178-4657-99f3-4447cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 31, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>andrezero: Yeah, it's a shame : /. But I've given up on building the perfect CMS for now and unfortunately wouldn't know any alternative either. I found that most companies need customized solutions these days anyway so it's not that much of a bummer for me. Not sure if there is any similar activity in the CakePHP community right now.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-f52c-4631-bfe7-4f4bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2dda9c7f2049531aaf8365941edd71ed&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://google.com/" rel="nofollow">Lane Luce</a>						</strong>
+						<strong>said 
+						on Jun 14, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This one makes sence "One's first step in wisdom is to kuesstion everything - and one's last is to come to terms with everything."</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4def-7a64-4b4b-a3c5-489dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=60237bbd021c82501faa3849ab0a65b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Rahul&nbsp;						</strong>
+						<strong>said 
+						on Sep 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>i have set up enviornment for working with cakePHP Now any one will  please help me to know where to start from..........</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df6-00d4-4c41-a37f-426ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c494143281b3f09faedcf788ae10545c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.blogtalkradio.com/Buy__Hydrocodone" rel="nofollow">Buy Hydrocodone</a>						</strong>
+						<strong>said 
+						on Feb 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Buy Hydrocodone - Secure Online Ordering <a href="http://www.blogtalkradio.com/Buy__Hydrocodone" rel="nofollow">buy hydrocodone</a> Hydrocodone buy - No Prescription hydrocodone abuse - [url=http://www.blogtalkradio.com/Buy__Hydrocodone]buy hydrocodone[/url].</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

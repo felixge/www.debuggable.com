@@ -1,0 +1,465 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Simple Data Access Control &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/simple-data-access-control:48b250b6-7314-48e8-8252-6efb4834cda3">Simple Data Access Control</a></h2>	<div class="posted-on">
+		<p>Posted on 25/8/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>this is post #6 of my <a href="http://debuggable.com/posts/time-to-grow-again-or-loose-money:48ab3665-2054-4e55-b13f-0c104834cda3">30 day challenge</a>.</p>
+<p>If your application is like most, then you have some basic permission requirements for your data. A simple scenario is the following. Blog posts can only be edited by their owners and administrators. Same goes for viewing unpublished blog posts. Given that requirement I usually wrote code like this in the past:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> PostsController <span class="kw2">extends</span> Controller<span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">function</span> view<span class="br0">&#40;</span><span class="re0">$id</span> = <span class="kw2">null</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$post</span> = <span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">findById</span><span class="br0">&#40;</span><span class="re0">$post</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <a href="http://www.php.net/assert"><span class="kw3">Assert</span></a>::<span class="me2">notEmpty</span><span class="br0">&#40;</span><span class="re0">$post</span>, <span class="st0">'404'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$ownPost</span> = <span class="re0">$post</span><span class="br0">&#91;</span><span class="st0">'Post'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'user_id'</span><span class="br0">&#93;</span> == User::<span class="me2">get</span><span class="br0">&#40;</span><span class="st0">'id'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <a href="http://www.php.net/assert"><span class="kw3">Assert</span></a>::<span class="kw2">true</span><span class="br0">&#40;</span><span class="re0">$post</span><span class="br0">&#91;</span><span class="st0">'Post'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'published'</span><span class="br0">&#93;</span> || <span class="br0">&#40;</span><span class="re0">$ownPost</span> || User::<span class="me2">isAdmin</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>, <span class="st0">'403'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span> <br />
+<br />
+&nbsp; <span class="kw2">function</span> edit<span class="br0">&#40;</span><span class="re0">$id</span> = <span class="kw2">null</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$post</span> = <span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">findById</span><span class="br0">&#40;</span><span class="re0">$post</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <a href="http://www.php.net/assert"><span class="kw3">Assert</span></a>::<span class="me2">notEmpty</span><span class="br0">&#40;</span><span class="re0">$post</span>, <span class="st0">'404'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$ownPost</span> = <span class="re0">$post</span><span class="br0">&#91;</span><span class="st0">'Post'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'user_id'</span><span class="br0">&#93;</span> == User::<span class="me2">get</span><span class="br0">&#40;</span><span class="st0">'id'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <a href="http://www.php.net/assert"><span class="kw3">Assert</span></a>::<span class="kw2">true</span><span class="br0">&#40;</span><span class="re0">$ownPost</span> || User::<span class="me2">isAdmin</span><span class="br0">&#40;</span><span class="br0">&#41;</span>, <span class="st0">'403'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span> <br />
+<span class="br0">&#125;</span></div>
+<p><strong>Note:</strong> See this post about <a href="http://debuggable.com/posts/assert-the-yummyness-of-your-cake:480f4dd6-7fe0-4113-9776-458acbdd56cb">the Assert implementation</a>. If you wonder about the User::get('id') call - that is part of our custom Auth system we hope to publish at some point.</p>
+<p>One could argue that the above is not ideally DRY and therefor should be refactored. In the past I probably would have followed that logic. However, these days I'm more often like fuck DRY if a little dupplication here and there makes code easier to read and to maintain (yes, that is very much possible with certain one liners).</p>
+<p>Anyway, what I don't like about the above is that I feel the logic for deciding record permissions falls into the Model realm. It simply makes more sense if you think of it as a business requirement which should be abstracted in the model layer. So here is how I deal with the problem these days:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> User <span class="kw2">extends</span> AppModel<span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/static"><span class="kw3">static</span></a> <span class="kw2">function</span> can<span class="br0">&#40;</span><span class="re0">$action</span>, <span class="re0">$record</span>, <span class="re0">$options</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/is_string"><span class="kw3">is_string</span></a><span class="br0">&#40;</span><span class="re0">$options</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$options</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'model'</span> =&gt; <span class="re0">$options</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="re0">$options</span> = <a href="http://www.php.net/array_merge"><span class="kw3">array_merge</span></a><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'action'</span> =&gt; <span class="re0">$action</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'model'</span> =&gt; <a href="http://www.php.net/key"><span class="kw3">key</span></a><span class="br0">&#40;</span><span class="re0">$record</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span>, <span class="re0">$options</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/method_exists"><span class="kw3">method_exists</span></a><span class="br0">&#40;</span><span class="re0">$options</span><span class="br0">&#91;</span><span class="st0">'model'</span><span class="br0">&#93;</span>, <span class="st0">'userCan'</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/call_user_func"><span class="kw3">call_user_func</span></a><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="re0">$options</span><span class="br0">&#91;</span><span class="st0">'model'</span><span class="br0">&#93;</span>, <span class="re0">$method</span><span class="br0">&#41;</span>, <span class="re0">$record</span>, <span class="re0">$options</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$record</span><span class="br0">&#91;</span><span class="re0">$options</span><span class="br0">&#91;</span><span class="st0">'model'</span><span class="br0">&#93;</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'user_id'</span><span class="br0">&#93;</span> == User::<span class="me2">get</span><span class="br0">&#40;</span><span class="st0">'id'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">class</span> Post <span class="kw2">extends</span> AppModel<span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/static"><span class="kw3">static</span></a> <span class="kw2">function</span> userCan<span class="br0">&#40;</span><span class="re0">$record</span>, <span class="re0">$options</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$options</span><span class="br0">&#91;</span><span class="st0">'action'</span><span class="br0">&#93;</span> == <span class="st0">'view'</span> &amp;&amp; <span class="re0">$record</span><span class="br0">&#91;</span><span class="st0">'Post'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'published'</span><span class="br0">&#93;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">true</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="br0">&#40;</span><span class="re0">$record</span><span class="br0">&#91;</span><span class="st0">'Post'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'user_id'</span><span class="br0">&#93;</span> == User::<span class="me2">get</span><span class="br0">&#40;</span><span class="st0">'id'</span><span class="br0">&#41;</span><span class="br0">&#41;</span> || User::<span class="me2">isAdmin</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">class</span> PostsController <span class="kw2">extends</span> Controller<span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">function</span> view<span class="br0">&#40;</span><span class="re0">$id</span> = <span class="kw2">null</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$post</span> = <span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">findById</span><span class="br0">&#40;</span><span class="re0">$post</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <a href="http://www.php.net/assert"><span class="kw3">Assert</span></a>::<span class="me2">notEmpty</span><span class="br0">&#40;</span><span class="re0">$post</span>, <span class="st0">'404'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <a href="http://www.php.net/assert"><span class="kw3">Assert</span></a>::<span class="kw2">true</span><span class="br0">&#40;</span>User::<span class="me2">can</span><span class="br0">&#40;</span><span class="st0">'view'</span>, <span class="re0">$post</span><span class="br0">&#41;</span>, <span class="st0">'403'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span> <br />
+<br />
+&nbsp; <span class="kw2">function</span> edit<span class="br0">&#40;</span><span class="re0">$id</span> = <span class="kw2">null</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$post</span> = <span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">findById</span><span class="br0">&#40;</span><span class="re0">$post</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <a href="http://www.php.net/assert"><span class="kw3">Assert</span></a>::<span class="me2">notEmpty</span><span class="br0">&#40;</span><span class="re0">$post</span>, <span class="st0">'404'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <a href="http://www.php.net/assert"><span class="kw3">Assert</span></a>::<span class="kw2">true</span><span class="br0">&#40;</span>User::<span class="me2">can</span><span class="br0">&#40;</span><span class="st0">'edit'</span>, <span class="re0">$post</span><span class="br0">&#41;</span>, <span class="st0">'403'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span> <br />
+<span class="br0">&#125;</span>
+</div>
+<p>This is quite some code for this refactoring, yet I found it extremly nice to work with this pattern torwards data access control. It is fairly light weight compared to most other approaches, yet gives you a per-Model and per-Context kind of flexibility on access control.</p>
+<p>Let me know if you have any questions!</p>
+<p>HTH,<br />
+-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/48b250b6-7314-48e8-8252-6efb4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsimple-data-access-control%3A48b250b6-7314-48e8-8252-6efb4834cda3 &amp;title=Simple+Data+Access+Control';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsimple-data-access-control%3A48b250b6-7314-48e8-8252-6efb4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsimple-data-access-control%3A48b250b6-7314-48e8-8252-6efb4834cda3&amp;title=Simple+Data+Access+Control&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsimple-data-access-control%3A48b250b6-7314-48e8-8252-6efb4834cda3&amp;title=Simple+Data+Access+Control';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/baseurl-finding-simple-event-broadcasting-and-element-sorting-in-js:480f4dd6-5164-4694-9334-44dccbdd56cb">BaseUrl finding, Simple event broadcasting and element sorting in JS</a></li>
+							<li><a href="/posts/access-your-config-files-rapidly-win32-only:480f4dd6-3ed4-4725-b26e-40e5cbdd56cb">Access your config files rapidly (Win32 only)</a></li>
+							<li><a href="/posts/simple-global-ajax-activity-indicator-with-jquery:480f4dd6-7508-4aea-9850-4139cbdd56cb">Simple global Ajax activity indicator with jQuery</a></li>
+							<li><a href="/posts/control-your-css-via-php-good-stuff:480f4dfe-4fec-482f-96f5-4a45cbdd56cb">Control Your CSS Via PHP - Good Stuff!</a></li>
+							<li><a href="/posts/simple-listshelper-for-displaying-nested-ul-ol-lists:480f4dd5-19f4-4612-9508-4797cbdd56cb">Simple ListsHelper for displaying nested ul / ol lists</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/simple-and-complex-strings:480f4dfd-9cd8-4f42-82ae-4a1fcbdd56cb">Simple and Complex Strings</a></li>
+							<li><a href="/posts/ten-simple-tricks-that-will-make-you-a-valuable-colleague-part-i:480f4dfe-dfe0-44f3-9af7-46a0cbdd56cb">Ten Simple Tricks That Will Make You A Valuable Colleague, Part I</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/simple-data-access-control:48b250b6-7314-48e8-8252-6efb4834cda3">14 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/simple-data-access-control:48b250b6-7314-48e8-8252-6efb4834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-48b26c33-6ffc-4e3c-945c-26924834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c3c5907d2d49cbe8f230115d022332a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Thomas&nbsp;						</strong>
+						<strong>said 
+						on Aug 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hm, i have a little understanding problem with your example. what exactly is the purpose of your "User"-class?<br />
+like i see it, it has 2 purposes to handle. one, the real one to handle/manage and another one to .. eh, represent some special user?</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b26f71-d40c-4f09-8fc4-5f3e4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thomas: Sry, forgot the 'extends AppModel'. I promote the idea of using Model classes as static namespaces for relevant functionality as well as gateways for the application state.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b28eba-9338-44de-ab90-24a74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Aug 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I think that what Thomas pointed out is interesting and valid, Models on CakePHP already represent two things: a record it self and the whole table - Daniel Hofstetter wrote about it : <a rel="nofollow" href="http://cakebaker.42dh.com/2008/04/22/thinking-about-the-model-ii/.">http://cakebaker.42dh.com/2008/04/22/thinking-about-the-model-ii/.</a> Sure your approach is really nice, but you're giving User model one more role, so it now represents three things (2 + 1 = 3, I know math!), what it's a bit confusing, specially when working with UsersControllers, because you'll see User representing all this roles together... kind annoying and not much readable...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b2a8db-8418-422e-a082-74a54834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=669144d1ab0a861af5d54175371bc586&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.mark-story.com" rel="nofollow">Mark Story</a>						</strong>
+						<strong>said 
+						on Aug 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I think this is a sound approach and one I often implement.  My only criticism is that your post assumes the reader is familiar with your previous posts.  If they are not, your examples are more complicated to understand, as there is further reading required.</p>
+<p>rafaelbandeira3: I've always thought that implementing simple access control is best done in the models.  Otherwise you end up with this logic in your controllers / appController. Leaving you with a bulky appController or lots of requestAction() to perform simple access checks.  Both of which are less appealing to me than fat models.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b2ca6d-cf64-4f8d-bf02-46724834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f72d844cd647e3a0b36255724bfd9c9f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Kjell&nbsp;						</strong>
+						<strong>said 
+						on Aug 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I am currently refactoring my project controllers and i am too asking myself how to get rid of repetive access logic. This post came to the right time. ;) anyway: I really like your approach, but there is one thing i feel problematic. </p>
+<p>return ($record['Post']['user_id']...</p>
+<p>It's not always said that the record is nested like that. (hasMany, etc..). Maybe a non-issue?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b2e194-35a4-4ceb-b306-7c524834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Aug 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Mark Story: I agree with you, my only con to Felix's approach, although I thought it was nice, is that he has one class that does a lot of things, some of them wich aren't even in the same context. My solution to this kind of scenario was implementing a more flexible interface between AuthComponent - wich I extended with the name AppAuthComponent, and the User model class, then always I needed to check something I would pass user's data as a method param. I think this way things are kept in their "more logical" place.</p>
+<p>But that's my opinion, not a law.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b2e1fb-1820-4218-a30f-7ca44834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0b7ce81e5136a03cc7be3f3da750bf5c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://chinooktc.com" rel="nofollow">timmy</a>						</strong>
+						<strong>said 
+						on Aug 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>f@ck dry!  classic.</p>
+<p>I'm curious, don't many folks use ACL for such authentication?  I've made numerous attempts but usually get super pissed off and end up using some code that looks like your first example.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b2ee14-92c8-4714-8dde-74be4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c6a43df32b447320e98f27cdd6640d3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://tumble.kabturek.info" rel="nofollow">kabturek</a>						</strong>
+						<strong>said 
+						on Aug 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@timmy<br />
+yep - i use ACL and access checks are gone from the actions (95% of them). Only 5% of actions need some kinf of $this->Acl->check($this->Auth->user(), 'controller/action/whatever/scheme/you/got', 'update') in them.</br><br />
+I tought that ACL is a too big canon before but... it really simplifies stuff when you get used to it.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b2f018-afc8-4bed-8a6e-1d6d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=32378c4f76f261d63c3c3a941054e440&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.neilcrookes.com" rel="nofollow">Neil Crookes</a>						</strong>
+						<strong>said 
+						on Aug 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Should $post in the findById calls in the PostsController be $id?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b3c554-8e34-4bf1-bcf2-57304834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c3c5907d2d49cbe8f230115d022332a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Thomas&nbsp;						</strong>
+						<strong>said 
+						on Aug 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>felix, i assumbed it. and i think, that is a realy, realy bad thinking of "practicism" architectur. like rafaelbandeira3 already explain.<br />
+i like the idea of simple, readbable oo-architecture. that includes the fact, that cone class only do this, what it should to do. not more. not less. a appmodel-representive has to access/manage data from a source (f.e. a database) but has not to decide over access-guidlines. nor do any other things.</br><br />
+i'm suprised that you do, assumed, fine test-driven development, but on the other side prefer such architecture guidlines.</br><br />
+maybe i'm wrong about your purpose here. if i misunderstanding something, please correct me.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b3d561-cd2c-49db-8058-26574834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fff0d05378ec238b0ccc6f5bedbf0adb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://richardathome.wordpress.com" rel="nofollow">Richard@Home</a>						</strong>
+						<strong>said 
+						on Aug 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>That's very cunning. It's like a cut down version of ACL (which I find very over complicated for simple rights/roles).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b46582-e518-492e-b6ac-4d2e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=264a62367b088950f90efd64bfeca2b9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							ring0&nbsp;						</strong>
+						<strong>said 
+						on Aug 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>class PostsController extends Controller{<br />
+  function view($id = null) {</br><br />
+    $post = $this->Post->findById($post /* mistake? */);</br><br />
+    Assert::notEmpty($post, '404');</br><br />
+    Assert::true(User::can('view', $post), '403');</br><br />
+  }</br></p>
+<p>  function edit($id = null) {<br />
+    $post = $this->Post->findById($post  /* mistake? */);</br><br />
+    Assert::notEmpty($post, '404');</br><br />
+    Assert::true(User::can('edit', $post), '403');</br><br />
+  }</br><br />
+}</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b881ba-6b54-4107-b81b-4ece4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2c6fb3e24099dc616333f40b683a2744&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							brian&nbsp;						</strong>
+						<strong>said 
+						on Aug 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>doesn't all of this "where does this belong" stuff really depend on your business logic for your application?  When I think of MVC, my models should encapsulate my business rules.  If I a lot of rules concerning "users can do this, or that, but not that", then certainly it seems to follow that this logic should or could reside in my User class.  To me, the controller should simply marshall data from my view to my model and from my model to my view, ensuring data integrity and validation.  So, putting access control in the model makes perfect sense to me.</p>
+<p>As always, I think we often look for what we think is the "right" way rather than just doing what is best for our situation.  If we always looked for what was right, then we would follow all the Ruby guys that tell us, basically, it's wrong to use PHP :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-491b618c-b770-4bc5-8ce6-34094834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ec0958d5348b7ff610c9f108460b4841&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.helfenberg.ch" rel="nofollow">Pfadi Frauenfeld</a>						</strong>
+						<strong>said 
+						on Nov 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It's WAY faster to manually build a query which returns all allowed records instead of using ACL. this way, one can work around the issue that ACL ist url-based and not record-based. (this is a big problem on index pages)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

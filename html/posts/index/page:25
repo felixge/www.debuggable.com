@@ -1,0 +1,503 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Blog &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="paging">
+	<a href="/posts/index/page:24" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:21">21</a></span> | <span><a href="/posts/index/page:22">22</a></span> | <span><a href="/posts/index/page:23">23</a></span> | <span><a href="/posts/index/page:24">24</a></span> | <span class="current">25</span> | <span><a href="/posts/index/page:26">26</a></span> | <span><a href="/posts/index/page:27">27</a></span> | <span><a href="/posts/index/page:28">28</a></span> | <span><a href="/posts/index/page:29">29</a></span> <a href="/posts/index/page:26" class="next">Next &raquo;</a></div>
+	<div class="post">
+	<h2><a href="/posts/the-30-day-challenge-so-far:48bfcf51-3534-488e-82fb-2ccc4834cda3">30 minutes are more than you think</a></h2>	<div class="posted-on">
+		<p>Posted on 4/9/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>So I'm now 15 days into <a href="http://debuggable.com/posts/time-to-grow-again-or-loose-money:48ab3665-2054-4e55-b13f-0c104834cda3">the 30 day challenge I set for myself</a>. So far I have covered quite a bit of ground and would like to use this post (#16) to share some of the experiences I had.</p>
+<p>First of all lets look at the posts:</p>
+<ol>
+<li><a href="http://debuggable.com/posts/requestaction-considered-harmful:48abb514-1f9c-4443-b91c-6d0f4834cda3">requestAction considered harmful</a></li>
+<li><a href="http://debuggable.com/posts/string-substitution-using-uuids:48ad0e84-7c80-4bfd-b6be-4e8d4834cda3">String substitution using UUIDs</a></li>
+<li><a href="http://debuggable.com/posts/hacking-the-wires:48ae63ea-9888-482f-9a28-44684834cda3">Hacking the Wires</a></li>
+<li><a href="http://debuggable.com/posts/private-methods-follow-up:4873b289-8f70-4500-a798-76ea4834cda3">Private methods - Follow Up</a></li>
+<li><a href="http://debuggable.com/posts/4-cakephp-tricks:4811ad82-32dc-4a38-bc10-36304834cda3">Two CakePHP tricks</a></li>
+<li><a href="http://debuggable.com/posts/simple-data-access-control:48b250b6-7314-48e8-8252-6efb4834cda3">Simple Data Access Control</a></li>
+<li><a href="http://debuggable.com/posts/i-believe-in-symmetry:48b24d77-ffe8-4544-9f21-4e3a4834cda3">I believe in Symmetry</a></li>
+<li><a href="http://debuggable.com/posts/passing-controller-variables-to-your-javascript:48b4f0c6-c718-47b2-bca1-05794834cda3">Passing controller variables to your JavaScript</a></li>
+<li><a href="http://debuggable.com/posts/hdd-surgery-for-my-macbook-pro:48b71c63-7cf4-4046-805b-15434834cda3">HDD surgery for my MacBook Pro</a></li>
+<li><a href="http://debuggable.com/posts/normalizing-cakephp-model-records:48b7ed7f-9498-4b9c-8734-6f014834cda3">Normalizing CakePHP model records</a></li>
+<li><a href="http://debuggable.com/posts/lookupable-behavior:48b93b4a-eaf8-4fc8-85ad-6d454834cda3">Lookupable Behavior</a></li>
+<li><a href="http://debuggable.com/posts/cloud-behavior:48ba9455-30c8-46de-9e24-4cd94834cda3">Cloud Behavior</a></li>
+<li><a href="http://debuggable.com/posts/akismet-datasource:48bbe6f0-b7c0-47e5-8337-15624834cda3">Akismet datasource</a></li>
+<li><a href="http://debuggable.com/posts/datasources,-models,-components,-behaviors:48bd3025-2c44-40b6-a6e7-35674834cda3">Datasources, Models, Components, Behaviors</a></li>
+<li><a href="http://debuggable.com/posts/textexpander-and-apple-mail-recipient-name-auto-insertion:48be8683-115c-4197-8ae2-5daa4834cda3">TextExpander & Apple Mail recipient name auto insertion</a></li>
+</ol>
+<p>As you can see some of the posts are not necessarily CakePHP / JS specific. However, 10 out of the 15 posts contain previously unreleased code which is a figure I'm quite happy with.</p>
+<p>Much more interesting however is that I pretty much planned out none of these posts. I set my alarm to 7:30am in the morning but quite a few times I also allowed myself a little more sleep if I was up too late the night before. So when I got up, I used whatever time was left before 9am to come up with an idea for a post and write it.</p>
+<p>In general I would guess that about 50% of the posts so far were written in 30 minutes or less. Some of the posts above were even written in 10 minutes.</p>
+<p>This came as an incredibly suprise to me, because I would not have thought that it was possible to write a decent blog post in less than 1 hour. One could of course argue that the quality of my posts suffered, but I haven't seen too much evidence of that. No here is what I think:</p>
+<blockquote><p>If you are given nothing but 30 minutes to contribute to society - you act. You don't let yourself be stopped, distracted or second guess yourself. There simply is no time for it.</p></blockquote>
+<p>Never have I experienced such powerful evidence of <a href="http://en.wikipedia.org/wiki/Parkinson's_law">Parkinson's law</a> before. But the more I do, the more I start to believe that our biggest productivity bottleneck is having too much time!</p>
+<p>I mean we have a whole life time for our accomplishments. But if you look at the achievements of the vast majority out there, you'll surely agree that most of it could be accomplished in less than a year.</p>
+<p>Quite seriously, I think I would be excited if at any point of my life I was told I had 90 days left to live. Don't get me wrong, this is not a suicidal kind of fantasy after too much dealing with internet explorer. I obviously hope to live much longer. But I'm really happy to have come to the realization that no matter how much time we have at our hands, there are incredible things we can do with it.</p>
+<p>So I am already exploring new ideas to enforce time constraints with other aspects of my work. I have a few side projects I'm quite excited about, but that seem to move at an incredibly slow pace. The main problem is that there are no consequences of not having them move rapidly and so they don't. I will update you as I start to implement new approaches for them.</p>
+<p>Anyway, I want to thank everybody for helping me with this! A few people have email'd me about the money because they missed my post updating my reference time zone (EST now) or were a little too early when I posted an article 10 seconds before the deadline ended. Amazingly pretty much all of them wanted to donate the money to the cake software foundation which is great. However, I will still try to not loose my challenge : ).</p>
+<p>So stay tuned for the new and exciting posts to come beginning tomorrow.</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/48bfcf51-3534-488e-82fb-2ccc4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-30-day-challenge-so-far%3A48bfcf51-3534-488e-82fb-2ccc4834cda3 &amp;title=30+minutes+are+more+than+you+think';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-30-day-challenge-so-far%3A48bfcf51-3534-488e-82fb-2ccc4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-30-day-challenge-so-far%3A48bfcf51-3534-488e-82fb-2ccc4834cda3&amp;title=30+minutes+are+more+than+you+think&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-30-day-challenge-so-far%3A48bfcf51-3534-488e-82fb-2ccc4834cda3&amp;title=30+minutes+are+more+than+you+think';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/the-30-day-challenge-so-far:48bfcf51-3534-488e-82fb-2ccc4834cda3">5 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/the-30-day-challenge-so-far:48bfcf51-3534-488e-82fb-2ccc4834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/textexpander-and-apple-mail-recipient-name-auto-insertion:48be8683-115c-4197-8ae2-5daa4834cda3">TextExpander & Apple Mail recipient name auto insertion</a></h2>	<div class="posted-on">
+		<p>Posted on 3/9/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>this is post #15 of my <a href="http://debuggable.com/posts/time-to-grow-again-or-loose-money:48ab3665-2054-4e55-b13f-0c104834cda3">30 day challenge</a>. </p>
+<p>Today I want to share a little Mac productivity trick for Apple Mail that I came up with yesterday. I'm in the process of switching from my long-time E-Mail client Thunderbird. Thunderbird and I had a good time, but I can't deal with its problems anymore. UTF-8 emails break text selection, line breaks are off, and a few other things here and there annoy me. But most importantly, Thunderbird does not do a good job on osx integration.</p>
+<p>So one of the things I was used from Thunderbird was an extension called <a href="http://extensions.hesslow.se/extension/4/Quicktext/">QuickText</a>. It basically allowed me to define a response template where I could use the recipients first / last name as a placeholder variable. After doing some research in the Apple Mail world, I found that <a href="http://mailtemplate.mactank.com/">MailTemplate</a>  seems to do what I needed. However, I wasn't too happy to have to do 2 mouse clicks for invoking it.</p>
+<p>Meet <a href="http://www.smileonmymac.com/TextExpander/">TextExpander</a>. TextExpander is basically a tool that can auto-insert custom snippets wherever you need them. There are tons of tools like this out there, but <a href="http://www.43folders.com/2006/09/05/textexpander-review">most Mac folks seems to like</a> this particular implementation. </p>
+<p>Anyway, the big problem with it is, is that it has no direct Apple Mail integration. Therefor you cannot use the first / last name of the recipient in your templates. However, it does support AppleScript, so after a little tinkering I was able to come up with this:</p>
+<pre><code>tell application "Mail"
+	set selected to selection
+	set msg to item 1 of selected
+	set sentBy to (sender of msg)
+	"Hey " & word 1 of sentBy & ",\n\n\n"
+end tell</code></pre>
+<p>My abbreviation for this snippet is "hey". This is a huge help for me since I have to answer tons of different people every day and addressing them with their first name is usually a nice thing to do. I also have some snippets using the last name (mainly for Germans who are all Mr. and Mrs. with each other ^^) , all you have to change is "word 1 of sentBy" to "word 2 of sentBy".</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/48be8683-115c-4197-8ae2-5daa4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftextexpander-and-apple-mail-recipient-name-auto-insertion%3A48be8683-115c-4197-8ae2-5daa4834cda3 &amp;title=TextExpander+%26+Apple+Mail+recipient+name+auto+insertion';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftextexpander-and-apple-mail-recipient-name-auto-insertion%3A48be8683-115c-4197-8ae2-5daa4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftextexpander-and-apple-mail-recipient-name-auto-insertion%3A48be8683-115c-4197-8ae2-5daa4834cda3&amp;title=TextExpander+%26+Apple+Mail+recipient+name+auto+insertion&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftextexpander-and-apple-mail-recipient-name-auto-insertion%3A48be8683-115c-4197-8ae2-5daa4834cda3&amp;title=TextExpander+%26+Apple+Mail+recipient+name+auto+insertion';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/textexpander-and-apple-mail-recipient-name-auto-insertion:48be8683-115c-4197-8ae2-5daa4834cda3">1 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/textexpander-and-apple-mail-recipient-name-auto-insertion:48be8683-115c-4197-8ae2-5daa4834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/datasources,-models,-components,-behaviors:48bd3025-2c44-40b6-a6e7-35674834cda3">Datasources, Models, Components, Behaviors</a></h2>	<div class="posted-on">
+		<p>Posted on 2/9/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>this is post #14 of my <a href="http://debuggable.com/posts/time-to-grow-again-or-loose-money:48ab3665-2054-4e55-b13f-0c104834cda3">30 day challenge</a>. </p>
+<p>In my previous post people were wondering why I had chosen a datasource for my <a href="http://debuggable.com/posts/akismet-datasource:48bbe6f0-b7c0-47e5-8337-15624834cda3">implementation of the Akismet API</a>. Some people felt Models, Components or even Behaviors could be more appropriate.</p>
+<p>Indeed, about 2 years ago I did a previous <a href="http://debuggable.com/posts/remember-the-days-before-spam-a-cakephp-model-for-akismet:480f4dd5-d358-4f51-ac83-45f1cbdd56cb">Akismet implementation using a Model</a>. But that always felt wrong. In CakePHP Models are meant to abstract a relational database table. To map its associations, to define its validation rules and provide easy CRUD functionality.</p>
+<blockquote><p>Unless the web service you're dealing with is a REST interface for CRUD operations, using a Model for its abstraction is way overkill.</p></blockquote>
+<p>So what about Behaviors? Behaviors are meant to abstract re-usable CRUD, validation and association tasks. A behavior might interact with a web service, but should not be the primary means of abstracting it.</p>
+<p>Components are tempting. They indeed seem like a good choice for certain tasks. But their strength lays elsewhere. Components are good for abstracting functionality shared among multiple controllers. Often times they aren't even necessary because the logic one is trying to abstract has its place inside the model. Also:</p>
+<blockquote><p>Components are not globally accessible nor do they have a built-in mechanism for configuration like datasources do.</p></blockquote>
+<p>So I am fairly convinced that <strong>most web services</strong> are best abstracted using datasources. They make it easy to store the API key in your database.php file (which is not semantically perfect but lets be a little forgiving here). They can be accessed from a Component, Controller, Model, Behavior or any other part of your application and that makes a ton of sense. Because some services may allow you to upload data, resize pictures, transform text, detect spam, aggregate information, validate identities - all things that are best done in different places of your application.</p>
+<p>There are some imperfections to the whole thing and some web servies might require the combination of a datasource (for the protocol) and a model (for the CRUD abstraction), but if you are in doubt - start with a datasource.</p>
+<p>If you are interested in learning, check out some of the <a href="http://github.com/felixge/debuggable-scraps/tree/master/cakephp/datasources">datasources we have published</a> so far:</p>
+<ul>
+<li><a href="http://debuggable.com/posts/akismet-datasource:48bbe6f0-b7c0-47e5-8337-15624834cda3">Akismet SPAM detection</a></li>
+<li><a href="http://debuggable.com/posts/amazon-associates-api-data-source-for-cakephp:4891ecd6-0330-47c7-b338-0dd34834cda3">Amazon Associate Web Services</a></li>
+<li><a href="http://debuggable.com/posts/new-google-analytics-api:480f4dd6-c59c-445f-8ce0-4202cbdd56cb">Google Analytics</a></li>
+</ul>
+<p>-- Felix Geisendörfer<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/48bd3025-2c44-40b6-a6e7-35674834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdatasources%2C-models%2C-components%2C-behaviors%3A48bd3025-2c44-40b6-a6e7-35674834cda3 &amp;title=Datasources%2C+Models%2C+Components%2C+Behaviors';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdatasources%2C-models%2C-components%2C-behaviors%3A48bd3025-2c44-40b6-a6e7-35674834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdatasources%2C-models%2C-components%2C-behaviors%3A48bd3025-2c44-40b6-a6e7-35674834cda3&amp;title=Datasources%2C+Models%2C+Components%2C+Behaviors&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdatasources%2C-models%2C-components%2C-behaviors%3A48bd3025-2c44-40b6-a6e7-35674834cda3&amp;title=Datasources%2C+Models%2C+Components%2C+Behaviors';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/datasources,-models,-components,-behaviors:48bd3025-2c44-40b6-a6e7-35674834cda3">20 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/datasources,-models,-components,-behaviors:48bd3025-2c44-40b6-a6e7-35674834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/akismet-datasource:48bbe6f0-b7c0-47e5-8337-15624834cda3">Akismet datasource</a></h2>	<div class="posted-on">
+		<p>Posted on 1/9/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>this is post #13 of my <a href="http://debuggable.com/posts/time-to-grow-again-or-loose-money:48ab3665-2054-4e55-b13f-0c104834cda3">30 day challenge</a>.</p>
+<p>For our blog here at debuggable we use the excellent Akismet service to protect ourselves from spam. Thanks to CakePHP, our implementation for it is as simple as this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> Comment <span class="kw2">extends</span> AppModel<span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$validate</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="st0">'text'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'rule'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'notSpam'</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'message'</span> =&gt; <span class="st0">'This comment appears to be spam. Please contact us if the problem persists.'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'required'</span> =&gt; <span class="kw2">true</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; <span class="br0">&#41;</span>,<br />
+&nbsp; <span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; <span class="kw2">function</span> notSpam<span class="br0">&#40;</span><span class="re0">$fields</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$akismet</span> = ConnectionManager::<span class="me2">getDataSource</span><span class="br0">&#40;</span><span class="st0">'akismet'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> !<span class="re0">$akismet</span>-&gt;<span class="me1">isSpam</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">data</span><span class="br0">&#91;</span><span class="st0">'Comment'</span><span class="br0">&#93;</span>, Post::<span class="me2">url</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">data</span><span class="br0">&#91;</span><span class="st0">'Comment'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'post_id'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+<span class="br0">&#125;</span></div>
+<p>So if you are coding up a little blog or something else that needs (Comment) spam protection, we released our Akismet API datasource for you.</p>
+<p>Get it while its hot: <a href="http://github.com/felixge/debuggable-scraps/tree/master/cakephp/datasources/akismet">Akismet Datasource</a> at the <a href="http://github.com/felixge/debuggable-scraps/tree/master">Debuggable Scraps repository</a>.</p>
+<p>Alright, hope this helps some of you out there. Please Comment with suggestions and criticism ; ).</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/48bbe6f0-b7c0-47e5-8337-15624834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fakismet-datasource%3A48bbe6f0-b7c0-47e5-8337-15624834cda3 &amp;title=Akismet+datasource';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fakismet-datasource%3A48bbe6f0-b7c0-47e5-8337-15624834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fakismet-datasource%3A48bbe6f0-b7c0-47e5-8337-15624834cda3&amp;title=Akismet+datasource&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fakismet-datasource%3A48bbe6f0-b7c0-47e5-8337-15624834cda3&amp;title=Akismet+datasource';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/akismet-datasource:48bbe6f0-b7c0-47e5-8337-15624834cda3">6 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/akismet-datasource:48bbe6f0-b7c0-47e5-8337-15624834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/cloud-behavior:48ba9455-30c8-46de-9e24-4cd94834cda3">Cloud Behavior</a></h2>	<div class="posted-on">
+		<p>Posted on 31/8/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>this is post #12 of my <a href="http://debuggable.com/posts/time-to-grow-again-or-loose-money:48ab3665-2054-4e55-b13f-0c104834cda3">30 day challenge</a>.</p>
+<p>While preparing the application we use for our <a href="http://debuggable.com/posts/cakephp-workshop-in-raleigh-nc-sep-6-to-7:488a234d-39fc-4d06-9c57-65aa4834cda3">Raleigh, NC workshop</a>, I had to implement an algorithm to display the records of a table in tag-cloud kind of view. Since the approach I took turned out fairly neat I thought other people might like to use this, so I refactored everything into a little behavior this morning.</p>
+<p>In order to download & install the behavior, please go here: <a href="http://github.com/felixge/debuggable-scraps/tree/master/cakephp/behaviors/cloud">Cloud Behavior</a> at <a href="http://debuggable.com/posts/debuggable-scraps-on-github:488f5a12-5fac-4c90-9822-56384834cda3">Debuggable Scraps</a>.</p>
+<p>The code for the behavior itself looks like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> CloudBehavior <span class="kw2">extends</span> ModelBehavior<span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$mapMethods</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'/^_findCloud$/'</span> =&gt; <span class="st0">'_findCloud'</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; <span class="kw2">function</span> setup<span class="br0">&#40;</span>&amp;<span class="re0">$Model</span>, <span class="re0">$settings</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">settings</span><span class="br0">&#91;</span><span class="re0">$Model</span>-&gt;<span class="me1">alias</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">settings</span><span class="br0">&#91;</span><span class="re0">$Model</span>-&gt;<span class="me1">alias</span><span class="br0">&#93;</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'scale'</span> =&gt; <span class="nu0">2</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'shuffle'</span> =&gt; <span class="kw2">true</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'query'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'countField'</span> =&gt; <span class="st0">'count'</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/is_array"><span class="kw3">is_array</span></a><span class="br0">&#40;</span><span class="re0">$settings</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$settings</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="re0">$Model</span>-&gt;__findMethods<span class="br0">&#91;</span><span class="st0">'cloud'</span><span class="br0">&#93;</span> = <span class="kw2">true</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">settings</span><span class="br0">&#91;</span><span class="re0">$Model</span>-&gt;<span class="me1">alias</span><span class="br0">&#93;</span> = <a href="http://www.php.net/array_merge"><span class="kw3">array_merge</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">settings</span><span class="br0">&#91;</span><span class="re0">$Model</span>-&gt;<span class="me1">alias</span><span class="br0">&#93;</span>, <span class="re0">$settings</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="kw2">function</span> _findCloud<span class="br0">&#40;</span>&amp;<span class="re0">$Model</span>, <span class="re0">$method</span>, <span class="re0">$state</span>, <span class="re0">$query</span>, <span class="re0">$results</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$state</span> == <span class="st0">'before'</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$query</span> = <a href="http://www.php.net/array_merge"><span class="kw3">array_merge</span></a><span class="br0">&#40;</span><span class="re0">$query</span>, <span class="re0">$this</span>-&gt;<span class="me1">settings</span><span class="br0">&#91;</span><span class="re0">$Model</span>-&gt;<span class="me1">alias</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'query'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$query</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$results</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="re0">$countField</span> = <span class="re0">$this</span>-&gt;<span class="me1">settings</span><span class="br0">&#91;</span><span class="re0">$Model</span>-&gt;<span class="me1">alias</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'countField'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$countField</span> || !<span class="re0">$Model</span>-&gt;<span class="me1">hasField</span><span class="br0">&#40;</span><span class="re0">$countField</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/trigger_error"><span class="kw3">trigger_error</span></a><span class="br0">&#40;</span><span class="st0">'CloudBehavior: You have to configure a valid countField for querying this Model<span class="es0">\'</span>s records as a cloud!'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="re0">$max</span> = <span class="re0">$results</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$Model</span>-&gt;<span class="me1">alias</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$countField</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$min</span> = <span class="re0">$results</span><span class="br0">&#91;</span><a href="http://www.php.net/count"><span class="kw3">count</span></a><span class="br0">&#40;</span><span class="re0">$results</span><span class="br0">&#41;</span><span class="nu0">-1</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$Model</span>-&gt;<span class="me1">alias</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$countField</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$range</span> = <span class="re0">$max</span> - <span class="re0">$min</span>;<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$range</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$range</span> = <span class="nu0">1</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$results</span> <span class="kw1">as</span> &amp;<span class="re0">$command</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$command</span><span class="br0">&#91;</span><span class="re0">$Model</span>-&gt;<span class="me1">alias</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'scale'</span><span class="br0">&#93;</span> = <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#40;</span><span class="br0">&#40;</span><span class="re0">$command</span><span class="br0">&#91;</span><span class="re0">$Model</span>-&gt;<span class="me1">alias</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$countField</span><span class="br0">&#93;</span> - <span class="re0">$min</span><span class="br0">&#41;</span> / <span class="re0">$range</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; * <span class="re0">$this</span>-&gt;<span class="me1">settings</span><span class="br0">&#91;</span><span class="re0">$Model</span>-&gt;<span class="me1">alias</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'scale'</span><span class="br0">&#93;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; + <span class="nu0">1</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">settings</span><span class="br0">&#91;</span><span class="re0">$Model</span>-&gt;<span class="me1">alias</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'shuffle'</span><span class="br0">&#93;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/srand"><span class="kw3">srand</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/shuffle"><span class="kw3">shuffle</span></a><span class="br0">&#40;</span><span class="re0">$results</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$results</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Please note how I have to violate the concept behind private methods and properties to make this work. My follow up post on this topic is close to completion ; ).</p>
+<p>The elegant part about this approach is that you can really keep your view logic down to a minimum:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$out</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$tags</span> <span class="kw1">as</span> <span class="re0">$tag</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$size</span> = <span class="nu0">10</span> * <span class="re0">$tag</span><span class="br0">&#91;</span><span class="st0">'Tag'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'scale'</span><span class="br0">&#93;</span>;<br />
+&nbsp; <span class="re0">$out</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <span class="re0">$html</span>-&gt;<span class="me1">link</span><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="re0">$tag</span><span class="br0">&#91;</span><span class="st0">'Tag'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>,<br />
+&nbsp; &nbsp; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'controller'</span> =&gt; <span class="st0">'tags'</span>, <span class="st0">'action'</span> =&gt; <span class="st0">'view'</span>, <span class="re0">$tag</span><span class="br0">&#91;</span><span class="st0">'Tag'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'id'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>, <br />
+&nbsp; &nbsp; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'style'</span> =&gt; <span class="st0">'font-size: '</span>.<span class="re0">$size</span>.<span class="st0">'px;'</span><span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <a href="http://www.php.net/join"><span class="kw3">join</span></a><span class="br0">&#40;</span><span class="st0">', '</span>, <span class="re0">$out</span><span class="br0">&#41;</span>;</div>
+<p>Anyway, I hope this code is helpful to some of you out there. Feedback is welcome as always. Please comment!</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/48ba9455-30c8-46de-9e24-4cd94834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcloud-behavior%3A48ba9455-30c8-46de-9e24-4cd94834cda3 &amp;title=Cloud+Behavior';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcloud-behavior%3A48ba9455-30c8-46de-9e24-4cd94834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcloud-behavior%3A48ba9455-30c8-46de-9e24-4cd94834cda3&amp;title=Cloud+Behavior&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcloud-behavior%3A48ba9455-30c8-46de-9e24-4cd94834cda3&amp;title=Cloud+Behavior';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/cloud-behavior:48ba9455-30c8-46de-9e24-4cd94834cda3">4 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/cloud-behavior:48ba9455-30c8-46de-9e24-4cd94834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="paging">
+	<a href="/posts/index/page:24" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:21">21</a></span> | <span><a href="/posts/index/page:22">22</a></span> | <span><a href="/posts/index/page:23">23</a></span> | <span><a href="/posts/index/page:24">24</a></span> | <span class="current">25</span> | <span><a href="/posts/index/page:26">26</a></span> | <span><a href="/posts/index/page:27">27</a></span> | <span><a href="/posts/index/page:28">28</a></span> | <span><a href="/posts/index/page:29">29</a></span> <a href="/posts/index/page:26" class="next">Next &raquo;</a></div>	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

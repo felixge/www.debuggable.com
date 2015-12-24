@@ -1,0 +1,335 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Being trapped in programmers hell &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/being-trapped-in-programmers-hell:480f4dd6-69e8-4cd7-ada5-4460cbdd56cb">Being trapped in programmers hell</a></h2>	<div class="posted-on">
+		<p>Posted on 2/11/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p>Yeah, that's how I feel right now, like I'm in hell. Well, minus meeting all the interesting people that supposely went there for the even more interesting things they did in their lives.</p>
+<p>What's the matter? I don't know. On Saturday I wanted to commit some changes to one of my local SVN repositories and got some ugly "couldn't establish ra_local_session" error message from TortoiseSVN, and that's when all the trouble started ... Before that I was just enjoying an amazing productivity high, created by the numerous changes I've recently tried to make in my life and felt like writing a little post about this. Right now, 5 days laters, I can hardly remember how it felt to be productive.</p>
+<p>The entire SVN problem turned out to be a nightmare. I could find some people having the same issue via google, but all of them had the problem when doing any svn operation. I only had the issue with commit - update, info, export, etc. worked just fine. And of course, none of the solutions I found seemed to be related or helping in my case. I tried to use the svn admin tools to repair my (corrupted?) svn repository, but no luck. I spent hours and hours trouble shooting, but nothing helped. Finally I thought maybe updating to svn 1.4 would solve my problem, but far from it. To make a long story short, TortoiseSVN 1.4 broke my shell integration, did not fix the issue and caused nothing but trouble.</p>
+<p>So that's how I spent my Saturday and Sunday. I finally gave up and started the repository all over again. Luckily this had been a young project with no important branches yet. But still, I really really hate not being able to solve a problem, it's not a good sign.</p>
+<p>Monday came. I wanted to continue working on my big CMS project that was scheduled for a presentation with the client tonight, and things seemed to look good. I was integrating a PicturesController for image uploads (including zipped files with numerous images) and I was very confident to meet the deadline. Let's put it like that, since the late afternoon of Monday, I've been writing about ~5 lines of productive code for that project, and no I was not able to make the deadline working.</p>
+<p>Once again, hell broke loose and something as ridicolous easy as readfile(); failed on me. If you want to get detailed information on my issue, <a href="http://groups.google.com/group/cake-php/browse_thread/thread/1b5d5c26f1d6691f/223c377b2a5cbde4">checkout this post on the Google Group</a>. Or to make this a short story as well: I have to serve an image via CakePHP but it only partially get's to the browser. And even worse: It's a <a href="http://en.wikipedia.org/wiki/Heisenbug">Heisenbug</a> in the sense that in some cases the picture get's displayed completely, and in all the other cases only in fragments and apparantly some code I tried had a small effect on the amount of bytes that make it to the browser. So I've spent hours and hours researching this, stumbling across some people having the same issue with various php/apache setups, but no solution. Right now I've tried just about anything from paranoid ob_flushing, sending different header data, testing across multiple browser, php.ini/httpd.conf tweaking, numerous reboots and even more numerous apache restarts, updating php, updating apache, switching from FastCGI to running php as a module to banging my head against the monitor and more. All of this brought no solution to my problem. In the best cases nothing happened, but usally more problems arose which turned out to be even harder to fix. The best one being CakePHP not running when setting up php as an apache module ...</p>
+<p>Those of you who have read my google group post might think I'm stupid for not just ignoring the issue as it does not occur with my host, but to me there is no way to move on before fixing my problem. I cannot accept working with a dev system that shows incosistent output behavior, that's suicide. But if I can't fix this problem at some point soon, I can't guarantee for my surrival either. It's a nightmare, it's hell ...</p>
+<p>So why have I bothered to write this post? Well maybe to relief the pain a little bit, maybe to join <a href="http://snook.ca/archives/personal/frenetic_freelance/">Jonathan Snook having a bad time</a>, or maybe simply to let you guys know I'm not dead (yet) and new posts will come as soon as I go back to being a php developer rather then a windows victim.</p>
+<p>In any case, wish me luck and if you have the slightest idea what could fix <a href="http://groups.google.com/group/cake-php/browse_thread/thread/1b5d5c26f1d6691f/223c377b2a5cbde4">my issue</a>, please let me know!</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-69e8-4cd7-ada5-4460cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbeing-trapped-in-programmers-hell%3A480f4dd6-69e8-4cd7-ada5-4460cbdd56cb &amp;title=Being+trapped+in+programmers+hell';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbeing-trapped-in-programmers-hell%3A480f4dd6-69e8-4cd7-ada5-4460cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbeing-trapped-in-programmers-hell%3A480f4dd6-69e8-4cd7-ada5-4460cbdd56cb&amp;title=Being+trapped+in+programmers+hell&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbeing-trapped-in-programmers-hell%3A480f4dd6-69e8-4cd7-ada5-4460cbdd56cb&amp;title=Being+trapped+in+programmers+hell';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/being-trapped-in-programmers-hell:480f4dd6-69e8-4cd7-ada5-4460cbdd56cb">10 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/being-trapped-in-programmers-hell:480f4dd6-69e8-4cd7-ada5-4460cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4de2-50ec-474a-8b53-43e7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2a9061ce0793836cb48218756c2ad577&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Ben&nbsp;						</strong>
+						<strong>said 
+						on Nov 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Is it particular images that set it off?</p>
+<p>By this I mean, does one image always cause the problem while other may never have it?</p>
+<p>It could be an issue with the files you're trying to serve rather than the PHP code.</p>
+<p>I would also ask why you're using fpassthru(). If you're just reading the file straight out to the browser, you should try readfile(). It'll save mucking about with the fopen/fclose calls and may not trigger your problem.</p>
+<p>Actually, after looking it up, the PHP manual suggests the above approach if you don't need to seek within the file.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-0b98-4245-b967-42afcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Nov 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ben: The problem exists when using readfile, fpassthru, fread (in a loop) and any other way to output the data. This is regardless of the picture. Now even more odd: If I capture the output to a variable and echo the contents of this variable and then save the variable contents to a file then the image in the browser has the bug, but the on saved to the disk does not ... It's insane ...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-c64c-4af0-9086-4431cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cc67673ba8206e6fbea6430a28a6088b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dobersch.com/" rel="nofollow">Gabriel</a>						</strong>
+						<strong>said 
+						on Nov 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<blockquote><p>But still, I really really hate not being able to solve a problem, it’s not a good sign.[...]but to me there is no way to move on before fixing my problem</p></blockquote>
+<p>This really is the hardest part! I think I can feel for you and your situation; a few weeks ago I had a problem the other way around: on my WinXP development machine everything worked like a charm, and on the linux production server the problem appeared: the image crop function of ImageMagic did not work like expected (white stripes on both sides). After way too much research I hacked together a solution "around" the bug, that only affected the server version of IM and only using GIF images.</p>
+<blockquote><p>and no I was not able to make the deadline working.</p></blockquote>
+<p>Maybe the saying of Douglas Adams can help you keeping the faith nevertheless: "I love deadlines. I specially love the swooshing sound they make as they fly by."</p>
+<p>Hang in there!<br />
+Gabriel</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-dcf0-427f-bcba-4b51cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2a9061ce0793836cb48218756c2ad577&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Ben&nbsp;						</strong>
+						<strong>said 
+						on Nov 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>So basically there's no way to reproduce/not produce the bug on demand?</p>
+<p>That's always right pain. I wish you luck in tracking it down.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-c720-4af7-90b5-4c2bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f0b8fa14cbee5edfdeeac6b8f9ad062d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://sanisoft.com/" rel="nofollow">Tarique Sani</a>						</strong>
+						<strong>said 
+						on Nov 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>If bug is independent of the image used try and see if it is independent of the machine / PHP version used....</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-0c40-4f5f-aa22-4aafcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Nov 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for the comments. Ben: No, I could not give somebody instructions on how to reproduce the bug, I have not idea what is actually causing it. However, I have a strong suspision it could be related to runninng PHP as FastCGI, but running PHP as an apache module has brought it's own (similiary hairy) issues.</p>
+<p>Tarique: No it's not machine independent. The script runs just fine on my host. I use php 4.4.1, the same version as my host, and apache 2.0.59. I will probably try php 4.4.4 today, but upgrading from 4.4.0->4.4.1 yesterday didn't change anything, and my host runs the same php version without problems. The thing is simply: I need the code to run on my dev box, I cannot switch systems : /. And I have to stick with Apache 2.x and I also would like to run the same php version as my host does ...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-9364-445c-b130-4e36cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8f5c82c5eb917c1e1c6eab4534d1cbe4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dieter@be&nbsp;						</strong>
+						<strong>said 
+						on Nov 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>well i know that on linux many problems are caused by the different threading options that apache supports<br />
+on my distribution (gentoo) php is only supported when using the mpm-prefork engine. mpm-worker has some known issues.  Not using any MPM at all is also an option, but i would first try preforking.</br></p>
+<p>And speaking about the programmers hell: tell me about it!<br />
+my phpeclipse IDE has been crashing all the time, productivity dropped quite a lot, so join the club</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-69d4-4691-a482-4078cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2006/11/03/windows-xp-apache-php-output-problem/" rel="nofollow">ThinkingPHP and beyond &raquo; Windows XP Apache PHP output prob</a>						</strong>
+						<strong>said 
+						on Nov 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Oh boy, this has been a true nightmare and I really want to thank all the people who have thrown in their suggestions in the Google Group post and the blog post I made. Now I can finally go back to being productive! [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-09d4-4bf4-b3a3-430bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=57abd59dd9f19b6f9cbd6a7ca7319896&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Jim&nbsp;						</strong>
+						<strong>said 
+						on Nov 13, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I had a similar run in with attempting to display images via CakePHP earlier last week.  My problem was no where near the severity of yours (as it turns out).  I also missed my deadline because of this (thought, it wasn't necessarily a rock solid one).  It ended up that I was outputting some extra white space in my image data, at the top of the browser.  Once I noticed it, it was just a matter of finding the right file.</p>
+<p>Did you get your issue fixed?  What was involved?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-6f8c-473e-a166-4a10cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Nov 17, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Jim: Checkout this post here, http://www.thinkingphp.org/2006/11/03/windows-xp-apache-php-output-problem/.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

@@ -1,0 +1,1305 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>An Ajax file upload progressbar &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/an-ajax-file-upload-progressbar:480f4dd5-ec84-4f60-b69f-470bcbdd56cb">An Ajax file upload progressbar</a></h2>	<div class="posted-on">
+		<p>Posted on 27/4/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p><strong style="color: red;">Important Warning:</strong> The code presented her was an <strong>experiment</strong> of mine that I did over a year ago. In the meantime flash based file uploaders have become a much better weapon of choice when it comes to unobtrusive upload experience enhancing. As of now <strong>I highly recommend</strong> you to checkout either <a href="http://www.pixeline.be/experiments/jqUploader/">jqUploader</a> or <a href="http://swfupload.mammon.se/">SWFUpload</a> as I am no longer able to provide support for this solution. Setting them up should be multiple times easier and will require no Perl or (Cake)PHP on the server side. HTH, Felix.</p>
+<p>It's been quite a while since my last post, but believe me I've been working hard for this one. This time I'll present a solution of mine that allows you to have a <strong>progress bar for file uploads</strong> via ajax (and, unfortunatly a perl script). Now, since this is quite heavy on server load I mostly created it for usage in backends and I think thats where most ajax should belong anyway. But of course, you can use it for whatever you want to.</p>
+<p>At this point I need to credit the people who created the <a href="https://sourceforge.net/projects/uber-uploader">Uber Uploader</a> project from where I've taken the perl script for this.</p>
+<p>My solution consists out of a bunch of JS, a CakePHP component and the modified Perl script from Uber Uploader.</p>
+<p>The Code, Documentation and a Live Demo and can be found <a href="http://thinkingphp.org/demos/cake-timer/" title="Code, Documentation and a Live Demo">here</a>.</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-ec84-4f60-b69f-470bcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fan-ajax-file-upload-progressbar%3A480f4dd5-ec84-4f60-b69f-470bcbdd56cb &amp;title=An+Ajax+file+upload+progressbar';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fan-ajax-file-upload-progressbar%3A480f4dd5-ec84-4f60-b69f-470bcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fan-ajax-file-upload-progressbar%3A480f4dd5-ec84-4f60-b69f-470bcbdd56cb&amp;title=An+Ajax+file+upload+progressbar&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fan-ajax-file-upload-progressbar%3A480f4dd5-ec84-4f60-b69f-470bcbdd56cb&amp;title=An+Ajax+file+upload+progressbar';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/dessert-5-keep-a-custom-configuration-file:480f4dd5-6ee8-40ab-a6f0-413bcbdd56cb">Dessert #5 - Keep a custom configuration file</a></li>
+							<li><a href="/posts/streaming-file-uploads-with-node-js:4ac094b2-b6c8-4a7f-bd07-28accbdd56cb">Streaming file uploads with node.js</a></li>
+							<li><a href="/posts/simple-global-ajax-activity-indicator-with-jquery:480f4dd6-7508-4aea-9850-4139cbdd56cb">Simple global Ajax activity indicator with jQuery</a></li>
+							<li><a href="/posts/parsing-file-uploads-at-500-mb-s-with-node-js:4c03862e-351c-4faa-bb67-4365cbdd56cb">Parsing file uploads at 500 mb/s with node.js</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/an-ajax-file-upload-progressbar:480f4dd5-ec84-4f60-b69f-470bcbdd56cb">69 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/an-ajax-file-upload-progressbar:480f4dd5-ec84-4f60-b69f-470bcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dd7-8c58-4005-ad3b-4783cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f4112f3023c643bf2f7b32c9c5dcfcba&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakebaker.wordpress.com" rel="nofollow">Daniel Hofstetter</a>						</strong>
+						<strong>said 
+						on Apr 28, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Good work!</p>
+<p>The link "check out the documentation" on the demo page is broken.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-f2d8-4f9e-a99b-4d20cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakebaker.wordpress.com/2006/04/28/an-ajax-file-upload-progress-bar/" rel="nofollow">cake baker &raquo; An Ajax file upload progress bar</a>						</strong>
+						<strong>said 
+						on Apr 28, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Felix Geisendörfer has announced an Ajax file upload progress bar which integrates with CakePHP. The solution looks very promising, but check it out yourself, there is a demo online. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-a544-47ee-91be-4848cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 28, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Daniel/dhofstet,</p>
+<p>thx for your comment. You are right about the link problem, forgot to change it when changing my paths. Well but this brings me to mention another problem, when the page with the missing controller error is beeing rendered, all links in the menu seem to use a wrong base_path, making everything broken. I'll update the site to the latest nightly when I get time and will check if the issue has already been resolved. Otherwise it might be something to put on Trac.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-4c4c-4a44-9442-40f3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0c91ca7d976b9c8d26ab4ed93218962f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Lorenzo&nbsp;						</strong>
+						<strong>said 
+						on May 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great code!<br />
+It's strange but if i try to upload with files ( 100mb ) with linux firefox or mac os x firefox , all right! With Windows often upload was broken showing this message:"Error: progressTracker not available"</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-ebf8-484b-b517-4798cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Lorenzo: Are you talking about your own server? Or about the demo I've got online? Because the one online shouldn't accept files that big.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-76f0-4fc2-8326-4160cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0c91ca7d976b9c8d26ab4ed93218962f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Lorenzo&nbsp;						</strong>
+						<strong>said 
+						on May 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,<br />
+I'am talking about both (my server and your). It's very strange!</br><br />
+I've tried *at work* and *at home*. Same result: linux and mac can upload without problems ... with windows not !</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-a874-47cf-b165-475dcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hm, Lorenzo, that sounds strange indeed. Is it only with files in the range of a hundred mb or with smaller files as well? I didn't have problems like this before.</p>
+<p>The "Error: progressTracker not available" will appear when the AJAX request for retrieving the status failed. I could imagine a badly configured firewall to do stuff like this, but that's just a guess. Is the Windows configuration at home and at work the same?</p>
+<p>--Felix</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-3e14-40cc-ba4d-414bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0c91ca7d976b9c8d26ab4ed93218962f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Lorenzo&nbsp;						</strong>
+						<strong>said 
+						on May 04, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>No, configuration are different.( But the router is the same) I'am not idea what can be. And i don't think is the firewall (  mac and linux client function great! ) I tried also original Uber php scripts: with mac and linux all goes done, with windows upload broken around 70-80 mb.<br />
+I disable antivirus and firewall ... same result :(</br><br />
+I'am looking for check WHAT the problem!</br><br />
+I'm doing other test  .... i will post you result :)</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-b674-4812-850a-4daecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 04, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Lorenzo, well I've not tried files that big and since I'm on a 64 kbit connection (...) I'll not be able to do so at any point soon. But if you find a reason for the problems you have I'll be glad to publish a patch for it ; ).</p>
+<p>bye, Felix</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-025c-4215-bf9a-4c8ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://crispytown.com/blog/archives/309" rel="nofollow">CRiSPyToWN -=- Blog of Useless Data &raquo; Upload files with an</a>						</strong>
+						<strong>said 
+						on May 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] read more | digg story [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-3c54-4577-a5ae-4801cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=17bb3a22ed95710fa1936457cae5706d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Will&nbsp;						</strong>
+						<strong>said 
+						on May 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Works great in Firefox.  But not so much in Safari.  In safari, a new page opens with this output:</p>
+<p>Upload Complete<br />
+Array</br><br />
+(</br><br />
+    [upload_range] =&gt; 1</br><br />
+)</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-74bc-4356-bd79-45a0cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Will,</p>
+<p>Safari is not supported (as the text above the demo upload form indicates) so far. But that's really only because I can't test and fix it there. I don't think any of the techniques used should be problematic with Safari in general.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-59f0-474f-afb3-4e66cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=de81def1ca1f7eb61448822a7518832a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Franz Huber&nbsp;						</strong>
+						<strong>said 
+						on May 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Does not work in Safari. Useless, because you can not build a website that does not for the majority of mac users.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-c5a8-4ed8-b666-4be8cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Franz, I live in Germany, a country with propably less then 0.5% of Mac Users, theoretically I could care less about them. But the truth is just that I've got no Mac to test the JS on (and don't plan to get one either), so if you want to work with it, go and fix it yourself.</p>
+<p>And if you'd actually have read the article above then you would know that this is intended for Administrator panels. When I build those I tell the client to use IE/FF or even Opera. If the client is unhappy with that he has to pay for having his exotic browser supported. *sigh* ... But oh well thanks for your comment anyway.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-5c44-4dd1-b306-4325cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f31d5e31fedf5f2d6b3c2f1901adc9ba&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							damob&nbsp;						</strong>
+						<strong>said 
+						on May 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ok, same thing now but for Download</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-229c-4344-8883-435bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a57cc620df619bb6b2127fccc4985d58&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							heh&nbsp;						</strong>
+						<strong>said 
+						on May 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sorry mate, but perl (or any non-php) = dealbreaker.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-da2c-4097-87c1-4ac5cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b088f953eab83ee7012ef01107dd2d66&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Bryan&nbsp;						</strong>
+						<strong>said 
+						on May 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Doesn't work on Safari.  Not useful.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-70dc-4599-9230-4432cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.bsaxon.com/?p=13" rel="nofollow">bsaxon.com &raquo; Blog Archive &raquo; Upload files with an AJA</a>						</strong>
+						<strong>said 
+						on May 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Ever wondered if it was possible to display the upload status to a user while he is uploading a file to your website? It is! Check out this PHP implementation on thinkingphp.org.read more | digg story [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-923c-484a-868e-4b22cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0e5b260ac3d3a9cde4bf992fa4289c27&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://whaletattoo.com" rel="nofollow">Tom</a>						</strong>
+						<strong>said 
+						on May 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'm sorry but I'll have to stand up for Felix on this.<br />
+This *is* useful for most admins. It's gonna be written into the next version of my CMS because none of my clients use Safari.</br><br />
+Furthermore I realize that this is freeware and open for developement. I recognize quality scripting when I see it and know when I'm beat. This is far better than anything I could have come up with and so I'll simply develop it.</br><br />
+My loose change anyway,</br><br />
+Tom</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-da60-48f8-badb-4538cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2006/05/07/need-visitors-go-diggcom/" rel="nofollow">ThinkingPHP &raquo; Need visitors? Go Digg.com</a>						</strong>
+						<strong>said 
+						on May 07, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] ThinkingPHP: An Ajax file upload progressbar [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-dfa8-4b11-a56e-480acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4f80306192ee9a0fdf65be2deb793f22&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.nooby.com.ar" rel="nofollow">Guido</a>						</strong>
+						<strong>said 
+						on May 07, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Cool man!</p>
+<p>thanks for this one!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-9000-4804-ac55-46b6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.ssh.tw/?p=149" rel="nofollow">sshlog &raquo; 20060509</a>						</strong>
+						<strong>said 
+						on May 09, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] An Ajax file upload progressbar [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-eb24-44e8-ad94-4d51cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=806ece7dfec941694e4a08779b69f78f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://webtweakers.com" rel="nofollow">Bas van Gaalen</a>						</strong>
+						<strong>said 
+						on May 09, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The demo you've put up works nicely on my Windows and I'm sure the Safari problems are fixable. Aren't Mac-users the kind of people who fix open-source software to work on their machine as well, instead of complaining about it?</p>
+<p>ps: I'm sure that the Perl cgi can be refactored to PHP. Now if I only had time...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-2f6c-4e96-82c4-4d6ecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 09, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey, Bas van Gaalen. I agree with you, this is OS, if something doesn't work you should contribute instead of to complain ; ).</p>
+<p>Anyway, I wouldn't know how to refactor the Perl script into php. The problem is that you don't get access to the POST data before the upload is completed in php. That's something only perl can do. Well, there is a PHP hack to make this possible as well, but something that only works on dedicated hosts is less appealing to me then the perl compromise. The other idea would be to watch the temporary upload folder for php, but then you've got the problem that you don't know which file is the one the user is uploading? Is it the latest one, or are two users uploading at the same time? Hard to know. That makes this method unreliable as well ... Therefor the perl script is the only solution I'm seeing right now : /.</p>
+<p>bye, Felix</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-15cc-4532-826b-42aecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6d166ee9c91f6e826ff843a00ebbd8bd&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							silang&nbsp;						</strong>
+						<strong>said 
+						on May 12, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for this one. One thing I had a problem with was uploading a load of pictures and then sticking names into a db in same order as entered.  Found solution that seems to work to stop files being written to params file in seemingly random order - in uber_uploader.cgi around line 220<br />
+replace "foreach $file_name (keys %uploaded_files){ . .. " with "foreach $file_name (sort  keys %uploaded_files){ .."</br><br />
+also using $this-&gt;Image-&gt;create()</br><br />
+doesnt seem to work with the cake core files in the demo.  Using 1.0.0.2482 stops problem but brings up error Notice: Undefined variable: uninflectedSingluar in /var/www/html/cake-timer/cake/libs/inflector.php on line 251</br><br />
+is this  just me doing something dumb?</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-51b8-45ad-bfbd-44a1cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 12, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi silang, I'm happy to see your trying to use CakeTimer ; ). Ok regarding the fileupload order: I have no idea how this is done, this is part of the uber_uploader project and I just modified the .cgi file to fit my needs. However, I think your other problem is not directly related to CakeTimer. Either something went wrong when you updated the core, or you have a problem in your code. But as always: you never know until it's fixed ; ).</p>
+<p>Regarding CakeTimer in general. I'll soon start rewriting the entire thing, trying to make the entire thing easier to set up, as well as to improve the code itself. I'll also use Prototype instead of the Yahoo! UI Library for the next version since most people are already using it, and I just used Yahoo! because I wanted to learn more about it, which I did by now ; ).</p>
+<p>Thanks for your Interest,<br />
+--Felix</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-7ccc-435b-91b7-4ce9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=04b8fca2c8dde2ed82373ade37e9789d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Som Sun Guy&nbsp;						</strong>
+						<strong>said 
+						on May 23, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>No Safari No Good for Me - damn, I would have used this in the SUN infrasructure code!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-9da0-4305-b41f-44e9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=84af6d408989f5fd8574cc37d2806819&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.sibsoft.net/xupload.html" rel="nofollow">Alex Z</a>						</strong>
+						<strong>said 
+						on May 24, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Uberuloader was created using <a href="http://www.sibsoft.net/xupload.html" rel="nofollow">XUpload</a> code by <a href="http://www.sibsoft.net" rel="nofollow">SibSoft</a>.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-86bc-410f-b697-4ddbcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=84af6d408989f5fd8574cc37d2806819&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.sibsoft.net/xupload.html" rel="nofollow">Alex Z</a>						</strong>
+						<strong>said 
+						on May 24, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>So, check out <a>SibSoft XUpload</a> to get latest version of real upload progress bar.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-93c8-4b8d-8f84-422ccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 24, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Alex Z:<br />
+Well, thanks for this information but XUpload is a commercial project (at least the ajax version is) , so it's of no interest for me. </br></p>
+<p>Som Sun Guy:<br />
+I'm sry, I hear a lot of people complaining about this issue, but no one has offered me to help debugging for safari. I really think there are just some minor JS issues, but since I'm not into Apple computers I cannot test it myself.</br></p>
+<p>For All:<br />
+I'm currently writing a completly new version of this progress bar, using an own (and better) perl script so the entire project can become MIT licensed. I'll also use Prototype instead of the Yahoo! library, and add a couple new features.</br></p>
+<p>Stay tuned.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-ed1c-4a52-9a58-4120cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a9428f923f8a9a1d224b5a18269b1d22&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.sevenapps.com" rel="nofollow">reza ahmad</a>						</strong>
+						<strong>said 
+						on May 27, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>How can we write the programm in php for the progressbar with time and upload file size.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-d828-472b-b772-4298cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 30, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>reza ahmad: Afaik, this is not possible due to the fact that you won't be able to access post data before it's completly uploaded to the server in php.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-0e8c-42e1-8808-4b6bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3009d00caf645b1ad38ace4c019c9213&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://zacksmithdesign.com" rel="nofollow">zack</a>						</strong>
+						<strong>said 
+						on Jun 05, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hello...</p>
+<p>i've been trying for a while now on my own remake of the uber uploader as well. except... all i need it to do is to tell me the progress of an upload that i've already got a form for in php. i don't need it to actually upload the files, make the temp directory, or rename the files or anything like that. just accept a few variables from me about the file and tell me it's upload progress.</p>
+<p>can you point me in a good direction or help me develop this? i can probably pay you for your time. thanks...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-1da8-41d5-af63-4eeacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=84af6d408989f5fd8574cc37d2806819&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.sibsoft.net" rel="nofollow">Alex Z</a>						</strong>
+						<strong>said 
+						on Jun 07, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Btw, the guy who developed UberUploader were using some code from <a href="http://www.sibsoft.net/xupload.html" rel="nofollow">XUpload</a>.  We also have free version of xupload.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-af84-4ee2-84e2-4503cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 07, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Alex Z: I understand that this comment is related to the post and therefor I do not consider it as spam. However, this is no site to promote commercial software, and you already did that in your previous comments. So, please stop it or I'll filter xupload / sibsoft.net from my blog in future. Thanks. --Felix</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-ea30-4f30-95cc-4428cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d0a2d288eecee9a2274b1b11f1f3a293&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.webdice.org" rel="nofollow">Peter</a>						</strong>
+						<strong>said 
+						on Jun 20, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Just to set the record straight. When I needed a upload progress bar I downloaded MegaUpload but I found it lacking. I also downloaded Xupload but also found it lacking because it used the same upload mechanism as MegaUpload. In other words it bypassed cgi.pm and tried to handle the upload itself. The one thing I did like about Xupload was that the progress bar did not refresh. So I re-wrote everything and used the Xupload progress bar idea. When I was finished I offered the code to the authors of both projects but they were not interested. So, I started my own project called Uber-Uploader and mentioned both authors as contributors in my source code. Several weeks later my upload mechanism appeared in the Xupload project and to date it does not mention my name in the source code as a contributor. Also, I occasionally  point my users to Xupload as an alternative to my my script and  have posted code in Xuploads help forum.  I do not care that Xupload uses my upload mechanism because it is open source software. What really bothers me though is,</p>
+<p>a. I am not credited for the upload mechanism in the Xupload source code.<br />
+b. The author of Xupload keeps posting in forums that I ripped off his code.</br></p>
+<p>The funny thing is, if someone were to download both projects and compare the code you would see they are nothing alike. Accept for the upload mechanism as I changed my progress code a while back. Sorry for the rant but I do not appriciate someone insinuating that I ripped off code from them that I actually provided and they are charging money for it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-e96c-46af-a93b-4073cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d0a2d288eecee9a2274b1b11f1f3a293&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.webdice.org" rel="nofollow">Peter</a>						</strong>
+						<strong>said 
+						on Jun 20, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Just a follow up. The upload mechanism actually appeared two months later.</p>
+<p>Xupload version 1.4 used the MU upload mechanism and it was released 2005-05-05<br />
+Xupload version 2.0 used UU upload mechanism and it was released 2005-12-07</br><br />
+Uber-Uploader version 1.0 was released 2005-10-07</br></p>
+<p>Uber-Uploader version 1.0 is not active but I can re-activate it if anyone cares to have a look.</p>
+<p>Again, sorry for the rant.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-67c0-4b9e-9f40-4736cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 20, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Peter,</p>
+<p>hm I'm sorry for what happened there and I agree that something like this is not ok. I'm in big favor of Open Source but even more in favor of Free Software, which is the reason why I license all things I create and publish under the MIT license at the moment. </p>
+<p>So if somebody comes and takes my code and makes it commercial, no problem. If he doesn't mention my name in the product - works for me too. But if that guy would say that I stole his source when he was actually using mine - that's definitly not funny.</p>
+<p>Together with the posts from Alex Z, weather or not he's a member of the project, and your comment, I've gotten a very negative picture of this project so far and I'd recommend their project manager to overthink their strategy, and potential users to look for other choices then Xupload.</p>
+<p>For that reason I wish good luck to you peter and hope stuff like this won't happen to you again.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-3288-43a1-97b8-411dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d0a2d288eecee9a2274b1b11f1f3a293&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.webdice.org" rel="nofollow">Peter</a>						</strong>
+						<strong>said 
+						on Jun 20, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>Thanks for the feedback. I'm not saying you should not use Xupload as I still believe it is a well written upload script and I will continue to recommend it along with MegaUpload as a good alternative to Uber-Uploader.  I have often stated publicly that MegaUpload and Xupload inspired Uber-Uploader and if it were not for these two projects, UberUploader would not even exist. However, I depend on developing software to make a living so it is not good for my reputation if someone states in a public forum that I ripped thier code and claimed it as my own. I would not even care if it was claimed in private, but a potential employer could easily google this and come to the wrong conclusion.  Sorry, but I was forced to play my hand.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-6b88-4445-b5ec-48abcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8cb6116a2db75f008d5f038a02764963&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.rodneyoliver.com" rel="nofollow">Rodney</a>						</strong>
+						<strong>said 
+						on Jun 26, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'd like to give this a try but the link to the files and docs is broken.  Is there an alternate area to download the files?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-2f34-4731-acc9-4179cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 27, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Rodney, I don't know if there was a temporary problem when you checked, but right now, everything seems to work nicely.</p>
+<p>Try: http://thinkingphp.org/demos/cake-timer/ (don't forget the trailing slash!)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-19ac-4186-9b7e-4510cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://lawfully.wordpress.com/2006/05/06/400/" rel="nofollow">lawfully &raquo; Blog Archive &raquo;</a>						</strong>
+						<strong>said 
+						on Jul 27, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] AUTOMATOR.USThe Computer Bed - Euro FlyingBedMac Mini Intel Core Duo Upgrade GuideLinuxAdvocate.org - Linux information, advocacy, reviews and tips for everyone.LILEKS (James) the EngraveyardLinux versus Mac OS X on Intel Dual CoreWired 14.05: The RFID Hacking UndergroundBBC NEWS | Programmes | Click | Hacker fears &#8216;UFO cover-up&#8217;LinuxAdvocate.org - Linux information, advocacy, reviews and tips for everyone.CakeTimer - Demo Page | An Ajax file uploads progress barThinkingPHP » An Ajax file upload progressbar [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dda-0320-417a-bf3d-478acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=84af6d408989f5fd8574cc37d2806819&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.sibsoft.net/xupload.html" rel="nofollow">Alex Z</a>						</strong>
+						<strong>said 
+						on Aug 15, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hello everyone,</p>
+<p>noone telling that Peter "ripped" or "stolen" sources of Xupload. A long time ago, when Xupload was completely free open source project, we had some communication with Peter and he used some ideas in his code, as well as we used some of his ideas. Again, that was just ideas/features using, but not source code copy-pasting or something like that (we're talking about open source versions). We respect intellectual property rights and not going to  complain on somebody. If Peter have any complains on Xupload authors, he can contact us and we will resolve issue, if any. If we somehow hurt Peter, then we ready to present our apologies. As for Felix, who's "taking negative picture" and advising to stay away from xupload, we recommend to gain an understanding of full situation first and only then start making such statements. But sorry for double posting about Xupload. Anyway, if somebody have any questions - you're welcome to email. Thanks for attention.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dda-6bc4-4f4e-8422-4494cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 15, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Alright, Alex Z, Peter, and who ever else is listening:</p>
+<p>I guess in future I'll try to avoid getting involved in 3rd party conflicts over intellectual property. It is impossible for me to figure out who did what and who didn't. </p>
+<p>However, I did feel that Alex Z tried to catch some of the digg traffic this article recieved by pointing people to their product (xupload). And I just don't like my blog being used for commercial advertisment. If users of a commercial product point it out because they like it, ok. But the next time a vendor will post on here for other reasons than correcting mistakes or contributing to the discussion, I'll delete such comments.</p>
+<p>So based on the comments in here I was naturally in favour of peters point, but as I said: I really don't know who is right. And I'd like the discussion about it here to stop at this point. </p>
+<p>If somebody reads this who is looking for an ajax upload progress bar, go ahead and make up your mind about xupload and all the other products yourself. Feel free to post suggestions on here, but please not accuses etc. anymore.</p>
+<p>Regarding the CakeTimer itself: The setup proofed to be somewhat difficult and a lot of people struggled with integrating it. I had a client who needed it and I was in the progress of refactoring the code and to write my own perl script, but he canceld the request, so I didn't go with it any further. Anyway, if you need something to integrate an ajax upload bar into your site, you can drop me a note at http://www.fg-webdesign.de/en/ and I'll see what I can do, depending on how busy I am. I definitly have no time to support this in my spare time right now.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-ca38-4894-82f4-4da0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=962b02f0c914d37c4dfece85a8d9f6b7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.seemysites.net/projFolder/uploader" rel="nofollow">Another free AJAX file upload script</a>						</strong>
+						<strong>said 
+						on Sep 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The Uber uploader had a great idea.  I have my own implementation of an AJAX file upload script based on the same idea (credits are in the source code) - but I tototally rewrote the JavaScript.  The result is with proper compression the script size is less than 5K!  You can take a look at it at: http://www.seemysites.net/projFolder/uploader</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-45bc-46c7-8ecb-4005cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>When somebody has JS disabled your upload form get's broken. Try to use unobstrusive JS if possible.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dde-973c-48cd-a369-4c1acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2006/09/25/diggcom-open-source-intellectual-property-thinkingphporg/" rel="nofollow">ThinkingPHP and beyond &raquo; Digg.com, Open Source, Intellectu</a>						</strong>
+						<strong>said 
+						on Sep 25, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] You&#8217;ve probably all followed my latest post that was purely written to make it to the digg.com home, which it did. However, the resulting traffic I got was not as overwelming as I had hoped, and even less then I had my with the first article of mine which made it to digg.com&#8217;s homepage. The stats are still going up a little bit, but I think it&#8217;ll come down to about 3000 visitors, which is pretty low knowing that last time I had 8000 and expected around 15k this time. Maybe I had a bad timing, used a little too much buzz language, or the article wasn&#8217;t just that good. But I think it&#8217;s fairly safe to say that only the news with the most catchy headlines and descriptions got a chance in the game today. Seems like the web isn&#8217;t too different from traditional media in that respect after all. As far as ad revenue goes, the total will probably range between $20-30, and whatever it ends up being, 100% instead of the original 75% of it will go to the foundation. It&#8217;s not a lot, but I hope it&#8217;ll be appriciated anyway. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-e6b8-4d25-9ec9-4b80cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cacf29db7cc68cf8caa56f8e2848cd2d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dom&nbsp;						</strong>
+						<strong>said 
+						on Jan 17, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi ^^</p>
+<p>Great Job ... but  i have somes problem with cake timer.<br />
+Uber Uploader works on my server but cake timer don't work.</br></p>
+<p>I try to upload a file and i have a error message 'Error: progressTracker timeout: max is 15 seconds'</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-464c-4036-8534-427acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9f71501bfd71edc2b69e92e90bcdc6b5&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Chris&nbsp;						</strong>
+						<strong>said 
+						on Jan 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix, I also have the following error:</p>
+<p>progressTracker timeout: max is 15 seconds</p>
+<p>Any idea as to what would cause this?  I have tried the obvious like folder permissions and paths but with no joy.</p>
+<p>PS Dont let people get you down; you have provided a great piece of functionality to the cakephp community. :o)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-d090-4bde-a2f1-456bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d3ba28fecd257f581734830330e8fc19&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dom&nbsp;						</strong>
+						<strong>said 
+						on Feb 01, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi,</p>
+<p>The example works but ...<br />
+When i try cake timer with the last version of cake (cake_1.1.12.4205), i have somes errors :</br></p>
+<p>Error: progressTracker Data has a wrong format!</p>
+<p>Notice: session_start(): ps_files_cleanup_dir: opendir(/var/lib/php4) failed: Permission denied (13) in /var/www/virtual/**********/htdocs/up/cake/libs/session.php on line 146</p>
+<p>Warning: Cannot modify header information - headers already sent by (output started at /var/www/virtual/**********/htdocs/up/cake/libs/session.php:146) in /var/www/virtual/**********/htdocs/up/cake/libs/session.php on line 147</p>
+<p>Warning: Cannot modify header information - headers already sent by (output started at /var/www/virtual/**********/htdocs/up/cake/libs/session.php:146) in /var/www/virtual/**********/htdocs/up/app/controllers/components/cake_timer.php on line 88</p>
+<p>Warning: Cannot modify header information - headers already sent by (output started at /var/www/virtual/**********/htdocs/up/cake/libs/session.php:146) in /var/www/virtual/**********/htdocs/up/app/controllers/components/cake_timer.php on line 89</p>
+<p>Warning: Cannot modify header information - headers already sent by (output started at /var/www/virtual/**********/htdocs/up/cake/libs/session.php:146) in /var/www/virtual/**********/htdocs/up/app/controllers/components/cake_timer.php on line 90</p>
+<p>Warning: Cannot modify header information - headers already sent by (output started at /var/www/virtual/**********/htdocs/up/cake/libs/session.php:146) in /var/www/virtual/**********/htdocs/up/app/controllers/components/cake_timer.php on line 91</p>
+<p>Warning: Cannot modify header information - headers already sent by (output started at /var/www/virtual/**********/htdocs/up/cake/libs/session.php:146) in /var/www/virtual/**********/htdocs/up/app/controllers/components/cake_timer.php on line 92</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-3294-4380-91f5-40e8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cf4875242cef9a9b907636f7486a5608&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Bhaumik Patel&nbsp;						</strong>
+						<strong>said 
+						on May 09, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I want to stores the html-form file values into the session variable in php file and after the 4 pages access one by one. (like shopping cart - if successful payment then upload image) i upload this image file but it gives a error : no such file ,</p>
+<p>so i confused here.<br />
+session values are destroued after some time ?</br></p>
+<p>Please give me the proper solution of it.<br />
+----------Help-------</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-c1e8-40c2-b0e2-44d0cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 09, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Bhaumik: Is this a CakePHP question? If so please try the google group or #cakephp alongside with further information. Otherwise I can't really help : /.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dee-7dc4-4a00-b50b-4271cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=78fa98242c8bec5512265592bf5bccf1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.padda.co.za" rel="nofollow">yebo</a>						</strong>
+						<strong>said 
+						on Aug 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>doesn't seem to work for me</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dee-7854-4608-941f-4347cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>yebo: Did you read the red text that says 'Important' on top of this post : )?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df0-d38c-4bee-9001-4441cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7f04cff4488b33fa51b405db7aa92888&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.melian.org" rel="nofollow">multimedia m</a>						</strong>
+						<strong>said 
+						on Oct 12, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It works. Thank you !</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df1-18e8-4213-9590-41fbcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.mt-soft.com.ar/2007/10/22/handling-exceptions-in-cakephp-12/" rel="nofollow">Exceptional Cake - Handling Exceptions in CakePHP 1.2 | MT-Soft </a>						</strong>
+						<strong>said 
+						on Oct 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] An Ajax file upload progressbar [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-3d40-4693-8f22-4968cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9738731182fdeb43090022b9954365df&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							victories&nbsp;						</strong>
+						<strong>said 
+						on Mar 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>code link is broken, please check an fix</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-c874-4b9a-8ec2-4724cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8fe49b90c42daeef76d0e065b0f819de&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://tapos.wordpress.com" rel="nofollow">Tapos Pal</a>						</strong>
+						<strong>said 
+						on Apr 04, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hi Felix,<br />
+code link broken. it's not working with a trailing slash or not. Please have a check.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-a9ac-49f3-bfa7-42cacbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 05, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sorry folks, had to take the upload demo down - people were spamming it like crazy. Please see the "Important Warning" section on top of the page.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-ecb0-48b9-8a5f-4ff8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=34d9ac56c3878159b820746953c6a735&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Jens Mertelmeyer&nbsp;						</strong>
+						<strong>said 
+						on Apr 15, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>So is there any way to get your script? I'm really interested!<br />
+As for flash uploaders: I don't know ... they're not ... cool ... :-D</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-dffc-4f19-9b10-4179cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 15, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ok let me phrase that very clearly. The code sucked. I regret having written it. I would have nightmares if people were using it for anything but compiling a list of bad ideas.</p>
+<p>Sorry folks, but it was fun to play with it at the time, but I never got it really reliably nor do I think that even if it was it would be a good solution due to the difficulties in setting it up and the amount of unnecessary communication involved.</p>
+<p>Jens: Check out SWFUpload, it is essentially making the stability of flash available to you via a JS API. That means your UI is completely JS and flash is just used for reporting back on progress of of the upload. Its my method of choice these days.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a4c416-8744-4370-9ded-1e6e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1dd0ab521db4d6f194f1d5954db4c694&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.x-car.com.pl" rel="nofollow">przyciemnianie szyb</a>						</strong>
+						<strong>said 
+						on Aug 14, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>thx for links i was looking for some kind scripts to AJAX upload</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49498f75-16ec-43f6-bd78-5c664834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6da4df8d7981610ac2fd2f10b1ad2746&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Matthew&nbsp;						</strong>
+						<strong>said 
+						on Dec 17, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Actually i think this script and uber-upload have a lot of merit still in them.</p>
+<p>I have clients that want to upload large files to there server but are scared of ftp and want it browser base which allows adding into a database.</p>
+<p>As you know some hosts limit the size of posts to say 2mb which can be useless for certain files.</p>
+<p>The perl script by passes that allowing for larger file uploads which is great.</p>
+<p>I would recommend it for backend work. When in a secure area needing sessions and cookies to check login and auth's flash can be a nightmare to get working as it logs you out all the time.</p>
+<p>Just my thoughts i'm loving uber-uploader and would of loved to have seen what you have done.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-498130f4-b184-4880-8929-2d9a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=603ae6d6a875dd5fad12c7d9ded8efdc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Biney&nbsp;						</strong>
+						<strong>said 
+						on Jan 29, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I have problem in file uploaod in ajax in cakephp?<br />
+i am unable to get $_FILES values or $this->data values of file like name,type, error, size</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49917913-c770-4757-ac64-14ec4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ef0633e072a669de047f53a5235b3c11&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://3v-doble.es" rel="nofollow">StReO</a>						</strong>
+						<strong>said 
+						on Feb 10, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>im trying dthe uber uploader</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49aec971-fea8-430e-95c2-5c584834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2fd6b19302ac599a95b9239f56b22f24&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://ranacse05.wordpress.com" rel="nofollow">ranacse05</a>						</strong>
+						<strong>said 
+						on Mar 04, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Its not shown .</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a50de7e-3a50-4ada-93a3-756b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4b7d6ac0b9fba38cc93e7072efd9ee88&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.healthygenerationz.com" rel="nofollow">Raymond Software Indonesia</a>						</strong>
+						<strong>said 
+						on Jul 05, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The link "check out the documentation" on the demo page is broken.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a5cf113-ca20-475b-acaa-44164834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0288f415295f39ed0d5fafe1da544e5d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://juanpablostange.blogspot.com" rel="nofollow">Juan</a>						</strong>
+						<strong>said 
+						on Jul 14, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>juanpablostange.blogspot.com/2009/07/upload-progress-bar-100-php.html</p>
+<p>Hope its usefull for somebody</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a6017db-21d8-4bd2-8e16-568a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bb6ad01a3ad3f381c6ba2e1cb420142c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.think-new.com" rel="nofollow">Adam</a>						</strong>
+						<strong>said 
+						on Jul 17, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great Blog!  Thanks!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

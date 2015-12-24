@@ -1,0 +1,597 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>CouchDB Insert Benchmarks &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/couchdb-insert-benchmarks:4a4365e2-9d04-4170-9f88-2de34834cda3">CouchDB Insert Benchmarks</a></h2>	<div class="posted-on">
+		<p>Posted on 25/6/09 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>I am currently working on replacing Amazon S3 as the key value storage service for Debuggable's new startup. The main reason for that choice is that we want the ability to license the technology for in-house usage, which means the S3 dependency has to go.</p>
+<p>Over the past year or so I have repeatedly heard good things about CouchDB (not to mention that Damien Katz became a personal hero of mine after seeing <a href="http://www.infoq.com/presentations/katz-couchdb-and-me">this video</a>). But the main reason for preferring CouchDB over all the <a href="http://www.metabrew.com/article/anti-rdbms-a-list-of-distributed-key-value-stores/">alternative key value stores</a> is CouchDB's simplicity. Using HTTP + JSON as the protocol and embracing complete RESTfulness makes getting started with CouchDB ridiculously easy. It also makes it very awesome as you can build your architecture with other HTTP tools such as reverse proxies, http load balancers, etc..</p>
+<p>Anyway, having done absolutely nothing with CouchDB before, I feel I should avoid shooting myself in the foot by making poor performance / scaling assumptions that may or may not be true for our particular use cases. So I did what every new user of an open source project <del>would</del> <add>should</add> do and setup some benchmarks.</p>
+<p>However, the whole point of these is not to find out how fast CouchDB really is - I don't care as long as it scales horizontally. No, I am mostly interested in finding out 2 things:</p>
+<ul>
+<li>a) How much slacking time do I have left before we seriously need to scale out to multiple CouchDB nodes</li>
+<li>b) When that day comes, what can we expect in terms of replication delay (eventual consistency) in a multi-master setup</li>
+</ul>
+<p>So far I have been mostly studying question a). Since our application is mostly storage heavy, but does not necessarily have lots of read hits (see, this is the point where you should realize my tests might not help answer your questions at all - sorry), I was wondering about the disk space consumption relative to the number of documents stored in the database.</p>
+<p>After reading a bit about the <a href="http://en.wikipedia.org/wiki/B%2B_tree">B+ tree</a> CouchDB uses for storage, I assumed that the required disk space would grow linear with the number of documents stored. However, my initial tests indicated that the disk space / document was growing with each document I was adding. Assuming a bad setup and after discussing this a bit in #couchdb, I decided to create a more serious setup on Amazon Ec2 inserting anywhere from 0 - 1 million records.</p>
+<p>I put all the code for setting up the environment and running the tests on GitHub, see my <a href="http://github.com/felixge/couchdb-benchmarks/tree/master">couchdb-benchmarks</a> project.</p>
+<p>Anyway you waited long enough. Time for my initial results:</p>
+<pre class="terminal">doc count (before compact): 0
+doc count (after compact): 0
+insert time: 0 sec
+insert time / doc: n/a ms
+compact time: 1.0064 sec
+compact time / doc: n/a ms
+disk size (before compact): 79 bytes
+disk size (after compact): 79 bytes
+.couch size (before compact): 79 bytes
+.couch size (after compact): 79 bytes
+.couch size / doc (before compact): n/a bytes
+.couch size / doc (after compact): n/a bytes
+
+doc count (before compact): 1
+doc count (after compact): 1
+insert time: 0.0015 sec
+insert time / doc: 1.46 ms
+compact time: 1.0051 sec
+compact time / doc: 1005.14 ms
+disk size (before compact): 315 bytes
+disk size (after compact): 4179 bytes
+.couch size (before compact): 315 bytes
+.couch size (after compact): 4179 bytes
+.couch size / doc (before compact): 315 bytes
+.couch size / doc (after compact): 4179 bytes
+
+doc count (before compact): 2
+doc count (after compact): 2
+insert time: 0.0015 sec
+insert time / doc: 0.75 ms
+compact time: 1.0057 sec
+compact time / doc: 502.87 ms
+disk size (before compact): 503 bytes
+disk size (after compact): 8281 bytes
+.couch size (before compact): 503 bytes
+.couch size (after compact): 8281 bytes
+.couch size / doc (before compact): 251.5 bytes
+.couch size / doc (after compact): 4140.5 bytes
+
+doc count (before compact): 3
+doc count (after compact): 3
+insert time: 0.0017 sec
+insert time / doc: 0.56 ms
+compact time: 1.0053 sec
+compact time / doc: 335.1 ms
+disk size (before compact): 693 bytes
+disk size (after compact): 8281 bytes
+.couch size (before compact): 693 bytes
+.couch size (after compact): 8281 bytes
+.couch size / doc (before compact): 231 bytes
+.couch size / doc (after compact): 2760.33 bytes
+
+doc count (before compact): 4
+doc count (after compact): 4
+insert time: 0.0017 sec
+insert time / doc: 0.44 ms
+compact time: 1.0053 sec
+compact time / doc: 251.33 ms
+disk size (before compact): 883 bytes
+disk size (after compact): 8281 bytes
+.couch size (before compact): 883 bytes
+.couch size (after compact): 8281 bytes
+.couch size / doc (before compact): 220.75 bytes
+.couch size / doc (after compact): 2070.25 bytes
+
+doc count (before compact): 5
+doc count (after compact): 5
+insert time: 0.0018 sec
+insert time / doc: 0.36 ms
+compact time: 1.0054 sec
+compact time / doc: 201.08 ms
+disk size (before compact): 1071 bytes
+disk size (after compact): 8281 bytes
+.couch size (before compact): 1071 bytes
+.couch size (after compact): 8281 bytes
+.couch size / doc (before compact): 214.2 bytes
+.couch size / doc (after compact): 1656.2 bytes
+
+doc count (before compact): 6
+doc count (after compact): 6
+insert time: 0.0019 sec
+insert time / doc: 0.32 ms
+compact time: 1.0051 sec
+compact time / doc: 167.52 ms
+disk size (before compact): 1261 bytes
+disk size (after compact): 8281 bytes
+.couch size (before compact): 1261 bytes
+.couch size (after compact): 8281 bytes
+.couch size / doc (before compact): 210.17 bytes
+.couch size / doc (after compact): 1380.17 bytes
+
+doc count (before compact): 7
+doc count (after compact): 7
+insert time: 0.0021 sec
+insert time / doc: 0.3 ms
+compact time: 1.005 sec
+compact time / doc: 143.57 ms
+disk size (before compact): 1459 bytes
+disk size (after compact): 8281 bytes
+.couch size (before compact): 1459 bytes
+.couch size (after compact): 8281 bytes
+.couch size / doc (before compact): 208.43 bytes
+.couch size / doc (after compact): 1183 bytes
+
+doc count (before compact): 8
+doc count (after compact): 8
+insert time: 0.0022 sec
+insert time / doc: 0.27 ms
+compact time: 1.0049 sec
+compact time / doc: 125.61 ms
+disk size (before compact): 1655 bytes
+disk size (after compact): 8281 bytes
+.couch size (before compact): 1655 bytes
+.couch size (after compact): 8281 bytes
+.couch size / doc (before compact): 206.88 bytes
+.couch size / doc (after compact): 1035.13 bytes
+
+doc count (before compact): 9
+doc count (after compact): 9
+insert time: 0.0023 sec
+insert time / doc: 0.25 ms
+compact time: 1.0053 sec
+compact time / doc: 111.7 ms
+disk size (before compact): 1849 bytes
+disk size (after compact): 8281 bytes
+.couch size (before compact): 1849 bytes
+.couch size (after compact): 8281 bytes
+.couch size / doc (before compact): 205.44 bytes
+.couch size / doc (after compact): 920.11 bytes
+
+doc count (before compact): 10
+doc count (after compact): 10
+insert time: 0.0025 sec
+insert time / doc: 0.25 ms
+compact time: 1.0042 sec
+compact time / doc: 100.42 ms
+disk size (before compact): 2043 bytes
+disk size (after compact): 8281 bytes
+.couch size (before compact): 2043 bytes
+.couch size (after compact): 8281 bytes
+.couch size / doc (before compact): 204.3 bytes
+.couch size / doc (after compact): 828.1 bytes
+
+doc count (before compact): 50
+doc count (after compact): 50
+insert time: 0.0072 sec
+insert time / doc: 0.14 ms
+compact time: 1.0038 sec
+compact time / doc: 20.08 ms
+disk size (before compact): 10319 bytes
+disk size (after compact): 16473 bytes
+.couch size (before compact): 10319 bytes
+.couch size (after compact): 16473 bytes
+.couch size / doc (before compact): 206.38 bytes
+.couch size / doc (after compact): 329.46 bytes
+
+doc count (before compact): 100
+doc count (after compact): 100
+insert time: 0.0136 sec
+insert time / doc: 0.14 ms
+compact time: 1.0054 sec
+compact time / doc: 10.05 ms
+disk size (before compact): 20430 bytes
+disk size (after compact): 24665 bytes
+.couch size (before compact): 20430 bytes
+.couch size (after compact): 24665 bytes
+.couch size / doc (before compact): 204.3 bytes
+.couch size / doc (after compact): 246.65 bytes
+
+doc count (before compact): 500
+doc count (after compact): 500
+insert time: 0.0687 sec
+insert time / doc: 0.14 ms
+compact time: 1.0062 sec
+compact time / doc: 2.01 ms
+disk size (before compact): 104616 bytes
+disk size (after compact): 110690 bytes
+.couch size (before compact): 104616 bytes
+.couch size (after compact): 110690 bytes
+.couch size / doc (before compact): 209.23 bytes
+.couch size / doc (after compact): 221.38 bytes
+
+doc count (before compact): 1000
+doc count (after compact): 1000
+insert time: 0.1361 sec
+insert time / doc: 0.14 ms
+compact time: 1.003 sec
+compact time / doc: 1 ms
+disk size (before compact): 212260 bytes
+disk size (after compact): 217186 bytes
+.couch size (before compact): 212260 bytes
+.couch size (after compact): 217186 bytes
+.couch size / doc (before compact): 212.26 bytes
+.couch size / doc (after compact): 217.19 bytes
+
+doc count (before compact): 2500
+doc count (after compact): 2500
+insert time: 0.4686 sec
+insert time / doc: 0.19 ms
+compact time: 1.006 sec
+compact time / doc: 0.4 ms
+disk size (before compact): 814957 bytes
+disk size (after compact): 819298 bytes
+.couch size (before compact): 814957 bytes
+.couch size (after compact): 819298 bytes
+.couch size / doc (before compact): 325.98 bytes
+.couch size / doc (after compact): 327.72 bytes
+
+doc count (before compact): 5000
+doc count (after compact): 5000
+insert time: 0.9165 sec
+insert time / doc: 0.18 ms
+compact time: 1.0065 sec
+compact time / doc: 0.2 ms
+disk size (before compact): 2012394 bytes
+disk size (after compact): 2015330 bytes
+.couch size (before compact): 2012394 bytes
+.couch size (after compact): 2015330 bytes
+.couch size / doc (before compact): 402.48 bytes
+.couch size / doc (after compact): 403.07 bytes
+
+doc count (before compact): 7500
+doc count (after compact): 7500
+insert time: 1.5116 sec
+insert time / doc: 0.2 ms
+compact time: 2.0112 sec
+compact time / doc: 0.27 ms
+disk size (before compact): 3778774 bytes
+disk size (after compact): 3797090 bytes
+.couch size (before compact): 3778774 bytes
+.couch size (after compact): 3797090 bytes
+.couch size / doc (before compact): 503.84 bytes
+.couch size / doc (after compact): 506.28 bytes
+
+doc count (before compact): 10000
+doc count (after compact): 10000
+insert time: 2.3111 sec
+insert time / doc: 0.23 ms
+compact time: 3.015 sec
+compact time / doc: 0.3 ms
+disk size (before compact): 5653905 bytes
+disk size (after compact): 5652578 bytes
+.couch size (before compact): 5653905 bytes
+.couch size (after compact): 5652578 bytes
+.couch size / doc (before compact): 565.39 bytes
+.couch size / doc (after compact): 565.26 bytes
+
+doc count (before compact): 25000
+doc count (after compact): 25000
+insert time: 6.8684 sec
+insert time / doc: 0.27 ms
+compact time: 7.0746 sec
+compact time / doc: 0.28 ms
+disk size (before compact): 20595235 bytes
+disk size (after compact): 20635746 bytes
+.couch size (before compact): 20595235 bytes
+.couch size (after compact): 20635746 bytes
+.couch size / doc (before compact): 823.81 bytes
+.couch size / doc (after compact): 825.43 bytes
+
+doc count (before compact): 50000
+doc count (after compact): 50000
+insert time: 15.8227 sec
+insert time / doc: 0.32 ms
+compact time: 14.1612 sec
+compact time / doc: 0.28 ms
+disk size (before compact): 51808040 bytes
+disk size (after compact): 51724386 bytes
+.couch size (before compact): 51808040 bytes
+.couch size (after compact): 51724386 bytes
+.couch size / doc (before compact): 1036.16 bytes
+.couch size / doc (after compact): 1034.49 bytes
+
+doc count (before compact): 100000
+doc count (after compact): 100000
+insert time: 35.3071 sec
+insert time / doc: 0.35 ms
+compact time: 33.4723 sec
+compact time / doc: 0.33 ms
+disk size (before compact): 125497442 bytes
+disk size (after compact): 125419618 bytes
+.couch size (before compact): 125497442 bytes
+.couch size (after compact): 125419618 bytes
+.couch size / doc (before compact): 1254.97 bytes
+.couch size / doc (after compact): 1254.2 bytes
+
+doc count (before compact): 250000
+doc count (after compact): 250000
+insert time: 104.0009 sec
+insert time / doc: 0.42 ms
+compact time: 97.3738 sec
+compact time / doc: 0.39 ms
+disk size (before compact): 394489375 bytes
+disk size (after compact): 394457190 bytes
+.couch size (before compact): 394489375 bytes
+.couch size (after compact): 394457190 bytes
+.couch size / doc (before compact): 1577.96 bytes
+.couch size / doc (after compact): 1577.83 bytes
+
+doc count (before compact): 500000
+doc count (after compact): 500000
+insert time: 230.6021 sec
+insert time / doc: 0.46 ms
+compact time: 209.0139 sec
+compact time / doc: 0.42 ms
+disk size (before compact): 900271866 bytes
+disk size (after compact): 900280422 bytes
+.couch size (before compact): 900271866 bytes
+.couch size (after compact): 900280422 bytes
+.couch size / doc (before compact): 1800.54 bytes
+.couch size / doc (after compact): 1800.56 bytes
+
+doc count (before compact): 750000
+doc count (after compact): 750000
+insert time: 354.7959 sec
+insert time / doc: 0.47 ms
+compact time: 380.9895 sec
+compact time / doc: 0.51 ms
+disk size (before compact): 1446452532 bytes
+disk size (after compact): 1445376102 bytes
+.couch size (before compact): 1446452532 bytes
+.couch size (after compact): 1445376102 bytes
+.couch size / doc (before compact): 1928.6 bytes
+.couch size / doc (after compact): 1927.17 bytes
+
+doc count (before compact): 1000000
+doc count (after compact): 1000000
+insert time: 487.3284 sec
+insert time / doc: 0.49 ms
+compact time: 570.2633 sec
+compact time / doc: 0.57 ms
+disk size (before compact): 2023280441 bytes
+disk size (after compact): 2022334566 bytes
+.couch size (before compact): 2023280441 bytes
+.couch size (after compact): 2022334566 bytes
+.couch size / doc (before compact): 2023.28 bytes
+.couch size / doc (after compact): 2022.33 bytes</pre>
+<p>From this data, a few assumptions can be made:</p>
+<ul>
+<li>CouchDB inserts ~2-3k documents / second in a >100k documents database (for this particular hardware / benchmark setup)</li>
+<li>CouchDB inserts get slower on bigger databases</li>
+<li>CouchDB seems to use more bytes / document the larger the database gets (this is scary, but might explain the previous 2 observations)</li>
+<li>The time it takes for compacting a database with identical, unmodified documents seems to be almost equal to the time it took to insert the initial documents. Makes lots of sense assuming the writes are I/O bound.</li>
+</ul>
+<p>Now since I am new to CouchDB there is a very large chance for problems with my setup and the logic behind my assumptions. However, I hope that by sharing them I can get feedback to make the benchmarks better and provide explanations for the observed characteristics.</p>
+<p>I also hope that some of you might feel compelled to <a href="http://github.com/felixge/couchdb-benchmarks/tree/master">fork the project</a> on GitHub and provide more benchmarks. Personally I am going to work on analyzing replication next. If I find time I'll also add some CSV exports and pretty rendering facilities with some google charts.</p>
+<p>Comment if you have any thoughts, want to see more tests or share some religious propaganda related to your key-value storage system of choice : ).</p>
+<p>-- Felix Geisendörfer aka the_undefined</p>
+<p>PS: A few questions I can already see coming up:</p>
+<p><strong>Why does compact always take at least 1 second?</strong><br />
+Because I use a while() loop with sleep(1) to determine when compact is done. I could check more frequently, but its not really a variable I'm interested in.</p>
+<p><strong>Why does compact increase the file size for < 50000 documents?</strong><br />
+Good question, I have no idea. Anybody?</p>
+<p><strong>What insert method is used?</strong><br />
+Have a look at the <a href="http://github.com/felixge/couchdb-benchmarks/tree/master">benchmark source</a>. Basically it's bulk-inserts of 1000 items at a time with pre-generated UUIDs.</p>
+<p><strong>I ran the benchmark and got some additional output</strong><br />
+Yeah, I removed some debugging / activity indicators to make the results more readable for this article.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4a4365e2-9d04-4170-9f88-2de34834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcouchdb-insert-benchmarks%3A4a4365e2-9d04-4170-9f88-2de34834cda3 &amp;title=CouchDB+Insert+Benchmarks';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcouchdb-insert-benchmarks%3A4a4365e2-9d04-4170-9f88-2de34834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcouchdb-insert-benchmarks%3A4a4365e2-9d04-4170-9f88-2de34834cda3&amp;title=CouchDB+Insert+Benchmarks&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcouchdb-insert-benchmarks%3A4a4365e2-9d04-4170-9f88-2de34834cda3&amp;title=CouchDB+Insert+Benchmarks';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/couchdb-insert-benchmarks:4a4365e2-9d04-4170-9f88-2de34834cda3">5 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/couchdb-insert-benchmarks:4a4365e2-9d04-4170-9f88-2de34834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4a43b033-ac2c-470b-a9fa-56304834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4c1f7ad0026132535ddc7af0a48ca8be&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.happyworm.com" rel="nofollow">Mark Boas</a>						</strong>
+						<strong>said 
+						on Jun 25, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix, I read this article with some interest. I'm using Amazon's EC2 for an application we are currently developing where fast DB inserts are key. The obvious candidate is S3 but I has also been considering CouchDB. It would be interesting to see how CouchDB performance stacks up against S3.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a43f787-0518-4b9c-a542-37e54834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=86ab357e353dac463235019b06e9891f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://damienkatz.net/" rel="nofollow">Damien Katz</a>						</strong>
+						<strong>said 
+						on Jun 25, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great work Felix! We need more of this.</p>
+<p>Because our UUIDs are completely random, it's actually the worst case scenario for document creation, as we have to update the by_id index in random spots. If you want to have the fastest possible insert times, you should give the _id's ascending values, so get a UUID and increment it by 1, that way it's always inserting in the same place in the index, and being cache friendly once you are dealing with files larger than RAM. For an easier way to do the same thing, just sequentially number the documents but make it fixed length with padding so that they sort correctly, "0000001" instead of "1" for example.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a43f92b-4cf4-416e-87ef-3fa24834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=86ab357e353dac463235019b06e9891f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://damienkatz.net/" rel="nofollow">Damien Katz</a>						</strong>
+						<strong>said 
+						on Jun 25, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The reason you see the amount the file grows to vary, and generally increase, is because of the btree by_id and by_seq indexes, who's update cost per document are LOG(N). So the slow growth rate increase is expected.</p>
+<p>The reason the compaction increases the file size might be becauase you are doing larger transactions instead than the compaction does, which works by reading some data and filling a buffer, and then writing it and it's indexes out. If that buffer is smaller than your buld transactions, it will compact larger than the original file.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a44199e-9c5c-4c4c-a6e5-06d54834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e0a3d8bad3526a207b8234539681cd8e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.steveoliveira.com" rel="nofollow">Steve Oliveira</a>						</strong>
+						<strong>said 
+						on Jun 26, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for posting that video Damien Katz video, Felix. That was pretty damn inspirational.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a49387c-fee8-4fdb-830e-2e884834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e8dc52828af38c3237267bfd1718f75f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.snailinaturtleneck.com" rel="nofollow">Kristina</a>						</strong>
+						<strong>said 
+						on Jun 29, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi!  Thanks for the script!  I tried out your benchmark with MongoDB, and put the results up at www.snailinaturtleneck.com/blog/?p=74, if anyone's interested.  (The short summary: MongoDB was a lot faster.)</p>
+<p>For people using other DB's: feel free to send me your results so I can add them to my comparison graph!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

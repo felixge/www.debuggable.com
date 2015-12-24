@@ -1,0 +1,584 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Dessert #14 - The new Xml class &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/dessert-14-the-new-xml-class:480f4dd5-4e94-4cc3-91d5-4b5acbdd56cb">Dessert #14 - The new Xml class</a></h2>	<div class="posted-on">
+		<p>Posted on 21/9/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p>This is going to be my first 1.2 dessert, I hope the 1.1 people don't mind it, in case you really want to use it in your current application, you can <a href="https://svn.cakephp.org/repo/branches/1.2.x.x/cake/libs/xml.php">grab the Xml class</a> itself from the 1.2 branch and put it into the vendors folder.</p>
+<p>One of the very cool things that's going to ship with the new release is a new Xml class that can parse any given Xml document for you, which is a really nice thing to have, especially if you manually parsed Xml before like I did.</p>
+<p>I was thinking about how to show it's functionality best, and I think the good old RSS example will do the job. So in order to fully appriciate it, take a look at the <a href="http://cakeforge.org/snippet/download.php?type=snippet&id=237">code of my RssModel</a> needed to parse an Rss feed. After that look at a very quick & dirty example of displaying an Rss feed using the new Xml class of 1.2:</p>
+<p>Fetch the feed like this in the Controller:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> XmlTestController <span class="kw2">extends</span> AppController<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">&quot;XmlTest&quot;</span>;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$uses</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw2">function</span> index<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; uses<span class="br0">&#40;</span><span class="st0">'Xml'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$Feed</span> =&amp; <span class="kw2">new</span> XML<span class="br0">&#40;</span><span class="st0">'http://www.thinkingphp.org/feed/'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'Feed'</span>, <span class="re0">$Feed</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>And then display it in the View:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">&lt;?php</span> <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$Node</span>-&gt;<span class="me1">name</span>==<span class="st0">'item'</span><span class="br0">&#41;</span>: <span class="kw2">?&gt;</span><br />
+&nbsp; &nbsp; &lt;h2&gt;<span class="kw2">&lt;?php</span> <span class="re0">$Title</span> = <span class="re0">$Node</span>-&gt;<span class="me1">getChild</span><span class="br0">&#40;</span><span class="st0">'title'</span><span class="br0">&#41;</span>; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$Title</span>-&gt;<span class="me1">value</span>; <span class="kw2">?&gt;</span>&lt;/h2&gt;<br />
+&nbsp; &nbsp; &lt;p&gt;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw2">&lt;?php</span> <span class="re0">$Description</span> = <span class="re0">$Node</span>-&gt;<span class="me1">getChild</span><span class="br0">&#40;</span><span class="st0">'description'</span><span class="br0">&#41;</span>; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$Description</span>-&gt;<span class="me1">value</span>; <span class="kw2">?&gt;</span><br />
+&nbsp; &nbsp; &lt;/p&gt;<br />
+<span class="kw2">&lt;?php</span> <span class="kw1">endif</span>; <span class="kw2">?&gt;</span></div>
+<p>That's it, you already parsed an entire Rss feed and displayed all it's item in a simple headline/paragraph chain. Now imagine how easy it'll be to work with web services using the power of this class ; ). I'm talking with nate about this kind of stuff right now, and it looks like CakePHP will get a couple new datasources in 1.2 for this as well, but I'll write more about this once the Api for it get's more stable. However, one thing is for sure: We'll not need to extend the Model class any more to emulate different data sources in 1.2.</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-4e94-4cc3-91d5-4b5acbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-14-the-new-xml-class%3A480f4dd5-4e94-4cc3-91d5-4b5acbdd56cb &amp;title=Dessert+%2314+-+The+new+Xml+class';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-14-the-new-xml-class%3A480f4dd5-4e94-4cc3-91d5-4b5acbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-14-the-new-xml-class%3A480f4dd5-4e94-4cc3-91d5-4b5acbdd56cb&amp;title=Dessert+%2314+-+The+new+Xml+class&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-14-the-new-xml-class%3A480f4dd5-4e94-4cc3-91d5-4b5acbdd56cb&amp;title=Dessert+%2314+-+The+new+Xml+class';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/dessert-2-become-friends-with-the-inflector:480f4dd5-1de0-45a4-b8f0-4282cbdd56cb">Dessert #2 - Become friends with the Inflector</a></li>
+							<li><a href="/posts/dessert-7-conventions-over-ego:480f4dd5-8154-4f7f-9de9-4a0dcbdd56cb">Dessert #7 - Conventions over Ego</a></li>
+							<li><a href="/posts/10-days-of-free-dessert-cakephp-tips:480f4dd5-1da4-4248-91f4-4043cbdd56cb">10 Days of free Dessert! (CakePHP Tips)</a></li>
+							<li><a href="/posts/dessert-13-a-simple-config-model:480f4dd5-d100-4e7f-80e6-416acbdd56cb">Dessert #13 - A simple Config Model</a></li>
+							<li><a href="/posts/cake-12s-set-class-eats-arrays-for-breakfast:480f4dd6-d084-4fb7-bacc-49fdcbdd56cb">Cake 1.2&#039;s Set class eats nested arrays for breakfast!</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/dessert-5-keep-a-custom-configuration-file:480f4dd5-6ee8-40ab-a6f0-413bcbdd56cb">Dessert #5 - Keep a custom configuration file</a></li>
+							<li><a href="/posts/dessert-12-debugging-requestaction:480f4dd5-bca4-4e86-820c-4f4dcbdd56cb">Dessert #12 - Debugging requestAction</a></li>
+							<li><a href="/posts/dessert-1-the-7-crucials-of-crud:480f4dd5-cbcc-479c-a754-48d0cbdd56cb">Dessert #1 - The 7 crucials of CRUD</a></li>
+							<li><a href="/posts/dessert-10-default-models-components-helpers:480f4dd5-b24c-4df9-ad49-4530cbdd56cb">Dessert #10 - Default Models, Components &amp; Helpers</a></li>
+							<li><a href="/posts/dessert-6-mysql-utf-8:480f4dd5-b70c-4655-b5fe-4f35cbdd56cb">Dessert #6 - MySql &amp; UTF-8</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/dessert-14-the-new-xml-class:480f4dd5-4e94-4cc3-91d5-4b5acbdd56cb">20 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/dessert-14-the-new-xml-class:480f4dd5-4e94-4cc3-91d5-4b5acbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4ddd-6b48-43ae-9a13-46f9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=42c5bbf957f3ac0385fb5694d40992ef&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.wizardworx.co.za" rel="nofollow">Mladen Mihajlovic</a>						</strong>
+						<strong>said 
+						on Sep 22, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Considering that SimpleXml gives quite a bit more functionality, I wonder how much this class would be used (in PHP 5).</p>
+<p>http://www.php.net/simplexml</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddd-9bb4-44c0-8c1c-40accbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c0080c91e2e3412e7ea291062d3d65af&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Ben&nbsp;						</strong>
+						<strong>said 
+						on Sep 22, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>To be honest, I prefer this XML parsing class (at the moment). I highly recommend it:</p>
+<p>http://keithdevens.com/software/phpxml</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddd-2640-4ecb-bf8c-4cdecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 23, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>While both of those approaches look nice and probably would be useful to some degree, neither of them could be used in CakePHP. SimpleXml because it's php5 and CakePHP will still support php4 in version 2.0, and the one you pointed out Ben, because it would violate CakePHP's IP policiy to use foreign vendor stuff.</p>
+<p>Afaik, that's the main reason the Xml class for CakePHP was written and why it's going to be used.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddd-e970-4e80-b6f2-4141cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c0080c91e2e3412e7ea291062d3d65af&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Ben&nbsp;						</strong>
+						<strong>said 
+						on Sep 23, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>While I can see the point in the CakePHP IP policy, I also think it is dangerous to have the "not invented here" mentality. Is there a document anywhere outlining why they chose this route?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-ae1c-4c8d-bf52-4767cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 23, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ben: I'm not a CakePHP spokesmen, so don't take my word for it. I just made this statement based on the fact that there is not a single line of code that wasn't written by the CakePHP team in the distribution, as well as by the fact that this is advertised on the front page. They also only accept code contributions by people who signed a CLA. That's all the insight I got into it.</p>
+<p>However, this policy absolutly one of my favourite parts about CakePHP. Because that's why CakePHP isn't bloated piece composed of hundreds of OS projects like the Akelos Framwork (http://trac.akelos.org/) is, which weights over 5mb by default. So personally I don't think the origin of this policy is that they only want stuff invented by the CakePHP core team, but that they want to have the best quality with the least bloat, and that is what I like.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-375c-4c8c-9944-435fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=627a6f9b10c229d749ac5c1ce076899a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Romas&nbsp;						</strong>
+						<strong>said 
+						on Oct 11, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sadly I didn't manage to get this example running:( A short more detailed explanation would be more than welcome...  I get the following error: Warning: require_once(cake\libs\set.php) [function.require-once]: failed to open stream: No such file or directory. Of course I couldn't find a file named set.php... should there be one? where can I get one?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-1fe8-47d8-8822-4eaecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 11, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Romas: Are you using Cake 1.2? If not you might have to copy more then just the xml.php file to your vendors folder and include it manually.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-d99c-461f-9fe6-401acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=627a6f9b10c229d749ac5c1ce076899a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Romas&nbsp;						</strong>
+						<strong>said 
+						on Oct 12, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>No, I am using v 1.1.8.3544. Version 1.2 isn't out yet, is it?  Anyway, I couldn't find place to get it. Any place to download it?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dde-8874-48ca-a918-4f8ecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 12, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It's not out, no. But you can get it from the 1.2 SVN branch by using svn export.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dde-a6a8-4f3a-89b6-4ff1cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=627a6f9b10c229d749ac5c1ce076899a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Romas&nbsp;						</strong>
+						<strong>said 
+						on Oct 12, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for help. That is my first dive into SVN repository:)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-2290-4eea-bdc6-4eb6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1a09d6ee1bf38b683069e442d5bd6e47&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Richard&nbsp;						</strong>
+						<strong>said 
+						on Oct 24, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi,</p>
+<p>I upgraded to Cake 1.2 to try this out but cannot get to work. I have no problem using your example but cannot parse XML below   ..any ideas?</p>
+<p>  WebService<br />
+  password</br></p>
+<p>      104<br />
+      67</br></p>
+<p>      Single<br />
+      1</br><br />
+      2006-12-10T00:00:00</br><br />
+      1</br><br />
+      2</br><br />
+      210</br></p>
+<p>      Internet Rate Single</p>
+<p>      105<br />
+      68</br><br />
+      Double</br><br />
+      2</br></p>
+<p>      2006-12-10T00:00:00<br />
+      1</br><br />
+      2</br><br />
+      230</br><br />
+      Internet Rate Double</br></p>
+<p>      106<br />
+      85</br><br />
+      Suite</br><br />
+      4</br><br />
+      2006-12-10T00:00:00</br></p>
+<p>      1<br />
+      2</br><br />
+      350</br><br />
+      Internet Rate Suite</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-2a9c-4098-9369-4c6acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1a09d6ee1bf38b683069e442d5bd6e47&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Richard&nbsp;						</strong>
+						<strong>said 
+						on Oct 24, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>OK, my above code example obviously doesn't work!  ..you can view XML here: http://dev.mincapartments.com/test.xml</p>
+<p>Thanks!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-9990-4629-b346-4282cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=999fca25a3b0a6e6808d68ccffd68e60&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rss-blogger.de" rel="nofollow">Siegfried Hirsch</a>						</strong>
+						<strong>said 
+						on Oct 24, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hello Felix,<br />
+thanks a lot for this hint. I am still using 1.1.8.3544 and I wanted to mention, that I had to download the xml.php AND set.php from svn. </br></p>
+<p>After installing xml.php in the vendors directory and using: vendor('xml'); instead of uses('Xml'); and putting the set.php into the right directory cake/libs everything else worked very well.</p>
+<p>Makes a lot of sense, because now technorati, del.icio.us and alexa are just a link away ;-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-75cc-4368-87a1-493ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f116483e95c0666d887d5f24089bc07b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Eric&nbsp;						</strong>
+						<strong>said 
+						on Nov 13, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi, I install the set.php and xml.php into my cake/lib,  and I use , I can get the following display:</p>
+<p>CakePHP Rapid Development</p>
+<p>XML Object<br />
+(</br><br />
+    [__parser] =&gt; Resource id #38</br><br />
+    [__file] =&gt;</br><br />
+    [__rawData] =&gt; </br></p>
+<p>	http://www.thinkingphp.org<br />
+	Just another WordPress weblog</br><br />
+	Fri, 10 Nov 2006 05:53:08 +0000</br><br />
+	http://wordpress.org/?v=2.0.4</br><br />
+	en</br><br />
+        ... ...</br></p>
+<p>When I use the view file for xml_test/index.thtml<br />
+childNodes[0]-&gt;childNodes[0]-&gt;childNodes as $Node): ?&gt;</br><br />
+name=='item'): ?&gt;</br><br />
+... ...</br></p>
+<p>I can't get the result, instead of<br />
+Warning: Invalid argument supplied for foreach() in</br><br />
+D:\Program Files\xampp\htdocs\cake\app\views\xml_test\index.thtml on line 5</br></p>
+<p>Why it happend ?<br />
+I have 1.10 installed.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-0274-4ba1-bc2f-4388cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Nov 17, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I just found out that the childNotes variable has been renamed to children and that my code above won't work any longer. Check out this changeset to see what it's all about: https://trac.cakephp.org/changeset/3804 .</p>
+<p>Thanks to Marcin Domanski aka kabturek (http://kabturek.info) for pointing it out to me via email.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-7edc-4058-ac80-4e22cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bd6a1eda386bc697491b9ab8c7f42bd3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.esthesie.fr" rel="nofollow">Maxim</a>						</strong>
+						<strong>said 
+						on Jan 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Will there be one day any xpath function to this xml lib? :'(</p>
+<p>(P.S. : the above link to trac points to the changeset "3804."  -&gt; notice the dot. It should be "3804" without the dot because it is considered as a float number or something like that)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-6e88-44e3-b7f0-48f4cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Maxim: Dunno if there will be xpath support. I'm somebody who does not particularly like XML so I'm not missing it. However, I can see how it would come handy if one has to work with XML a lot ...</p>
+<p>PS: I fixed the link above - thx.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-3c90-40bc-b9e2-4333cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=74f94f3d280c03dea39e21df2bdb00a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://mandysingh.blogspot.com" rel="nofollow">Mandy</a>						</strong>
+						<strong>said 
+						on Feb 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Using the new xml.php file, I was able to get this to work:</p>
+<p>I wanted to contact the youtube dev api to get the thumbnail url and for that I did -</p>
+<p>    vendor('xml');<br />
+    $file = "http://www.youtube.com/a...";</br><br />
+    $Feed =&amp; new XML($file);</br><br />
+    foreach ($Feed-&gt;children[0]-&gt;children[0]-&gt;children as $Node)</br><br />
+    {</br><br />
+      if ($Node-&gt;name=='thumbnail_url')</br><br />
+      {</br><br />
+        $thumbnail = $Node-&gt;value;</br><br />
+        debug($thumbnail);</br><br />
+      }</br><br />
+    }</br></p>
+<p>Thanks,<br />
+Mandy.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-c964-493f-b0db-4edacbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Awesome Mandy! Hope you don't spend all day on youtube.com now ... ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-dcec-4380-879b-4c37cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0ddfd368b2858f83f017c5ba40f43f17&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://snowdog.pl" rel="nofollow">snowdog</a>						</strong>
+						<strong>said 
+						on Nov 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Another change to the core: 'getChild' was replaced by 'child'...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

@@ -1,0 +1,751 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>New router goodies &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/new-router-goodies:480f4dd6-4d40-4405-908d-4cd7cbdd56cb">New router goodies</a></h2>	<div class="posted-on">
+		<p>Posted on 3/3/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>here are a couple cool things that the Router class can do for you in the <a href="https://svn.cakephp.org/repo/branches/1.2.x.x/">latest SVN:HEAD of CakePHP</a>.</p>
+<h3>Reverse routing</h3>
+<p>You might have heard that instead of the good old $html->link('My post title', '/posts/view/5') you are now supposed to use the much more verbose:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$html</span>-&gt;<span class="me1">link</span><span class="br0">&#40;</span><span class="st0">'My post title'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp;<span class="st0">'controller'</span> =&gt; <span class="st0">'posts'</span>,<br />
+&nbsp; &nbsp;<span class="st0">'action'</span> =&gt; <span class="st0">'view'</span>,<br />
+&nbsp; &nbsp;<span class="nu0">5</span><br />
+<span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>But have you also been told what the advantage is? Because come on, '/posts/view/5' makes a lot of sense and is much less of a hassle to type. So there must be a reason for going the verbose route (no pun intended ; ).</p>
+<p>The reason for the new syntax can be found in a new feature for the Router called <strong>"reverse routing"</strong>. Essentially it does the exact oposite of what the Router normally does for you. Instead of taking a string url and mapping it to a controller:action, it takes a list of parameters and looks for the route matching them and spits out the corresponding url string. Confused? Don't be, its easy. If we take our example from above and assume that we have a route like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+Router::<span class="me2">connect</span><span class="br0">&#40;</span><span class="st0">'/hot_posts/*'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'controller'</span> =&gt; <span class="st0">'posts'</span>, <span class="st0">'action'</span> =&gt; <span class="st0">'view'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>Then our 'My post title' link will suddenly point to '/hot_posts/5' instead of '/posts/view/5'. What happened is that the router did a reverse lookup and noticed that you'd like to map your Posts::view($id) action to a different url than CakePHP normally would. So instead of returning you the default one, the router returned your own customized url to you.</p>
+<h3>Route parameters</h3>
+<p>Another cool thing supported by the 1.2 Router are <strong>route parameters</strong>. Essentially they are the ':something' parts you might have seen in Router::connect calls before. Lets say you got sick of your wordpress blog and want to convert it to CakePHP. One of the things you need to take care of is to make sure that you don't break any legacy urls because otherwise Google will stop loving you. The most common url pattern one should try to keep is the '/yyyy/mm/dd/post-title' one. With the new Router this can easily be accomplished using route parameters:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+Router::<span class="me2">connect</span><span class="br0">&#40;</span><span class="st0">'/:year/:month/:day/:title'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'controller'</span> =&gt; <span class="st0">'legacy_urls'</span>, <span class="st0">'action'</span> =&gt; <span class="st0">'map'</span><span class="br0">&#41;</span>, <br />
+&nbsp; &nbsp;<a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'year'</span> =&gt; <span class="re0">$Year</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'month'</span> =&gt; <span class="re0">$Month</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'day'</span> =&gt; <span class="re0">$Day</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'title'</span> =&gt; <span class="st0">'.+'</span>,<br />
+&nbsp; &nbsp;<span class="br0">&#41;</span><br />
+<span class="br0">&#41;</span>;</div>
+<p>To explain, :year/:month/:day/:title are placeholder variable that are called route parameters. For each one of those placeholders you can define your own regex to match them in the 3rd param of Router::connect. CakePHP also provides you with some default regex to make your life easier. Currently those are: $Action, $Year, $Month, $Day, $ID and $UUID. An easy way to find out what they do is to <a href="https://trac.cakephp.org/browser/branches/1.2.x.x/cake/libs/router.php#L80">look at the Router::__named property</a>.</p>
+<h3>Getting fancy with passing route parameters</h3>
+<p>If you've been reading my blog for a while then you might know that I'm <a href="http://www.thinkingphp.org/2006/09/18/dessert-11-welcome-back-friendly-urls/">in love with a certain url pattern</a>. For those who don't, here is the synopsis. Instead of /posts/view/5 I like my urls to look like /posts/5:my-post-title. I don't want go into the many advantages of those urls right now (this will be a separate post). But instead I want to show you how they can be accomplished using the 1.2 router without any custom hacking:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+Router::<span class="me2">connect</span><span class="br0">&#40;</span><span class="st0">'/posts/:id::url_title'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'controller'</span> =&gt; <span class="st0">'posts'</span>, <span class="st0">'action'</span> =&gt; <span class="st0">'view'</span><span class="br0">&#41;</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp;<span class="st0">'pass'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'id'</span>, <span class="st0">'url_title'</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp;<span class="st0">'id'</span> =&gt; <span class="st0">'[<span class="es0">\d</span>]+'</span><br />
+<span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>To explain: What I do here is to define a url with two route parameters (id, url_title) which I separate using a colon (:id::url_title). Then I tell the router to map all matching /posts/&lt;id&gt;:&lt;url_title&gt; urls to the PostsController::view action. In the next parameter I specify that a valid id is made up of digits only (I could also use $ID for that). Now the interesting part is the new 'pass' key in the 3rd param. What it essentially does is to tell the router to take the matched 'id' and 'url_title' and pass it into the PostsController::view($id, $url_title = null) action. This is very convenient since you can now directly pass any route parameter into an action instead of having to access it via $this->params['url_title]. It also means you can use the same code to handle /posts/view/5 as you use for /posts/5:my-post-title.</p>
+<h3>Reverse Routing, again</h3>
+<p>Oh well, but what is if I ever change my mind about the entire /posts/&lt;id&gt;:&lt;url_title&gt; thing? The answer is to use reverse routing in all your links:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$html</span>-&gt;<span class="me1">link</span><span class="br0">&#40;</span><span class="st0">'My post title'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp;<span class="st0">'controller'</span> =&gt; <span class="st0">'posts'</span>,<br />
+&nbsp; &nbsp;<span class="st0">'action'</span> =&gt; <span class="st0">'view'</span>,<br />
+&nbsp; &nbsp;<span class="st0">'id'</span> =&gt; <span class="nu0">5</span>,<br />
+&nbsp; &nbsp;<span class="st0">'url_title'</span> =&gt; <span class="st0">'my-post-title'</span><br />
+<span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>This will as you might already expect return a link pointing to '/posts/5:my-post-title'. If you ever want to change your url style, all you have to do is to change the route, and voila, all links will follow. But it gets even better if you apply a little abstraction with creative usage of your Post model as a namespace:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> Post <span class="kw2">extends</span> AppModel<span class="br0">&#123;</span><br />
+&nbsp; &nbsp;<a href="http://www.php.net/static"><span class="kw3">static</span></a> <span class="kw2">function</span> url<span class="br0">&#40;</span><span class="re0">$id</span>, <span class="re0">$base</span> = <span class="kw2">false</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/is_array"><span class="kw3">is_array</span></a><span class="br0">&#40;</span><span class="re0">$id</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="re0">$post</span> = <span class="re0">$id</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$post</span><span class="br0">&#91;</span><span class="st0">'Post'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$post</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Post'</span> =&gt; <span class="re0">$post</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="re0">$post</span> = ClassRegistry::<span class="me2">init</span><span class="br0">&#40;</span><span class="st0">'Post'</span><span class="br0">&#41;</span>-&gt;<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'first'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'conditions'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Post.id'</span> =&gt; <span class="re0">$id</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'fields'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'id'</span>, <span class="st0">'url_title'</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'recursive'</span> =&gt; <span class="nu0">-1</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$post</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> Router::<span class="me2">url</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'controller'</span> =&gt; <span class="st0">'posts'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'action'</span> =&gt; <span class="st0">'view'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'id'</span> =&gt; <span class="re0">$post</span><span class="br0">&#91;</span><span class="st0">'Post'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'id'</span><span class="br0">&#93;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'url_title'</span> =&gt; <span class="re0">$post</span><span class="br0">&#91;</span><span class="st0">'Post'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'url_title'</span><span class="br0">&#93;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'base'</span> =&gt; <span class="re0">$base</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp;<span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span>;</div>
+<p>Now you can simply link to any given Post in your application with the following code:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$html</span>-&gt;<span class="me1">link</span><span class="br0">&#40;</span><span class="st0">'My post title'</span>, Post::<span class="me2">url</span><span class="br0">&#40;</span><span class="nu0">5</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>Or if you loop through a series of posts:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$posts</span> <span class="kw1">as</span> <span class="re0">$post</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp;<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$html</span>-&gt;<span class="me1">link</span><span class="br0">&#40;</span><span class="re0">$post</span><span class="br0">&#91;</span><span class="st0">'Post'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'title'</span><span class="br0">&#93;</span>, Post::<span class="me2">url</span><span class="br0">&#40;</span><span class="re0">$post</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Note that in the second example no database query will be issued (which is very desirable if you are inside of a view).</p>
+<p>Alright, I hope this is useful for those of you who didn't look into all of the new Router stuff. I'll also do a post on the new REST functionality soon, so stay tuned.</p>
+<p>-- Felix Geisendörfer aka the_undefined</p>
+<p>PS: Feel free to ask any router related questions in the comments section.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-4d40-4405-908d-4cd7cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnew-router-goodies%3A480f4dd6-4d40-4405-908d-4cd7cbdd56cb &amp;title=New+router+goodies';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnew-router-goodies%3A480f4dd6-4d40-4405-908d-4cd7cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnew-router-goodies%3A480f4dd6-4d40-4405-908d-4cd7cbdd56cb&amp;title=New+router+goodies&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnew-router-goodies%3A480f4dd6-4d40-4405-908d-4cd7cbdd56cb&amp;title=New+router+goodies';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/new-router-goodies:480f4dd6-4d40-4405-908d-4cd7cbdd56cb">32 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/new-router-goodies:480f4dd6-4d40-4405-908d-4cd7cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4df7-8ea8-45fe-b0c8-4415cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c28cbc5ff5f63a4fa191af3bb49a36a7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.nateklaiber.com" rel="nofollow">Nate Klaiber</a>						</strong>
+						<strong>said 
+						on Mar 03, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It's nice to see route recognition show up in Cake, that makes it much more flexible for larger applications. Also, You have some good examples of its usage.</p>
+<p>Some would sway against using PHP to build the link, thinking it is easier to just use HTML - but the flexibility you get in the long run makes it worth it. You can change routes without worrying about changing a ton of links (not that I recommend changing your URL structure often, but for development purposes).</p>
+<p>I thought I saw mentioned somewhere that Cake was getting RESTful support? (or maybe they already have). Does that get bundled with recognized URL's as well?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-5fb0-48a9-a39f-4d0fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f4112f3023c643bf2f7b32c9c5dcfcba&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakebaker.42dh.com" rel="nofollow">Daniel Hofstetter</a>						</strong>
+						<strong>said 
+						on Mar 03, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It is probably a theoretical issue, but how does the reverse routing deal with the ambiguity you have if multiple routes point to the same controller action?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-7228-4b6d-90b4-48b0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b827ecd1c6f54af0be4a762de2202214&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://renovatioweb.com" rel="nofollow">Martin Bavio</a>						</strong>
+						<strong>said 
+						on Mar 03, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Dude, you are my hero. Thanks for this superb class of such a misterious topic.</p>
+<p>Martin B</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-7f8c-42a0-bccb-44d0cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 03, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Daniel: Pretty sure the Router will use the first matching route (this goes for normal routing as well as reverse routing). Thats why you should always define your most specific routes first.</p>
+<p>Nate: CakePHP has full REST support now, I'll do a post on it soon. Meanwhile check Router::mapResources($controller) to get an idea of how it works.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-3190-44a0-8fb6-4f78cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=609f4e7c8f383061fba78bd1dd6fcc84&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Bert VdB&nbsp;						</strong>
+						<strong>said 
+						on Mar 03, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Very informative post on routing !</p>
+<p>My current solution for this reverse routing problem was to use 1 helper name UrlHelper that contains all my logic for creating url's.</p>
+<p>The disadvantage of this solution is that you need to keep routes.php and UrlHelper synchronized, but it's nice to have all url creation in 1 place which allows for easy url updating.</p>
+<p>I'm not quite sure if the UrlHelper is still of any use when you can use Reverse Routing ... I'm going to give that some thought :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-bf0c-4ce0-a2d8-4504cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=692152846270156fcfc529a8678b0698&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.pagebakers.nl" rel="nofollow">Eelco Wiersma</a>						</strong>
+						<strong>said 
+						on Mar 03, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I was already using these techniques for a project last few weeks, saved me alot of time and hacking. I didn't know about the 'pass' option, this makes things even more sweet!</p>
+<p>cheers</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-f6fc-4f21-8c0e-4183cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 03, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Eelco: 'pass' has only been added in the last 3 days ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-c144-4fc0-8201-4d14cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cherryonthe.popnews.com/2008/03/04/il-y-a-une-route/" rel="nofollow">Cherry on the&#8230; &raquo; Il y a une route</a>						</strong>
+						<strong>said 
+						on Mar 04, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Felix Geisendörfer aka the_undefined a publié hier une petite présentation très utile concernant les derniers ajouts à la gestion des routes sous CakePHP. Il faut utiliser la dernière version du SVN pour en profiter, mais j&#8217;ai déjà pu expérimenter les bienfaits du reverse routing : en gros, quelle que soit le schéma d&#8217;URL que vous avez défini dans route.php, les liens générés dans vos views en utilisant le helper $html-&gt;link le reflèteront bien, sans besoin de mise à jour. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-3f9c-4fb0-b97c-4bd1cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=51601384d074ea2b9ae699ab3f48dbc7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Terr&nbsp;						</strong>
+						<strong>said 
+						on Mar 04, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great article. Certainly not the easiest subject to grasp, but your examples give some good ideas on how to use this.</p>
+<p>I'm not really fond of the change to $html-&gt;url. I can understand why they did it, it's just like the changes to $form-&gt;create, but some shorthand methods would help Cake's rapid development image we all know and love and the tidyness of our view templates. Maybe I'll make some myself and send them in as a patch (if there aren't some already).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-0b3c-4253-bf6d-4d3fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=782ed167b5c2c2563480ad62727f6b08&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.bruechner.de" rel="nofollow">Simon Brüchner</a>						</strong>
+						<strong>said 
+						on Mar 04, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I allready thought of something like this (cool feature)!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-e4a0-49b6-98f0-4500cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 04, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Terr: You can still use HtmlHelper::url / Router::url with simple string parameters, which in fact I also still do a lot. But whenever you do this you loose the advantages of reverse routing, so keep that in mind.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-d3c4-44cb-9b1c-4c32cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6cacda6f9cdac54d60f51d6190631fd8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							nao&nbsp;						</strong>
+						<strong>said 
+						on Mar 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix, related to your enchancement, this ticket : https://trac.cakephp.org/ticket/4293</p>
+<p>Tell me if I am wrong.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-98a0-4b4e-a240-4453cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bc6a5fb920b23608043441b9e2aae33d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							darkangel&nbsp;						</strong>
+						<strong>said 
+						on Mar 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>Is it not possible to mix named params and regex in the same path element?</p>
+<p>e.g. /forums/.+-:id\.html</p>
+<p>Even: /forums/:slug-:id\.html doesn't seem to work.</p>
+<p>/forums/:slug-:id works, but it's not exactly what I'm looking for.</p>
+<p>Thanks.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-a10c-4146-a263-43f9cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>darkangel: Not sure if regex usage is supposed to work in routes. However, you can define a matching regex for named params which should mostly solve the problem. About '.html', you might want to investigate on Router::parseExtensions(), that should help.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-2894-4f2d-ae52-4a29cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bc6a5fb920b23608043441b9e2aae33d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							darkangel&nbsp;						</strong>
+						<strong>said 
+						on Mar 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix: Hmmm, I'm using regex in other routes (without named params), to implement our shared love -- /model/123:title-slug ... using: /model/(\d{1,4}):.+</p>
+<p>The above is similar to the route in my initial question, where I'm trying to match the slug but not capture it (not really an issue, since I'm eventually going to use the slug to check for a valid URL [suggested by AD7six]).</p>
+<p>Thanks for the parseExtensions() tip -- it works.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-af1c-4ae9-920f-4269cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=acc5b3654de177e6c0306d2f6964b674&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.munitic.com.hr" rel="nofollow">Ivica Munitic</a>						</strong>
+						<strong>said 
+						on Mar 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>For me your code does not work. Instead of /posts/1:my-first-post i get /posts/view/1/url_title:my-first-post. I can't find out what I'm doing wrong.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-5f40-4965-b757-4870cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ivica: Are you using the latest nightly / svn version of Cake 1.2?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-80bc-490e-8ca8-4455cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=acc5b3654de177e6c0306d2f6964b674&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.munitic.com.hr" rel="nofollow">Ivica Munitic</a>						</strong>
+						<strong>said 
+						on Mar 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix: Yes from https://svn.cakephp.org/repo/trunk/cake/1.2.x.x/ revision 6613</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-c6b0-470a-92ea-4192cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=acc5b3654de177e6c0306d2f6964b674&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.munitic.com.hr" rel="nofollow">Ivica Munitic</a>						</strong>
+						<strong>said 
+						on Mar 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix: Here are my routes, model and view<br />
+http://bin.cakephp.org/view/1112036488</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-6bd0-43d3-a7a9-44cacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=acc5b3654de177e6c0306d2f6964b674&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.munitic.com.hr" rel="nofollow">Ivica Munitic</a>						</strong>
+						<strong>said 
+						on Mar 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well  it seems I used the wrong repository ... isted of branches/1.2.x.x i used trunk :)<br />
+Now it works.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-c0b4-4568-8048-4a0ccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ivica: Cool : )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-41a4-4395-bf5b-498acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bc06c3fb7ef65eb090f48535a9d92500&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.rizn.info" rel="nofollow">purepear</a>						</strong>
+						<strong>said 
+						on Apr 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yep... the trunk still doesn't contain these changes. I got the head revision and it worked! :) ... Great tutorial.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df9-bbc0-4ac2-baa2-46d4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=df6a56352c6503ac24c26fb3521cca56&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							David Persson&nbsp;						</strong>
+						<strong>said 
+						on Apr 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Reverse routing isn't working for me in plugin views while it does in normal app views.<br />
+I always get /posts/view/1/url_title:my-first-post instead of /posts/1:my-first-post similiar to what Ivica encountered. I'm using revision 6707of the 1.2 branch... maybe this is ticket worth?</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df9-7474-4b16-bfe8-4c20cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>try to add a: plugin => null key to your url array. If that does not help, open a ticket.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df9-2ad0-478b-a633-4ca7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=df6a56352c6503ac24c26fb3521cca56&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							David Persson&nbsp;						</strong>
+						<strong>said 
+						on Apr 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hell yes, that works! My greetings to Berlin!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-481288b4-f230-468b-b977-0e0c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d794fcafc238a9560a663a8eb09543d4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://php.abdullahsolutions.com" rel="nofollow">Abdullah Zainul Abidin</a>						</strong>
+						<strong>said 
+						on Apr 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,<br />
+Great tutorial. Really opens up my mind as to what routing in cakephp can do. So I've been trying to be a little creative but couldn't get it to work. You see, I'm building a sort of community website kind of application. And I'd like the url's to be of the pattern /[community name]/[controller]/[action]/. And so I set up a route like so:</br><br />
+Router::connect('/:community/:controller/:action/:id',array(),array('pass'=>array('community','id')));</br><br />
+And it works okay. But one problem I have is that there is some controllers which are not community specific and so I'd like them to route like normal but I can't get it to work. Any idea of how I can specify which controller to route like normal and anything other than them route it like the above example? Thank you.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4812ded8-e740-4d8a-a645-0d2b4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Abdullah: Hop on irc, I can't really help unless I see what you do. Normally the router should pick the right url if you don't supply a community parameter.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4814ff75-b920-4e08-9d11-64544834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d794fcafc238a9560a663a8eb09543d4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://php.abdullahsolutions.com" rel="nofollow">Abdullah Zainul Abidin</a>						</strong>
+						<strong>said 
+						on Apr 27, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thank you for your reply. I did not check back till much later. And I have found a work to make it work so far. Now my router is like this:<br />
+	Router::connect('/:controller/:action/*',array(),array('controller'=>'users|communities'));</br><br />
+	Router::connect('/:community/:controller/:action/*',array(),array('pass'=>array('community')));</br><br />
+	Router::connect('/:community/:controller/:action/:id/*',array(),array('pass'=>array('community','id')));</br></p>
+<p>And that seems to work fine for now. My main problem is that the community part could be any alphanumeric value. I wanted it to be redirected to a community does not exists if the specific controllers are not stated. So the first line seems to work for detecting that these are the controllers allowed and passed on like normal. All others would be captured and later directed to the proper community or no community page. Haven't tested it thoroughly yet though because there's a lot of links to start adding the community part. Thank you again.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-483a8812-37dc-4044-b2a9-4e514834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f4a29ad2f64c836852f3f24457398e37&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Marek Zwick&nbsp;						</strong>
+						<strong>said 
+						on May 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Maybe this could be interesting for you:<br />
+<a rel="nofollow" href="http://www.webonorme.net/forums/rest-and-resource-handling-with-cakephp-paul-reinheimer.htm">http://www.webonorme.net/forums/rest-and-resource-handling-with-cakephp-paul-reinheimer.htm</a></br></p>
+<p>It' an interesting tutorial about RESTful routing and handling of diferent content types (XML...)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-487dd1f6-63ac-4e36-8cd6-2d044834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=eb332354a0322d736265cfac80e650b9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Edwin&nbsp;						</strong>
+						<strong>said 
+						on Jul 16, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Is it possible to get this working with pagination? I'd like an URL like this -> model/:id-:url_title-:page but i haven't got any luck yet with getting it working. Thanks, great post!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48c809d0-ffc8-4f7c-a43d-0d714834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8d2435a56d548bfb66e5069458781d44&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							anthony&nbsp;						</strong>
+						<strong>said 
+						on Sep 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I was attempting to do some reverse routing with a named parameter 'page' and couldn't get a working reverse route. So I copied your reverse routing example for the /posts/:id::url_title, which worked perfectly. But if you change 'id' to 'page' it no longer work. Any way to fix this?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ea41a7-e310-4516-80fe-3cae4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c01f230403f49bd820309093d6e010ee&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Oscar&nbsp;						</strong>
+						<strong>said 
+						on Oct 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ran into an issue with this solution today.. Validation with 'rule'=>'url' doesn't work :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

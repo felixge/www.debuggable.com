@@ -1,0 +1,759 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Blog &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="paging">
+	<a href="/posts/index/page:43" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:40">40</a></span> | <span><a href="/posts/index/page:41">41</a></span> | <span><a href="/posts/index/page:42">42</a></span> | <span><a href="/posts/index/page:43">43</a></span> | <span class="current">44</span> | <span><a href="/posts/index/page:45">45</a></span> | <span><a href="/posts/index/page:46">46</a></span> | <span><a href="/posts/index/page:47">47</a></span> | <span><a href="/posts/index/page:48">48</a></span> <a href="/posts/index/page:45" class="next">Next &raquo;</a></div>
+	<div class="post">
+	<h2><a href="/posts/composing-methods-split-temporary-variable:480f4dfe-1e28-4e32-b4b3-458ccbdd56cb">Composing Methods: Split Temporary Variable</a></h2>	<div class="posted-on">
+		<p>Posted on 2/7/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><strong>When you have the same temporary variable assigned to more than once, split it up into two, unless it is a loop variable.</strong></p>
+<h1>Motivation</h1>
+<p>Temporary variables have various uses. They can be used as counters in loops, as collecting variables building up a result or as simple containers containing the result of a long-winded expression for easy reference.</p>
+<p>These kinds of variables (containers) should be assigned to only once. Else one could think they have more than one responsibility, resulting in your code being less readable. Using a temp for two things is very confusing for the reader. Introduce a new temp for every new thing.</p>
+<p>Don't listen to the performance people who say that introducing another variable will use up more memory unnecessarily. Optimize your application where it is having performance bottlenecks and don't believe such silly crap. Registering a new variable within your memory will not eat it up - especially not these days where at least one Gig of RAM is common among the webhosters. </p>
+<p>Readable code will lead you to refactorings that will improve upon the application's speed enormously anyway. If you hadn't done the refactoring you would have never gotten the chance of seeing that performance bottleneck in the first place.</p>
+<h1>Mechanics</h1>
+<ol>
+<li>Change the name of a temp at its declaration and its first assignment. Don't change collecting or building variables (like $i = $i + some expression; $i .= some expression, etc.).</li>
+<li>Change all references of the temp up to its second assignment.</li>
+<li>Declare and name a new temp at the second assignment of the old temp.</li>
+<li>Repeat the stages, renaming at the declaration and changing references until the next assignment.</li>
+</ol>
+<h1>Example Code</h1>
+<p>When calculating two things for the same object, having the same temp for both calculations is quite common. Let's look at a possible scenario for a rectangle and fix it up:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> rectangle<span class="br0">&#40;</span><span class="re0">$width</span>=<span class="nu0">1</span>, <span class="re0">$height</span>=<span class="nu0">1</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$temp</span> = <span class="nu0">2</span> * <span class="br0">&#40;</span><span class="re0">$width</span> + <span class="re0">$height</span><span class="br0">&#41;</span>;<br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;Perimter: $temp <br />
+&quot;</span>;<br />
+&nbsp; <br />
+&nbsp; <span class="re0">$temp</span> = <span class="re0">$width</span> * <span class="re0">$height</span>;<br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;Area: $temp&quot;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>As you see, $temp is used for both the perimeter and the area computation. It is still readable within that example, but imagine slightly more complicated code. Wouldn't you want the code to look something like the following then instead?</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> rectangle<span class="br0">&#40;</span><span class="re0">$width</span>=<span class="nu0">1</span>, <span class="re0">$height</span>=<span class="nu0">1</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$perimeter</span> = <span class="nu0">2</span> * <span class="br0">&#40;</span><span class="re0">$width</span> + <span class="re0">$height</span><span class="br0">&#41;</span>;<br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;Perimter: $perimeter <br />
+&quot;</span>;<br />
+&nbsp; <br />
+&nbsp; <span class="re0">$area</span> = <span class="re0">$width</span> * <span class="re0">$height</span>;<br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;Area: $area&quot;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Always introduce a new temp for a different thing. Performance most often is not an issue. Make your code readable, please.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-1e28-4e32-b4b3-458ccbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcomposing-methods-split-temporary-variable%3A480f4dfe-1e28-4e32-b4b3-458ccbdd56cb &amp;title=Composing+Methods%3A+Split+Temporary+Variable';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcomposing-methods-split-temporary-variable%3A480f4dfe-1e28-4e32-b4b3-458ccbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcomposing-methods-split-temporary-variable%3A480f4dfe-1e28-4e32-b4b3-458ccbdd56cb&amp;title=Composing+Methods%3A+Split+Temporary+Variable&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcomposing-methods-split-temporary-variable%3A480f4dfe-1e28-4e32-b4b3-458ccbdd56cb&amp;title=Composing+Methods%3A+Split+Temporary+Variable';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/composing-methods-split-temporary-variable:480f4dfe-1e28-4e32-b4b3-458ccbdd56cb">4 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/composing-methods-split-temporary-variable:480f4dfe-1e28-4e32-b4b3-458ccbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/composing-methods-introduce-explaining-variable:480f4dfe-23f4-4fa4-b586-413fcbdd56cb">Composing Methods: Introduce Explaining Variable</a></h2>	<div class="posted-on">
+		<p>Posted on 2/7/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><i>Introduce Explaining Variable</i></p>
+<p> <strong>When you have a complicated expression that clutters up your code, introduce temporary variables for parts of the expression so the expression itself is readable again.</strong></p>
+<h1>Motivation</h1>
+<p> Expressions can become very complex and hard to read. In such a circumstance temporary variables can be very helpful to maintain the readability of your code.</p>
+<p> <i>Introduce Explaining Variable</i> is particularly useful with long if-statements. You can take each condition, introduce an explaining variable and the conditional logic will read very well.<br />
+ Another occasion is a long algorithmn where each step in the calculation can be explained with a well-named temporary variable.</p>
+<p> If you ask me you should prefer <a href="http://php-coding-practices.com/refactoring/composing-methods/how-to-compose-methods-the-extract-method-refactoring/">Extract Method</a> if you can, because more smaller methods are usually more readable and (re-)usable. However, there are times when Extract method doesn't work, because you the code is too cluttered up. In such a case you should use <i>Introduce Explaining Variable</i><br />
+ to see what's going in the code. Then you can decide whether Extract Method is the way to go.</p>
+<h1>Mechanics</h1>
+<p> The mechanics of <i>Introduce Explaining Variable</i> are very simple:</p>
+<ol>
+<li>Declare a temporary variable and set it to the result of a part of the complex expression.</li>
+<li>Replace the result part of the expression with your new temp.</li>
+<li>Repeat for other parts of the expression.</li>
+</ol>
+<h1>Example Code</h1>
+<p> Okay we start with a calculation for a fictive price of an item. It could look something along the lines of the following:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> price<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp;&nbsp;<span class="co1">// price is base price - quantity discount + extra fee</span><br />
+&nbsp;&nbsp;<span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">quantity</span> * <span class="re0">$this</span>-&gt;<span class="me1">item_price</span> -<br />
+&nbsp;&nbsp;&nbsp; <a href="http://www.php.net/max"><span class="kw3">max</span></a><span class="br0">&#40;</span><span class="nu0">0</span>, <span class="re0">$this</span>-&gt;<span class="me1">quantity</span> - <span class="nu0">200</span><span class="br0">&#41;</span> * <span class="re0">$this</span>-&gt;<span class="me1">item_price</span> * <span class="nu0">0.08</span> +<br />
+&nbsp;&nbsp;&nbsp; <a href="http://www.php.net/min"><span class="kw3">min</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">quantity</span> * <span class="re0">$this</span>-&gt;<span class="me1">item_price</span> * <span class="nu0">0.1</span>, <span class="nu0">100.0</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>You probably agree it's very hard to read. We are in dare need of a comment to maintain readability. Without the comment, not only<br />
+your colleagues would get lost in the code, but so would you. :) We deicde we can introduce a temp for the base price to start things off:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> price<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="co1">// price is base price - quantity discount + extra fee</span><br />
+&nbsp; <span class="re0">$basePrice</span> = <span class="re0">$this</span>-&gt;<span class="me1">quantity</span> * <span class="re0">$this</span>-&gt;<span class="me1">item_price</span>;<br />
+&nbsp; <span class="kw1">return</span> &nbsp;<span class="re0">$basePrice</span> -<br />
+&nbsp; &nbsp; <a href="http://www.php.net/max"><span class="kw3">max</span></a><span class="br0">&#40;</span><span class="nu0">0</span>, <span class="re0">$this</span>-&gt;<span class="me1">quantity</span> - <span class="nu0">200</span><span class="br0">&#41;</span> * <span class="re0">$this</span>-&gt;<span class="me1">item_price</span> * <span class="nu0">0.08</span> +<br />
+&nbsp; &nbsp; <a href="http://www.php.net/min"><span class="kw3">min</span></a><span class="br0">&#40;</span><span class="re0">$basePrice</span> * <span class="nu0">0.1</span>, <span class="nu0">100.0</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Cool, a bit better so far. Now let's go for the quantity discount:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> price<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="co1">// price is base price - quantity discount + extra fee</span><br />
+&nbsp; <span class="re0">$basePrice</span> = <span class="re0">$this</span>-&gt;<span class="me1">quantity</span> * <span class="re0">$this</span>-&gt;<span class="me1">item_price</span>;<br />
+&nbsp; <span class="re0">$quantityDiscount</span> = <a href="http://www.php.net/max"><span class="kw3">max</span></a><span class="br0">&#40;</span><span class="nu0">0</span>, <span class="re0">$this</span>-&gt;<span class="me1">quantity</span> - <span class="nu0">200</span><span class="br0">&#41;</span> * <span class="re0">$this</span>-&gt;<span class="me1">item_price</span> * <span class="nu0">0.08</span>;<br />
+&nbsp; <span class="kw1">return</span> &nbsp;<span class="re0">$basePrice</span> - <span class="re0">$quantityDiscount</span> + <a href="http://www.php.net/min"><span class="kw3">min</span></a><span class="br0">&#40;</span><span class="re0">$basePrice</span> * <span class="nu0">0.1</span>, <span class="nu0">100.0</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Finally, the extra fee (whatever it is, it is evil:p):</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> price<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$basePrice</span> = <span class="re0">$this</span>-&gt;<span class="me1">quantity</span> * <span class="re0">$this</span>-&gt;<span class="me1">item_price</span>;<br />
+&nbsp; <span class="re0">$quantityDiscount</span> = <a href="http://www.php.net/max"><span class="kw3">max</span></a><span class="br0">&#40;</span><span class="nu0">0</span>, <span class="re0">$this</span>-&gt;<span class="me1">quantity</span> - <span class="nu0">200</span><span class="br0">&#41;</span> * <span class="re0">$this</span>-&gt;<span class="me1">item_price</span> * <span class="nu0">0.08</span>;<br />
+&nbsp; <span class="re0">$extraFee</span> = <a href="http://www.php.net/min"><span class="kw3">min</span></a><span class="br0">&#40;</span><span class="re0">$basePrice</span> * <span class="nu0">0.1</span>, <span class="nu0">100.0</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw1">return</span> &nbsp;<span class="re0">$basePrice</span> - <span class="re0">$quantityDiscount</span> + <span class="re0">$extraFee</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Notice that with our last refactoring the code speaks for itself and we should remove the comment altogether, as otherwise it would be<br />
+<a href="http://php-coding-practices.com/agile-software-development/problems-with-repeatitive-source-code-or-better-dont-repeat-yourself/">Duplicate knowledge</a>.</p>
+<p>We could have gone for <a href="http://php-coding-practices.com/refactoring/composing-methods/how-to-compose-methods-the-extract-method-refactoring/">Extract Method</a> as well,<br />
+because small methods for all parts of the price expression would be very neat in an object environment. Why? Because they would be visible to all other methods of the class and can be used there. Initially, they would be private,<br />
+but you can always relax that later to make them visible to other objects as well.</p>
+<p>Here is what this computation would look like with <a href="http://php-coding-practices.com/refactoring/composing-methods/how-to-compose-methods-the-extract-method-refactoring/">Extract Method</a>:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> price<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">return</span> &nbsp;<span class="re0">$this</span>-&gt;<span class="me1">basePrice</span><span class="br0">&#40;</span><span class="br0">&#41;</span> - <span class="re0">$this</span>-&gt;<span class="me1">quantityDiscount</span><span class="br0">&#40;</span><span class="br0">&#41;</span> + <span class="re0">$this</span>-&gt;<span class="me1">extraFee</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">function</span> basePrice<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">quantity</span> * <span class="re0">$this</span>-&gt;<span class="me1">item_price</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">function</span> quantityDiscount<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">return</span> <a href="http://www.php.net/max"><span class="kw3">max</span></a><span class="br0">&#40;</span><span class="nu0">0</span>, <span class="re0">$this</span>-&gt;<span class="me1">quantity</span> - <span class="nu0">200</span><span class="br0">&#41;</span> * <span class="re0">$this</span>-&gt;<span class="me1">item_price</span> * <span class="nu0">0.08</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">function</span> extraFee<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">return</span> <a href="http://www.php.net/min"><span class="kw3">min</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">basePrice</span><span class="br0">&#40;</span><span class="br0">&#41;</span> * <span class="nu0">0.1</span>, <span class="nu0">100.0</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Looking good yes? For this example Extract method is indeed better, but I couldn't think of anything better to explain <i>Introduce Explaining Variable</i> to you. :) Perhaps some kind of conditional logic to check whether we are on IE or Mozilla would have been nice? Argh, too bad. :)</p>
+<p>Cheers!</p>
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-23f4-4fa4-b586-413fcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcomposing-methods-introduce-explaining-variable%3A480f4dfe-23f4-4fa4-b586-413fcbdd56cb &amp;title=Composing+Methods%3A+Introduce+Explaining+Variable';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcomposing-methods-introduce-explaining-variable%3A480f4dfe-23f4-4fa4-b586-413fcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcomposing-methods-introduce-explaining-variable%3A480f4dfe-23f4-4fa4-b586-413fcbdd56cb&amp;title=Composing+Methods%3A+Introduce+Explaining+Variable&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcomposing-methods-introduce-explaining-variable%3A480f4dfe-23f4-4fa4-b586-413fcbdd56cb&amp;title=Composing+Methods%3A+Introduce+Explaining+Variable';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/composing-methods-introduce-explaining-variable:480f4dfe-23f4-4fa4-b586-413fcbdd56cb">1 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/composing-methods-introduce-explaining-variable:480f4dfe-23f4-4fa4-b586-413fcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/how-to-compose-methods-the-extract-method-refactoring:480f4dfe-c0d8-48ac-9d91-4b47cbdd56cb">How To Compose Methods: The Extract Method Refactoring</a></h2>	<div class="posted-on">
+		<p>Posted on 28/6/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><strong>When you have a code fragment that can be grouped together, turn the fragment into a method whose name explains the purpose of the method. Eliminate all conflicts with local variables as you go.</strong></p>
+<h1>Motivation</h1>
+<p>Extract Method is one of the refactorings that you will do most often. It just happens too often that as a deadline comes near people tend to take their programming not as seriously as they should. The result? Godclasses and god methods, that try to do too much. If you manage to break classes down into smaller classes and methods into smaller methods you will be better off for several reasons: your code will read like a series of comments; you give other methods a better chance to use your code; you will make your code a lot more testable. Oh and ou will feel a lot more comfortable about your code.</p>
+<p>Finally, you will also make your code a lot easier accessible for fellow coders and improve your overall reputation within your company. The problem with short methods is the naming. You really have to pay attention to your naming. With many short methods you will end up with really long names that may be longer than the code in their body. That's perfect, though - don't worry about this. If your method names speak for themselves you are on your way to success.</p>
+<p>"So, how long should a method be?" I hear you asking. To me, length is not an issue. They key is the closeness of the method name and the method body. If extracting improves clarity then do it. Even do it, when the new name of the method is longer than its new body.</p>
+<h1>Mechanics</h1>
+<ol>
+<li>Create a new method and name it after the new intention of it (name it by what it does and not by how it does it).</li>
+<li>Copy the code to extract into the new method.</li>
+<li>Check the extracted code for any variables that are local in scope to the source method.</li>
+<li>If any temporary variables are only used within your target method, make them local variables there.</li>
+<li>Make the local-variable checks: See if <a href="http://php-coding-practices.com/refactoring/composing-methods/composing-methods-inline-temp/">Inline Temp</a> or <a href="http://php-coding-practices.com/refactoring/composing-methods/composing-methods-replace-temp-with-query/">Replace Temp With Query</a><br />
+make sense. If one variable is modified, you can most often treat the extracted code as a query and assign the result to the variable concerned. If there are several such variables, don't extract the method and try to encapsulate the temporary variables first.</li>
+<li>Pass local-scope variables from the source method as parameters into the target method.</li>
+<li>Replace the extracted code in the source method with a call to the target method.</li>
+<li>Test.</li>
+</ol>
+<h1>Examples</h1>
+<h2>No Local variables</h2>
+<p>In its simplest case, extract method can be done on the fly and is trivilially easy:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> printHeader <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$output</span> = &lt; &lt;&lt;HTML<br />
+&lt;!DOCTYPE html <span class="kw2">PUBLIC</span> <span class="st0">&quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot;</span> <span class="st0">&quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;</span>&gt;<br />
+&lt;html xmlns=<span class="st0">&quot;http://www.w3.org/1999/xhtml&quot;</span>&gt;<br />
+&lt;head profile=<span class="st0">&quot;http://gmpg.org/xfn/11&quot;</span>&gt;<br />
+<br />
+&nbsp; &lt;title&gt; PHP Coding Practices - Become an expert PHP Programmer&lt;/title&gt;<br />
+&nbsp; &lt;meta http-equiv=<span class="st0">&quot;Content-Type&quot;</span> content=<span class="st0">&quot;text/html; charset=UTF-8&quot;</span> /&gt;&nbsp;<br />
+&nbsp; &lt;meta name=<span class="st0">&quot;generator&quot;</span> content=<span class="st0">&quot;WordPress 2.1.1&quot;</span> /&gt; &lt;!-- leave this <span class="kw1">for</span> stats please --&gt;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;meta name=<span class="st0">&quot;verify-v1&quot;</span> content=<span class="st0">&quot;beuH5Tc0J6zi6YCVt6RnxwIeqR/Zq1WhRwgi7I5hNZo=&quot;</span> /&gt;<br />
+&nbsp; &lt;meta name=<span class="st0">&quot;robots&quot;</span> content=<span class="st0">&quot;index,follow&quot;</span> /&gt;<br />
+&lt;meta name=<span class="st0">&quot;language&quot;</span> content=<span class="st0">&quot;en&quot;</span> /&gt;<br />
+&lt;meta name=<span class="st0">&quot;author&quot;</span> content=<span class="st0">&quot;Tim Koschuetzki&quot;</span> /&gt;<br />
+<br />
+&lt;link rel=<span class="st0">&quot;shortcut icon&quot;</span> href=<span class="st0">&quot;favicon.ico&quot;</span> type=<span class="st0">&quot;image/x-icon&quot;</span> /&gt;<br />
+&lt;link rel=<span class="st0">&quot;stylesheet&quot;</span> href=<span class="st0">&quot;http://php-coding-practices.com/wp-content/themes/digg-3-col/style.css&quot;</span> type=<span class="st0">&quot;text/css&quot;</span> media=<span class="st0">&quot;screen&quot;</span> /&gt;<br />
+&nbsp; &lt;link rel=<span class="st0">&quot;alternate&quot;</span> type=<span class="st0">&quot;application/rss+xml&quot;</span> title=<span class="st0">&quot;RSS 2.0&quot;</span> href=<span class="st0">&quot;http://php-coding-practices.com/feed/&quot;</span> /&gt;<br />
+&nbsp; &lt;link rel=<span class="st0">&quot;alternate&quot;</span> type=<span class="st0">&quot;text/xml&quot;</span> title=<span class="st0">&quot;RSS .92&quot;</span> href=<span class="st0">&quot;http://php-coding-practices.com/feed/rss/&quot;</span> /&gt;<br />
+&nbsp; &lt;link rel=<span class="st0">&quot;alternate&quot;</span> type=<span class="st0">&quot;application/atom+xml&quot;</span> title=<span class="st0">&quot;Atom 0.3&quot;</span> href=<span class="st0">&quot;http://php-coding-practices.com/feed/atom/&quot;</span> /&gt;<br />
+&nbsp; &lt;link rel=<span class="st0">&quot;pingback&quot;</span> href=<span class="st0">&quot;http://php-coding-practices.com/xmlrpc.php&quot;</span> /&gt;<br />
+<br />
+&nbsp; &nbsp; &lt;link rel=<span class="st0">'archives'</span> title=<span class="st0">'June 2007'</span> href=<span class="st0">'http://php-coding-practices.com/2007/06/'</span> /&gt;<br />
+&nbsp; &lt;link rel=<span class="st0">'archives'</span> title=<span class="st0">'May 2007'</span> href=<span class="st0">'http://php-coding-practices.com/2007/05/'</span> /&gt;<br />
+&nbsp; &lt;link rel=<span class="st0">'archives'</span> title=<span class="st0">'April 2007'</span> href=<span class="st0">'http://php-coding-practices.com/2007/04/'</span> /&gt;<br />
+<br />
+&nbsp; &lt;link rel=<span class="st0">'archives'</span> title=<span class="st0">'March 2007'</span> href=<span class="st0">'http://php-coding-practices.com/2007/03/'</span> /&gt;<br />
+&nbsp; &nbsp; <br />
+&lt;!-- META Tags added by Add-Meta-Tags WordPress plugin. Get it at: http:<span class="co1">//www.g-loaded.eu/ --&gt;</span><br />
+&lt;meta name=<span class="st0">&quot;description&quot;</span> content=<span class="st0">&quot;We provide easy-to-read, fun and practical articles about php best coding practices. Implement the tips given and you will become an expert php programmer.&quot;</span> /&gt;<br />
+&lt;meta name=<span class="st0">&quot;keywords&quot;</span> content=<span class="st0">&quot;php coding practices, best practices, php webdevelopment, coding guidelines, coding standards, coding principles, security, test driven development, unit tests, coding practice principle secure&quot;</span> /&gt;<br />
+HTML;<br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$output</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>This function prints the header of http://php-coding-practices.com. We could as easily define it as:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> printHeader <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$output</span> = buildDoctype<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="re0">$output</span> .= buildTitle<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="re0">$output</span> .= buildRelations<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="re0">$output</span> .= buildMetaTags<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$output</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">function</span> buildDoctype<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$output</span> = &lt; &lt;&lt;HTML<br />
+&nbsp; &nbsp; &lt;!DOCTYPE html <span class="kw2">PUBLIC</span> <span class="st0">&quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot;</span> <span class="st0">&quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;</span>&gt;<br />
+&nbsp; &nbsp; &lt;html xmlns=<span class="st0">&quot;http://www.w3.org/1999/xhtml&quot;</span>&gt;<br />
+&nbsp; &nbsp; &lt;head profile=<span class="st0">&quot;http://gmpg.org/xfn/11&quot;</span>&gt;<br />
+HTML;<br />
+&nbsp; <span class="kw1">return</span> <span class="re0">$output</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">function</span> buildTitle<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$output</span> = &lt; &lt;&lt;HTML<br />
+<span class="re1">&nbsp; &nbsp; &lt;title&gt; PHP Coding Practices - Become an expert PHP Programmer</span><br />
+HTML;<br />
+&nbsp; <span class="kw1">return</span> <span class="re0">$output</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">function</span> buildRelations<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$output</span> = &lt; &lt;&lt;HTML<br />
+&nbsp; &nbsp; &lt;link rel=<span class="st0">&quot;shortcut icon&quot;</span> href=<span class="st0">&quot;favicon.ico&quot;</span> type=<span class="st0">&quot;image/x-icon&quot;</span> /&gt;<br />
+&nbsp; &nbsp; &lt;link rel=<span class="st0">&quot;stylesheet&quot;</span> href=<span class="st0">&quot;http://php-coding-practices.com/wp-content/themes/digg-3-col/style.css&quot;</span> type=<span class="st0">&quot;text/css&quot;</span> media=<span class="st0">&quot;screen&quot;</span> /&gt;<br />
+&nbsp; &nbsp; &lt;link rel=<span class="st0">&quot;alternate&quot;</span> type=<span class="st0">&quot;application/rss+xml&quot;</span> title=<span class="st0">&quot;RSS 2.0&quot;</span> href=<span class="st0">&quot;http://php-coding-practices.com/feed/&quot;</span> /&gt;<br />
+&nbsp; &nbsp; &lt;link rel=<span class="st0">&quot;alternate&quot;</span> type=<span class="st0">&quot;text/xml&quot;</span> title=<span class="st0">&quot;RSS .92&quot;</span> href=<span class="st0">&quot;http://php-coding-practices.com/feed/rss/&quot;</span> /&gt;<br />
+&nbsp; &nbsp; &lt;link rel=<span class="st0">&quot;alternate&quot;</span> type=<span class="st0">&quot;application/atom+xml&quot;</span> title=<span class="st0">&quot;Atom 0.3&quot;</span> href=<span class="st0">&quot;http://php-coding-practices.com/feed/atom/&quot;</span> /&gt;<br />
+&nbsp; &nbsp; &lt;link rel=<span class="st0">&quot;pingback&quot;</span> href=<span class="st0">&quot;http://php-coding-practices.com/xmlrpc.php&quot;</span> /&gt;<br />
+&nbsp; <br />
+&nbsp; &nbsp; &nbsp; &lt;link rel=<span class="st0">'archives'</span> title=<span class="st0">'June 2007'</span> href=<span class="st0">'http://php-coding-practices.com/2007/06/'</span> /&gt;<br />
+&nbsp; &nbsp; &lt;link rel=<span class="st0">'archives'</span> title=<span class="st0">'May 2007'</span> href=<span class="st0">'http://php-coding-practices.com/2007/05/'</span> /&gt;<br />
+&nbsp; &nbsp; &lt;link rel=<span class="st0">'archives'</span> title=<span class="st0">'April 2007'</span> href=<span class="st0">'http://php-coding-practices.com/2007/04/'</span> /&gt;<br />
+&nbsp; <br />
+&nbsp; &nbsp; &lt;link rel=<span class="st0">'archives'</span> title=<span class="st0">'March 2007'</span> href=<span class="st0">'http://php-coding-practices.com/2007/03/'</span> /&gt;<br />
+&nbsp; <br />
+HTML;<br />
+&nbsp; <span class="kw1">return</span> <span class="re0">$output</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">function</span> buildMetaTags<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$output</span> = &lt; &lt;&lt;HTML<br />
+&nbsp; &nbsp; &lt;meta http-equiv=<span class="st0">&quot;Content-Type&quot;</span> content=<span class="st0">&quot;text/html; charset=UTF-8&quot;</span> /&gt;&nbsp;<br />
+&nbsp; &nbsp; &lt;meta name=<span class="st0">&quot;generator&quot;</span> content=<span class="st0">&quot;WordPress 2.1.1&quot;</span> /&gt; &lt;!-- leave this <span class="kw1">for</span> stats please --&gt;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;meta name=<span class="st0">&quot;verify-v1&quot;</span> content=<span class="st0">&quot;beuH5Tc0J6zi6YCVt6RnxwIeqR/Zq1WhRwgi7I5hNZo=&quot;</span> /&gt;<br />
+&nbsp; &nbsp; &lt;meta name=<span class="st0">&quot;robots&quot;</span> content=<span class="st0">&quot;index,follow&quot;</span> /&gt;<br />
+&nbsp; &nbsp; &lt;meta name=<span class="st0">&quot;language&quot;</span> content=<span class="st0">&quot;en&quot;</span> /&gt;<br />
+&nbsp; &nbsp; &lt;meta name=<span class="st0">&quot;author&quot;</span> content=<span class="st0">&quot;Tim Koschuetzki&quot;</span> /&gt;<br />
+&nbsp; &nbsp; &lt;meta name=<span class="st0">&quot;description&quot;</span> content=<span class="st0">&quot;We provide easy-to-read, fun and practical articles about php best coding practices. Implement the tips given and you will become an expert php programmer.&quot;</span> /&gt;<br />
+&nbsp; &nbsp; &lt;meta name=<span class="st0">&quot;keywords&quot;</span> content=<span class="st0">&quot;php coding practices, best practices, php webdevelopment, coding guidelines, coding standards, coding principles, security, test driven development, unit tests, coding practice principle secure&quot;</span> /&gt;<br />
+HTML;<br />
+&nbsp; <span class="kw1">return</span> <span class="re0">$output</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Looks much cleaner already, no? Now if we wanted to use variables to build the site title or to load a css file based on user input, then that would be a lot easier than before.</p>
+<h2>Using Local Variables</h2>
+<p>The problem with local variables are parameters passed into the original method and temporaries built in the original method. Local variables are only in scope within the source method and they sometimes cause problems or prevent you from doing the refactoring altogether.</p>
+<p>The easiest case is when the locals are only read, but not changed. In this case you can just pass them in as parameters:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> printSumOfAnyOtherArrayValue<span class="br0">&#40;</span><span class="re0">$array</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$result</span> = <span class="nu0">0</span>;<br />
+&nbsp; <span class="re0">$i</span> = <span class="nu0">0</span>;<br />
+&nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$array</span> <span class="kw1">as</span> <span class="re0">$value</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$i</span>++;<br />
+&nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><span class="re0">$i</span> % <span class="nu0">2</span> == <span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$result</span> += <span class="re0">$value</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;Some HTML Formatting for the result: {$result}&quot;</span>; <span class="co1">// $result is the local in this case</span><br />
+<span class="br0">&#125;</span></div>
+<p>I can extract the printing of the result into its own method:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> printSumOfAnyOtherArrayValue<span class="br0">&#40;</span><span class="re0">$array</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$result</span> = <span class="nu0">0</span>;<br />
+&nbsp; <span class="re0">$i</span> = <span class="nu0">0</span>;<br />
+&nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$array</span> <span class="kw1">as</span> <span class="re0">$value</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$i</span>++;<br />
+&nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><span class="re0">$i</span> % <span class="nu0">2</span> == <span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$result</span> += <span class="re0">$value</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; printResult<span class="br0">&#40;</span><span class="re0">$result</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">function</span> printResult<span class="br0">&#40;</span><span class="re0">$result</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;Some HTML Formatting for the result: {$result}&quot;</span>;<br />
+<span class="br0">&#125;</span></div>
+<h2>Reassigning A Local Variables</h2>
+<p>It's the assignment to locale variables that becomes complicated. If you see an assignment to a parameter you should immediately remove it.</p>
+<p>For temps that are assigned to, there are two cases. The simpler cases is that in which the variable is a temp used only in the extracted code. In this case you can remove it into the extracted code.</p>
+<p>If the variable is not used after the code is extracted, you can make the change in just the extracted code. If it is used afterward, you need to make the extracted code return the changed value of the variable. Check the following code that illustrates this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> printSumOfAnyOtherArrayValue<span class="br0">&#40;</span><span class="re0">$array</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$result</span> = <span class="nu0">0</span>;<br />
+&nbsp; <span class="re0">$i</span> = <span class="nu0">0</span>;<br />
+&nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$array</span> <span class="kw1">as</span> <span class="re0">$value</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$i</span>++;<br />
+&nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><span class="re0">$i</span> % <span class="nu0">2</span> == <span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$result</span> += <span class="re0">$value</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; printResult<span class="br0">&#40;</span><span class="re0">$result</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">function</span> printResult<span class="br0">&#40;</span><span class="re0">$result</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;Some HTML Formatting for the result: {$result}&quot;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Now I extract the calculation:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> printSumOfAnyOtherArrayValue<span class="br0">&#40;</span><span class="re0">$array</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$result</span> = calculateSumOfAnyOtherArrayValue<span class="br0">&#40;</span><span class="re0">$array</span><span class="br0">&#41;</span>;<br />
+&nbsp; printResult<span class="br0">&#40;</span><span class="re0">$result</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="kw2">function</span> calculateSumOfAnyOtherArrayValue<span class="br0">&#40;</span><span class="re0">$array</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$result</span> = <span class="nu0">0</span>;<br />
+&nbsp; <span class="re0">$i</span> = <span class="nu0">0</span>;<br />
+&nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$array</span> <span class="kw1">as</span> <span class="re0">$value</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$i</span>++;<br />
+&nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><span class="re0">$i</span> % <span class="nu0">2</span> == <span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$result</span> += <span class="re0">$value</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="kw1">return</span> <span class="re0">$result</span>;<br />
+<span class="br0">&#125;</span><br />
+&nbsp; <br />
+<span class="kw2">function</span> printResult<span class="br0">&#40;</span><span class="re0">$result</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;Some HTML Formatting for the result: {$result}&quot;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>The $result variable is used in both places - so I need to return it from calculateSumOfAnyOtherArrayValue(). Now we can rewrite our printSumOfAnyOtherArrayValue() method to:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> printSumOfAnyOtherArrayValue<span class="br0">&#40;</span><span class="re0">$array</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; printResult<span class="br0">&#40;</span>calculateSumOfAnyOtherArrayValue<span class="br0">&#40;</span><span class="re0">$array</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>If something more involved should happen to the $result variable, like an initial value depending on some class attribute, we would pass it to calculateSumOfAnyOtherArrayValue() as  a parameter:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> printSumOfAnyOtherArrayValue<span class="br0">&#40;</span><span class="re0">$array</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$result</span> = <span class="re0">$this</span>-&gt;<span class="me1">start</span>;<br />
+&nbsp; <span class="re0">$result</span> = calculateSumOfAnyOtherArrayValue<span class="br0">&#40;</span><span class="re0">$array</span>,<span class="re0">$result</span><span class="br0">&#41;</span>;<br />
+&nbsp; printResult<span class="br0">&#40;</span><span class="re0">$result</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="kw2">function</span> calculateSumOfAnyOtherArrayValue<span class="br0">&#40;</span><span class="re0">$array</span>, <span class="re0">$initialValue</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$result</span> = <span class="re0">$initialValue</span>;<br />
+&nbsp; <span class="re0">$i</span> = <span class="nu0">0</span>;<br />
+&nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$array</span> <span class="kw1">as</span> <span class="re0">$value</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$i</span>++;<br />
+&nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><span class="re0">$i</span> % <span class="nu0">2</span> == <span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$result</span> += <span class="re0">$value</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="kw1">return</span> <span class="re0">$result</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>After some testing, we can refactor this and make it even better:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> printSumOfAnyOtherArrayValue<span class="br0">&#40;</span><span class="re0">$array</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$result</span> = calculateSumOfAnyOtherArrayValue<span class="br0">&#40;</span><span class="re0">$array</span>,<span class="re0">$this</span>-&gt;<span class="me1">start</span><span class="br0">&#41;</span>;<br />
+&nbsp; printResult<span class="br0">&#40;</span><span class="re0">$result</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Now this looks neat no? Now the calculation of the actual value can be very easily changed. We could just call another calculation method, or strategy, if you want to speak in terms of <a href="http://php-coding-practices.com/category/design-patterns/">Design Patterns</a>.</p>
+<h1>What Happens When More Than One Variable Needs To Be Returned?</h1>
+<p>Here you have several options. The way I prefer is to have a method for each return value. Usually you can arrange things for that and you will be fine. However, if you somehow can't do it and things look awkward, return an array of return values instead and live with it. Document it as some *nasty* stuff, though, and refactor it again with the next opportunity.<br />
+</head></html></head></html><br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-c0d8-48ac-9d91-4b47cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-compose-methods-the-extract-method-refactoring%3A480f4dfe-c0d8-48ac-9d91-4b47cbdd56cb &amp;title=How+To+Compose+Methods%3A+The+Extract+Method+Refactoring';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-compose-methods-the-extract-method-refactoring%3A480f4dfe-c0d8-48ac-9d91-4b47cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-compose-methods-the-extract-method-refactoring%3A480f4dfe-c0d8-48ac-9d91-4b47cbdd56cb&amp;title=How+To+Compose+Methods%3A+The+Extract+Method+Refactoring&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-compose-methods-the-extract-method-refactoring%3A480f4dfe-c0d8-48ac-9d91-4b47cbdd56cb&amp;title=How+To+Compose+Methods%3A+The+Extract+Method+Refactoring';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/how-to-compose-methods-the-extract-method-refactoring:480f4dfe-c0d8-48ac-9d91-4b47cbdd56cb">4 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/how-to-compose-methods-the-extract-method-refactoring:480f4dfe-c0d8-48ac-9d91-4b47cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/simple-global-ajax-activity-indicator-with-jquery:480f4dd6-7508-4aea-9850-4139cbdd56cb">Simple global Ajax activity indicator with jQuery</a></h2>	<div class="posted-on">
+		<p>Posted on 27/6/07 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>I'm currently doing something very cool which I intend to write about in great detail later on. I'm refactoring all JS for my current web app (the secret one that was supposed to launch like 3 month ago ^^) from an MVC-ish class approach to jQuery plugins. It's gorgeous!. My code is getting smaller, easier to read and more robust. I really can't await writing a more lengthy post about this topic and why I believe that JS is one of the hottest languages these days but requires a different mindset then what we are used to from PHP and other scripting languages.</p>
+<p>Anyway, back to the topic. One of the things I just refactored was the code I use to display a little ajax activity indicator so Users know when the app is working on somethings for them. Since the result is a pretty generic little script I thought it might be interesting for others to look at:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$<span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> $headline = $<span class="br0">&#40;</span><span class="st0">'h1:first'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; $<span class="br0">&#40;</span>document<span class="br0">&#41;</span>.<span class="me1">ajaxSend</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; $headline<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">'activity'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; .<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">'activity'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; $<span class="br0">&#40;</span>document<span class="br0">&#41;</span>.<span class="me1">ajaxStop</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; $headline.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">'activity'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span>;</div>
+<p>Notes: I don't use the $headline variable out of PHP habits but as a mean to indicate jQuery objects throughout my application. The 'removeClass' call in the ajaxSend closure is neccessary since otherwise you might add the 'activity' class twice to the $headline if two requests are going on at the same time which is something I usually try to avoid.</p>
+<p>In the application you can then see a little <a href="http://www.napyfab.com/ajax-indicators/">ajax spinner</a> show up whenever requests are taking place:</p>
+<p><img src="http://img516.imageshack.us/img516/6512/activityln3.png" style="border: 1px solid #000;"></p>
+<p>I hope some of you find this little snippet useful ; ).</p>
+<p>Some unrelated news: I don't know how many unique downloads my <a href="http://www.thinkingphp.org/2007/06/17/screencast-using-vendor-branching-and-cakephp/">svn screencast</a> received but my stats say it swallowed around 250 GB in traffic which is sort of nuts. When I found out about it I was kind of scared for a second but then remembered that I recently upgraded my web hosting plan to one where I have unlimited traffic - which saved me 100 euros in bandwidth fees ; ).</p>
+<p>So stay tuned for upcoming stuff like the finished <a href="http://www.thinkingphp.org/2007/06/14/containable-20-beta/">Containable behavior</a>, some other code and posts I got in my backlog as well as the launch of my little web application.</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-7508-4aea-9850-4139cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsimple-global-ajax-activity-indicator-with-jquery%3A480f4dd6-7508-4aea-9850-4139cbdd56cb &amp;title=Simple+global+Ajax+activity+indicator+with+jQuery';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsimple-global-ajax-activity-indicator-with-jquery%3A480f4dd6-7508-4aea-9850-4139cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsimple-global-ajax-activity-indicator-with-jquery%3A480f4dd6-7508-4aea-9850-4139cbdd56cb&amp;title=Simple+global+Ajax+activity+indicator+with+jQuery&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsimple-global-ajax-activity-indicator-with-jquery%3A480f4dd6-7508-4aea-9850-4139cbdd56cb&amp;title=Simple+global+Ajax+activity+indicator+with+jQuery';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/simple-global-ajax-activity-indicator-with-jquery:480f4dd6-7508-4aea-9850-4139cbdd56cb">13 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/simple-global-ajax-activity-indicator-with-jquery:480f4dd6-7508-4aea-9850-4139cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/things-to-avoid-in-a-team-programming-environment:480f4dfe-7890-4234-8979-40f4cbdd56cb">Things To Avoid In A Team-Programming Environment</a></h2>	<div class="posted-on">
+		<p>Posted on 26/6/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><strong>I have been working within a team of programmers directly within the same office for almost three months now. It's my first experience of such a nature considering my freelancing background. I am going to share with you, what things, in my opinion, one HAS TO avoid in such an environment.</strong></p>
+<h1>Putting Parse Errors Into The Version-Control-System</h1>
+<h2>The Problem</h2>
+<p>Yes of course, this should go without explanation. However, when you are in a rush for a deadline or the person above you is nitpicking or you simply have a bad day, it can happen - you check in parse errors. I have found myself checking in parse errors as well. It's just the desire to get it finally working (!) without thinking about possible consequences. With a test server set up this is usually not a problem. It doesn't improve your reputation among the team, though.</p>
+<h2>The Solution</h2>
+<p>Relax. Test everything before you check it in. Simply refresh your current test page to see if a parse error popped up. It only takes five seconds. Five very valuable seconds. </p>
+<p>If you find yourself having a bad day, relax even more before you check something in. I have found myself willing to be the fastest in feature completion sometimes. However, well tested, slowly-developed code is a lot more worthy in the longterm.</p>
+<h1>Undeliberate Code-Replacement</h1>
+<h2>The Problem</h2>
+<p>Sometimes you are getting conflicts within your version control system, but the person you need to ask which code fragment is the correct one is in a meeting or out to lunch. What do you do? You replace the code with your good will so you can continue working, right? Wrong!</p>
+<p>This is again one of those things that only bring a quickfix for your situation, but result in pure malice in the longterm.</p>
+<h2>The Solution</h2>
+<p>Relax. Work on something else. Blog a bit ;) or work on another component. Of course in a tightly coupled system this may be a problem, but you always can do something else and wait for the person to check the conflict. The bad news is that conflicts should not happen in the first place as they are a result of miss-communication within the team. However, in a non-OOP environments it tends to happen a lot more often.</p>
+<h1>Checking In Untested Code</h1>
+<h2>The Problem</h2>
+<p>Being in a rush for a deadline you forget to test your code thoroughly or even forget to write unit tests for it alltogether. Or, even worse, you are not addicted to writing tests.</p>
+<h2>The Solution</h2>
+<p>Make an appointment with yourself to write unit tests. This appointment is just as important as the upcoming meeting with your CEO. Write them. Simple!</p>
+<p>They do not need to be under version control. They can be on your local machine and that's it. They just need to be there somewhere and get used.</p>
+<h1>Wrong Assertions Or Better "What Does It Need To Do Exactly?"</h1>
+<h2>The Problem</h2>
+<p>You find your own code (components) not returning what is expected by the clients (your colleagues) regularly. This is due to wrong assertions and unclear communication in the phase where requirements for the new code are written down.</p>
+<h2>The Solution</h2>
+<p>Well there is no ultimate solution to this, as it boils down to communication problems. The only thing I can suggest is that you think about it from an engineer's perspective: What does come in and what should go out? In which format? What should happen when the wrong thing goes in?</p>
+<p>It's these things that make <a href="http://php-coding-practices.com/category/test-driven-development/" title="Test-driven Development">Test-driven Development</a> so successful. TDD <strong>forces you</strong> think about this stuff a lot more thoroughly.</p>
+<h1>No Handling Of Exceptional Behavior</h1>
+<h2>The Problem</h2>
+<p>This goes hands in hands with the last one. You find yourself not handling exceptional behavior (the preconditions for your code are not met) on a regular basis.</p>
+<h2>The Solution</h2>
+<p>Make it a quality standard that everything you write takes care of most if not all circumstances possible in your application. If you fetch currency rates from your database and your application's output greatly depends on it, this is extremely critical stuff. Of course, the fetching from the database may go wrong, as the table may be <a href="http://dev.mysql.com/doc/refman/4.1/en/table-maintenance.html">crashed</a>. You at least need to send a critical log email to yourself if this happens. If it happens, show a friendly page to your visitors explaining that something went wrong, without telling them the truth.</p>
+<p>If you find yourself developing an application where you lose the overview about in which state the app is in, rewrite it. Simple. The risks of security issues, slow development times etc. far outweigh the time lost without new features in most cases.</p>
+<h1>Unclear Documentation Within The Code</h1>
+<h2>The Problem</h2>
+<p>Your code can be understood by you easily. However, your teammates struggle understanding your code. Your code documentation is wrong, is based on wrong assertions or is simply unclear.</p>
+<h2>The Solution</h2>
+<p>Keep your code documentation up to date with your thoughts. If you write good code that speaks for itself, less documentation is needed, which is a good thing. Other than that:</p>
+<ul>
+<li>Make it a quality standard that you use <a href="http://www.google.de/url?sa=t&ct=res&cd=1&url=http%3A%2F%2Fwww.phpdoc.org%2F&ei=PbyARqXHDIugnQOn_82bAw&usg=AFQjCNES71s9eQNI1xADTUxvpmbFJHfJwA&sig2=W-UGYOCLMyixoWCc5lNJlw">PHP Doc Comments</a> for every little class, method, function or whatever.</li>
+<li>Document the uneasy code fragments as well. Do not explain what the code does, but explain why it does what it does.</li>
+<li>Regularly ask your teammates if they understand your code. Do this especially when their code depends on yours.</li>
+</ul>
+<h1>Finding The One To Blame</h1>
+<h2>The Problem</h2>
+<p>Your team spends way too much time searching through revision logs to find out whom of the team checked in crappy code that suffers from one or more of things from above.</p>
+<h2>The Solution</h2>
+<p>Do not spend your time doing this, it's way too expensive. If everybody works for everybody, the code improves over time to a great extent. We are only humans and mistakes happen. Things in our family and friends may cause us to be unrelaxed and uncomfortable. This may ultimately cause us to "have a bad day", a definite problem from a programmer's point of you. Also some colleagues may be young and have less experience in a team environment (like me :)). Working closely together, building good relationships and "allowing" people to do mistakes eliminates the problems.</p>
+<h1>Conclusion</h1>
+<p>I have outlined only some problems that regularly occur in team environments here. However, I think they are some of the most important ones and ones that happen in many teams.</p>
+<p>The ultimate thing to prevent these problems is to relax and think about what you are doing. Program consciously so to speak. :) Then sit together with your team, make up your mind with regards to how you can improve the overall team culture and things will improve greatly.</p>
+<p>Have a good one!<br />
+Tim<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-7890-4234-8979-40f4cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthings-to-avoid-in-a-team-programming-environment%3A480f4dfe-7890-4234-8979-40f4cbdd56cb &amp;title=Things+To+Avoid+In+A+Team-Programming+Environment';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthings-to-avoid-in-a-team-programming-environment%3A480f4dfe-7890-4234-8979-40f4cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthings-to-avoid-in-a-team-programming-environment%3A480f4dfe-7890-4234-8979-40f4cbdd56cb&amp;title=Things+To+Avoid+In+A+Team-Programming+Environment&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthings-to-avoid-in-a-team-programming-environment%3A480f4dfe-7890-4234-8979-40f4cbdd56cb&amp;title=Things+To+Avoid+In+A+Team-Programming+Environment';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/things-to-avoid-in-a-team-programming-environment:480f4dfe-7890-4234-8979-40f4cbdd56cb">2 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/things-to-avoid-in-a-team-programming-environment:480f4dfe-7890-4234-8979-40f4cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="paging">
+	<a href="/posts/index/page:43" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:40">40</a></span> | <span><a href="/posts/index/page:41">41</a></span> | <span><a href="/posts/index/page:42">42</a></span> | <span><a href="/posts/index/page:43">43</a></span> | <span class="current">44</span> | <span><a href="/posts/index/page:45">45</a></span> | <span><a href="/posts/index/page:46">46</a></span> | <span><a href="/posts/index/page:47">47</a></span> | <span><a href="/posts/index/page:48">48</a></span> <a href="/posts/index/page:45" class="next">Next &raquo;</a></div>	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

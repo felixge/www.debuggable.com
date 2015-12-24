@@ -1,0 +1,870 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Parsing XML With The DOM Library &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/parsing-xml-with-the-dom-library:480f4dfe-03e4-47f1-bf8c-47dacbdd56cb">Parsing XML With The DOM Library</a></h2>	<div class="posted-on">
+		<p>Posted on 5/6/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><strong>The PHP 4 DOMXML extension has undergone some serious transformation since PHP5 and is a lot easier to use. Unlike SimpleXML, DOM can, at times, be cumbersome and unwiedly. However, it is often a better choice than SimpleXML. Please join me and find out why.</strong></p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>Since SimpleXML and DOM objects are interoperable you can use the former for simplicity and the latter for power. How you can exchange data between the two extensions is explained at the bottom of the article.<br />
+ The DOM extension is especially useful when you want to modify XML documents , as SimpleXML for example does not allow to remove nodes from an XML document. For this article's code examples we will use the same foundation that we used in the <a href="http://php-coding-practices.com/language-specific/parsing-xml-using-simplexml/" title="Parsing XML with SimpleXML">Parsing XML with SimpleXML</a> post.<br />
+We will use this very site's google sitemap file, which can be downloaded <a href="http://php-coding-practices.com/sitemap.xml">here</a>. The sitemap.xml file features an xml list of pages of php-coding-practices.com for easy indexing in google.</p>
+<h1>Loading and Saving XMLDocuments</h1>
+<p>The DOM extension, just like SimpleXML, provides two ways to load xml documents - either by string or by filename:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$source</span> = <span class="st0">'sitemap.xml'</span>;<br />
+<br />
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">load</span><span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// load as string</span><br />
+<span class="re0">$dom2</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom2</span>-&gt;<span class="me1">loadXML</span><span class="br0">&#40;</span><a href="http://www.php.net/file_get_contents"><span class="kw3">file_get_contents</span></a><span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>In addition to that, the DomDocument object provides two functions to load html files. The advantage is that html files do not have to be well-formed to load. Here is an example:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$doc</span> = <span class="kw2">new</span> DOMDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$doc</span>-&gt;<span class="me1">loadHTML</span><span class="br0">&#40;</span><span class="st0">&quot;&lt;html&gt;&lt;body&gt;Test<br />
+&lt;/body&gt;&lt;/html&gt;&quot;</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$doc</span>-&gt;<span class="me1">saveHTML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>The cool news is that mal-formed HTML will automatically be transferred into well-formed one. Look at this script:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$doc</span> = <span class="kw2">new</span> DOMDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$doc</span>-&gt;<span class="me1">loadHTML</span><span class="br0">&#40;</span><span class="st0">&quot;&lt;html&gt;&lt;body&gt;&lt;p&gt;Test<br />
+&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$doc</span>-&gt;<span class="me1">saveHTML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>The <a href="http://www.php.net/manual/en/function.dom-domdocument-loadhtml.php">DomDocument::loadHTML()</a> method will automatically add a DTD (Document Type Definition) and add the missing end-tag for the opened p-tag. Cool, isn't it?</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_html" style="white-space: wrap;white-space: nowrap;"><span class="sc2"><span class="kw2">&lt;</span></a> !DOCTYPE html PUBLIC <span class="st0">&quot;-//W3C//DTD HTML 4.0 Transitional//EN&quot;</span> <span class="st0">&quot;http://www.w3.org/TR/REC-html40/loose.dtd&quot;</span><span class="kw2">&gt;</span></a></span><br />
+<span class="sc2"><a href="http://december.com/html/4/element/html.html"><span class="kw2">&lt;html&gt;</span></a></span><span class="sc2"><a href="http://december.com/html/4/element/body.html"><span class="kw2">&lt;body&gt;</span></a></span><span class="sc2"><a href="http://december.com/html/4/element/p.html"><span class="kw2">&lt;p&gt;</span></a></span>Test<br />
+<span class="sc2"><span class="kw2">&lt;/p&gt;</span></span><span class="sc2"><span class="kw2">&lt;/body&gt;</span></span><span class="sc2"><span class="kw2">&lt;/html&gt;</span></span></div>
+<p>Saving XML data with the DOM library is as easy. Just use <a href="http://www.php.net/manual/en/function.dom-domdocument-savehtml.php">DomDocument::saveHTML()</a> and <a href="http://www.php.net/manual/en/function.dom-domdocument-savexml.php">DomDocument::saveXML()</a> with no parameters. They will automatically create XML or HTML documents from your xml contents and return them. <a href="http://www.php.net/manual/en/function.dom-domdocument-savehtmlfile.php">DomDocument::saveHTMLFile()</a> and <a href="http://www.php.net/manual/en/function.dom-domdocument-save.php">DomDocument::save()</a> save to html and xml files. They request a filepath paramter as a string.</p>
+<h1>XPath Queries</h1>
+<p>One of the most powerful features of the DOM extension is the way in which it integrates with XPath queries. In fact, DomXpath is much more powerful than its SimpleXML equivalent:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$source</span> = <span class="st0">'sitemap.xml'</span>;<br />
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">load</span><span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$xpath</span> = <span class="kw2">new</span> DomXPath<span class="br0">&#40;</span><span class="re0">$dom</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$xpath</span>-&gt;<span class="me1">registerNamespace</span><span class="br0">&#40;</span><span class="st0">'c'</span>, <span class="st0">'http://www.google.com/schemas/sitemap/0.84'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$result</span> = <span class="re0">$xpath</span>-&gt;<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">&quot;//c:loc/text()&quot;</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$result</span>-&gt;<span class="me1">length</span>.<span class="st0">'<br />
+'</span>;<br />
+<span class="co1">//echo $result-&gt;item(3)-&gt;data;</span><br />
+<span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$result</span> <span class="kw1">as</span> <span class="re0">$b</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$b</span>-&gt;<span class="me1">data</span>.<span class="st0">'<br />
+'</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Notice that the sitemap xml file contains a namespace already, which we register using DomXPath::registerNamespace():</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></div>
+<p>We really have to register that namespace with the DomXPath object or else it will not know where to search. ;) You can also register multiple namespaces, but more on that later. Notice that we use text() within the xpath query to get the actual text contents of the nodes.<br />
+If you want to learn the ins and outs of the xpath language, I recommend reading the <a href="http://www.w3.org/TR/xpath" title="XPath Reference">W3C XPath Reference</a>.</p>
+<h1>Modifying XML Documents</h1>
+<h2>Adding New Nodes</h2>
+<p>To add new data to a loaded dom documented, we need to create new DomElement objects by using the <a href="http://www.php.net/manual/en/function.dom-domdocument-createelement.php">DomDocument::createElement(), </a><a href="http://www.php.net/manual/en/function.dom-domdocument-createelementns.php">DomDocument::createElementNS()</a> and <a href="http://www.php.net/manual/en/function.dom-domdocument-createtextnode.php">DomDocument::createTextNode()</a> methods.<br />
+In the following we will add a new url to our urlset:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$source</span> = <span class="st0">'sitemap.xml'</span>;<br />
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">load</span><span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// url element</span><br />
+<span class="re0">$url</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">'url'</span><span class="br0">&#41;</span>;<br />
+<br />
+<br />
+<span class="co1">// location</span><br />
+<span class="re0">$loc</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">'loc'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$text</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createTextNode</span><span class="br0">&#40;</span><span class="st0">'http://php-coding-practices.com/article/'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$loc</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$text</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// last modification</span><br />
+<span class="re0">$lastmod</span>= <span class="re0">$dom</span>-&gt;<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">'lastmod'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$text</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createTextNode</span><span class="br0">&#40;</span><span class="st0">'2007-04-20T10:24:32+00:00'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$lastmod</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$text</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// change frequency</span><br />
+<span class="re0">$changefreq</span>= <span class="re0">$dom</span>-&gt;<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">'changefreq'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$text</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createTextNode</span><span class="br0">&#40;</span><span class="st0">'weekly'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$changefreq</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$text</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// priority</span><br />
+<span class="re0">$priority</span>= <span class="re0">$dom</span>-&gt;<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">'priority'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$text</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createTextNode</span><span class="br0">&#40;</span><span class="st0">'0.3'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$priority</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$text</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+<span class="co1">// add the elements to the url&nbsp; &nbsp; </span><br />
+<span class="re0">$url</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$loc</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$lastmod</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$changefreq</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$priority</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// add the new url to the root element (urlset)</span><br />
+<span class="re0">$dom</span>-&gt;<span class="me1">documentElement</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$url</span><span class="br0">&#41;</span>;<br />
+<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$dom</span>-&gt;<span class="me1">saveHtml</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>The code is pretty self-explanatory. First we create a new url element as well as some sub-elements. Then we append those sub-elements to the url element, which we in turn append to the document's root element. Note that the root element can be accessed via the $dom->documentElement property. The output:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">....</span><br />
+<span class="sc0">&nbsp; &lt;loc&gt;</span>http://php-coding-practices.com/2007/04/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-04-30T16:54:58+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>yearly<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>0.5<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/2007/03/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-03-29T20:04:51+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>yearly<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>0.5<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span></div>
+<p>Now it was certainly not as easy as it would have been had we used SimpleXML. The DOM extension provides many more methods for more power. For example you can associate a namespace with an element<br />
+while creation using <a href="http://www.php.net/manual/en/function.dom-domdocument-createelementns.php">DomDocument::createElementNS()</a>. I will provide some example code on that later in the article.</p>
+<h2>Adding Attributes To Nodes</h2>
+<p>Via <a href="http://www.php.net/manual/en/function.dom-domdocument-setattribute.php">DomDocument::setAttribute()</a> we can easily add an attribute to a node object. Example:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$url</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">'url'</span><span class="br0">&#41;</span>;<br />
+...<br />
+<span class="re0">$url</span>-&gt;<span class="me1">setAttribute</span><span class="br0">&#40;</span><span class="st0">'meta:level'</span>,<span class="st0">'3'</span><span class="br0">&#41;</span>;</div>
+<p>Here we set a fictive meta:level attribute with the value 3 to our url NodeElement from above.</p>
+<h2>Moving Data</h2>
+<p>Moving data is not as obvious as you might expect, as the DOM extension does not provide a real method that takes care of that, explicitly. Instead we will have to use<br />
+a combination of <a href="http://www.php.net/manual/en/function.dom-domdocument-appendchild.php>DomDocument::appendChild()</a> and <a href="http://www.php.net/manual/en/function.dom-domdocument-createelement.php">DomDocument::insertBefore()</a>. As an example, suppose we want to move our new url from above just before the very first url:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$xpath</span> = <span class="kw2">new</span> DomXPath<span class="br0">&#40;</span><span class="re0">$dom</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$xpath</span>-&gt;<span class="me1">registerNamespace</span><span class="br0">&#40;</span><span class="st0">&quot;c&quot;</span>,<span class="st0">&quot;http://www.google.com/schemas/sitemap/0.84&quot;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$result</span> = <span class="re0">$xpath</span>-&gt;<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">&quot;//c:url&quot;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">1</span><span class="br0">&#41;</span>-&gt;<span class="me1">parentNode</span>-&gt;<span class="me1">insertBefore</span><span class="br0">&#40;</span><span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">1</span><span class="br0">&#41;</span>,<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$dom</span>-&gt;<span class="me1">saveXML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p><a href="http://www.php.net/manual/en/function.dom-domdocument-insertbefore.php">DomDocument::insertBefore()</a> takes two parameters, the new node and the reference node. It inserts the new node before the reference node. In our example, we insert the second url ($result->item(1)) before the first one ($result->item(0)).<br />
+I hear you asking why we use <a href="http://www.php.net/manual/en/function.dom-domdocument-insertbefore.php">DomDocument::insertBefore()</a> on the $result->item(1)->parentNode node.. Couldn't we just as easily use simply $result->item(0)? No of course not, as we need to execute <a href="http://www.php.net/manual/en/function.dom-domdocument-insertbefore.php">DomDocument::insertBefore()</a> on the root element, urlset, and not a specific url (look at our xpath query).<br />
+We could use the following code which is perfectly valid and gets us the same results, though:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span>-&gt;<span class="me1">parentNode</span>-&gt;<span class="me1">insertBefore</span><span class="br0">&#40;</span><span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">1</span><span class="br0">&#41;</span>,<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>If we wanted to append the first url at the bottom of the sitemap, the following code is the way to go:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span>-&gt;<span class="me1">parentNode</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// or $dom-&gt;documentElement-&gt;appendChild($result-&gt;item(0)); respectively</span></div>
+<p>Easy is it not? :) <a href="http://www.php.net/manual/en/function.dom-domdocument-insertbefore.php">DomDocument::insertBefore()</a> and <a href="http://www.php.net/manual/en/function.dom-domnode-appendchild.php">DomNode::appendChild()</a> automatically move (and not copy and then move) the corresponding nodes. If you wish to clone a node first before moving it, use DomNode::cloneNode() first:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$source</span> = <span class="st0">'sitemap.xml'</span>;<br />
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">load</span><span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$xpath</span> = <span class="kw2">new</span> DomXPath<span class="br0">&#40;</span><span class="re0">$dom</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$xpath</span>-&gt;<span class="me1">registerNamespace</span><span class="br0">&#40;</span><span class="st0">&quot;c&quot;</span>,<span class="st0">&quot;http://www.google.com/schemas/sitemap/0.84&quot;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$result</span> = <span class="re0">$xpath</span>-&gt;<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">&quot;//c:url&quot;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$clone</span> = <span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span>-&gt;<span class="me1">cloneNode</span><span class="br0">&#40;</span><span class="kw2">true</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">4</span><span class="br0">&#41;</span>-&gt;<span class="me1">parentNode</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$clone</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$dom</span>-&gt;<span class="me1">saveXML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>The important thing here is that you have to supply omNode::cloneNode() with a true parameter (default is false), so that it copies all descendant nodes as well. If we had left that to false, we would have gotten an empty &lt;url&gt;&lt;/url&gt; node, which is not desirable. ;)</p>
+<h2>Modifying Node Data</h2>
+<p>When modifying node data, you want to modify the CDATA within a node. You can use xpath again to find the node you want to edit and then simply supply a new value to its data property:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$source</span> = <span class="st0">'sitemap.xml'</span>;<br />
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">load</span><span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$xpath</span> = <span class="kw2">new</span> DomXPath<span class="br0">&#40;</span><span class="re0">$dom</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$xpath</span>-&gt;<span class="me1">registerNamespace</span><span class="br0">&#40;</span><span class="st0">&quot;c&quot;</span>,<span class="st0">&quot;http://www.google.com/schemas/sitemap/0.84&quot;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$result</span> = <span class="re0">$xpath</span>-&gt;<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">&quot;//c:loc/text()&quot;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$node</span> = <span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span>-&gt;<span class="me1">data</span> = <a href="http://www.php.net/strtoupper"><span class="kw3">strtoupper</span></a><span class="br0">&#40;</span><span class="re0">$node</span>-&gt;<span class="me1">data</span><span class="br0">&#41;</span>;<br />
+<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$dom</span>-&gt;<span class="me1">saveXML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>This code transforms the location data of the second url to uppercase letters.</p>
+<h2>Removing Data From XML Documents</h2>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>There are three types of data that you would possbily want to remove from xml documents: elements, attributes and CDATA. The DOM extension provides a method for each of them:<br />
+<a href="http://www.php.net/manual/en/function.dom-domelement-removeattribute.php">DomElement::removeAttribute()</a>, <a href="http://www.php.net/manual/en/function.dom-domnode-removechild.php">DomNode::removeChild()</a> and <a href="http://www.php.net/manual/en/function.dom-domcharacterdata-deletedata.php">DomCharacterData::deleteData()</a>. We will use a custom xml document and not our sitemap to demonstrate their behavior. This makes it easier for you<br />
+to come back to this article and see at first glance how these methods work. Thank <a href="http://www.1lifestory.com">Nikos</a> if you want to. ;)</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$xml</span> = &lt;&lt;&lt;XML<br />
+&lt;xml&gt;<br />
+&nbsp; &lt;text type=<span class="st0">&quot;input&quot;</span>&gt;This is some really cool text!&lt;/text&gt;<br />
+&nbsp; &lt;text type=<span class="st0">&quot;input&quot;</span>&gt;This is some other really cool text!&lt;/text&gt;<br />
+&nbsp; &lt;text type=<span class="st0">&quot;misc&quot;</span>&gt;This is some cool text!&lt;/text&gt;<br />
+&nbsp; &lt;text type=<span class="st0">&quot;output&quot;</span>&gt;This is text!&lt;/text&gt;<br />
+<br />
+XML;<br />
+<br />
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">loadXML</span><span class="br0">&#40;</span><span class="re0">$xml</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$xpath</span> = <span class="kw2">new</span> DomXPath<span class="br0">&#40;</span><span class="re0">$dom</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$result</span> = <span class="re0">$xpath</span>-&gt;<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">&quot;//text&quot;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// remove first node</span><br />
+<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span>-&gt;<span class="me1">parentNode</span>-&gt;<span class="me1">removeChild</span><span class="br0">&#40;</span><span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// remove attribute from second node</span><br />
+<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">1</span><span class="br0">&#41;</span>-&gt;<span class="me1">removeAttribute</span><span class="br0">&#40;</span><span class="st0">'type'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">//delete data from third element</span><br />
+<span class="re0">$result</span> = <span class="re0">$xpath</span>-&gt;<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">'text()'</span>,<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">2</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span>-&gt;<span class="me1">deleteData</span><span class="br0">&#40;</span><span class="nu0">0</span>, <span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span>-&gt;<span class="me1">length</span><span class="br0">&#41;</span>;<br />
+<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$dom</span>-&gt;<span class="me1">saveXML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>The output of this is:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot;?&gt;</span><br />
+<span class="sc3"><span class="re1">&lt;xml<span class="re2">&gt;</span></span></span><br />
+&nbsp; <br />
+&nbsp; <span class="sc3"><span class="re1">&lt;text<span class="re2">&gt;</span></span></span>This is some other really cool text!<span class="sc3"><span class="re1">&lt;/text<span class="re2">&gt;</span></span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;text</span> <span class="re0">type</span>=<span class="st0">&quot;misc&quot;</span><span class="re2">&gt;</span></span><span class="sc3"><span class="re1">&lt;/text<span class="re2">&gt;</span></span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;text</span> <span class="re0">type</span>=<span class="st0">&quot;output&quot;</span><span class="re2">&gt;</span></span>This is text!<span class="sc3"><span class="re1">&lt;/text<span class="re2">&gt;</span></span></span></div>
+<p>In this example we start by retrieving all text nodes from a document. Then we remove some data from that document. Simple.<br />
+In fact we remove the first node alltogether as well as the attribute of the second node. Finally we truncate the character data of the third node, using xpath to query the corresponding text() node.<br />
+Note that DomCharacterData::deleteData() requires a starting offset and a length parameter. Since we want to truncate the data in our example we supply 0 and the length of the CDATA node.</p>
+<h1>DOM And Working With Namespaces</h1>
+<p>DOM is very capable of handling namespaces on its own. Most of the time you can ignore them and pass attribute and element names with the appropriate prefix directly to most DOM functions.</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$node</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">'ns1:somenode'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span>-&gt;<span class="me1">setAttribute</span><span class="br0">&#40;</span><span class="st0">'ns2:someattribute'</span>,<span class="st0">'somevalue'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$node2</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">'ns3:anothernode'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$node2</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Set xmlns attributes</span><br />
+<br />
+<span class="re0">$node</span>-&gt;<span class="me1">setAttribute</span><span class="br0">&#40;</span><span class="st0">'xmlns:ns1'</span>, <span class="st0">'http://php-coding-practices.com/'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span>-&gt;<span class="me1">setAttribute</span><span class="br0">&#40;</span><span class="st0">'xmlns:ns2'</span>, <span class="st0">'http://php-coding-practices.com/articles/'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span>-&gt;<span class="me1">setAttribute</span><span class="br0">&#40;</span><span class="st0">'xmlns:ns3'</span>, <span class="st0">'http://php-coding-practices.com/sitemap/'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span>-&gt;<span class="me1">setAttribute</span><span class="br0">&#40;</span><span class="st0">'xmlns:ns4'</span>, <span class="st0">'http://php-coding-practices.com/about-the-author/'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$node</span><span class="br0">&#41;</span>;<br />
+<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$dom</span>-&gt;<span class="me1">saveXML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>The output of this script is:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot;?&gt;</span><br />
+<span class="sc3"><span class="re1">&lt;ns1</span> :somenode <br />
+&nbsp; ns2<span class="re0">:someattribute</span>=<span class="st0">&quot;somevalue&quot;</span> <br />
+&nbsp; xmlns:ns1=<span class="st0">&quot;http://php-coding-practices.com/&quot;</span> <br />
+&nbsp; xmlns:ns2=<span class="st0">&quot;http://php-coding-practices.com/articles/&quot;</span> <br />
+&nbsp; xmlns:ns3=<span class="st0">&quot;http://php-coding-practices.com/sitemap/&quot;</span> <br />
+&nbsp; xmlns:ns4=<span class="st0">&quot;http://php-coding-practices.com/about-the-author/&quot;</span><span class="re2">&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;ns3</span> :anothernode<span class="re2">/&gt;</span></span></div>
+<p>We can simplify the use of namespaces somewhat by using <a href="http://www.php.net/manual/en/function.dom-domdocument-createelementns.php">DomDocument::createElementNS()</a> and <a href="http://www.php.net/manual/en/function.dom-domdocument-setattributens.php">DomDocument::setAttributeNS()</a>, which were specifically designed for this purpose:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$node</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createElementNS</span><span class="br0">&#40;</span><span class="st0">'http://php-coding-practices.com/'</span>, <span class="st0">'ns1:somenode'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span>-&gt;<span class="me1">setAttributeNS</span><span class="br0">&#40;</span><span class="st0">'http://somewebsite.com/ns2'</span>, <span class="st0">'ns2:someattribute'</span>, <span class="st0">'somevalue'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$node2</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createElementNS</span><span class="br0">&#40;</span><span class="st0">'http://php-coding-practices.com/articles/'</span>, <span class="st0">'ns3:anothernode'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node3</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createElementNS</span><span class="br0">&#40;</span><span class="st0">'http://php-coding-practices.com/sitemap/'</span>, <span class="st0">'ns1:someothernode'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$node</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$node2</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$node3</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$node</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$dom</span>-&gt;<span class="me1">saveXML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>This results in the following output:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot;?&gt;</span><br />
+<span class="sc3"><span class="re1">&lt;ns1</span> :somenode <br />
+&nbsp; xmlns:ns1=<span class="st0">&quot;http://php-coding-practices.com/&quot;</span> <br />
+&nbsp; xmlns:ns2=<span class="st0">&quot;http://somewebsite.com/ns2&quot;</span> <br />
+&nbsp; xmlns:ns3=<span class="st0">&quot;http://php-coding-practices.com/articles/&quot;</span> <br />
+&nbsp; xmlns:ns11=<span class="st0">&quot;http://php-coding-practices.com/sitemap/&quot;</span> <br />
+&nbsp; ns2<span class="re0">:someattribute</span>=<span class="st0">&quot;somevalue&quot;</span><span class="re2">&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;ns3</span> :anothernode xmlns:ns3=<span class="st0">&quot;http://php-coding-practices.com/articles/&quot;</span><span class="re2">/&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;ns11</span> :someothernode xmlns:ns1=<span class="st0">&quot;http://php-coding-practices.com/sitemap/&quot;</span><span class="re2">/&gt;</span></span></div>
+<h1>Interfacing With SimpleXML</h1>
+<p>As I have mentioned at the start of our little DOM journey it is very easy to exchange loaded documents between SimpleXML and DOM. Therefore, you can take advantage of both<br />
+systems' strengths - SimpleXML's simplicity and DOM's power.</p>
+<p>You can import SimpleXML object into DOM by using PHP's dom_import_simplexml() function:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$sxml</span> = simplexml_load_file<span class="br0">&#40;</span><span class="st0">'sitemap.xml'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span> = dom_import_simplexml<span class="br0">&#40;</span><span class="re0">$sxml</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">importNode</span><span class="br0">&#40;</span><span class="re0">$node</span>,<span class="kw2">true</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$node</span><span class="br0">&#41;</span>;</div>
+<p><a href="http://www.php.net/manual/en/function.dom-domdocument-importnode.php">DomDocument::importNode()</a> creates a copy of the node and associates it with the current document. Its second parameter - a boolean value - determines if the method will recursively import the subtree or not.</p>
+<p>You can also import a dom object into SimpleXML using simple_xml_import_dom():</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">load</span><span class="br0">&#40;</span><span class="st0">'sitemap.xml'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$sxe</span> = simplexml_import_dom<span class="br0">&#40;</span><span class="re0">$dom</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$sxe</span>-&gt;<span class="me1">url</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span>-&gt;<span class="me1">loc</span>;</div>
+<h1>Conclusion</h1>
+<p> DOM is certainly a very powerful way of dealing with XML documents. While it provides a good interface for basically every task one could dream of it often takes quite a lot of code lines to accomplish a task. SimpleXML's interface is of course a little easier, but less powerful.</p>
+<p> Especially the fact that SimpleXML is rather incapable of removing data makes DOM the way to go for more complicated XML document processing. DOM's power in dealing with namespaces make it a valuable tool when dealing with large portions of data where naming conflicts are likely.</p>
+<p> In fact we covered only a small portion of DOM's power. There are many other associating objects which have several useful methods. For example, we have not covered how to append character data. Check <a href="http://www.php.net/manual/en/ref.dom.php">the DOM function reference</a> for more information.</p>
+<p> Thanks for staying with me on the DOM-boot till the end of our joirney! I hope you enjoyed it - please beware of the gap between the boot and the footbridge when leaving.</urlset><br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-03e4-47f1-bf8c-47dacbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fparsing-xml-with-the-dom-library%3A480f4dfe-03e4-47f1-bf8c-47dacbdd56cb &amp;title=Parsing+XML+With+The+DOM+Library';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fparsing-xml-with-the-dom-library%3A480f4dfe-03e4-47f1-bf8c-47dacbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fparsing-xml-with-the-dom-library%3A480f4dfe-03e4-47f1-bf8c-47dacbdd56cb&amp;title=Parsing+XML+With+The+DOM+Library&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fparsing-xml-with-the-dom-library%3A480f4dfe-03e4-47f1-bf8c-47dacbdd56cb&amp;title=Parsing+XML+With+The+DOM+Library';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/parsing-xml-using-simplexml:480f4dfe-6a58-4a17-a133-455acbdd56cb">Parsing XML using SimpleXML</a></li>
+							<li><a href="/posts/queues-in-the-cloud-debuggable-php-sqs-library:49b11c11-2f00-4945-a41e-45304834cda3">Queues in the cloud - Debuggable PHP SQS Library</a></li>
+							<li><a href="/posts/parsing-file-uploads-at-500-mb-s-with-node-js:4c03862e-351c-4faa-bb67-4365cbdd56cb">Parsing file uploads at 500 mb/s with node.js</a></li>
+							<li><a href="/posts/parsing-a-form-in-node-js-1:4b0bff13-4244-4ebc-8455-4975cbdd56cb">Parsing form data with node.js</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/parsing-xml-with-the-dom-library:480f4dfe-03e4-47f1-bf8c-47dacbdd56cb">24 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/parsing-xml-with-the-dom-library:480f4dfe-03e4-47f1-bf8c-47dacbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4e00-4900-49fa-86e0-4b18cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.developercast.com/2007/06/05/tim-koschuetzkis-blog-parsing-xml-with-the-dom-library/" rel="nofollow">developercast.com &raquo; Tim Koschuetzki&#8217;s Blog: Parsing </a>						</strong>
+						<strong>said 
+						on Jun 05, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Koschuetzki has created and posted a new tutorial today that talks about working with XML documents with PHP&#8217;s DOM Library (the PHP5 version) [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e00-21e0-4547-84d8-4430cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://nawak.unotherblog.net/180/parser-du-xml-en-php5.html" rel="nofollow">Nawak! le blog de Super Chinois &raquo; Blog Archive &raquo; Par</a>						</strong>
+						<strong>said 
+						on Jun 07, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] complément de la doc PHP officielle, voici un petit tutorial qui va bien et qui nous montre les différentes manipulations qu&#8217;il est possible [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e00-acd0-4265-ae48-4a5acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.content4.symphora.com/index.php/2007/06/09/master-your-domain-with-php/" rel="nofollow">&lt;CONTENT /&gt; v.4 &raquo; Master Your DOMain With PHP</a>						</strong>
+						<strong>said 
+						on Jun 10, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Parsing XML With The DOM Library | PHP Coding Practices - Become an expert PHP Programmer - Great article that goes deep into the the DOMXML extensions of PHP, showing you how to do serious manipulation of XML documents.  Includes loading, parsing and writing XML docs, using XPath queries, adding nodes, removing data and more. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e01-b38c-4651-be82-4972cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=08b49e3d543f221ed51cdbe118448275&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							noob&nbsp;						</strong>
+						<strong>said 
+						on Jun 29, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>good stuff on namespaces; didn't see anyting about validating a document (dtd, schema) or error handling</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e03-710c-4aff-a034-47eccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1d9edb0696730b9b3390b31d61381c57&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.coolpositive.blogspot.com" rel="nofollow">coolpositive</a>						</strong>
+						<strong>said 
+						on Oct 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Parsing XML With The DOM Library | PHP Coding Practices - Become an expert PHP Programmer - Great article that goes deep into the the DOMXML extensions of PHP, showing you how to do serious manipulation of XML documents.  Includes loading, parsing and writing XML docs, using XPath queries, adding nodes, removing data and more</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e03-8c24-4704-a305-4afccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1d9edb0696730b9b3390b31d61381c57&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.coolpositive.blogspot.com" rel="nofollow">coolpositive</a>						</strong>
+						<strong>said 
+						on Oct 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Koschuetzki has created and posted a new tutorial today that talks about working with XML documents with PHP’s DOM Library (the PHP5 version</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e04-66c4-4680-aeb8-45e4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb8c31cda2f7e95c1855b1f735006c1a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.hhh.com" rel="nofollow">sss</a>						</strong>
+						<strong>said 
+						on Dec 31, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>worst site</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e05-af40-40ad-afa4-4be3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1e8e6f65bc77e8499698ca2ca7df85ed&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Chris&nbsp;						</strong>
+						<strong>said 
+						on Mar 27, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I have been trying to run the namespaces example among others and I keep getting - </p>
+<p>Parse error: syntax error, unexpected T_VARIABLE in /Library/WebServer/Documents/tester/dom/read.php on line 4</p>
+<p>Any ideas would be much appreciated,</p>
+<p>Cheers<br />
+Chris</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e05-07c8-49b6-97b8-4d82cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Mar 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Can you show me your code please?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e05-87a4-4bcc-a36f-4f75cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d57d3ac61dd528dbc70b5c5cf844eb5e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Mangal&nbsp;						</strong>
+						<strong>said 
+						on Apr 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Good,,,</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-486eaed1-e59c-4d77-941b-1d3f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4b5e174eb12d025b30654ac32f0e21ec&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://gisconsultancy.com/blog" rel="nofollow">Rob</a>						</strong>
+						<strong>said 
+						on Jul 04, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Just a note to say thanks, a really useful article.  Was going around the bend not understaning why addAttribute was working; setAttribute fixed the problem.  Thanks, Rob.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48732397-b504-4784-92f1-64704834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b6f163053fa7ff0660a9fe596edd35e9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.kamas.pl" rel="nofollow">kamas</a>						</strong>
+						<strong>said 
+						on Jul 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Very useful article, thx Tim!!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48adb3a4-1adc-4237-9d43-37924834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7591b0692c6183fbcdc41f48082711fc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Mikhail&nbsp;						</strong>
+						<strong>said 
+						on Aug 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Tim,<br />
+I'm wondering how do you format the xml output? Like in the 8th panel above (titled "XML") the output is nicely formatted with each node on a separate line. My output is always in one very very long line. Any tips are appreciated.</br><br />
+Thank you!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48adb541-7c1c-4ff7-8c76-7e3d4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Aug 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Mikhail: Unfortunately I had the same problem like you and just formatted it so it could actually be analyzed by people here reading the post. : /</p>
+<p>I can't think of anything other than parsing the XML output again to make it work. However, the DOM library might provide some tool for this? I can't seem to find it though. : (</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ade6c8-9a20-4a76-8532-15ea4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7591b0692c6183fbcdc41f48082711fc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Mikhail&nbsp;						</strong>
+						<strong>said 
+						on Aug 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks Tim! I guess in the big scheme of things it doesn't matter how it's stored in a file. As long as I can parse it ok :).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ae7aea-ff38-409f-a31e-3cd04834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Absolutely :]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48af856a-ad9c-4e55-adfa-6ebb4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7591b0692c6183fbcdc41f48082711fc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Mikhail&nbsp;						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ok, I found a nice solution to formatting the XML output - it is using the newline \n (and tab \t) characters. The idea is to append these before and after the text-node value, as shown in simple example below:	</p>
+<p>$dom = domxml_open_file($xmlpath);<br />
+$root = $dom->document_element(); //get root node</br><br />
+$dom->preserveWhiteSpace = true;</br><br />
+$dom->formatOutput = true;</br><br />
+  //create entry container</br><br />
+$entry_container = $dom->create_element("entry");</br><br />
+$entry_container = $root->append_child($entry_container);</br></p>
+<p>  //create word within entry<br />
+$word = $dom->create_element("word");</br><br />
+$word = $entry_container->append_child($word);</br><br />
+  //write to word container</br><br />
+$word_value = $dom->create_text_node(<b>"\n"</b>.$_POST['myword'].<b>"\n"</b>);</br><br />
+$word_value = $word->append_child($word_value);</br><br />
+$dom->dump_file($xmlpath, false, true); //save xml file</br></p>
+<p>this outputs a word on a separate line, between the opening and closing tags. Much neater I suppose.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48aff6fa-c8c8-4e90-88c9-6e8b4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Perfect, thanks for sharing Mikhail! :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4904d85a-0cc8-4e0c-b393-67a24834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5914bbfdcaca6921abbc242e96b29477&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							YoDaddy&nbsp;						</strong>
+						<strong>said 
+						on Oct 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>"The DomDocument::loadHTML() method will automatically add a DTD (Document Type Definition) and add the missing end-tag for the opened p-tag. Cool, isn't it?"<br />
+NO, IT IS NOT! It sucks big time, like anything that should be controlled but isn't! I'm still struggling to avoid JUST THIS automatic insertions, because I need to work on bits of HTML, without the DTD, HEAD, BODY tags.</br><br />
+What would be really cool is to find a way of using loadHTML, do your thing then output with saveHTML WITHOUT having to put up with these unwelcomed and uncontrollable additions by the PHP DOM. Jesus!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49649dae-f474-405f-af4f-64164834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=711de060427d33871e32a06e557401c8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.unisupuk.com" rel="nofollow">Ben</a>						</strong>
+						<strong>said 
+						on Jan 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I agree with YoDaddy! I too am trying to work with HTMl fragments, and I am finding the "wonderful" auto DTD insertion a blinding headache! I've been at this for over 17 hours now and I still can't find a solution. If anyone has any suggestions then I would greatly welcome them!</p>
+<p>Still a pretty cool article though, I did use it to start learning manipulation of XML with PHPs Dom a few months ago :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4964d40c-f5f8-4d18-a8ca-55164834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Jan 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>YoDaddy, Ben : No need to shout. -.-</p>
+<p>Hmm, I don't see a solution either, other than manually editing the file later. The API obviously does not allow it. So one would need to write a wrapper around saveHtml() and that removes the unwelcomed additions.</p>
+<p>Ben: You say you have been at this for 17 hours, did you not try to manually edit the file after?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49ad7549-0c98-4b74-8dcd-4f424834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5ed3ff1db231aaf7a53c7d7d6356ddd9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://yougatech.com" rel="nofollow">yougapi</a>						</strong>
+						<strong>said 
+						on Mar 03, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for the post. Helps me a lot to remove a node from an XML as I was using simpleXML and delete possibilities are limited on XML feed. I writted a post on my little experience:</p>
+<p>Here is the link: Here is the link: <a rel="nofollow" href="http://yougatech.com/2009/02/remove-an-xml-node-using-dom-document-and-attribute-name/">http://yougatech.com/2009/02/remove-an-xml-node-using-dom-document-and-attribute-name/</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49d52317-14e0-49f9-a3f3-26164834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5436e00f6c994ff3222f4feca5fc91c3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Pedro&nbsp;						</strong>
+						<strong>said 
+						on Apr 02, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Tim,</p>
+<p>In your examples, the namespace declaration is repeated (in both the root node and in the element where it is used).  Having the namespace declaration repeated in every element is a lot of overhead when there are many elements.  Any idea how to make it only appear in the root node?</p>
+<p>Actually for me, it only shows up in every node where it's used, but not in the root.  Using PHP 5.1.3</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a5dae4a-2438-4427-8f42-7c204834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=66782fecbdd8097f0d8c9d632ae3041c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.elemental.co.za" rel="nofollow">Elemental</a>						</strong>
+						<strong>said 
+						on Jul 15, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>thanks for the post, PHP4 and XML handling was a real pain!</p>
+<p>PHP5 is a dream to manipulate XML.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

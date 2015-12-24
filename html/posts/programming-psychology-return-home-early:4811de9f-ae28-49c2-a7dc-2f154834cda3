@@ -1,0 +1,690 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Programming Psychology - Return home early &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/programming-psychology-return-home-early:4811de9f-ae28-49c2-a7dc-2f154834cda3">Programming Psychology - Return home early</a></h2>	<div class="posted-on">
+		<p>Posted on 25/4/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>this is an experimental post on the psychology of programming. As of lately I have become very interested in the thought processes that cause us to write certain code. Because I believe understanding the patterns in your own thinking will by far make the biggest impact on how good you will get as a programmer. Forget design patterns, forget unit testing, forget all those functions you know. Important is to question why they exist and how they could be improved. I'm not saying you cannot be a good programmer if you do not care about this. But I am saying you will most likely never exceed the skills of all the other programmers out there. You will more or less write the same code everybody else does.</p>
+<p>In the scope of this post I will try to explain a very simple thought pattern that I am calling "return home early" that evolved out of me analyzing my coding habits. The simplest way for you to follow the thought process is to have a look at the following <strong>bad code</strong>:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> edit<span class="br0">&#40;</span><span class="re0">$id</span> = <span class="kw2">null</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'id'</span>, <span class="re0">$id</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">exists</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$post</span> = <span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">read</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$this</span>-&gt;<span class="me1">RequestHandler</span>-&gt;<span class="me1">isGet</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">validates</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">save</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">data</span><span class="br0">&#91;</span><span class="st0">'Post'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Message</span>-&gt;<span class="me1">add</span><span class="br0">&#40;</span><span class="st0">'Post was saved successfully.'</span>, <span class="st0">'ok'</span><span class="br0">&#41;</span>;&nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Message</span>-&gt;<span class="me1">add</span><span class="br0">&#40;</span><span class="st0">'A db problem permitted your data from being saved'</span>, <span class="st0">'error'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Message</span>-&gt;<span class="me1">add</span><span class="br0">&#40;</span><span class="st0">'Post was saved successfully.'</span>, <span class="st0">'ok'</span><span class="br0">&#41;</span>;&nbsp; <br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/assert"><span class="kw3">Assert</span></a>::<span class="me2">notEmpty</span><span class="br0">&#40;</span><span class="re0">$result</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">data</span> = <span class="re0">$post</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">render</span><span class="br0">&#40;</span><span class="st0">'404'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>What you see is a typical Post::edit action like the one used on this blog (in fact I derived it from it). I tried to cripple the code so badly that you can tell what is wrong with it right away:</p>
+<blockquote class="center"><p>There are way too many levels of nesting for something that should be dead simple.</p></blockquote>
+<p>But yet, most projects that I have been involved with had code like this in them. This is not because most programmers are stupid, I think this is a result of logic thinking. Even so I luckily never had to draw much flow charts in my life, I think that my brain somewhat works like one. I think most of us who think logically develop their thoughts in form of a tree, jumping from node to node, leaving dead ends all over because we are not able to focus on too many things at once. This is also why <a href="http://www.mindmeister.com/">mind mapping</a> is a useful technique that I started to embrace lately. It helps us to increase the amount of connections per node in our thinking and lets us discover new nodes (ideas) previously unreachable with our normal thinking.</p>
+<p>Another technique that really helps understanding your thinking is to visualize it. Close your eyes and try to see the patterns in whatever it is you are doing (not just programming) for a second. Applied to our particular example above, we could visualize the code above like this:</p>
+<p><img class="center" src="http://thinkingphp.org/img/return_home_early_1.png"></p>
+<p>Now suddenly it becomes very easy to simplify what we are doing. All we have to do is to align those nodes that are not dead ends. Visually speaking that means to make a re-arrangement like this:</p>
+<p><img class="center" src="http://thinkingphp.org/img/return_home_early_2.png"></p>
+<p>In terms of code this means to get rid of anything that looks like an else statement and use a return statement wherever we hit a dead-end (return home early). Our particular example for example could be re-written as follows:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> edit<span class="br0">&#40;</span><span class="re0">$id</span> = <span class="kw2">null</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'id'</span>, <span class="re0">$id</span><span class="br0">&#41;</span>;<br />
+&nbsp; <a href="http://www.php.net/assert"><span class="kw3">Assert</span></a>::<span class="kw2">true</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">exists</span><span class="br0">&#40;</span><span class="br0">&#41;</span>, <span class="st0">'404'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="re0">$post</span> = <span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">read</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">RequestHandler</span>-&gt;<span class="me1">isGet</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">data</span> = <span class="re0">$post</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="re0">$result</span> = <span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">save</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">data</span><span class="br0">&#91;</span><span class="st0">'Post'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">validationErrors</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">Message</span>-&gt;<span class="me1">add</span><span class="br0">&#40;</span><span class="st0">'Please fill out all fields'</span>, <span class="st0">'error'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <a href="http://www.php.net/assert"><span class="kw3">Assert</span></a>::<span class="me2">notEmpty</span><span class="br0">&#40;</span><span class="re0">$result</span>, <span class="st0">'save'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Message</span>-&gt;<span class="me1">add</span><span class="br0">&#40;</span><span class="st0">'Post was saved successfully.'</span>, <span class="st0">'ok'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>What you can see right away is that we have saved a couple lines of code, but that's not even the exciting part. The exciting part is that by recognizing a pattern in our thinking we were able to produce much simpler results! An interesting implication of this technique is that it is much harder for us to reverse engineer our logic than it is for us to produce it. This is why reading other people's source code can be difficult at times. It is not that their code is difficult, it is just that it's laid out in the way of the thought process that created it. So when you sometimes read a piece of code and really enjoy reading it, it is most likely a sign of conscious thinking and <strong>reorganization</strong> of typical <strong>thought patterns</strong> into <strong>human readable patterns</strong>.</p>
+<p><strong>Note:</strong>  I do not use the word refactoring in this post because the word has too much association with design patterns for my taste. Design patterns itself do not make things simpler! The process of reorganizing your natural thinking does.</p>
+<p><strong>Regarding the second code example:</strong> I cheated a little bit in terms of saving if statements by using my <a href="http://www.debuggable.com/posts/assert-the-yummyness-of-your-cake:480f4dd6-7fe0-4113-9776-458acbdd56cb">Assert class</a> to simplify things even further.</p>
+<p>All right, I'm really interested in hearing if some of you would enjoy more posts like this. I also still have tons of behaviors and components in my backlog for publishing, but this is a fascinating topic to me right now that I would like to write more about.</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4811de9f-ae28-49c2-a7dc-2f154834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprogramming-psychology-return-home-early%3A4811de9f-ae28-49c2-a7dc-2f154834cda3 &amp;title=Programming+Psychology+-+Return+home+early';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprogramming-psychology-return-home-early%3A4811de9f-ae28-49c2-a7dc-2f154834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprogramming-psychology-return-home-early%3A4811de9f-ae28-49c2-a7dc-2f154834cda3&amp;title=Programming+Psychology+-+Return+home+early&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprogramming-psychology-return-home-early%3A4811de9f-ae28-49c2-a7dc-2f154834cda3&amp;title=Programming+Psychology+-+Return+home+early';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/programming-psychology-ii-private-methods:481ed862-b0d8-4a0e-9247-165c4834cda3">Programming Psychology II: Private methods </a></li>
+							<li><a href="/posts/release-early-release-often-caketaster:480f4dd6-0b74-41c2-a201-436acbdd56cb">Release early, Release often, CakeTaster</a></li>
+							<li><a href="/posts/the-linguistics-of-programming:48cfa8e1-5298-47c0-bf46-363d4834cda3">The Linguistics of Programming</a></li>
+							<li><a href="/posts/things-to-avoid-in-a-team-programming-environment:480f4dfe-7890-4234-8979-40f4cbdd56cb">Things To Avoid In A Team-Programming Environment</a></li>
+							<li><a href="/posts/release-early-release-often-a-svnftp-deployment-task:480f4dd6-6268-4185-8624-4607cbdd56cb">Release early, Release often, A SVN/FTP Deployment Task</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/programming-psychology-return-home-early:4811de9f-ae28-49c2-a7dc-2f154834cda3">28 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/programming-psychology-return-home-early:4811de9f-ae28-49c2-a7dc-2f154834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4811ff7c-393c-45de-a56c-65ee4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=68c529c3442953c3beb00a7ccca7e6bb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://" rel="nofollow">Lucian Lature</a>						</strong>
+						<strong>said 
+						on Apr 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Bring out the other stuff: behaviors and components.</p>
+<p>A good idea would be to alternate the content, between programming practices & styles ( like this post... )and the heavy artillery of Cake, so we can have a peaceful digest reading the posts.</p>
+<p>Just a thought...interesting reading btw.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48120472-6130-44f6-b3dd-565c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4741574f03892c61d2b0fea7977c6563&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://injunctioncity.com" rel="nofollow">cartosys</a>						</strong>
+						<strong>said 
+						on Apr 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'm very interested in this theory and would definitely encourage you to post more.  The flow chart visualizations were key in illustrating your points--they gave me a little "brainstorm rush." thx</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4812099e-e6cc-438a-916e-1d224834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=45ad758e00adf3c8808c09396f969965&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.codershop.com" rel="nofollow">Ryan Oldham</a>						</strong>
+						<strong>said 
+						on Apr 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>First, let me just say that I appreciate your willingness to take the time to share gems like this.  I'll be using this information today.  I would like more posts like this one.  If you can find time to write posts like this one, as well as publish the components and behaviors you have, that would be great.<br />
+Thanks again.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48123885-1ec4-4c3c-ba66-2cd24834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=72b7bdc2ea7ade2d95f3396ded0a40ec&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://" rel="nofollow">leo</a>						</strong>
+						<strong>said 
+						on Apr 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'd also really appreciate if you post more stuff like this.<br />
+I just did something like your 1st example (nested if/else) a few days ago and wondered how i could have done it better...now i know :)</br></p>
+<p>thank you very much and greetings from germany ;)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48126d66-4420-4903-addb-2ea24834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Apr 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Leo,</p>
+<p>where do you live in Germany?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4812b5c9-ec68-4d4d-93d7-3d6f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=44dc48f920e4adf1c2fe17c414a44625&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.kevinold.com" rel="nofollow">Kevin Old</a>						</strong>
+						<strong>said 
+						on Apr 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>Great post!  I agree, I think simplicity is the key.  Way too often programmers code whatever they are thinking just to solve the problem and forget the step of refactoring/cleaning code/whatever you want to call it, but if left the way it is it's a confusing mess and incomplete.</p>
+<p>Very interested in reading your future posts!</p>
+<p>Kevin</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4812d5ce-b604-43e5-97b7-0d2b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=264bc4d50ceb0c16f204960ae07dedbb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Sebastian&nbsp;						</strong>
+						<strong>said 
+						on Apr 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>nice article. Since I bother my co-programmers since years that they should prefer "return early" instead of "deep-nesting", I think I'll use this blog entry with it's very helpful visualization of the principle as reference material ;-)</p>
+<p>Also useful in this respect are "continue" and "break" in loops, they help a lot avoiding to write much code for special cases. Some consider this bad practice (because they can be seen as variations of the "goto" paradigm) but that hey many advantages if used in a well-considered way, e.g. search for something in a loop and "break" when the searched item has been found (if "return" isn't possible), or jump over items with "continue" if the are not relevant for the loop, instead of filtering them before entering the loop.</p>
+<p>Sebastian</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4812dde4-de88-467c-ab49-0d2b4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sebastian: Good luck convincing your peers! I also very much agree with you about the loop thing, the same idea applies there was well.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48139335-fa20-422b-82f6-2cfd4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=612ad7c3adee43c41ee3e88affe94472&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							NOSLOW&nbsp;						</strong>
+						<strong>said 
+						on Apr 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I've been taught a more strict top-down approach where the code should drop out the bottom of functions and that early and/or many exit points were generally bad practice. But I think this applies more to old VB programming where you'd often have "cleanup" sections at the bottom that always needed to execute before exiting the routine. </p>
+<p>I do see the advantages of this "return home early" approach, though. Once my code starts to look too complicated/too many nestings for something that should be simple (or thought as a simple), I try to rewrite/refactor so that it reads more clearer. Making something human readable and understandable is certainly makes code easier to maintain later on.</p>
+<p>Keep these kind of posts coming. If we weren't interested in becoming better coders, I don't think we'd be hear reading.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4814fe66-4e10-4d7a-9232-56244834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=602221e0c40c93cfe5c1925a89f2d291&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.miphp.net/" rel="nofollow">Bret Kuhns</a>						</strong>
+						<strong>said 
+						on Apr 27, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Though I would agree that it cuts lines and might seem like an advantage at first, I have to say it seems as though this approach might actually make your code less readable. If somewhere were to skim your code quickly, using nesting as a guide, they might be apt (perhaps not in the provided example, but in other situations) to completely ignore your return and may find themselves confused about the code's execution. In short methods like the one provided, it's not terrible to throw a couple returns, but in sections that are unavoidably long, more than a single return can be quite confusing. I also have to cringe at the difference in return types depending on the situation. It's always best to have a clear hand-shake between methods (clearly expected input and output of a method), and multiple returns can make that messy... That's maybe not so relevant in a loosely-typed language like PHP, but it's still good in general for project management.</p>
+<p>Either way, please continue sharing your thoughts, I always looked forward to a post on <a rel="nofollow" href="http://thinkingphp.org">thinkingphp.org</a> and hope to see more here soon!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-481514d4-d9a8-4bb7-8f7a-472d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=86675f852f5e2db456062a67a04491f7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.kienpham.com" rel="nofollow">Kien Pham</a>						</strong>
+						<strong>said 
+						on Apr 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>I really like this post, I run into this type of logic thinking..problem all the time.</p>
+<p>I also very interested in your Assert class and the Message (component?). How is the Message different with the cake built in Flash? I don't think the Message is part of the cake core?</p>
+<p>Also, how do you format the view when the Assert class throw the Exception?</p>
+<p>Thanks,<br />
+Kien</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4815620f-c8e0-46ff-8a35-1cb74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5e7b4a4aaa9ec8651b805954e09c985&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Apr 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Bret: Hrm, but don't you think that 20 nestings of if-else structures would the code much harder to read? I think when you are reading such nested code (that should not happen all too often anyway) you will extra attention to any line and there will not miss the return statements.</p>
+<p>In fact cutting down on the lines will help you with that.</p>
+<p>About the Assert class, does this here help you? <a rel="nofollow" href="http://debuggable.com/posts/assert-the-yummyness-of-your-cake:480f4dd6-7fe0-4113-9776-458acbdd56cb"></a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4815c95f-eee0-468f-9391-6c944834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=34d57f8b69c811da62b91ee792e8fcaa&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dsi.vozibrale.com/" rel="nofollow">dr. Hannibal Lecter</a>						</strong>
+						<strong>said 
+						on Apr 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi there!</p>
+<p>I've been a fan of this "early return" style for quite a while now, even though I don't use it as much (mostly in MSSQL stored procedures and C# at work).</p>
+<p>It really does make your code more readable and maintainable, but it's true, you have to be careful with those returns..</p>
+<p>Great article!</p>
+<p>p.s. regex still catching false URLs in comments? "\." ;-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4815d178-0a58-4539-a028-47864834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bcc9ed034a1445489a472e5487219721&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.alanblainewhitney.com" rel="nofollow">Alan Whitney</a>						</strong>
+						<strong>said 
+						on Apr 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Good post.</p>
+<p>As nearly everybody else said, KISS (keep it simple stupid).  I have been doing the return early thing for a while and find it helpful.</p>
+<p>Cake is awesome too.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4815e20d-cc30-4a8d-b29d-27ee4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f3f6960aa4a2b4893f2b690aa8e153df&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://christian.roy.name/" rel="nofollow">Christia nRoy</a>						</strong>
+						<strong>said 
+						on Apr 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Bret: It has been my experience that having functions or piece of code that are longer than a screen should refactored (In the non-design pattern way meaning) into a greater number of smaller functions to simply code and make it easier to read.</p>
+<p>With that in mind, missing the return statement is less likely to happen.</p>
+<p>A colleague of me once told me that the return early method also makes it harder to debug as now there are X places where it returns and without a debugger, you have to place debugging prints at every return line to know which one is the culprit.</p>
+<p>I do not use a debugger myself so I know what he means but it was never a source of frustration for me to have to do that.</p>
+<p>I continue and will continue to use return early method.</p>
+<p>Nice article.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-481731c9-23f8-4876-9163-7f3c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0b445cbf94ece79268253e9d7c4b9b10&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.builtbysimple.com" rel="nofollow">Joshua Powell</a>						</strong>
+						<strong>said 
+						on Apr 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is great, I always enjoy reading posts that share my thoughts with code design and structure. Too many people get stuck in deadline mode, even when they're not (myself included) and don't take the few minutes to think out their code before writing. Doing what is simplest is not always the best.</p>
+<p>More. More. More.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4817df10-bf28-434a-b5e6-16284834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1fc72542ffbe28a61b51f4ffe106f301&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.samuofm.com" rel="nofollow">Sam Jones</a>						</strong>
+						<strong>said 
+						on Apr 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I think a lot of programmers would be well served to use visualization tools like the flow graphs you gave as examples.  They always help me out, especially with refactoring which is what you essentially doing here.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4817dfbd-f814-4568-a975-16334834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1fc72542ffbe28a61b51f4ffe106f301&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.samuofm.com" rel="nofollow">Sam Jones</a>						</strong>
+						<strong>said 
+						on Apr 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I think a lot of programmers would be well served to use visualization tools like the flow graphs you gave as examples.  They always help me out, especially with refactoring which is what you essentially doing here.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4817f85b-f530-4d24-8c47-4cf64834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=44060e16163fceaddae337f87357c6ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rubayeet.wordpress.com" rel="nofollow">Rubayeet</a>						</strong>
+						<strong>said 
+						on Apr 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice post Felix. I had to face a similar situation last week. I was supposed to build a tool that is almost same as one my teammate had built earlier. The boss expected me build it fast since all I had to do is figure out the code and make changes where necessary. But when I looked into the code, I felt myself loosing in a maze! The code was deeply nested. The method names were too similar to each other, it was hard to memorize which was doing what. The guy had built the entire logic in a single controller class, making it very large in LOCs. So I built the tool from scratch. The boss wasn't happy, but he understood.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48184c25-5000-4de7-a249-451c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7a77ba5031960fad02e002d3e961f432&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://piotr.zalewa.info" rel="nofollow">Piotr Zalewa</a>						</strong>
+						<strong>said 
+						on Apr 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi</p>
+<p>Nice way of showing why to use alghoritm ...</p>
+<p>Do you have an error in the diagram?<br />
+In the first it is the path [Post Exists] -Yes-&gt; [Get] -YES-&gt; &lt;Show Edit&gt;</br><br />
+In the second: [Post Exists] -Yes-&gt; [Get] -NO-&gt; &lt;Show Edit&gt;</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-481aa3d2-7c34-463e-9d1a-5efd4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4e7305053878d9ab30892251f2553148&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							geff chang&nbsp;						</strong>
+						<strong>said 
+						on May 02, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>my teacher told me that multiple return statements are a bad idea.<br />
+what do you think?</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-481ba3ca-4e60-43e9-96e4-75954834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e9eb916762bed727497e363149692d49&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Bogdan Gribincea&nbsp;						</strong>
+						<strong>said 
+						on May 02, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Your post is DEAD ON! I often write complicated, nested, code that even I can't read after it's done.. although it works and all that. So understanding how we think is the most important thing.<br />
+I read the first piece of code in your post, my brain kind of understood that it was an EDIT but it didn't understand how it worked. When i saw the flowcharts everything became clear, and it became clear that it could be improved.</br><br />
+From now on i'll try using flowcharts to understand how i think heh.</br><br />
+Your idea to think about the thinking process was great. Thanks ;)</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-481ed22b-3558-4784-9833-0cd34834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a72021aac78377a33f742bcdd753b4cf&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://sohaibmuneer.com" rel="nofollow">SayB</a>						</strong>
+						<strong>said 
+						on May 05, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Kool! Felix your post really gives me a boost! coz this style had come naturally my way too. In addition, I would like to add that most of us name methods/functions in a way that other people might not be able to understand the way WE do. For someone who doesn't have a problem using long method names can always name methods that explain a bit more about what it's doing. This way it really turns code into poetry :) - For example, if you want to "redirect if request is not AJAX", then how about using something named like this "$this->redirectIfNotAjax()" instead of something like "$this->isAjax()"  - the latter will obviously confuse someone else into expecting the function would return a value whereas it will also redirect too.<br />
+Thanks to you, my reluctance on this issue is no longer!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48294e35-2d30-40f5-8917-2cc24834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b4b46fee717470b0eff75f454045e452&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Sven P&nbsp;						</strong>
+						<strong>said 
+						on May 13, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice thread!<br />
+Reading through all those comments I encountered the question about multiple return statements only once, astonishing.</br><br />
+You succeeded to make the piece of code more readable by avoiding nested conditions. But by using multiple return statements you went into another trap. When trying to read code including multiple return statements most people will not be able to understand the logic of it, at least if the logical conditions are complex. You are likely to miss a return statement. It also - in php - leads to return values with different data-types within a function which makes it harder to include the functionality in other classes. I personaly prefer breaks and continues here.</br><br />
+What do you think about this?</br></p>
+<p>I appreciate the thread anyway. Would be a better world if more programmers had thoughts like that :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48298d29-4a94-4ed1-82cc-4c2d4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 13, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sven: Multiple return statements and different return types are good when used wisely. I can probably come up with some examples where this is not the case and code quality is decreased by using them, but generally speaking I think its worth to use those techniques they can reduce the level of nestings and therefor complexity of your code.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4861addc-a48c-442e-a64a-26944834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5c744871d0cf0a9ead9eef0bd8320b40&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							deltawing1&nbsp;						</strong>
+						<strong>said 
+						on Jun 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wow, excellent article! I think there needs to be a lot more articles like this, focusing on "how to think" instead of "how to code a specific thing". </p>
+<p>And design patterns actually increase code complexity, which is an undesirable side effect of their usage.</p>
+<p>You've hit the nail on the head. For the programmer, learning HOW to think is the most important thing. Languages come and go, frameworks are born and they eventually die. But your brain ... that's gonna last you a while.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48760e88-95bc-4e3b-b34c-053f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0e066e926c3b2b1fb21483a64f4dd6ce&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://hdh.dyn-o-saur.com/plos" rel="nofollow">hdh</a>						</strong>
+						<strong>said 
+						on Jul 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nitpick: the two diagrams are different. The first says "Get? --yes--> Show Edit", and the second says "--no-->".</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ee23cb-fa88-4838-9f55-24354834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=83a093c76c3f139e4a30f3d3fe0a6c81&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Thomas Jensen&nbsp;						</strong>
+						<strong>said 
+						on Oct 09, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Super post..<br />
+I totally agree, often it is much more simple to have multible return statements. Some purists will say it is bad practice, but they are wrong.</br><br />
+thx</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

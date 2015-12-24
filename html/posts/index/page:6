@@ -1,0 +1,602 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Blog &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="paging">
+	<a href="/posts/index/page:5" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:2">2</a></span> | <span><a href="/posts/index/page:3">3</a></span> | <span><a href="/posts/index/page:4">4</a></span> | <span><a href="/posts/index/page:5">5</a></span> | <span class="current">6</span> | <span><a href="/posts/index/page:7">7</a></span> | <span><a href="/posts/index/page:8">8</a></span> | <span><a href="/posts/index/page:9">9</a></span> | <span><a href="/posts/index/page:10">10</a></span> <a href="/posts/index/page:7" class="next">Next &raquo;</a></div>
+	<div class="post">
+	<h2><a href="/posts/streaming-utf-8-with-node-js:4bf28e8b-a290-432f-a222-11c1cbdd56cb">Streaming UTF-8 (with node.js)</a></h2>	<div class="posted-on">
+		<p>Posted on 18/5/10 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><a href="http://en.wikipedia.org/wiki/Utf-8#Description">UTF-8</a> is a variable-length character encoding for <a href="http://en.wikipedia.org/wiki/Unicode">Unicode</a>. This text is encoded in UTF-8, so the characters you are reading can consist of 1 to 4 bytes. As long as the characters fit within the ASCII range (0-127), there is exactly 1 byte used per character.</p>
+
+<p>But if I want to express a character outside the ASCII range, such as '¢', I need more bytes. The character '¢' for example consists of: 0xC2 and 0xA2. The first byte, 0xC2, indicates that '¢' is a 2-byte character. This is easy to understand if you look at the binary representation of 0xC2:</p>
+
+<pre><code>11000010
+</code></pre>
+
+<p>As you can see, the bit sequence begins with '110', which as per the UTF-8 specification means: "2 byte character ahead!". Another character such as '€' (0xE2, 0x82, 0xAC) would work the same way. The first byte, 0xE2, looks like this in binary:</p>
+
+<pre><code>11100010
+</code></pre>
+
+<p>The prefix '1110' specifies that there are 3 bytes forming the current character. More exotic characters may even start with '11110', which indicates a 4 byte character.</p>
+
+<p>As you can guess, UTF-8 text is not trivial to stream. Networks and file systems are not UTF-8 aware, so they will often split a chunk of text in the middle of a character.</p>
+
+<p>To make sure you don't process a partial character, you have to analyze the last 3 bytes of any given chunk in your stream to check for the bit-prefixes that are used to announce a multibyte character. If you detect an incomplete character, you need to buffer the bytes you have for it, and then prepend them to the next chunk that comes in.</p>
+
+<p>This way you can completely avoid breaking apart multibyte characters within a UTF-8 text, while still getting great performance and memory usage (only the last 3 bytes need checking / buffering).</p>
+
+<p>As of yesterday, <a href="http://nodejs.org/">node.js</a>'s net / http modules are now fully UTF-8 safe, thanks to the streaming Utf8Decoder (undocumented, API may change) you can see below:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> Buffer = require<span class="br0">&#40;</span><span class="st0">'buffer'</span><span class="br0">&#41;</span>.<span class="me1">Buffer</span>;<br />
+<br />
+<span class="kw2">var</span> Utf8Decoder = exports.<span class="me1">Utf8Decoder</span> = <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">this</span>.<span class="me1">charBuffer</span> = <span class="kw2">new</span> Buffer<span class="br0">&#40;</span><span class="nu0">4</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw1">this</span>.<span class="me1">charReceived</span> = <span class="nu0">0</span>;<br />
+&nbsp; <span class="kw1">this</span>.<span class="me1">charLength</span> = <span class="nu0">0</span>;<br />
+<span class="br0">&#125;</span>;<br />
+<br />
+Utf8Decoder.<span class="me1">prototype</span>.<span class="kw1">write</span> = <span class="kw2">function</span><span class="br0">&#40;</span>buffer<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> charStr = <span class="st0">''</span>;<br />
+&nbsp; <span class="co1">// if our last write ended with an incomplete multibyte character</span><br />
+&nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">charLength</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// determine how many remaining bytes this buffer has to offer for this char</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> i = <span class="br0">&#40;</span>buffer.<span class="me1">length</span> &gt;= <span class="kw1">this</span>.<span class="me1">charLength</span> - <span class="kw1">this</span>.<span class="me1">charReceived</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; ? <span class="kw1">this</span>.<span class="me1">charLength</span> - <span class="kw1">this</span>.<span class="me1">charReceived</span><br />
+&nbsp; &nbsp; &nbsp; : buffer.<span class="me1">length</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="co1">// add the new bytes to the char buffer</span><br />
+&nbsp; &nbsp; buffer.<span class="me1">copy</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">charBuffer</span>, <span class="kw1">this</span>.<span class="me1">charReceived</span>, <span class="nu0">0</span>, i<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">charReceived</span> += i;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">charReceived</span> &lt; <span class="kw1">this</span>.<span class="me1">charLength</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="co1">// still not enough chars in this buffer? wait for more ...</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// get the character that was split</span><br />
+&nbsp; &nbsp; charStr = <span class="kw1">this</span>.<span class="me1">charBuffer</span>.<span class="me1">slice</span><span class="br0">&#40;</span><span class="nu0">0</span>, <span class="kw1">this</span>.<span class="me1">charLength</span><span class="br0">&#41;</span>.<span class="me1">toString</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">charReceived</span> = <span class="kw1">this</span>.<span class="me1">charLength</span> = <span class="nu0">0</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>i == buffer.<span class="me1">length</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="co1">// if there are no more bytes in this buffer, just emit our char</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">onString</span><span class="br0">&#40;</span>charStr<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// otherwise cut of the characters end from the beginning of this buffer</span><br />
+&nbsp; &nbsp; buffer = buffer.<span class="me1">slice</span><span class="br0">&#40;</span>i, buffer.<span class="me1">length</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+<br />
+&nbsp; <span class="co1">// determine how many bytes we have to check at the end of this buffer</span><br />
+&nbsp; <span class="kw2">var</span> i = <span class="br0">&#40;</span>buffer.<span class="me1">length</span> &gt;= <span class="nu0">3</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; ? <span class="nu0">3</span><br />
+&nbsp; &nbsp; : buffer.<span class="me1">length</span>;<br />
+<br />
+&nbsp; <span class="co1">// figure out if one of the last i bytes of our buffer announces an incomplete char</span><br />
+&nbsp; <span class="kw1">for</span> <span class="br0">&#40;</span>; i &gt; <span class="nu0">0</span>; i--<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; c = buffer<span class="br0">&#91;</span>buffer.<span class="me1">length</span> - i<span class="br0">&#93;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="co1">// See http://en.wikipedia.org/wiki/UTF-8#Description</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// 110XXXXX</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>i == <span class="nu0">1</span> &amp;&amp; c &gt;&gt; <span class="nu0">5</span> == 0x06<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">charLength</span> = <span class="nu0">2</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// 1110XXXX</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>i &lt;= <span class="nu0">2</span> &amp;&amp; c &gt;&gt; <span class="nu0">4</span> == 0x0E<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">charLength</span> = <span class="nu0">3</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// 11110XXX</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>i &lt;= <span class="nu0">3</span> &amp;&amp; c &gt;&gt; <span class="nu0">3</span> == 0x1E<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">charLength</span> = <span class="nu0">4</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="kw1">this</span>.<span class="me1">charLength</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// no incomplete char at the end of this buffer, emit the whole thing</span><br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">onString</span><span class="br0">&#40;</span>charStr+buffer.<span class="me1">toString</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">return</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="co1">// buffer the incomplete character bytes we got</span><br />
+&nbsp; buffer.<span class="me1">copy</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">charBuffer</span>, <span class="nu0">0</span>, buffer.<span class="me1">length</span> - i, buffer.<span class="me1">length</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw1">this</span>.<span class="me1">charReceived</span> = i;<br />
+<br />
+&nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>buffer.<span class="me1">length</span> - i &gt; <span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// buffer had more bytes before the incomplete char, emit them</span><br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">onString</span><span class="br0">&#40;</span>charStr+buffer.<span class="me1">slice</span><span class="br0">&#40;</span><span class="nu0">0</span>, buffer.<span class="me1">length</span> - i<span class="br0">&#41;</span>.<span class="me1">toString</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="kw1">if</span> <span class="br0">&#40;</span>charStr<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// or just emit the charStr if any</span><br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">onString</span><span class="br0">&#40;</span>charStr<span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span>;</div></p>
+
+<p>I feel like this implementation could still be somewhat simplified, so if you have any suggestions or comments, please let me know!</p>
+
+<p>--fg</p>
+
+<p>PS: Another buffer-based project I'm working on is a fast multipart parser - stay tuned for another post!</p>
+
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/4bf28e8b-a290-432f-a222-11c1cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fstreaming-utf-8-with-node-js%3A4bf28e8b-a290-432f-a222-11c1cbdd56cb &amp;title=Streaming+UTF-8+%28with+node.js%29';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fstreaming-utf-8-with-node-js%3A4bf28e8b-a290-432f-a222-11c1cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fstreaming-utf-8-with-node-js%3A4bf28e8b-a290-432f-a222-11c1cbdd56cb&amp;title=Streaming+UTF-8+%28with+node.js%29&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fstreaming-utf-8-with-node-js%3A4bf28e8b-a290-432f-a222-11c1cbdd56cb&amp;title=Streaming+UTF-8+%28with+node.js%29';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/streaming-utf-8-with-node-js:4bf28e8b-a290-432f-a222-11c1cbdd56cb">12 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/streaming-utf-8-with-node-js:4bf28e8b-a290-432f-a222-11c1cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/understanding-node-js:4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb">Understanding node.js</a></h2>	<div class="posted-on">
+		<p>Posted on 29/4/10 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><a href="http://nodejs.org/">Node.js</a> has generally caused two reactions in people I've introduced it to. Basically people either "got it" right away, or they ended up being very confused.</p>
+
+<p>If you have been in the second group so far, here is my attempt to explain node:</p>
+
+<ul>
+<li>It is a command line tool. You download a tarball, compile and install the source.</li>
+<li>It let's you run JavaScript programs by typing 'node my_app.js' in your terminal.</li>
+<li>The JS is executed by the <a href="http://code.google.com/p/v8/">V8 javascript engine</a> (the thing that makes Google Chrome so fast).</li>
+<li>Node provides a JavaScript API to access the network and file system</li>
+</ul>
+
+<p><strong><em>"But I can do everything I need in: ruby, python, php, java, ... !".</em></strong></p>
+
+<p>I hear you. And you are right! Node is no freaking unicorn that will come and do your work for you, sorry. It's just a tool, and it probably won't replace your regular tools completely, at least not for now.</p>
+
+<p><strong><em>"Get to the point!"</em></strong></p>
+
+<p>Alright, I will. Node is basically very good when you need to do several things at the same time. Have you ever written a piece of code and said "I wish this would run in parallel"? Well, in node everything runs in parallel, except your code.</p>
+
+<p><strong><em>"Huh?"</em></strong></p>
+
+<p>That's right, <em>everything runs in parallel, except your code</em>. To understand that, imagine your code is the king, and node is his army of servants.</p>
+
+<p>The day starts by one servant waking up the king and asking him if he needs anything. The king gives the servant a list of tasks and goes back to sleep a little longer. The servant now distributes those tasks among his colleagues and they get to work.</p>
+
+<p>Once a servant finishes a task, he lines up outside the kings quarter to report. The king lets one servant in at a time, and listens to things he reports. Sometimes the king will give the servant more tasks on the way out.</p>
+
+<p>Life is good, for the king's servants carry out all of his tasks in parallel,   but only report with one result at a time, so the king can focus. *</p>
+
+<p><strong><em>"That's fantastic, but could you quit the silly metaphor and speak geek to me?"</em></strong></p>
+
+<p>Sure. A simple node program may look like this:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> fs = require<span class="br0">&#40;</span><span class="st0">'fs'</span><span class="br0">&#41;</span><br />
+&nbsp; , sys = require<span class="br0">&#40;</span><span class="st0">'sys'</span><span class="br0">&#41;</span>;<br />
+<br />
+fs.<span class="me1">readFile</span><span class="br0">&#40;</span><span class="st0">'treasure-chamber-report.txt'</span>, <span class="kw2">function</span><span class="br0">&#40;</span>report<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; sys.<span class="me1">puts</span><span class="br0">&#40;</span><span class="st0">&quot;oh, look at all my money: &quot;</span>+report<span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+<br />
+fs.<span class="me1">writeFile</span><span class="br0">&#40;</span><span class="st0">'letter-to-princess.txt'</span>, <span class="st0">'...'</span>, <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; sys.<span class="me1">puts</span><span class="br0">&#40;</span><span class="st0">&quot;can't wait to hear back from her!&quot;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span>;</div></p>
+
+<p>Your code gives node the two tasks to read and write a file, and then goes to sleep. Once node has completed a task, the callback for it is fired. But there can only be one callback firing at the same time. Until that callback has finished executing, all other callbacks have to wait in line. In addition to that, there is no guarantee on the order in which the callbacks will fire.</p>
+
+<p><strong><em>"So I don't have to worry about code accessing the same data structures at the same time?"</em></strong></p>
+
+<p>You got it! That's the entire beauty of JavaScripts single-threaded / event loop design!</p>
+
+<p><strong><em>"Very nice, but why should I use it?"</em></strong></p>
+
+<p>One reason is efficiency. In a web application, your main response time cost is usually the sum of time it takes to execute all your database queries. With node, you can execute all your queries at once, reducing the response time to the duration it takes to execute the slowest query.</p>
+
+<p>Another reason is JavaScript. You can use node to share code between the browser and your backend. JavaScript is also on its way to become a really universal language. No matter if you did python, ruby, java, php, ... in the past, you've probably picked up some JS along the way, right?</p>
+
+<p>And the last reason is raw speed. V8 is constantly pushing the boundaries in being one of the fastest dynamic language interpreters on the planet. I can't think of any other language that is being pushed for speed as aggressively as JavaScript is right now. In addition to that, node's I/O facilities are really light weight, bringing you as close to fully utilizing your system's full I/O capacities as possible.</p>
+
+<p><strong><em>"So you are saying I should write all my apps in node from now on?"</em></strong></p>
+
+<p>Yes and no. Once you start to swing the node hammer, everything is obviously going to start looking like a nail. But if you're working on something with a deadline, you might want to base your decision on:</p>
+
+<ul>
+<li>Are low response times / high concurrency important? Node is really good at that.</li>
+<li>How big is the project? Small projects should be fine. Big projects should evaluate carefully (available libraries, resources to fix a bug or two upstream, etc.).</li>
+</ul>
+
+<p><strong><em>"Does node run on Windows?"</em></strong></p>
+
+<p>No. If you are on windows, you need to run a virtual machine (I recommend <a href="http://www.virtualbox.org/">VirtualBox</a>) with Linux. Windows support for node is planned, but don't hold your breath for the next few months unless you want to help with the port.</p>
+
+<p><strong><em>"Can I access the DOM in node?"</em></strong></p>
+
+<p>Excellent question! No, the DOM is a browser thingy, and node's JS engine (V8) is thankfully totally separate from all that mess. However, there are people working on implementing <a href="http://www.yuiblog.com/blog/2010/04/09/node-js-yui-3-dom-manipulation-oh-my/">the DOM as a node module</a>, which may open very exciting possibilities such as unit testing client-side code.</p>
+
+<p><strong><em>"Isn't event driven programming really hard?"</em></strong></p>
+
+<p>That depends on you. If you already learned how to juggle AJAX calls and user events in the browser, getting used to node shouldn't be a problem.</p>
+
+<p>Either way, test driven development can really help you to come up with maintainable designs.</p>
+
+<p><strong><em>"Who is using it?"</em></strong></p>
+
+<p>There is a small / incomplete list in the <a href="http://wiki.github.com/ry/node">node wiki</a> (scroll to "Companies using Node"). <a href="http://www.yuiblog.com/blog/2010/04/09/node-js-yui-3-dom-manipulation-oh-my/">Yahoo</a> is experimenting with node for YUI, <a href="http://www.plurk.com/">Plurk</a> is using it for massive comet and Paul Bakaus (of jQuery UI fame) is building a <a href="http://ajaxian.com/archives/aves-game-engine">mind-blowing game engine</a> that has some node in the backend. <a href="http://www.joyent.com/">Joyent</a> has hired Ryan Dahl (the creator of node) and heavily sponsors the development.</p>
+
+<p>Oh, and Heroku just announced (experimental ) <a href="http://blog.heroku.com/archives/2010/4/28/node_js_support_experimental/">hosting support for node.js</a> as well.</p>
+
+<p><strong><em>"Where can I learn more?"</em></strong></p>
+
+<p>Tim Caswell is running the excellent <a href="http://howtonode.org/">How To Node</a> blog. Follow <a href="http://search.twitter.com/search?q=%23nodejs">#nodejs</a> on twitter. Subscribe to the <a href="http://groups.google.com/group/nodejs">mailing list</a>. And come and hang out in the IRC channel, <em>#node.js</em> (yes, the dot is in the name). We're close to hitting the 200 lurker-mark there soon : ).</p>
+
+<p>I'll also continue to write articles here on <a href="http://debuggable.com/">debuggable.com</a>.</p>
+
+<p>That's it for now. Feel free to comment if you have more questions!</p>
+
+<p>--fg</p>
+
+<p>*: The metaphor is obviously a simplification, but if it's hard to find a counterpart for the concept of non-blocking in reality.</p>
+
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Funderstanding-node-js%3A4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb &amp;title=Understanding+node.js';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Funderstanding-node-js%3A4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Funderstanding-node-js%3A4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb&amp;title=Understanding+node.js&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Funderstanding-node-js%3A4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb&amp;title=Understanding+node.js';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/understanding-node-js:4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb">26 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/understanding-node-js:4bd98440-45e4-4a9a-8ef7-0f7ecbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/interview-on-the-changelog:4bbba7b8-bb44-4960-8d6d-2cd9cbdd56cb">Interview on the changelog</a></h2>	<div class="posted-on">
+		<p>Posted on 6/4/10 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><a href="adam">Adam</a> and <a href="wynn">Wynn</a> interviewed me for the latest episode of the changelog:</p>
+
+<p><a href="http://thechangelog.com/post/501053444/episode-0-2-0-node-js-with-felix-geisendorfer">Episode 0.2.0 - Node.js with Felix Geisendörfer</a></p>
+
+<p>For those interested in node.js (frameworks, unit testing, etc.) this should be a nice introduction to the current status of the project and ecosystem.</p>
+
+<p>--fg</p>
+
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/4bbba7b8-bb44-4960-8d6d-2cd9cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Finterview-on-the-changelog%3A4bbba7b8-bb44-4960-8d6d-2cd9cbdd56cb &amp;title=Interview+on+the+changelog';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Finterview-on-the-changelog%3A4bbba7b8-bb44-4960-8d6d-2cd9cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Finterview-on-the-changelog%3A4bbba7b8-bb44-4960-8d6d-2cd9cbdd56cb&amp;title=Interview+on+the+changelog&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Finterview-on-the-changelog%3A4bbba7b8-bb44-4960-8d6d-2cd9cbdd56cb&amp;title=Interview+on+the+changelog';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/interview-on-the-changelog:4bbba7b8-bb44-4960-8d6d-2cd9cbdd56cb">0 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/interview-on-the-changelog:4bbba7b8-bb44-4960-8d6d-2cd9cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/quitting-open-source:4bb448b6-6414-45a3-a282-16c7cbdd56cb">Quitting open source</a></h2>	<div class="posted-on">
+		<p>Posted on 1/4/10 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><strong>Update:</strong> Yes, this of course was an April fools joke : )</p>
+
+<p>This is a decision that has not been easy for us. Over the years, Tim and I build our reputation and company on the basis of open source. For a long time we worked on <a href="http://cakephp.org/">CakePHP</a>, and more recently I became very involved with <a href="http://nodejs.org/">node.js</a>.</p>
+
+<p>Generally, open source has been very good to us. We learned a lot about programming, collaborated with great people and, thanks to our clients, made payroll consistently.</p>
+
+<p>But sometimes, even if things are good, you have to evaluate if they are aligned with your true goals. And today, we finally decided they are not. Our goals and the nature of open source are in fundamental conflict.</p>
+
+<p>What changed? Well, when we initially started debuggable, our goal was to build commercial web applications and make a living from that. But it turns out, that is actually really hard.</p>
+
+<p>37signals may wash your head about getting real until it comes off, but the truth is:</p>
+
+<p>You will not build a product like basecamp with a limit of 10h / week. And you certainly will not, let me stress that, develop an open source technology like Ruby on Rails along the way, which will then help you promote your product(s). 37signals either got insanely lucky, or they are glorifying their story after the fact. It is probably both.</p>
+
+<p>This leads back to our decision. We have concluded, that in order to reach our goals for 2010, we need more time. It is not really possible to cut on client work, since we've got bills to pay. So instead, we will drastically cut on our open source involvement.</p>
+
+<p>Beginning today, we will only work on open source, if we actually really need a critical bug fixed, and the maintainer of the project refuses to fix it for us. We will only send those bug fixes upstream, if the patches are big enough so it would be more difficult for us to maintain them privately.</p>
+
+<p>We estimate that this will free us 20 hours / week. Those hours, for now, will be used to finally get <a href="http://transloadit.com/">transloadit.com</a> out of the testing phase. At the same time, we are evaluating a more radical technology change. We recently developed our first native iPhone application for a client, and it is a truly great plattform. Also the iPad seems like a great opportunity we shouldn't miss. So I wouldn't be surprised if Tim and I would be moving to the App Store ecosystem at some point.</p>
+
+<p>So fare well, open source community. We are sorry we can longer be a part. Our website will be updated to reflect our new philosophy by tomorrow.</p>
+
+<p>-- Felix &amp; Tim</p>
+
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/4bb448b6-6414-45a3-a282-16c7cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fquitting-open-source%3A4bb448b6-6414-45a3-a282-16c7cbdd56cb &amp;title=Quitting+open+source';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fquitting-open-source%3A4bb448b6-6414-45a3-a282-16c7cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fquitting-open-source%3A4bb448b6-6414-45a3-a282-16c7cbdd56cb&amp;title=Quitting+open+source&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fquitting-open-source%3A4bb448b6-6414-45a3-a282-16c7cbdd56cb&amp;title=Quitting+open+source';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/quitting-open-source:4bb448b6-6414-45a3-a282-16c7cbdd56cb">12 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/quitting-open-source:4bb448b6-6414-45a3-a282-16c7cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/javascript-meetup-hamburg-slides:4b8f9986-4e64-4755-b420-074dcbdd56cb">JavaScript Meetup Hamburg + Slides</a></h2>	<div class="posted-on">
+		<p>Posted on 4/3/10 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><strong>Update:</strong> Andy Wenk posted <a href="http://blog.netzmeister-st-pauli.com/post/426345602/hhjs-first-meetup-hamburg">a very nice summary</a> of the event.</p>
+
+<p>Last night Tim and I took a little road trip to Hamburg. I had no idea the <a href="http://en.wikipedia.org/wiki/Reeperbahn">Reeperbahn</a> looked like Las Vegas : ).</p>
+
+<p>Anyway, our actual destination was the first <a href="http://twitter.com/hhjs">Hamburg JS</a> meetup where <a href="http://www.nonblocking.io/">Malte Ubl</a> invited me to speak about node.js. The turnout was fantastic, and thanks to <a href="http://www.sinnerschrader.de/">SinnerSchrader</a>'s hosting of the event, there was plenty of pizza, beer and an absolutely fantastic location.</p>
+
+<p>I've also updated my previous node.js talk, all the examples should now be 0.1.30+ compatible, and the section about "The Future" of node has a more recent and interesting list of things that are on the radar:</p>
+
+<div style="width:425px" id="__ss_3332942"><strong style="display:block;margin:12px 0 4px"><a href="http://www.slideshare.net/the_undefined/nodejs-a-quick-tour-ii" title="Node.js - A Quick Tour II">Node.js - A Quick Tour II</a></strong><object width="425" height="355"><param name="movie" value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=node-100304052653-phpapp02&stripped_title=nodejs-a-quick-tour-ii" /><param name="allowFullScreen" value="true"/><param name="allowScriptAccess" value="always"/><embed src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=node-100304052653-phpapp02&stripped_title=nodejs-a-quick-tour-ii" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="355"></embed></object></div>
+
+<p>You can also <a href="http://felixge.s3.amazonaws.com/10/nodejs-a-quick-tour-2.pdf">download the slides as PDF</a> (164 kb).</p>
+
+<p>--fg</p>
+
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/4b8f9986-4e64-4755-b420-074dcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fjavascript-meetup-hamburg-slides%3A4b8f9986-4e64-4755-b420-074dcbdd56cb &amp;title=JavaScript+Meetup+Hamburg+%2B+Slides';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fjavascript-meetup-hamburg-slides%3A4b8f9986-4e64-4755-b420-074dcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fjavascript-meetup-hamburg-slides%3A4b8f9986-4e64-4755-b420-074dcbdd56cb&amp;title=JavaScript+Meetup+Hamburg+%2B+Slides&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fjavascript-meetup-hamburg-slides%3A4b8f9986-4e64-4755-b420-074dcbdd56cb&amp;title=JavaScript+Meetup+Hamburg+%2B+Slides';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/javascript-meetup-hamburg-slides:4b8f9986-4e64-4755-b420-074dcbdd56cb">0 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/javascript-meetup-hamburg-slides:4b8f9986-4e64-4755-b420-074dcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="paging">
+	<a href="/posts/index/page:5" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:2">2</a></span> | <span><a href="/posts/index/page:3">3</a></span> | <span><a href="/posts/index/page:4">4</a></span> | <span><a href="/posts/index/page:5">5</a></span> | <span class="current">6</span> | <span><a href="/posts/index/page:7">7</a></span> | <span><a href="/posts/index/page:8">8</a></span> | <span><a href="/posts/index/page:9">9</a></span> | <span><a href="/posts/index/page:10">10</a></span> <a href="/posts/index/page:7" class="next">Next &raquo;</a></div>	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

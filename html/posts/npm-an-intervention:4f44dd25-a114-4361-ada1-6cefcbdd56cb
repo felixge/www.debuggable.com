@@ -1,0 +1,785 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>NPM - An intervention &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></h2>	<div class="posted-on">
+		<p>Posted on 22/2/12 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><strong>Update:</strong> Isaac <a href="http://debuggable.com/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb#comment-4f453c4b-7aac-4224-8c65-3f15cbdd56cb#comment-4f4533a2-f590-4b40-bde1-52eacbdd56cb">commented</a> and explained why fuzzy version specifiers are here to stay. I'll be ok with it and will adapt my workflow accordingly.</p>
+
+<p><strong>Update 2:</strong> I did not give up on the bug that is part of the story below, a test case and fix has been <a href="https://github.com/nodejitsu/forever/pull/246">submitted and merged</a>!</p>
+
+<p><strong>Update 3:</strong> NPM Shrinkwrap is now a <a href="http://blog.nodejs.org/2012/02/27/managing-node-js-dependencies-with-shrinkwrap/">real thing</a>.</p>
+
+<p>NPM is the official node.js package manager. Unlike many package managers
+that came before, it is actually incredibly awesome, and has helped to create
+one of the most vibrant communities in the history of open source.</p>
+
+<p>However, today I want to talk about a few aspects of npm that concern me. In
+particular I want to talk about stuff where I feel that NPM is making bad
+things easy, and good things hard.</p>
+
+<h2>NPM module versions are broken</h2>
+
+<p>Today, I tried to contribute to the <a href="https://github.com/nodejitsu/forever">forever</a> module. The company I am helping
+had to patch their version of it because of a hard-to-reproduce bug in
+production and asked me to help submitting their fix upstream. Being the
+scientific type, I set out to write a test case against the forever version
+their patch is based on:</p>
+
+<pre class="terminal">
+$ npm install forever@0.7.2
+</pre>
+
+<p>Fantastic, NPM lets me specify which version of forever I want to install. Now
+lets verify the installed version works:</p>
+
+<pre class="terminal">
+$ ./node_modules/forever/bin/forever
+
+node.js:134
+        throw e; // process.nextTick error, or 'error' event on first tick
+        ^
+TypeError: undefined is not a function
+    at CALL_NON_FUNCTION_AS_CONSTRUCTOR (native)
+    at Object.<anonymous> (/Users/Felix/Desktop/foo/node_modules/forever/lib/forever.js:43:23)
+    ...
+</pre>
+
+<p>Oh no, what happened? Mind you, except for an unrelated patch, this version of
+forever is running perfectly fine in production.</p>
+
+<p>Well, as it turns out, you have been lied to. There is no such thing as forever
+v0.7.2. At least not a single one. It depends on an implicit and unchangable
+second parameter: time.</p>
+
+<p>Why is that? Well, it is because forever v0.7.2 depends on this:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="st0">&quot;nconf&quot;</span>: <span class="st0">&quot;0.x.x&quot;</span>,</div></p>
+
+<p>And as it turns out, nconf has released newer versions matching this selector,
+featuring a different API.</p>
+
+<h2>You are doing it wrong</h2>
+
+<p>"Hah!", you might say. "That's why you should
+<a href="http://www.mikealrogers.com/posts/nodemodules-in-git.html">check your node&#95;modules into git</a>!".</p>
+
+<p>I am sorry, but that is not helpful. While this will allow me to pin down
+the node modules used by my app exactly, it does not help me here. What I want to
+do is to reproduce this bug in a standalone copy of forever v0.7.2, then
+check if it exists in the latest version, and if so submit the test case and
+fix for it upstream.</p>
+
+<p>However, I can't. Not without manually resolving all forever dependencies the
+way NPM resolved them when v0.7.2 was released. (The fact that forever is a bit
+of a <a href="https://github.com/nodejitsu/forever/blob/382f8e7f2a1da99838615d8e462be6b964975de4/package.json#L24-40">spaceship</a> when it comes to dependencies does not help either).</p>
+
+<h2>Discouraging Open Source</h2>
+
+<p>Speaking about Mikeal's article. I felt that something was wrong about checking
+your node&#95;modules into git when reading it, but it is only now that I can
+point out what:</p>
+
+<p>In the article, Mikeal argues that module authors should not try to exactly
+reference their dependency versions, so this way users would get more frequent
+updates of those dependencies and help test them.</p>
+
+<p>However, he says doing so for your app is a good thing.</p>
+
+<p>I disagree. To me, this approach discourages open source for two reasons:</p>
+
+<h3>a) Bug reports:</h3>
+
+<p>I currently maintain 44 NPM modules. It is very hard to keep
+up with that.</p>
+
+<p>If you are asking me to support multiple versions of all my dependencies, I
+will have to stop helping people with bug reports for my modules.</p>
+
+<p>When somebody reports a bug for a given version of my module, I want to know
+<strong>exactly</strong> what version he used. Figuring out when he installed my module to
+rule out dependency issues for every bug report is not an option for me.</p>
+
+<h3>b) Contributions</h3>
+
+<p>Ask yourself what is easier. Adding a quick patch to a node module you already
+track include in the git repo of your app, --or-- creating a fork of it, fixing the problem in the
+fork, pushing that fork on GitHub, changing your package.json to point to your
+fork, and submitting a pull request.</p>
+
+<p>I know people cannot be forced to contribute back, nor should they be. But
+as things stand right now, checking in all node_modules of an app into git is
+the <strong>only</strong> sane option, as the version numbers in your package.json are
+essentially meaningless.</p>
+
+<p>This means that contributing back to open source is made difficult by default,
+while keeping your patches to yourself is made easy. I would like this to be
+the other way arround.</p>
+
+<h2>Conclusion</h2>
+
+<p>I propose to gradually drop all support for fuzzy version specifiers from NPM.</p>
+
+<p>To me, fuzzy version specifiers are entirely evil. They make things more
+complex. They force me to manually snapshot the packages I depend on for my
+apps. They prevent me from supporting and contributing to open source.</p>
+
+<p>So rather than throwing more complexity at this problem, lets just remove
+this feature alltogether.</p>
+
+<p>If you agree, please <a href="https://twitter.com/felixge/status/172366107469029376">re-tweet this article</a> or leave a comment.</p>
+
+<p>--fg</p>
+
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/4f44dd25-a114-4361-ada1-6cefcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnpm-an-intervention%3A4f44dd25-a114-4361-ada1-6cefcbdd56cb &amp;title=NPM+-+An+intervention';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnpm-an-intervention%3A4f44dd25-a114-4361-ada1-6cefcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnpm-an-intervention%3A4f44dd25-a114-4361-ada1-6cefcbdd56cb&amp;title=NPM+-+An+intervention&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnpm-an-intervention%3A4f44dd25-a114-4361-ada1-6cefcbdd56cb&amp;title=NPM+-+An+intervention';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">28 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4f452277-615c-48f0-b4d2-33b0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=05ab66b795a2cbdffc97d2b8209e3a6b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://twitter.com/tbassetto" rel="nofollow">Thomas</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I agree with you, but do I really have to retweet Rasmus Lerdorf going to Etsy?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f452318-3e94-48c1-8c9e-3ed0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=620cd7bd79109f4880586646d7a24669&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://kishorelive.com" rel="nofollow">Kishore Nallan</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>There is another issue with fuzzy version specifiers (although that's not NPM's fault): Not all module authors actually follow conventions like major and minor release numbers.  So I can have 0.2.x in my package.json, but the module author can actually potentially land a major API change as a point release. Because of this, I have stopped using fuzzy specifiers.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f4523c9-5df4-4ba7-be81-3ca8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ee6f763a240b188df3e36feb5e0b1fbc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://synthmedia.co.uk" rel="nofollow">Dom Udall</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Completely agree, Rasmus retweeted (and the tweet that lead me here of course)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f452568-cb88-4a72-9071-431ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f1e3ab214a976a39cfd713bc93deb10f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							TJ&nbsp;						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>fuzzy is certainly more convenient when it works, but other than that yeah I agree haha, consistency > convenience</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f45259a-4640-41c9-989a-3ed0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5a342a41b386d3e37a1ed6d2232e4b87&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://tisba.de" rel="nofollow">Sebastian Cohnen</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I personally like the approach Bundler (for Ruby) is doing by having a Gemfile.lock which describes the dependency chain with all versions. This is checked into the repository to ensure everyone has the same version of dependencies installed.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f452682-14dc-49b8-be0c-3ca8cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thomas / Dom Udall: Sorry, the link to the tweet was a copy & paste fail. It's fixed now : ).</p>
+<p>Sebastian Cohnen: I'd rather make things simpler than making them more complicated. But if fuzzy version specifiers are here to stay, yeah, that would be the next best thing.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f452f30-4f78-44cf-bdc7-471bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bd0d3c76f5fd5a669d144c035648ac80&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.nodejs-news.com/" rel="nofollow">Vincent RABAH</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>I agree with out ! It must change : every time I have a npm update, I pray. Because often, I got broken packages :(</p>
+<p>I just made a post to nodeJS News to aware people.</p>
+<p><a rel="nofollow" href="http://www.nodejs-news.com/news/Felix-Geisendorfer-about-npm-modules/">http://www.nodejs-news.com/news/Felix-Geisendorfer-about-npm-modules/</a></p>
+<p>Regards</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f4533a2-f590-4b40-bde1-52eacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=73a2b24daecb976af81e010b7a3ce3c6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.izs.me/" rel="nofollow">Isaac Z. Schlueter</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>You don&apos;t need to figure out when they installed your module.  You only need to have them run <code>npm ls</code> and it&apos;ll tell you the version of everything that&apos;s installed.  I maintain 45 published modules, one of which is npm itself.  I&apos;ve not had a problem with this.</p>
+<p>Locking down node module versions will not prevent software from having bugs.  It will reduce one vector of divergence, but <em>only</em> that one vector.  It is a myth that all divergence in software is necessarily harmful.  Flexible version dependencies make <em>fixing</em> bugs easier as well, in many cases.</p>
+<p>In the case you mention, the <code>forever</code> program depends on nconf 0.x.x.  Using a module involves a certain amount of trust in the versioning semantics of the module&apos;s author.  Maybe forever&apos;s author should contact nconf&apos;s author and figure out something that can work for them ;)  In any event, all he has to do at that point is either publish a new version of forever which fixes the dependency, or a new version of nconf that maintains backwards compatibility.  (Indeed, it&apos;s what <em>has</em> happened, but your insistence on using 0.7.2 instead of 0.7.4 or 0.7.5 has exposed you to this bug that was already fixed!)</p>
+<p>The cost of this bug is very low.  Fixing it is easy.  Getting the relevant information to reproduce the state is a single command-line invocation and a paste into a gist.</p>
+<p>It&apos;s interesting to note that the <code>forever</code> package, as it is primarily a downloadable command line utility, really ought to have its dependencies bundled, (at least, according to me, and several others).  Yes, this means that, after updating nconf to 0.5.1 to support whatever Broadway needs, Charlie will have to update the copy that forever is using, and re-publish with a new version.  That&apos;s what I do for npm.  It&apos;s not really any more work than explicit version numbers, and in fact, is easiest to accomplish when version numbers in package.json are vague.</p>
+<p>In short, I think that the forever/nconf example is a bit of a straw man.  npm ls will tell you which versions of everything are installed, and forever ought to be checking in its entire dependency tree anyway.  It&apos;s not worth giving up the added real-world coverage, of allowing one&apos;s reusable module to be installed in multiple different configurations.  It&apos;s not worth giving up the convenience of releasing bugfixes by pushing one thing vs having to push several.</p>
+<p>You&apos;re trying to optimize for the deployment case, at the expense of the reusable module development case, and not realizing that the reason there is so much activity here is because we work so hard to make it convenient to do so.</p>
+<p>Moving on...</p>
+<p><code>npm shrinkwrap</code> is coming very soon (like <code>bundler lock</code>).  This is a compromise between the convenience of easy upgrades and checking everything into git/bundling in the package tarball.  Even in this case, though, I really don&apos;t get why you think that checking deps into git for deployed apps is much less convenient than fixed dependency versions.</p>
+<p>I maintain a lot of reusable libs, many of which depend on one another.  Having to update them all every time one of them changes would mean that the vast majority don&apos;t get bugfixes, or my modules would have to be more monolithic, or that there&apos;d be many different copies installed unnecessarily.</p>
+<p>You can&apos;t get away from having to figure out a reasonable compromise between module author and module user.  If <em>you</em> find that <em>you</em> prefer explicit dependency versions, fine.  No one&apos;s stopping you.  In fact, we&apos;re adding the shrinkwrap command so that you can have control over this all the way through the tree.  But I think that you&apos;re failing to see the real advantages of flexible dep versions in other areas.</p>
+<p>This feature will never be removed, gradually or otherwise.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f45390b-7118-467c-82b6-3f15cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d8eba8dd0e89a0580ec4157681121a79&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.mikealrogers.com" rel="nofollow">Mikeal Rogers</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I think you misunderstand my statements about checking modules in to git.</p>
+<p>A library like forever should NEVER check it's dependencies in to git. I explicitly state:</p>
+<blockquote><p>
+Only applications that are deployed should checkin node_modules. Package maintainers should continue to define what they think are acceptable version ranges, it’s the only way we can keep the community up with the rate of change and improvement we see in node.js.
+</p></blockquote>
+<p>An application you are deploying has different requirements and concerns than modules you publish to npm for others to use.</p>
+<p>I don't buy the argument that it discourages bug reports and contributions. Sure, it might be easiest to patch a bug locally and then push it to production, and when you're running an application that is breaking because of a bug in a dependency that is what you should do. Waiting around for your pull request to get accepted is a not an acceptable excuse for your site being down.</p>
+<p>You're missing the simple fact that using <code>npm install</code> will overwrite all those local changes, so if you aren't also going through the work to get contributions in upstream you'll never be able to upgrade that dependency, which will likely leave you with more bugs in the long run than you have currently.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f45397e-86b8-4d69-9cd0-3f15cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=73a2b24daecb976af81e010b7a3ce3c6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.izs.me/" rel="nofollow">Isaac Z. Schlueter</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>> A library like forever should NEVER check it's dependencies in to git.</p>
+<p>No, if anything, I misunderstand the forever module ;)</p>
+<p>I thought it was primarily a command-line util that keeps your thing running.  Yes, if it's a reusable library, then it shouldn't check its deps in.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f453a5d-91f8-4e63-a354-3ca8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23b827c76b7eebbb1936f905a7ba2e24&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://github.com/einaros" rel="nofollow">einaros</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Disregarding the rest of the discussions (there are valid points on both sides): There's also the inverted case of an external change (to e.g. node itself) breaking something in your module, which is in turn used by another (potentially more used) mod.</p>
+<p>Concretely, I maintain a websocket implementation called 'ws'. It's used by socket.io, websocket.io, zombie and other modules which are more commonly installed than ws itself. Yesterday I noticed that the prebuilt 0.6.11 node package for OS X now targets ia32, which causes x64 Mac users to end up with a mismatch between node itself and naively built native extensions. Consequently ws was broken, zombie was broken, websocket.io was broken.</p>
+<p>Seeing as most modules depend on version 0.4.x or ~0.4.0 of ws, I was able to 'fix' all of these other modules in one fell swoop by updating my build scripts and pushing 0.4.7.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f453c4b-7aac-4224-8c65-3f15cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Isaac:</p>
+<p>> Getting the relevant information to reproduce the state is a single command-line invocation and a paste into a gist.</p>
+<p>That assumes I had the right "v0.7.2" already installed on my system. I didn't.</p>
+<p>> In short, I think that the forever/nconf example is a bit of a straw man.</p>
+<p>Absolutely. I wanted to paint my angle on this issue in black and white in order to simplify and focus my arguments.</p>
+<p>I certainly don't run into this issue every day, and I certainly don't think this issue will actually stop me from anything. </p>
+<p>However, I stand by one thing: I feel like npm is making it hard to do what I want here, and I think my needs are reasonable, even if not shared by everybody. (more on this below)</p>
+<p>>  Even in this case, though, I really don't get why you think that checking deps into git for deployed apps is much less convenient than fixed dependency versions.</p>
+<p>The opposite. I think checking dependencies in git is very convenient. But I really dislike how it encourages to keep your patches private by making that option much easier than contributing. Now I certainly know that this does not apply to Mikeal or you at all, but from my experience helping companies with their projects, I'm not happy with this.</p>
+<p>> npm shrinkwrap is coming very soon (like bundler lock).</p>
+<p>Awesome. I'd still prefer to get rid of fuzzy versions, but this is the next best thing. So thank you so much for that, as well as your amazing work on npm. I really hope I got the tone of my post right, I certainly have nothing but good things to say about npm 99.9% of the time and I'd be concerned if you tried to please everybody 100% : ).</p>
+<p>> But I think that you're failing to see the real advantages of flexible dep versions in other areas.</p>
+<p>I see the benefits, but I'd rather have simplicity than flexibility here. I've seen many people caught by surprise when finding out that their fixed version numbers in their package.json only applies to the first level. It's not intuitive to me either.</p>
+<p>> This feature will never be removed, gradually or otherwise.</p>
+<p>I'm cool with that. You know better what's good for npm than anybody, so I'll adept to the way things work, as well as encourage people to check in their npm modules. And I'll simply be conservative when it comes to depending on modules with fuzzy version specifiers for my own modules.</p>
+<p>Thanks for taking the time to reply, I'll update the post now to reflect the outcome of this discussion.</p>
+<p>--fg</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f453d82-2048-4fe4-ac6d-5c67cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d8eba8dd0e89a0580ec4157681121a79&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.mikealrogers.com" rel="nofollow">Mikeal Rogers</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@isaacs</p>
+<p>the comment was pointed at Felix, not you. although i disagree that forever's stuff should be checked in, but that's a conversation for another post :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f453eee-e8d8-4dec-8357-5249cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>> the comment was pointed at Felix, not you.</p>
+<p>Oh? I thought I had this right in my article. If you have an idea for changing my phrasing, I'll be happy to edit.</p>
+<p>--fg</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f454008-435c-4cfb-b7ec-52eacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d8eba8dd0e89a0580ec4157681121a79&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.mikealrogers.com" rel="nofollow">Mikeal Rogers</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The root of problem was that you couldn't get the right version of forever because of a dep issue. Checking that dep in doesn't help you get a different version from `npm install` and forever shouldn't be checking in it's deps because it is a library. The version problem you have is unrelated to checking in deps unless forever checks in it's deps, which I expressly discourage.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f454286-6e20-41b1-8f14-3ca8cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>> The version problem you have is unrelated to checking in deps</p>
+<p>Kind of. My overarching point was against fuzzy version specifiers, not checking in node_modules. I only brought up checking in node_modules because it is another thing I am currently forced to do because of fuzzy version specifiers. But as mentioned by isaac, there will be a an alternative option using npm shrinkwrap soon.</p>
+<p>--fg</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f454903-0788-4a30-82ae-6466cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a9114dae66e945c664e67b955b2fe642&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://nodejitsu.com" rel="nofollow">Charlie Robbins</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>> (Indeed, it's what has happened, but your insistence on using 0.7.2 instead of 0.7.4 or 0.7.5 has exposed you to this bug that was already fixed!)</p>
+<p>First: forever@0.8.4 works just fine on node@0.4.x and node@0.6.x. Please upgrade </p>
+<p>This kind of situation is why I started to unpublish versions of modules that are no longer maintained. That practice caused a bunch of hoopla around NKO last year (again, about forever) so I stopped doing it. Yes, using nconf@0.x.x was a bad call: I expected the nconf API to be more stable than it was. I did however, publish multiple versions after that and expect people to upgrade quickly. This has been the common wisdom in the node community: upgrade early and often.</p>
+<p>That being said, we've begun to freeze dependencies at hard versions for complex dependency trees. A good example of this is flatiron: <a rel="nofollow" href="https://github.com/flatiron/flatiron/blob/master/package.json#L13-20">https://github.com/flatiron/flatiron/blob/master/package.json#L13-20</a> </p>
+<p>Looking forward to what `npm shrinkwrap` offers.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f454c5b-0c2c-4b3d-a15a-7115cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>> First: forever@0.8.4 works just fine on node@0.4.x and node@0.6.x. Please upgrade</p>
+<p>The problem also exists in the latest version of forever, see: <a rel="nofollow" href="https://github.com/nodejitsu/forever/pull/246">https://github.com/nodejitsu/forever/pull/246</a></p>
+<p>Anyway, I did not mean to criticize forever with this (other than the fact that I do think it's quite heavy on dependencies). In fact, the only reason why I went through the trouble of installing `v0.7.2` was so I could verify if the bug would go away in the latest version or not. It didn't, so I wrote a hopefully good test case / fix and submitted it to you guys.</p>
+<p>That being said, what's your take on semver?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f454f08-bf4c-45e3-ab15-6466cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a9114dae66e945c664e67b955b2fe642&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://nodejitsu.com" rel="nofollow">Charlie Robbins</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I like semver and I think that package@0.N.x (where N is a hard number, eg. 0.3.x) should be considered safe for module authors. The only times when semver has bit me in the ass is when I've done package@0.x.x.</p>
+<p>For application developers the standard should be hard dependencies; always. </p>
+<p>`forever` in-particular walks the line between application and module because it performs both tasks. I've been considering a module called `forever-core` with funtionality pulled-out from `forever` with just the core Objects (i.e. no CLI functionality) and then simply having the `forever` CLI app depend on that. In that world:</p>
+<p>* `forever-core` would have @0.N.x style dependencies<br />
+* `forever` would have hard dependencies, e.g. @0.5.1</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f455099-dcf4-4d07-be77-7235cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>> I like semver and I think that package@0.N.x (where N is a hard number, eg. 0.3.x) should be considered safe for module authors.</p>
+<p>Would love to chat about this in IRC at some point. IMO semver only works / has merit if we follow it closely, which also means that < 1.0.0 the version number makes no promises on stability. But I'd love to hear your thoughts.</p>
+<p>Also I agree on forever, it's a more difficult scenario. IMO the version you install globally should have fixed dependencies as npm currently does not allow you to reference paths as versions specifiers.</p>
+<p>--fg</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f455340-029c-49cc-af0b-7235cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23b827c76b7eebbb1936f905a7ba2e24&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://github.com/einaros" rel="nofollow">einaros</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Although in breach with semver, my idea of an ideal approach for small to medium sized modules: </p>
+<p>For any version x.y.z of a reasonably well tested module, with 'reasonably' meaning at least a spec for what input works with the public interface, z should be upped if and only if the test set for z runs successfully for z+1. Otherwise, y++.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f455968-4f44-4f89-9634-7235cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bd0d3c76f5fd5a669d144c035648ac80&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.nodejs-news.com/" rel="nofollow">Vincent RABAH</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I agree with you einaros, we should have a way to handle dependency, with numbers or something else. As Sebastian Cohnen said bundler on Ruby works fine! Perhaps using the same process as they used for Ruby and not "reinvent the wheel" ...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f455c81-0678-4f6f-9742-7c93cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a9114dae66e945c664e67b955b2fe642&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://nodejitsu.com" rel="nofollow">Charlie Robbins</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I've had a similar thought around binary modules and global dependencies. A number of forever's dependencies are only necessary for the application, not the library. It could be neat to have a `binaryDependencies` or something which delineates those modules used in `bin/*` scripts.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f456a93-357c-4be4-b6be-7c93cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=73a2b24daecb976af81e010b7a3ce3c6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.izs.me/" rel="nofollow">Isaac Z. Schlueter</a>						</strong>
+						<strong>said 
+						on Feb 22, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Of course, I don't want to come across as too much of a devil due to my part as devil's advocate here.</p>
+<p>There is a reason why npm supports listing a dependency explicitly.  It's easy to forget the history now, but this was once a contentious issue.  There were factions in the package.json spec debates back in the day claiming that `"foo":"1.2.3"` should be interpreted as `"foo":">=1.2.3 &lt;1.3.0"`, which is clearly completely insane, and that's why npm deviated from the semver.org spec somewhat, by introducing explicit ranges and so on.</p>
+<p>npm has always been about giving you the tools to do what you need to do.  I think that shrinkwrap will be useful to you in situations like this.  I also think that checking your modules into git would be a good idea if you're deploying them.  The unfortunate crisis of choice is the price we pay for such abundance :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f465601-4460-4674-9ea8-3523cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a998795c23a775e72ee28643c482a1f4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://writings.nunojob.com" rel="nofollow">Nuno Job</a>						</strong>
+						<strong>said 
+						on Feb 23, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Isn't this easy to solve?</p>
+<p>* When you npm publish it keeps a strict.txt file with deps:</p>
+<p>forever@0.8.5<br />
+├── watch@0.5.0</br><br />
+├── timespan@2.0.1</br><br />
+├── pkginfo@0.2.3</br><br />
+├── portfinder@0.2.1 (mkdirp@0.0.7)</br><br />
+├── optimist@0.2.8 (wordwrap@0.0.2)</br><br />
+├── microtime@0.2.0</br><br />
+├── daemon@0.4.1</br><br />
+├── node-fork@0.4.1</br><br />
+├── cliff@0.1.7 (eyes@0.1.7 colors@0.6.0-1)</br><br />
+├── minimatch@0.0.5 (lru-cache@1.0.5)</br><br />
+├── nconf@0.5.1 (ini@1.0.2 async@0.1.16 optimist@0.3.1)</br><br />
+├── utile@0.0.10 (rimraf@1.0.9 mkdirp@0.3.0 ncp@0.2.4 async@0.1.16)</br><br />
+├── nssocket@0.3.7 (lazy@1.0.8 eventemitter2@0.4.8)</br><br />
+├── winston@0.5.10 (eyes@0.1.7 colors@0.6.0-1 async@0.1.16 stack-trace@0.0.6 loggly@0.3.11)</br><br />
+├── broadway@0.1.11 (colors@0.6.0-1 eventemitter2@0.4.8 optimist@0.3.1)</br><br />
+├── flatiron@0.1.13 (director@1.0.9-1 optimist@0.3.1 prompt@0.1.12)</br><br />
+└── ps-tree@0.0.2</br></p>
+<p>* When you npm install you can npm install --strict that uses this file to match the exact thing that was published.</p>
+<p>Why is this a hard problem?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f4656b4-7410-4689-bcff-3688cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5e3c11edfcea93ed27b17942a46cefd0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://twitter.com/jmar777" rel="nofollow">Jeremy Martin</a>						</strong>
+						<strong>said 
+						on Feb 23, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>My two cents: I think it's important to look at this from the perspective of which use cases does NPM want to support.</p>
+<p><em>If</em> NPM wants to position itself as a tool that can be used in deployments, then it seems reasonable (and necessary) to grant developers control over the entire dependency tree.  Personally, I would love for NPM to be useful in this way, given that it is already <em>capable</em> in every regard, it just hasn't been rendered <em>practical</em> for this purpose at present time.  If I spin up a new server, I need to know exactly what code is running on it - it's simply not an option in QA/staging/prod environments to presume upon fuzzy versioning to not break stuff.</p>
+<p>However, if NPM does not want to support this use case, then this is less of an issue.  I say "less", because it's still inconvenient in situations like the one Felix described (which, incidentally, I've encountered as well).  While the reasoning behind fuzzy versioning is sound and works 99% of the time, it is mildly frustrating when I have to jump through 6 or 7 hoops to simply say "you there, run at this version!".</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f4657ab-d4dc-4238-a721-35cdcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a998795c23a775e72ee28643c482a1f4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://writings.nunojob.com" rel="nofollow">Nuno Job</a>						</strong>
+						<strong>said 
+						on Feb 23, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Oh so this is coming :) Nevermind. Next time read comments first :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f4659ea-0000-4c30-ba4a-3940cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5e3c11edfcea93ed27b17942a46cefd0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://twitter.com/jmar777" rel="nofollow">Jeremy Martin</a>						</strong>
+						<strong>said 
+						on Feb 23, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ahh, I missed the note on <code>npm shrinkwrap</code> as well. This sounds like a reasonable feature for we anal retentive types when it comes to NPM-enabled deployments.  Would an install option for providing "hints" for fuzzy versioning situations ever be considered?  This is a miserable example because it would be ambiguous in a whole slew of situations, but the idea would be something like <code>npm install --hint foo 0.1.4</code>.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

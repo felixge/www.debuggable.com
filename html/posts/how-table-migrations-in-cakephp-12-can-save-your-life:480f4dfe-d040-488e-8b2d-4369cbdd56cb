@@ -1,0 +1,579 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>How Table Migrations In CakePHP 1.2 Can Save Your Life &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/how-table-migrations-in-cakephp-12-can-save-your-life:480f4dfe-d040-488e-8b2d-4369cbdd56cb">How Table Migrations In CakePHP 1.2 Can Save Your Life</a></h2>	<div class="posted-on">
+		<p>Posted on 2/7/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><strong>Migrations are a wonderful technique to keep your database in sync with your code. When working on a project as a team, migrations can save your life. Please join me and get a  quick introduction to migrations in cakephp and become a happier coder. :]</strong></p>
+<p>Yes, they are finally here! Migrations in cake! They are so powerful - especially in a team programming environment. However, what are they in the first place?</p>
+<h1>What Are Migrations In CakePHP?</h1>
+<p>Migrations are .yml files that contain information about how to construct a new SQL table and how to drop it. A typical migration file looks as follows:</p>
+<p>[code]<br />
+UP:<br />
+  create_table:<br />
+    posts:<br />
+      user_id:<br />
+        type: integer<br />
+      title:<br />
+        type: text<br />
+        length: 255<br />
+      body:<br />
+        type: text<br />
+      highlighted:<br />
+        type: boolean<br />
+        default: false<br />
+      flagged:<br />
+        type: boolean<br />
+        default: false<br />
+      resolved:<br />
+        type: boolean<br />
+        default: false        </p>
+<p>DOWN:<br />
+  drop_table: [posts]<br />
+[/code]</p>
+<p>Notice the "UP" and "DOWN" in the code. They represent what to do when you want to migrate "up" to the next database scheme version and what to do when you want to go down. The code above does not need much explanation I think. When migrating up, we create a table named posts, that has six fields with some default, type and length restrictions. When migrating "down", we drop that table again.</p>
+<h1>How Does One Execute Migrations?</h1>
+<p>For this to work you will need <a href="http://pear.php.net">PEAR</a> installed along with its <a href="http://pear.php.net/package/MDB2">MDB2 Package</a>. Installing pear is as easy as executing a bat file on windows. Too bad I am a WAMP guy and haven't done much yet with Linux. However, detailed instructions on how to install pear under linux can be found <a href="http://pear.php.net/manual/en/installation.php">here</a>.</p>
+<p>The second step is altering your php.ini's include_path to look in your pear installation, too, or else it will not be able to find the MDB2 package. My include_path directive looks like the following:</p>
+<p>[code]<br />
+; UNIX: "/path1:/path2"<br />
+;include_path = ".:/php/includes"<br />
+;<br />
+; Windows: "\path1;\path2"<br />
+include_path = ".;C:\wamp\php\pear;"<br />
+[/code]</p>
+<p>Note, that "." stands for "current directory". On windows you separate directories with a semicolon and on *nix with a colon. Php.ini's include_path is a powerful thing, allowing you to customise your php installation to a great deal. However, don't mess with it. :]</p>
+<p><strong>Important:</strong> PHP's command line interface will grab the ini file that is <strong>in the same directory as your php.exe</strong> or php-cli.exe (respectively). Set that one up correctly, especially enable the mysql module. Without mysql support, migrations will be useless. :]</p>
+<p>The next step is to grab <a href="http://bakery.cakephp.org/articles/view/cake-db-migrations-v2-1">Joel Moss' Migration Shell Code</a>. Place it into app/vendors/shells/ and then start up your shell. Navigate to your project folder and then into /cake/console.</p>
+<p>Now type in <strong>php cake.php migrate</strong> and it will migrate to the latest version. With <strong>php cake.php migrate -v 3</strong> you will migrate to the third migration and so on.</p>
+<p>Your command could look like "php5 cake.php migrate", too. On windows you can register any php.exe with your "Path" environment variable.</p>
+<h1>A Bit More On Migration Files</h1>
+<p>Okay, now that we got it working, here is a bit more about the construction of migration files.</p>
+<p>First thing to note is that migrations can only keep your code in sync with the database <i>scheme</i>. To insert some default data into your tables you will have to rely on <a href="http://cakephp.org">Cakephp</a>'s fixtures, which I will write about in a later article.</p>
+<p>Your migration files have to be placed in <strong>app/config/migrations</strong> and they need to include some kind of number at the beginning of the file name. This is to express the version number of the migration. Here is a possible migration folder:</p>
+<p>[code]<br />
+001_initial_tables.yml<br />
+002_network_table.yml<br />
+003_posts_table.yml<br />
+003_comments_table.yml<br />
+004_tags_table.yml<br />
+[/code]</p>
+<p>You can also include more than one table setup within one migration. Here is an example migratiion file:</p>
+<p>[code]<br />
+#<br />
+# migration YAML file<br />
+#<br />
+UP:<br />
+  create_tables:<br />
+    tip_categories:<br />
+      name:<br />
+      fkey: parent<br />
+    tips:<br />
+      title:<br />
+      content:<br />
+        type: text<br />
+      fkey: category<br />
+DOWN:<br />
+  drop_tables: [tip_categories, tips]<br />
+[/code]</p>
+<p>Should be self-explaining. Instead of the "create_table:" command we use "create_tables:" and go through the scheme data one table at a time.</p>
+<h1>Conclusion</h1>
+<p>Migrations are extremely powerful. They will save you much time, energey and prevent you from getting hairloss. Having a working codebase with the correct information in the database is all happy programmer needs on his local test installation, no? :]</p>
+<p>If you run into problems getting migrations working, please let me know by commenting on this article. I will try my best to help you out.</p>
+<p>Have a good one! By the way, that migraine is actually inspiring me to blog. :)</p>
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-d040-488e-8b2d-4369cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-table-migrations-in-cakephp-12-can-save-your-life%3A480f4dfe-d040-488e-8b2d-4369cbdd56cb &amp;title=How+Table+Migrations+In+CakePHP+1.2+Can+Save+Your+Life';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-table-migrations-in-cakephp-12-can-save-your-life%3A480f4dfe-d040-488e-8b2d-4369cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-table-migrations-in-cakephp-12-can-save-your-life%3A480f4dfe-d040-488e-8b2d-4369cbdd56cb&amp;title=How+Table+Migrations+In+CakePHP+1.2+Can+Save+Your+Life&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-table-migrations-in-cakephp-12-can-save-your-life%3A480f4dfe-d040-488e-8b2d-4369cbdd56cb&amp;title=How+Table+Migrations+In+CakePHP+1.2+Can+Save+Your+Life';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/update-on-cakephp-google-analytics-apimodel:480f4dd5-7044-47bc-945a-4d90cbdd56cb">Update on CakePHP Google Analytics API/Model</a></li>
+							<li><a href="/posts/google-analytics-php-api-cakephp-model:480f4dd5-b2a4-452a-b4ed-4f3fcbdd56cb">Google Analytics PHP Api (CakePHP Model)</a></li>
+							<li><a href="/posts/amazon-associates-api-data-source-for-cakephp:4891ecd6-0330-47c7-b338-0dd34834cda3">Amazon Associates API (data source) for CakePHP</a></li>
+							<li><a href="/posts/screencast-using-vendor-branching-and-cakephp:480f4dd6-6cac-44cb-b685-4d6bcbdd56cb">Screencast #1: Using vendor branching and CakePHP</a></li>
+							<li><a href="/posts/how-to-do-group-by-conditions-in-model-find()-calls:483fdc1c-8454-4593-a55e-37244834cda3">How to do Group By conditions in Model find() calls in the CakePHP RC1</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/with-jquery-cakephp-to-world-domination-slides:480f4dd6-7cb8-4e84-af4f-4dc6cbdd56cb">With jQuery &amp; CakePHP to World Domination (Slides)</a></li>
+							<li><a href="/posts/remember-the-days-before-spam-a-cakephp-model-for-akismet:480f4dd5-d358-4f51-ac83-45f1cbdd56cb">Remember the days before spam? A CakePHP Model for Akismet  </a></li>
+							<li><a href="/posts/toogleing-associations-in-cakephp-models:480f4dd5-58b0-4ecf-bf4d-4637cbdd56cb">Toggling Associations in CakePHP Models</a></li>
+							<li><a href="/posts/extra-hot-cakephp-1.2-stable-is-finally-released!:4954151c-f87c-434b-abbd-4e404834cda3">Extra Hot: CakePHP 1.2 Stable is finally released!</a></li>
+							<li><a href="/posts/cakephp-bleeding-edge-google-group:480f4dd6-73e4-487a-9c7d-4b86cbdd56cb">CakePHP Bleeding Edge - Google Group</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/how-table-migrations-in-cakephp-12-can-save-your-life:480f4dfe-d040-488e-8b2d-4369cbdd56cb">21 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/how-table-migrations-in-cakephp-12-can-save-your-life:480f4dfe-d040-488e-8b2d-4369cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4e01-8bb0-44e8-bc74-4bf6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.developercast.com/2007/07/03/php-coding-practicescom-how-table-migrations-in-cakephp-12-can-save-your-life/" rel="nofollow">developercast.com &raquo; PHP-Coding-Practices.com: How Table Mi</a>						</strong>
+						<strong>said 
+						on Jul 03, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] PHP-Coding-Practices.com, Tim Koschuetzki has posted a new tutorial that just might save your life - well, at least the life of your CakePHP application - using table [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e01-a4d4-4f3b-b905-4395cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=84e15b4783a2a701d6547248697c3834&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://joelmoss.info" rel="nofollow">Joel Moss</a>						</strong>
+						<strong>said 
+						on Jul 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tim, great little tutorial. Thanks for the mention.</p>
+<p>I should tell you that if you want the latest and greatest version of Cake Migrations, then you should subscribe to my Switchboard at http://joelmoss.info. All new revisions are now posted in CakeForge at http://cakeforge.org/snippet/detail.php?type=snippet&amp;id=165</p>
+<p>Also, you mentioned fixtures, I also created a fixtures shell that works alongside migrations. It's a lot easier than Cake's built in fixtures. That can also be found at Cakeforge at http://cakeforge.org/snippet/detail.php?type=snippet&amp;id=166</p>
+<p>But again, thanks for the mention.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e01-7f6c-4e72-bef5-4c52cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Jul 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Joel!</p>
+<p>Thanks for stopping by. :] Will definately subscribe to the switchboard.</p>
+<p>My article on fixtures is planned for this weekend, so it would be cool to check out your latest revisions for the fixtures shell. Good times!</p>
+<p>Do you have MSN/AIM/ICQ ? Would like to talk to you about a projects of ours (I just noticed you are working for the same company as I do :]).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e01-694c-42bf-a371-4a1bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=84e15b4783a2a701d6547248697c3834&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://joelmoss.info" rel="nofollow">Joel Moss</a>						</strong>
+						<strong>said 
+						on Jul 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>You can catch me on MSIM using my email: joel[at]joelmoss.info</p>
+<p>I am planning on releasing a screencast on migrations and fixtures, so make sure you subscribe to my Switchboard.</p>
+<p>Speak to ya soon.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-8808-482d-bba3-4489cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=80acb818826f70823d6afb30d70fb5b9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://sf.jogger.pl" rel="nofollow">php blog</a>						</strong>
+						<strong>said 
+						on Jul 17, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>PHP4 dying and Cake die.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-84e8-4754-972c-40e6cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Jul 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Why do you want Cake to die?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-a4c4-48ef-9989-4d3fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=49299a7537c9cb6048e1592b38be82cf&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://apirate.iwasmeantto.be" rel="nofollow">Sam Figueroa</a>						</strong>
+						<strong>said 
+						on Jul 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great to see this RubyOnRails feature come to Cake. I work with RoR at home but with CakePHP at work. So this will in the future keep me from rambling around that we should rather use RoR at least concerning migrations.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-1b74-4d78-a3ef-497dcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Jul 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hehe, yeah!</p>
+<p>There are many other cool features going to be ported over to Cake. Also the migration feature is going to get a lift up, enabling it to retrieve database migration data from remote systems. Pretty kewl.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-9c38-4e84-b29c-4d9ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=84e15b4783a2a701d6547248697c3834&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://joelmoss.info" rel="nofollow">Joel Moss</a>						</strong>
+						<strong>said 
+						on Jul 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yeah, but read my latest post and you might not like what is in store. then again, you might.... http://joelmoss.info/switchboard/blog/2562:Migrations_making_their_way_into_the_CakePHP_core</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-7568-4a25-aa7d-4080cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=89855c32779d06daa3f60de1ad1f197c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							brian&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'm a bit of a newbie and haven't worked with RoR at all. So what are the advantages to using migrations versus simply performing a SQL query to do the same thing?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-01ec-4dec-8b1f-4c96cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=84e15b4783a2a701d6547248697c3834&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://joelmoss.info" rel="nofollow">Joel Moss</a>						</strong>
+						<strong>said 
+						on Aug 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Brian: it means you don't have to write any SQL at all, making it faster and easier to make changes to your DB. Its a version control system for your DB, so you can migrate up and down at any time. Just try it and you will love it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-2778-48f1-9a15-4614cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Aug 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>You really will, brian.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-b038-4dee-9ecd-4a94cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=89855c32779d06daa3f60de1ad1f197c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							brian&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Joel and Tim: ok...but I'm still not seeing how Table Migrations can be applied to simplify development. Can y'all highlight some examples where it simplifies development over using SQL?</p>
+<p>And maybe also clarify what you mean when you say "migrate up or down at any time"</p>
+<p>I'm sure there's a pearl here but I just see the oyster.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-bd40-4685-8d69-4e98cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=84e15b4783a2a701d6547248697c3834&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://joelmoss.info" rel="nofollow">Joel Moss</a>						</strong>
+						<strong>said 
+						on Aug 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The best thing would be for you to take a look at my screencast at http://joelmoss.info/switchboard/blog/2539:Screencast_How_to_use_CakePHP_Database_Migrations</p>
+<p>That should help you understand it and see its benefits.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-877c-4c12-b7e1-48e7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=89855c32779d06daa3f60de1ad1f197c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							brian&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks Joel, I'll take a look at it and let you know if it clears things up for me.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e03-98c8-4ad3-b803-473ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e59144b125f7b1c0244b0dd6d5052264&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.google.ru/" rel="nofollow">hiutopor</a>						</strong>
+						<strong>said 
+						on Sep 17, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hello </p>
+<p>Very interesting information! Thanks! </p>
+<p>G'night</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e04-37e4-4d5f-9af8-4d33cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e05ea929df643ad5b5db31ed6bed4e34&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							roryy&nbsp;						</strong>
+						<strong>said 
+						on Jan 03, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi i have a question about the migrate tool of Joel Moss. </p>
+<p>When I want to migrate (example 001_users.yml first and then 002_users.yml)<br />
+then the script is migrating 001 succesfully but 002 gives a error: Table</br><br />
+`users` already exists. Does someone know how I can avoid that problem? Alter_table doesn't work :(</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e04-2c88-4bcd-9747-42b2cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Jan 04, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Please show me the contents of your yml files.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e04-24cc-49d8-b342-47fbcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a8b8c6426be9d393182f8a8c8b8bf2d2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.4webby.com" rel="nofollow">Daniel Vecchiato</a>						</strong>
+						<strong>said 
+						on Mar 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I wrote a shell to generate yaml files easily: Yammy!</p>
+<p>Check it out here: </p>
+<p>http://www.4webby.com/blog/posts/view/3/yammy_db_to_yaml_shell_migrations_made_easy_in_cakephp</p>
+<p>Dan</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48e0f01a-f29c-4a88-8604-76d84834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3e95972fd6e85998842bc15df389eee1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://techcrate.wordpress.com/" rel="nofollow">forrestgump</a>						</strong>
+						<strong>said 
+						on Sep 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>lil something to get things started.... <a rel="nofollow" href="http://techcrate.wordpress.com/">http://techcrate.wordpress.com/</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-499411b4-4730-4838-a901-36854834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4f620710962bbc23af58b5e74893c093&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://tennismanager.sk" rel="nofollow">mito</a>						</strong>
+						<strong>said 
+						on Feb 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>What about using PHP code in migrations? It is often very useful to execute custom logic over data that are used in migrations.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

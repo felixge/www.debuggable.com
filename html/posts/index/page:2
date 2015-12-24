@@ -1,0 +1,512 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Blog &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="paging">
+	<a href="/posts/index/page:1" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:1">1</a></span> | <span class="current">2</span> | <span><a href="/posts/index/page:3">3</a></span> | <span><a href="/posts/index/page:4">4</a></span> | <span><a href="/posts/index/page:5">5</a></span> | <span><a href="/posts/index/page:6">6</a></span> | <span><a href="/posts/index/page:7">7</a></span> | <span><a href="/posts/index/page:8">8</a></span> | <span><a href="/posts/index/page:9">9</a></span> <a href="/posts/index/page:3" class="next">Next &raquo;</a></div>
+	<div class="post">
+	<h2><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></h2>	<div class="posted-on">
+		<p>Posted on 8/9/11 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Thanks to <a href="http://twitter.com/#!/izs">Isaac</a>, npm is getting more and more awesome by the hour. One of the
+coolest <a href="https://github.com/isaacs/npm/issues/1272">recent additions</a> (you need at least v1.0.26) is the ability to specify
+private git repositories urls as a dependency in your package.json files.</p>
+
+<p>At transloadit, we are currently using the feature to move some of our
+infrastructure code into separate packages, allowing for those to be tested
+and developed in isolation making our core application easier to maintain and
+work on.</p>
+
+<p>The syntax for referencing a git repository (and commit) is as follows:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="br0">&#123;</span><br />
+&nbsp; <span class="st0">&quot;name&quot;</span>: <span class="st0">&quot;my-app&quot;</span>,<br />
+&nbsp; <span class="st0">&quot;dependencies&quot;</span>: <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="st0">&quot;private-repo&quot;</span>: <span class="st0">&quot;git+ssh://git@github.com:my-account/node-private-repo.git#v0.0.1&quot;</span>,<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div></p>
+
+<p>This will include a private npm module called <code>"private-repo"</code> from GitHub. The
+url also contains an optional refspec (<code>#v0.0.1</code>) that tells npm which branch,
+commit, or in this case tag you want to have checked out.</p>
+
+<p>Now of course this is not the only way to do private npm repositories, but it
+is much simpler than running your <a href="https://github.com/isaacs/npm/blob/master/doc/registry.md">own registry</a>, so I would recommend it to
+most people.</p>
+
+<p>Before you head of to play with this, here is a final tip that may safe you
+some headaches. In all your private npm modules, add <code>"private": true</code> to your
+package.json. This will make sure npm will never let you accidentally publish
+your secret sauce to the official npm registry.</p>
+
+<p>Happy hacking,
+--fg</p>
+
+<p>PS: When deploying, don't forget that you need to authorize the servers ssh key for the GitHub repository you are depending on.</p>
+
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/4e68cc7d-1ac4-42d9-995a-343dcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprivate-npm-modules%3A4e68cc7d-1ac4-42d9-995a-343dcbdd56cb &amp;title=Private+npm+modules';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprivate-npm-modules%3A4e68cc7d-1ac4-42d9-995a-343dcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprivate-npm-modules%3A4e68cc7d-1ac4-42d9-995a-343dcbdd56cb&amp;title=Private+npm+modules&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprivate-npm-modules%3A4e68cc7d-1ac4-42d9-995a-343dcbdd56cb&amp;title=Private+npm+modules';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">6 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/how-to-fork-patch-npm-modules:4e2eb9f3-e584-44be-b1a9-3db7cbdd56cb">How to fork & patch npm modules</a></h2>	<div class="posted-on">
+		<p>Posted on 26/7/11 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>With now more than <a href="http://twitter.com/#!/npmjs/status/95573155099324416">3000 modules</a>, there are huge gaps in the quality of things you find in the <a href="http://search.npmjs.org/">npm registry</a>. But more often than not, it's easy to find a module that is really close to what you need, except if it wasn't for that one bug or missing feature.</p>
+
+<p>Now depending on who is maintaining this module, you may get the problem resolved by simply opening a GitHub issue and waiting for a few days. However, open source doesn't really work without community, nor do you always want to be at the mercy of someone else. So a much better approach is to actually roll up your sleeves, and fix the problem yourself.</p>
+
+<p>Here is the proper way to do this while using npm to manage your forked version of the module:</p>
+
+<ol>
+<li>Fork the project on GitHub</li>
+<li>Clone the fork to your machine</li>
+<li>Fix the bug or add the feature you want</li>
+<li>Push your commits up to your fork on GitHub</li>
+<li>Open your fork on GitHub, and click on the latest commit you made</li>
+<li>On the page of that commit, click on the "Downloads" button</li>
+<li>Right click on the "Download .tar.gz" button inside the popup, and copy the link ("Copy Link Address" in Chrome)</li>
+<li>Open up your package.json file, and replace the version number of the module with the url you just copied</li>
+<li>Send a pull request upstream (Optional, but this way you will avoid having to maintain that patch of yours against newer versions of the module you forked)</li>
+</ol>
+
+<p>Example: My new <a href="https://github.com/felixge/node-airbrake">airbrake module</a> uses a forked version of  <a href="https://github.com/oozcitak/xmlbuilder-js">xmlbuilder</a>. I submited my fix as a <a href="https://github.com/oozcitak/xmlbuilder-js/pull/11">pull request</a>, but it has not been merged yet. In order to pull in my changes via npm anyway, I simply pointed my <a href="https://github.com/felixge/node-airbrake/blob/master/package.json">package.json</a> to the download url of my fork on GitHub like so:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="st0">&quot;dependencies&quot;</span>: <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="st0">&quot;request&quot;</span>: <span class="st0">&quot;1.9.8&quot;</span>,<br />
+&nbsp; &nbsp; <span class="st0">&quot;xmlbuilder&quot;</span>: <span class="st0">&quot;https://github.com/felixge/xmlbuilder-js/tarball/4303eb2650a4b819a980b1dc9d2965862a1e9faf&quot;</span>,<br />
+&nbsp; &nbsp; <span class="st0">&quot;stack-trace&quot;</span>: <span class="st0">&quot;0.0.5&quot;</span>,<br />
+&nbsp; &nbsp; <span class="st0">&quot;traverse&quot;</span>: <span class="st0">&quot;0.4.4&quot;</span>,<br />
+&nbsp; &nbsp; <span class="st0">&quot;hashish&quot;</span>: <span class="st0">&quot;0.0.4&quot;</span><br />
+&nbsp; <span class="br0">&#125;</span>,</div></p>
+
+<p>Alright, let me know if this is helping your node.js adventures, or if you have an alternative workflow you are using. Otherwise, happy hacking!</p>
+
+<p>--fg</p>
+
+<p>PS: You should upgrade to the latest npm version first, some older versions had problems with handling url dependencies properly.</p>
+
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/4e2eb9f3-e584-44be-b1a9-3db7cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-fork-patch-npm-modules%3A4e2eb9f3-e584-44be-b1a9-3db7cbdd56cb &amp;title=How+to+fork+%26+patch+npm+modules';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-fork-patch-npm-modules%3A4e2eb9f3-e584-44be-b1a9-3db7cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-fork-patch-npm-modules%3A4e2eb9f3-e584-44be-b1a9-3db7cbdd56cb&amp;title=How+to+fork+%26+patch+npm+modules&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-fork-patch-npm-modules%3A4e2eb9f3-e584-44be-b1a9-3db7cbdd56cb&amp;title=How+to+fork+%26+patch+npm+modules';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/how-to-fork-patch-npm-modules:4e2eb9f3-e584-44be-b1a9-3db7cbdd56cb">1 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/how-to-fork-patch-npm-modules:4e2eb9f3-e584-44be-b1a9-3db7cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/node-js-workshop-in-cologne-june-10th:4dd66beb-ff04-4de9-a490-7c09cbdd56cb">Node.js Workshop in Cologne, June 10th</a></h2>	<div class="posted-on">
+		<p>Posted on 20/5/11 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>We apologize for the short notice, but if you are looking to put node.js in production, this full day <a href="http://nodecologne.eventbrite.com/">node.js workshop</a> we are organizing is where it's at!</p>
+
+<p>The workshop is happening on Friday June 10, one day before <a href="http://nodecamp.eu/">nodecamp.eu</a>. Space is limited to 15 people and expected to sell out quickly.</p>
+
+<p>As a reader of our blog, you can get a 15% discount on the regular ticket by using the code <code>'debuggable'</code>.</p>
+
+<p><strong>Should you attend?</strong></p>
+
+<p>This workshop will teach you everything you need in order to write and deploy powerful node.js applications. We'll try to cover a lot of ground, so if you are interested in any of the following, you should definitly attend:</p>
+
+<ul>
+<li>Setting up node.js on your local machine</li>
+<li>Understanding the module system</li>
+<li>Using npm for installing and upgrading modules</li>
+<li>Publishing your own npm modules</li>
+<li>Everything you need to know about http.Server</li>
+<li>Structuring your code using OOP in JavaScript</li>
+<li>Dealing with all the callbacks in a sane fashion</li>
+<li>Using the same code in node.js and the browser</li>
+<li>Building realtime apps with Socket.IO</li>
+<li>Using the express framework</li>
+<li>An overview over testing tools available for node.js</li>
+<li>Deploying node.js to Ec2 / Joyent</li>
+</ul>
+
+<p>The first half of the day will be guided by slides (which will be made available afterwards), with the second half being a hands-on session where we will build a small node app from scratch.</p>
+
+<p><strong>About the instructor</strong></p>
+
+<p>This workshop will be led by <a href="http://twitter.com/#!/felixge">Felix Geisendörfer</a> (that's me). He is one of the earliest and most active contributors to node.js, author of over 20 npm modules and also running one of the biggest node.js applications in production over at <a href="http://transloadit.com/">transloadit.com</a>.</p>
+
+<p>In addition, <a href="http://twitter.com/#!/tim_kos">Tim Koschützki</a> who is also a co-founder at transloadit, will be available all day to help with individual questions and trouble shooting. </p>
+
+<p><strong>Questions &amp; More Workshop</strong></p>
+
+<p>If you have additional questions or can't make it to this workshop, please head over to the <a href="http://nodecologne.eventbrite.com/">workshop page</a> which has information on other upcoming workshops and questions.</p>
+
+<p>--fg
+<img style="display: none;" src="http://debuggable.com/posts/tick/4dd66beb-ff04-4de9-a490-7c09cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnode-js-workshop-in-cologne-june-10th%3A4dd66beb-ff04-4de9-a490-7c09cbdd56cb &amp;title=Node.js+Workshop+in+Cologne%2C+June+10th';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnode-js-workshop-in-cologne-june-10th%3A4dd66beb-ff04-4de9-a490-7c09cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnode-js-workshop-in-cologne-june-10th%3A4dd66beb-ff04-4de9-a490-7c09cbdd56cb&amp;title=Node.js+Workshop+in+Cologne%2C+June+10th&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnode-js-workshop-in-cologne-june-10th%3A4dd66beb-ff04-4de9-a490-7c09cbdd56cb&amp;title=Node.js+Workshop+in+Cologne%2C+June+10th';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/node-js-workshop-in-cologne-june-10th:4dd66beb-ff04-4de9-a490-7c09cbdd56cb">2 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/node-js-workshop-in-cologne-june-10th:4dd66beb-ff04-4de9-a490-7c09cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/why-are-you-not-using-a-ssd-yet:4d64ad6f-22d8-4eca-99e8-765acbdd56cb">Why are you not using a SSD yet?</a></h2>	<div class="posted-on">
+		<p>Posted on 23/2/11 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>If you are a developer, and you have not switched to a SSD yet, what is your excuse?</p>
+
+<p>Let me explain. I've switched to an SSD a little over a week ago, and it's a different world. You know that feeling of having just bought &amp; setup a new machine and everything still runs very fast? Well, a SSD will make every single day feel just like that, except much faster.</p>
+
+<p>But I already knew that, so why has it taken me, and apparently you who is reading this, so long?</p>
+
+<p>Well, my main problem was that I have a few big things on my hard disk, namely music, photos and virtual machine images. This means that I need a hard disk of ~300 GB to work comfortably. However, the SSD I was <a href="http://eshop.macsales.com/shop/internal_storage/Mercury_Extreme_SSD_Sandforce/Solid_State_Pro">interested in</a> only comes in 40, 60, 120, 240 and 480 GB. The 480 GB costs ~$1.580 right now.</p>
+
+<p>A 240 GB SSD costs ~$520 which seems much less outrageous, but unfortunately that's still too small if it was my only disk.</p>
+
+<p>So for a while, I thought I'd have to wait another 1 - 2 years before enjoying the SSD experience. That was until I came across <a href="http://duncandavidson.com/blog/2010/10/upgraded-laptop">this article</a> which explained that you could replace your MacBook Pro's optical drive with an SSD. This means I could add an SSD to my machine without giving up the luxury of cheap mass storage.</p>
+
+<p>With this in mind, I decided to get a 120 GB SSD, which is plenty of space for my core system and applications. I followed a few youtube videos for swapping out the disks, and I also placed my previous hdd in the optical bay slot since I've heard reports of hibernation problems if you put your primary disk there.</p>
+
+<p>Making the new SSD my primary hard disk was easy as well. My initial attempt using time machine failed, so I simply booted up my system from the old primary hdd, and used <a href="http://www.bombich.com">carbon copy cloner</a> to copy all data (excluding my music, images and vms) to my new SSD. After that I made the SSD my primary boot disk using the "Startup Disk Preference Pane" and rebooted. The whole operation took about 1-2 hours.</p>
+
+<p>So how has this changed my life? First of all, boot time is incredible. Compared to Tim's mac (which is now scheduled for an upgrade ASAP as well), my machine goes from 0 to starting Photoshop in 48 seconds. Tim's machine takes 2 minutes and 50 seconds. Note: It takes about the same time for both machines to boot the kernel, but my machine is instantly ready at that point now.</p>
+
+<p>Starting programs is either instant or 2-3 times faster than before. Recursive grep (using <a href="http://betterthangrep.com/">ack</a>) is insanely fast / instant, even on big project. And git - it's a different world. If you've ever waited for minutes while running 'git gc' on a big project, an SSD turns this to seconds. Everything feels just incredibly fast.</p>
+
+<p>With this in mind, what's your excuse for not treating yourself to a SSD now?</p>
+
+<p>--fg</p>
+
+<p>PS: If you think you would miss your optical drive: You can get an external USB one for ~$40 on Amazon. If you really need the internal one back, I guess it would take you about ~10-15 minutes to put it back in once you know the procedure.</p>
+
+<p>PPS: If you're worried about the difficulty of replacing the disk: It's very easy, all you need to know is how to operate a screw driver. However, make sure you've got the right tools. The <a href="http://eshop.macsales.com/shop/internal_storage/Mercury_Extreme_SSD_Sandforce/Solid_State_Pro">OWC disk</a> I'm recommending comes with a set of tools if you order it with the data doubler for the optical bay.</p>
+
+<p>PPPS: My friend Joel <a href="https://twitter.com/jperras/status/40536250049888257">pointed out</a> the lack of <a href="http://en.wikipedia.org/wiki/TRIM">TRIM</a> support in OSX as a reason for not getting an SSD yet. That's a valid argument, but the OWC discs <a href="http://macperformanceguide.com/SSD-RealWorld-SevereDuty.html">do not suffer</a> from the lack of TRIM.</p>
+
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/4d64ad6f-22d8-4eca-99e8-765acbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwhy-are-you-not-using-a-ssd-yet%3A4d64ad6f-22d8-4eca-99e8-765acbdd56cb &amp;title=Why+are+you+not+using+a+SSD+yet%3F';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwhy-are-you-not-using-a-ssd-yet%3A4d64ad6f-22d8-4eca-99e8-765acbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwhy-are-you-not-using-a-ssd-yet%3A4d64ad6f-22d8-4eca-99e8-765acbdd56cb&amp;title=Why+are+you+not+using+a+SSD+yet%3F&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwhy-are-you-not-using-a-ssd-yet%3A4d64ad6f-22d8-4eca-99e8-765acbdd56cb&amp;title=Why+are+you+not+using+a+SSD+yet%3F';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/why-are-you-not-using-a-ssd-yet:4d64ad6f-22d8-4eca-99e8-765acbdd56cb">33 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/why-are-you-not-using-a-ssd-yet:4d64ad6f-22d8-4eca-99e8-765acbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/talks-talks-talks:4d5e9729-27b0-435c-952a-41decbdd56cb">Talks, talks, talks</a></h2>	<div class="posted-on">
+		<p>Posted on 18/2/11 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>I've been in Atlanta for the past two weeks, and thanks to the kind help of a few folks, I was able to present at 2 meetups, as well as <a href="http://startupriot.com/">Startup Riot 2011</a>.</p>
+
+<p>First up was a new talk at the <a href="http://www.meetup.com/atlantaruby/">Atlanta Ruby Meetup</a>:</p>
+
+<div style="width:425px" id="__ss_6974464"><strong style="display:block;margin:12px 0 4px"><a href="http://www.slideshare.net/the_undefined/nodejs-should-ruby-developers-care" title="Nodejs - Should Ruby Developers Care?">Nodejs - Should Ruby Developers Care?</a></strong><object id="__sse6974464" width="425" height="355"><param name="movie" value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=nodejs-should-ruby-developers-care-110218095101-phpapp02&stripped_title=nodejs-should-ruby-developers-care&userName=the_undefined" /><param name="allowFullScreen" value="true"/><param name="allowScriptAccess" value="always"/><embed name="__sse6974464" src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=nodejs-should-ruby-developers-care-110218095101-phpapp02&stripped_title=nodejs-should-ruby-developers-care&userName=the_undefined" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="355"></embed></object></div>
+
+<p><br>
+The talk was an attempt of taking out all the cool-aid and hype and focusing on node's true strength as well as weaknesses. I think the whole thing was very well-received, but I certainly could have done a little better on the delivery.</p>
+
+<p>Download: <a href="http://felixge.s3.amazonaws.com/11/nodejs-should-ruby-developers-care.pdf">nodejs-should-ruby-developers-care.pdf (733 KB)</a></p>
+
+<p>Next up was the 4th edition of my general introduction talk to node.js:</p>
+
+<div style="width:425px" id="__ss_6974385"><strong style="display:block;margin:12px 0 4px"><a href="http://www.slideshare.net/the_undefined/nodejs-a-quick-tour-v4" title="Nodejs - A quick tour (v4)">Nodejs - A quick tour (v4)</a></strong><object id="__sse6974385" width="425" height="355"><param name="movie" value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=nodejs-a-quick-tour-v4-110218094606-phpapp01&stripped_title=nodejs-a-quick-tour-v4&userName=the_undefined" /><param name="allowFullScreen" value="true"/><param name="allowScriptAccess" value="always"/><embed name="__sse6974385" src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=nodejs-a-quick-tour-v4-110218094606-phpapp01&stripped_title=nodejs-a-quick-tour-v4&userName=the_undefined" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="355"></embed></object></div>
+
+<p><br>
+This version of the talk was updated for the freshly released v0.4, and I've also tweaked some other slides to the point where I'm very happy with it. It seems to do a great job getting people excited about node, as well as highlighting sensible use cases.</p>
+
+<p>Download: <a href="http://felixge.s3.amazonaws.com/11/nodejs-a-quick-tour-v4.pdf">nodejs-a-quick-tour-v4.pdf (610 KB)</a></p>
+
+<p>And last but not least, I had the chance to do a 3 minute pitch for <a href="http://transloadit.com/">Transloadit</a> at <a href="http://startupriot.com/">Startup Riot</a>:</p>
+
+<div style="width:425px" id="__ss_6974507"><strong style="display:block;margin:12px 0 4px"><a href="http://www.slideshare.net/the_undefined/transloadit-at-startupriot" title="Transloadit at Startupriot">Transloadit at Startupriot</a></strong><object id="__sse6974507" width="425" height="355"><param name="movie" value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=transloadit-startupriot-110218095404-phpapp02&stripped_title=transloadit-at-startupriot&userName=the_undefined" /><param name="allowFullScreen" value="true"/><param name="allowScriptAccess" value="always"/><embed name="__sse6974507" src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=transloadit-startupriot-110218095404-phpapp02&stripped_title=transloadit-at-startupriot&userName=the_undefined" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="355"></embed></object></div>
+
+<p><br>
+Download: <a href="http://felixge.s3.amazonaws.com/11/transloadit-startupriot.pdf">transloadit-startupriot.pdf (640 KB)</a></p>
+
+<p>Doing the actual presentation was quite scary. I have never given a talk this short, you basically don't get any time to warm up and get into things. You got to go out, and give your best right away. Having an audience of ~500 people didn't help either.</p>
+
+<p>However, I think I pulled it of fairly well. My main message was: "Save the time, save the money, save the shrink - use transloadit", and I highlighted some of the cooler aspects of our service such as the <a href="http://transloadit.com/blog/2010/12/realtime-encoding-over-150x-faster">realtime encoding</a>. Lots of people came by to our table afterwards to find out more about the service, including a few VCs and angels (we're not looking for investment right now, but seeing their interest feels good regardless : ).</p>
+
+<p>There are a few more talks coming up in the next couple of months, but I also hope to find some more time for actual blogging again. I certainly want to start writing a few articles about testing JavaScript.</p>
+
+<p>--fg</p>
+
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/4d5e9729-27b0-435c-952a-41decbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftalks-talks-talks%3A4d5e9729-27b0-435c-952a-41decbdd56cb &amp;title=Talks%2C+talks%2C+talks';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftalks-talks-talks%3A4d5e9729-27b0-435c-952a-41decbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftalks-talks-talks%3A4d5e9729-27b0-435c-952a-41decbdd56cb&amp;title=Talks%2C+talks%2C+talks&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftalks-talks-talks%3A4d5e9729-27b0-435c-952a-41decbdd56cb&amp;title=Talks%2C+talks%2C+talks';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/talks-talks-talks:4d5e9729-27b0-435c-952a-41decbdd56cb">0 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/talks-talks-talks:4d5e9729-27b0-435c-952a-41decbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="paging">
+	<a href="/posts/index/page:1" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:1">1</a></span> | <span class="current">2</span> | <span><a href="/posts/index/page:3">3</a></span> | <span><a href="/posts/index/page:4">4</a></span> | <span><a href="/posts/index/page:5">5</a></span> | <span><a href="/posts/index/page:6">6</a></span> | <span><a href="/posts/index/page:7">7</a></span> | <span><a href="/posts/index/page:8">8</a></span> | <span><a href="/posts/index/page:9">9</a></span> <a href="/posts/index/page:3" class="next">Next &raquo;</a></div>	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

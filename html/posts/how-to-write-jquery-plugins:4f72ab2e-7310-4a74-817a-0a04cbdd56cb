@@ -1,0 +1,896 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>How to write jQuery plugins &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></h2>	<div class="posted-on">
+		<p>Posted on 29/3/12 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><a href="http://jquery.com">jQuery</a>, the most popular javascript library out there, is great for DOM abstraction. It allows you to encapsulate functionality into your own plugins, which
+is a great way to write reusable code. However, jQuery's rules for writing plugins are very loose, which leads to different plugin development practices - some of which are pretty poor.</p>
+
+<p>With this article I want to provide a simple plugin development pattern that will work in many situations. If the functionality you would like to encapsulate is large and really complex, jQuery plugins are probably not what you should use in the first place.
+You'd rather use something like <a href="http://documentcloud.github.com/backbone/">BackboneJS</a> or <a href="http://javascriptmvc.com/docs.html#!jQuery.Controller">jQuery.Controller</a> in this case.</p>
+
+<p>If you can't or don't want to use Backbone, you might still get away with my solution ...</p>
+
+<h2>Starting off</h2>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+;<span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>$, doc, win<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="st0">&quot;use strict&quot;</span>;<br />
+<br />
+&nbsp; <span class="co1">// plugin code will come here</span><br />
+<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="br0">&#40;</span>jQuery, document, window<span class="br0">&#41;</span>;</div></p>
+
+<p>The semi-colon before the function invocation keeps the plugin from breaking if our plugin is concatenated with other scripts that are not closed properly.</p>
+
+<p>"use strict"; puts our code into strict mode, which catches some common coding problems by throwing exceptions, prevents/throws errors when relatively "unsafe" actions are taken and disables Javascript features that are confusing or poorly thought out.
+To read about this in detail, please check <a href="http://ejohn.org/blog/ecmascript-5-strict-mode-json-and-more/">ECMAScript 5 Strict Mode, JSON, and More</a> by John Resig.</p>
+
+<p>Wrapping the jQuery object into the dollar sign via a closure avoids conflicts with other libraries that also use the dollar sign as an abbreviation.
+window and document are passed through as local variables rather than as globals, because this speeds up the resolution process and can be more efficiently minified.</p>
+
+<h2>Invoking our plugin</h2>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+;<span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>$, doc, win<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="st0">&quot;use strict&quot;</span>;<br />
+<br />
+&nbsp; <span class="kw2">function</span> Widget<span class="br0">&#40;</span>el, opts<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$el &nbsp;= $<span class="br0">&#40;</span>el<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">opts</span> = opts;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">init</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; Widget.<span class="me1">prototype</span>.<span class="me1">init</span> = <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+<br />
+&nbsp; <span class="br0">&#125;</span>;<br />
+<br />
+&nbsp; $.<span class="me1">fn</span>.<span class="me1">widget</span> = <span class="kw2">function</span><span class="br0">&#40;</span>opts<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw1">this</span>.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw2">new</span> Widget<span class="br0">&#40;</span><span class="kw1">this</span>, opts<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span>;<br />
+<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="br0">&#40;</span>jQuery, document, window<span class="br0">&#41;</span>;<br />
+<br />
+$<span class="br0">&#40;</span><span class="st0">'#mywidget'</span><span class="br0">&#41;</span>.<span class="me1">widget</span><span class="br0">&#40;</span><span class="br0">&#123;</span>optionA: <span class="st0">'a'</span>, optionB: <span class="st0">'b'</span><span class="br0">&#125;</span><span class="br0">&#41;</span>;</div></p>
+
+<p>We invoke our plugin on a jQuery object or jQuery set by simply calling our widget() method on it and pass it some options.
+Never forget about "return this.each(function() { ... })" in order to not break the chain-ability of jQuery objects.</p>
+
+<p>The main functionality of the plugin is encapsulated into a separate Widget class, which we instantiate for each member in our jQuery set. Now all functionality is encapsulated in these wrapper objects.
+The constructor is designed to just keep track of the passed options and the DOM element that the widget was initialized on.</p>
+
+<p>You could also keep track of more sub-elements here to avoid having to always .find() them (think of performance) as you need them:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+;<span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>$, doc, win<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="st0">&quot;use strict&quot;</span>;<br />
+<br />
+&nbsp; <span class="kw2">function</span> Widget<span class="br0">&#40;</span>el, opts<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$el &nbsp; &nbsp; = $<span class="br0">&#40;</span>el<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">opts</span> &nbsp; &nbsp;= opts;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$header = <span class="kw1">this</span>.$el.<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'.header'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$body &nbsp; = <span class="kw1">this</span>.$el.<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'.body'</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">init</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="co1">// ...</span><br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="br0">&#40;</span>jQuery, document, window<span class="br0">&#41;</span>;</div></p>
+
+<h2>Parsing options</h2>
+
+<p>When we invoked the plugin we passed it some options. Often you need default options that you want to extend. This is how we bring the two together in our object's init() method:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+;<span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>$, doc, win<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="st0">&quot;use strict&quot;</span>;<br />
+<br />
+&nbsp; <span class="kw2">function</span> Widget<span class="br0">&#40;</span>el, opts<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$el &nbsp;= $<span class="br0">&#40;</span>el<span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">defaults</span> = <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; optionA: <span class="st0">'someOption'</span>,<br />
+&nbsp; &nbsp; &nbsp; optionB: <span class="st0">'someOtherOption'</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw2">var</span> meta &nbsp;= <span class="kw1">this</span>.$el.<span class="me1">data</span><span class="br0">&#40;</span><span class="st0">'widget-plugin-opts'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">opts</span> = $.<span class="me1">extend</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">defaults</span>, opts, meta<span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="co1">// ...</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="co1">// ...</span><br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="br0">&#40;</span>jQuery, document, window<span class="br0">&#41;</span>;<br />
+<br />
+$<span class="br0">&#40;</span><span class="st0">'#mywidget'</span><span class="br0">&#41;</span>.<span class="me1">widget</span><span class="br0">&#40;</span><span class="br0">&#123;</span>optionA: <span class="st0">'a'</span>, optionB: <span class="st0">'b'</span><span class="br0">&#125;</span><span class="br0">&#41;</span>;</div></p>
+
+<p>I like keeping the default options within the constructor of the wrapper class and not outside of it. This provides the flexibility to just take the whole wrapping class and copy it to somewhere else where you might not even have jQuery available.</p>
+
+<p>If the element has options for us saved within its data attributes, we also want to take them into account. This is handy for when you have plugins that auto-initialize themselves (which we will do later) so that you have no way
+to pass options to them via their plugin invocation.</p>
+
+<p>Here is an example:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_html" style="white-space: wrap;white-space: nowrap;"><span class="sc2"><a href="http://december.com/html/4/element/div.html"><span class="kw2">&lt;div</span></a> <span class="kw3">class</span>=<span class="st0">&quot;widget js-widget&quot;</span> data-widget-plugin-opts=<span class="st0">&quot;{&quot;</span>optionA<span class="st0">&quot;:&quot;</span>someCoolOptionString<span class="st0">&quot;}&quot;</span><span class="kw2">&gt;</span></a></span></div></p>
+
+<h2>Optional: Keeping a reference to our wrapper object in the element</h2>
+
+<p>It's a good idea to keep a reference to our plugin object on the DOM element, because that helps a lot with debugging using your browser's javascript console later.
+I don't always do this because it may just be overkill for the situation at hand. But I want to show you how to do this regardless:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+;<span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>$, doc, win<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="st0">&quot;use strict&quot;</span>;<br />
+<br />
+&nbsp; <span class="kw2">var</span> <span class="kw3">name</span> = <span class="st0">'js-widget'</span>;<br />
+<br />
+&nbsp; <span class="kw2">function</span> Widget<span class="br0">&#40;</span>el, opts<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$el &nbsp;= $<span class="br0">&#40;</span>el<span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">defaults</span> = <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; optionA: <span class="st0">'someOption'</span>,<br />
+&nbsp; &nbsp; &nbsp; optionB: <span class="st0">'someOtherOption'</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="co1">// let's use our name variable here as well for our meta options</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> meta &nbsp;= <span class="kw1">this</span>.$el.<span class="me1">data</span><span class="br0">&#40;</span><span class="kw3">name</span> + <span class="st0">'-opts'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">opts</span> = $.<span class="me1">extend</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">defaults</span>, opts, meta<span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$el.<span class="me1">data</span><span class="br0">&#40;</span><span class="kw3">name</span>, <span class="kw1">this</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="co1">// ...</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="co1">// ...</span><br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="br0">&#40;</span>jQuery, document, window<span class="br0">&#41;</span>;<br />
+<br />
+$<span class="br0">&#40;</span><span class="st0">'#mywidget'</span><span class="br0">&#41;</span>.<span class="me1">widget</span><span class="br0">&#40;</span><span class="br0">&#123;</span>optionA: <span class="st0">'a'</span>, optionB: <span class="st0">'b'</span><span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+<br />
+console.<span class="me1">log</span><span class="br0">&#40;</span>$<span class="br0">&#40;</span><span class="st0">'#mywidget'</span><span class="br0">&#41;</span>.<span class="me1">data</span><span class="br0">&#40;</span><span class="st0">'js-widget'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div></p>
+
+<p>As you can see, we just expose our wrapper object using jQuery's $.data function. Easy.</p>
+
+<h2>Binding some events</h2>
+
+<p>Let's use our wrapper object's init() function to bind some events and write some real plugin code:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+;<span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>$, doc, win<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="st0">&quot;use strict&quot;</span>;<br />
+<br />
+&nbsp; <span class="kw2">var</span> <span class="kw3">name</span> = <span class="st0">'js-widget'</span>;<br />
+<br />
+&nbsp; <span class="kw2">function</span> Widget<span class="br0">&#40;</span>el, opts<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$el &nbsp; &nbsp; &nbsp;= $<span class="br0">&#40;</span>el<span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">defaults</span> = <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; optionA: <span class="st0">'someOption'</span>,<br />
+&nbsp; &nbsp; &nbsp; optionB: <span class="st0">'someOtherOption'</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw2">var</span> meta &nbsp; &nbsp; = <span class="kw1">this</span>.$el.<span class="me1">data</span><span class="br0">&#40;</span><span class="kw3">name</span> + <span class="st0">'-opts'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">opts</span> &nbsp; &nbsp;= $.<span class="me1">extend</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">defaults</span>, opts, meta<span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$el.<span class="me1">data</span><span class="br0">&#40;</span><span class="kw3">name</span>, <span class="kw1">this</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$header = <span class="kw1">this</span>.$el.<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'.header'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$body &nbsp; = <span class="kw1">this</span>.$el.<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'.body'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; Widget.<span class="me1">prototype</span>.<span class="me1">init</span> = <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> self = <span class="kw1">this</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$header.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click.'</span> + <span class="kw3">name</span>, <span class="st0">'.title'</span>, <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; &nbsp; self.<span class="me1">editTitle</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$header.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'change.'</span> + <span class="kw3">name</span>, <span class="st0">'select'</span>, <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; &nbsp; self.<span class="me1">saveTitle</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span>;<br />
+<br />
+&nbsp; Widget.<span class="me1">prototype</span>.<span class="me1">editTitle</span> = <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$header.<span class="me1">addClass</span><span class="br0">&#40;</span><span class="st0">'editing'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span>;<br />
+<br />
+&nbsp; Widget.<span class="me1">prototype</span>.<span class="me1">saveTitle</span> = <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> val = <span class="kw1">this</span>.$header.<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'.title'</span><span class="br0">&#41;</span>.<span class="me1">val</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="co1">// save val to database</span><br />
+<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$header.<span class="me1">removeClass</span><span class="br0">&#40;</span><span class="st0">'editing'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span>;<br />
+<br />
+&nbsp; <span class="co1">// ...</span><br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="br0">&#40;</span>jQuery, document, window<span class="br0">&#41;</span>;</div></p>
+
+<p>Notice that we have bound the events via .on() in delegation mode, which means that our .title element doesn't even have to be in the DOM yet when the events are bound.
+It's generally good practice to use event delegation, as you do not have to constantly bind/unbind events as elements are added/removed to/from the DOM.</p>
+
+<p>We use our name variable as an event namespace here, which allows easy unbinding later without removing event listeners on the widget elements that were not bound using our plugin.</p>
+
+<h2>How to prevent designers from breaking your plugins</h2>
+
+<p>Something else that I like doing is attaching different classes to elements depending on if they are meant for css styling or for javascript functionality.</p>
+
+<p>The markup that we could use for the plugin above could be:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_html" style="white-space: wrap;white-space: nowrap;"><span class="sc2"><a href="http://december.com/html/4/element/div.html"><span class="kw2">&lt;div</span></a> <span class="kw3">class</span>=<span class="st0">&quot;widget&quot;</span><span class="kw2">&gt;</span></a></span><br />
+&nbsp; <span class="sc2"><a href="http://december.com/html/4/element/div.html"><span class="kw2">&lt;div</span></a> <span class="kw3">class</span>=<span class="st0">&quot;header&quot;</span><span class="kw2">&gt;</span></a></span><span class="sc2"><span class="kw2">&lt;/div&gt;</span></span><br />
+&nbsp; <span class="sc2"><a href="http://december.com/html/4/element/div.html"><span class="kw2">&lt;div</span></a> <span class="kw3">class</span>=<span class="st0">&quot;body&quot;</span><span class="kw2">&gt;</span></a></span><span class="sc2"><span class="kw2">&lt;/div&gt;</span></span><br />
+<span class="sc2"><span class="kw2">&lt;/div&gt;</span></span></div></p>
+
+<p>And then we do:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$<span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; $<span class="br0">&#40;</span><span class="st0">'.widget'</span><span class="br0">&#41;</span>.<span class="me1">widget</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span>;</div></p>
+
+<p>This is all fine and dandy, but now our designer comes along, changes the classes around, because he is not aware of our new plugin (or worse, he doesn't even care). This would break our client javascript functionality.
+So what I often do is this instead:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_html" style="white-space: wrap;white-space: nowrap;"><span class="sc2"><a href="http://december.com/html/4/element/div.html"><span class="kw2">&lt;div</span></a> <span class="kw3">class</span>=<span class="st0">&quot;widget js-widget&quot;</span><span class="kw2">&gt;</span></a></span><br />
+&nbsp; <span class="sc2"><a href="http://december.com/html/4/element/div.html"><span class="kw2">&lt;div</span></a> <span class="kw3">class</span>=<span class="st0">&quot;header js-header&quot;</span><span class="kw2">&gt;</span></a></span><span class="sc2"><span class="kw2">&lt;/div&gt;</span></span><br />
+&nbsp; <span class="sc2"><a href="http://december.com/html/4/element/div.html"><span class="kw2">&lt;div</span></a> <span class="kw3">class</span>=<span class="st0">&quot;body js-body&quot;</span><span class="kw2">&gt;</span></a></span><span class="sc2"><span class="kw2">&lt;/div&gt;</span></span><br />
+<span class="sc2"><span class="kw2">&lt;/div&gt;</span></span></div></p>
+
+<p>Then in our plugin change how we find the body and header:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> Widget<span class="br0">&#40;</span>el, opts<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">this</span>.$el &nbsp; &nbsp; = $<span class="br0">&#40;</span>el<span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; <span class="kw1">this</span>.<span class="me1">defaults</span> = <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; optionA: <span class="st0">'someOption'</span>,<br />
+&nbsp; &nbsp; optionB: <span class="st0">'someOtherOption'</span><br />
+&nbsp; <span class="br0">&#125;</span>;<br />
+<br />
+&nbsp; <span class="kw2">var</span> meta &nbsp; &nbsp; = <span class="kw1">this</span>.$el.<span class="me1">data</span><span class="br0">&#40;</span><span class="kw3">name</span> + <span class="st0">'-opts'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw1">this</span>.<span class="me1">opts</span> &nbsp; &nbsp;= $.<span class="me1">extend</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">defaults</span>, opts, meta<span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; <span class="kw1">this</span>.$header = <span class="kw1">this</span>.$el.<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'.js-header'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw1">this</span>.$body &nbsp; = <span class="kw1">this</span>.$el.<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'.js-body'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div></p>
+
+<p>And change our invocation:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$<span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; $<span class="br0">&#40;</span><span class="st0">'.js-widget'</span><span class="br0">&#41;</span>.<span class="me1">widget</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span>;</div></p>
+
+<p>I agree it's a little more markup to write and you might not need to use this. Also, since we manipulate the DOM with jQuery plugins we might depend on specific tag types anyway.
+So if the designer changed all div's to be li's instead, it might still break our plugin. If you are in a situation where you have regressions due to frontend engineers and designers not communicating properly, using js- prefixed classes on all important elements might be a step in the right direction.</p>
+
+<p>Notice how this.$header and this.$body are also agnostic to the html tag of the element that they cover.</p>
+
+<h2>How to remove our plugin without removing the DOM element</h2>
+
+<p>For large applications it's important to allow multiple plugins to operate on the same elements.
+For this to work, you need to be able to add and remove plugins on the same element without affecting the other plugins.</p>
+
+<p>Most jQuery plugins expect you to remove the element entirely to teardown the plugin. But what if you want to remove the plugin without removing the element?
+We can do this using a destroy function:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+Widget.<span class="me1">prototype</span>.<span class="me1">destroy</span> = <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">this</span>.$el.<span class="me1">off</span><span class="br0">&#40;</span><span class="st0">'.'</span> + <span class="kw3">name</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw1">this</span>.$el.<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'*'</span><span class="br0">&#41;</span>.<span class="me1">off</span><span class="br0">&#40;</span><span class="st0">'.'</span> + <span class="kw3">name</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; <span class="kw1">this</span>.$el.<span class="me1">removeData</span><span class="br0">&#40;</span><span class="kw3">name</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw1">this</span>.$el = <span class="kw2">null</span>;<br />
+<span class="br0">&#125;</span>;</div></p>
+
+<p>It takes our local name variable again and removes all events in that namespace. It also removes the reference to the wrapper object from the element.
+Now we can easily remove the plugin from the outside:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$<span class="br0">&#40;</span><span class="st0">'.js-widget'</span><span class="br0">&#41;</span>.<span class="me1">data</span><span class="br0">&#40;</span><span class="st0">'js-widget'</span><span class="br0">&#41;</span>.<span class="me1">destroy</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div></p>
+
+<p>By the way, if you remove the DOM element, jQuery will take care of removing all associated data and events by itself, so there is no need to worry about that case.</p>
+
+<h2>How to write self-initializing plugins</h2>
+
+<p>If you need to deal with a lot of Ajax requests in your app and then need to bind plugins on the DOM elements that were just loaded, this tip might be pretty useful for you.</p>
+
+<p>What I like doing is using a PubSub implementation to automatically invoke plugins:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$<span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> $document = $<span class="br0">&#40;</span>document<span class="br0">&#41;</span>;<br />
+&nbsp; $document.<span class="me1">trigger</span><span class="br0">&#40;</span><span class="st0">'dom<em>loaded'</span>, $document<span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; $<span class="br0">&#40;</span><span class="st0">'.some</em>selector'</span><span class="br0">&#41;</span>.<span class="me1">load</span><span class="br0">&#40;</span><span class="st0">'/my/url'</span>, <span class="kw2">function</span><span class="br0">&#40;</span>nodes<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; $document.<span class="me1">trigger</span><span class="br0">&#40;</span><span class="st0">'ajax_loaded'</span>, nodes<span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span>;</div></p>
+
+<p>Now we can allow the plugin to bind itself to all elements that by class definition need to be bound to it:</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+;<span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>$, doc, win<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="st0">&quot;use strict&quot;</span>;<br />
+<br />
+&nbsp; <span class="kw2">var</span> <span class="kw3">name</span> = <span class="st0">'js-widget'</span>;<br />
+<br />
+&nbsp; <span class="co1">// wrapper object implementation, etc.</span><br />
+<br />
+&nbsp; $<span class="br0">&#40;</span>doc<span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'dom<em>loaded ajax</em>loaded'</span>, <span class="kw2">function</span><span class="br0">&#40;</span>nodes<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> $nodes = $<span class="br0">&#40;</span>nodes<span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw2">var</span> $elements = $nodes.<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'.'</span> + <span class="kw3">name</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; $elements = $elements.<span class="me1">add</span><span class="br0">&#40;</span>$nodes.<span class="me1">filter</span><span class="br0">&#40;</span><span class="st0">'.'</span> + <span class="kw3">name</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; $elements.<span class="me1">widget</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="br0">&#40;</span>jQuery, document, window<span class="br0">&#41;</span>;</div></p>
+
+<p>You can also come up with your own very custom events and even namespaces to allow your plugins to talk to each other without having to know about each other.</p>
+
+<p>Advantages of this:</p>
+
+<ol>
+<li><p>This removes a lot of boilerplate code from our app! Re-initializing plugins after an ajax request without extra codelines? No problem!</p></li>
+<li><p>We can simply remove functionality from our application by not loading a specific plugin's javascript file.</p></li>
+</ol>
+
+<p>I can see two obvious disadvantages here, though:</p>
+
+<ol>
+<li><p>We cannot provide options to the plugin invocation via this. We'd have to rely on options bound using the html5 data property "data-js-widget-opts" (read above).
+In my experience this not as often needed as one would think, though.</p></li>
+<li><p>If you have a very complex app with a lot of plugins and code flying around, this PubSub mechanism might not be the most performant way of doing things.
+Think of 20 plugins all doing some .find() and .filter() operation on a large piece of markup that was just loaded via ajax. Ugh. :)</p></li>
+</ol>
+
+<h2>Conclusion</h2>
+
+<p>Wrapping usable code in a jQuery plugin is not always easy, but following a few guidelines makes it a much better experience.
+The ultimate takeaway here is to always wrap the plugin functionality in a wrapper class, so that the elements in your jQuery set that you bind the plugin to do not interfer with each other.</p>
+
+<p>If your plugin is more complex, you could even use multiple wrapper classes and let their objects talk to each other. Or even cooler, try to move some of the functionality your plugin requires out into another, smaller plugin.
+And let the both of them talk to each other via PubSub.</p>
+
+<p>The rest is a couple nice extras that made my live easier.</p>
+
+<p>Here is the full skeleton again that I use when I write new plugins (rename accordingly):</p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+;<span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span>$, doc, win<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="st0">&quot;use strict&quot;</span>;<br />
+<br />
+&nbsp; <span class="kw2">var</span> <span class="kw3">name</span> = <span class="st0">'js-widget'</span>;<br />
+<br />
+&nbsp; <span class="kw2">function</span> Widget<span class="br0">&#40;</span>el, opts<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$el &nbsp; &nbsp; &nbsp;= $<span class="br0">&#40;</span>el<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$el.<span class="me1">data</span><span class="br0">&#40;</span><span class="kw3">name</span>, <span class="kw1">this</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">defaults</span> = <span class="br0">&#123;</span><span class="br0">&#125;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw2">var</span> meta &nbsp; &nbsp; &nbsp;= <span class="kw1">this</span>.$el.<span class="me1">data</span><span class="br0">&#40;</span><span class="kw3">name</span> + <span class="st0">'-opts'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">opts</span> &nbsp; &nbsp; = $.<span class="me1">extend</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">defaults</span>, opts, meta<span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">init</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; Widget.<span class="me1">prototype</span>.<span class="me1">init</span> = <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="br0">&#125;</span>;<br />
+<br />
+&nbsp; Widget.<span class="me1">prototype</span>.<span class="me1">destroy</span> = <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$el.<span class="me1">off</span><span class="br0">&#40;</span><span class="st0">'.'</span> + <span class="kw3">name</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$el.<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'*'</span><span class="br0">&#41;</span>.<span class="me1">off</span><span class="br0">&#40;</span><span class="st0">'.'</span> + <span class="kw3">name</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$el.<span class="me1">removeData</span><span class="br0">&#40;</span><span class="kw3">name</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.$el = <span class="kw2">null</span>;<br />
+&nbsp; <span class="br0">&#125;</span>;<br />
+<br />
+&nbsp; $.<span class="me1">fn</span>.<span class="me1">widget</span> = <span class="kw2">function</span><span class="br0">&#40;</span>opts<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw1">this</span>.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw2">new</span> Widget<span class="br0">&#40;</span><span class="kw1">this</span>, opts<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span>;<br />
+<br />
+&nbsp; $<span class="br0">&#40;</span>doc<span class="br0">&#41;</span>.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'dom_loaded ajax_loaded'</span>, <span class="kw2">function</span><span class="br0">&#40;</span>e, nodes<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> $nodes = $<span class="br0">&#40;</span>nodes<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> $elements = $nodes.<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'.'</span> + <span class="kw3">name</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; $elements = $elements.<span class="me1">add</span><span class="br0">&#40;</span>$nodes.<span class="me1">filter</span><span class="br0">&#40;</span><span class="st0">'.'</span> + <span class="kw3">name</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; $elements.<span class="me1">widget</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="br0">&#40;</span>jQuery, document, window<span class="br0">&#41;</span>;</div></p>
+
+<p>Kind regards,
+Tim</p>
+
+<p><a href="https://twitter.com/#!/tim_kos">@tim_kos</a>
+<img style="display: none;" src="http://debuggable.com/posts/tick/4f72ab2e-7310-4a74-817a-0a04cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-write-jquery-plugins%3A4f72ab2e-7310-4a74-817a-0a04cbdd56cb &amp;title=How+to+write+jQuery+plugins';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-write-jquery-plugins%3A4f72ab2e-7310-4a74-817a-0a04cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-write-jquery-plugins%3A4f72ab2e-7310-4a74-817a-0a04cbdd56cb&amp;title=How+to+write+jQuery+plugins&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-write-jquery-plugins%3A4f72ab2e-7310-4a74-817a-0a04cbdd56cb&amp;title=How+to+write+jQuery+plugins';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/simple-global-ajax-activity-indicator-with-jquery:480f4dd6-7508-4aea-9850-4139cbdd56cb">Simple global Ajax activity indicator with jQuery</a></li>
+							<li><a href="/posts/jquery-is-a-true-prototype-killer:480f4dd5-6634-48f4-99c2-4a2dcbdd56cb">jQuery is a true prototype killer</a></li>
+							<li><a href="/posts/jac-comment-box-auto-completer-jquery-plugin:48ce581c-a2ac-48ed-9a27-2c4c4834cda3">Jac: Comment box name auto completer (jQuery plugin)</a></li>
+							<li><a href="/posts/with-jquery-cakephp-to-world-domination-slides:480f4dd6-7cb8-4e84-af4f-4dc6cbdd56cb">With jQuery &amp; CakePHP to World Domination (Slides)</a></li>
+							<li><a href="/posts/jquery-madness-at-the-workshop-in-raleigh,-nc,-sepetember-6th---7th:48a9b405-7574-495b-b75e-2d284834cda3">jQuery Goodness at the Workshop in Raleigh, NC, September 6th - 7th</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/encode-html-entities-with-jquery:480f4dd6-13cc-4ce9-8071-4710cbdd56cb">Encode HTML entities with jQuery</a></li>
+							<li><a href="/posts/uhhhwat-introduction-to-the-jquery-community:480f4dd6-c598-474e-a57a-44e7cbdd56cb">&quot;uhhh.......WAT?&quot; - Introduction to the jQuery community</a></li>
+							<li><a href="/posts/rightjs-1-5-6-8-times-faster-than-jquery:4b1fc009-1940-4d26-bdc6-0af2cbdd56cb">RightJS 1.5: 6-8 times faster than jQuery</a></li>
+							<li><a href="/posts/getting-serious-with-jquery-adding-custom-css-selectors:480f4dd6-e834-4cf6-a5cc-478ccbdd56cb">Getting serious with jQuery - Adding custom CSS selectors</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">13 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4f7449d4-6124-455b-abd2-7af0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8ba7af140cf671c5cab61154d5ee19ef&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://bassistance.de" rel="nofollow">Jörn Zaefferer</a>						</strong>
+						<strong>said 
+						on Mar 29, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The pattern you describe is really close to what the jQuery UI widget factory abstracts for you. It goes a little further though, and with the updates we're landing in 1.9, its a pretty good replacement for Backbone.View.</p>
+<p>More here: <a rel="nofollow" href="http://jqueryui.com/demos/widget/">http://jqueryui.com/demos/widget/</a> and here <a rel="nofollow" href="http://wiki.jqueryui.com/w/page/12138135/Widget%20factory">http://wiki.jqueryui.com/w/page/12138135/Widget%20factory</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f7563e1-bd28-4688-9db1-7228cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ce04b463c8b75ca093ac37ebb2616ab6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Sebastian&nbsp;						</strong>
+						<strong>said 
+						on Mar 30, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Really nice! Thank you very much, i learned a lot!</p>
+<p>Greetings,<br />
+Sebastian</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f75b79a-0bfc-475a-bbe0-75f3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=516266bec6ac7e91d415b634979ab438&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Ben&nbsp;						</strong>
+						<strong>said 
+						on Mar 30, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tim,</p>
+<p>Thanks for this article. It is clearly written, useful and accurate. I just used your template to write a widget and it worked very well. </p>
+<p>There is a typo in second last code sample, but it is corrected in the final code box. </p>
+<p> <code>$(doc).on('domloaded ajaxloaded', function($nodes) {</code></p>
+<p>Should read</p>
+<p><code>$(doc).on('domloaded ajaxloaded', function(nodes) {</code></p>
+<p>Thanks again for the great work.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f75bf94-3e6c-408f-b7d6-7de3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Tim Koschuetzki&nbsp;						</strong>
+						<strong>said 
+						on Mar 30, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for reporting this Ben. I fixed it.</p>
+<p>Glad you like the article. :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f7b7fed-8e8c-49b4-ac86-5d5ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://robin-gloster.de" rel="nofollow">Robin</a>						</strong>
+						<strong>said 
+						on Apr 03, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>How would I add public functions to this plugin?<br />
+I didn't find anything really nice until now and I like your approach.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Tim Koschuetzki&nbsp;						</strong>
+						<strong>said 
+						on Apr 04, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well you could expose your object via $.data() (see "Optional: Keeping a reference to our wrapper object in the element" in the article) and add functions there.</p>
+<p>Alternatively you could do something like:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$.<span class="me1">fn</span>.<span class="me1">widget</span> = <span class="kw2">function</span><span class="br0">&#40;</span>opts<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="st0">'init'</span>: <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="kw1">return</span> <span class="kw1">this</span>.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="kw2">new</span> Widget<span class="br0">&#40;</span><span class="kw1">this</span>, opts<span class="br0">&#41;</span>;</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="br0">&#125;</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span>,</br><br />
+&nbsp; &nbsp; myFunc: <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; &nbsp; <span class="co1">// ...</span></br><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span></br><br />
+&nbsp; <span class="br0">&#125;</span>;</br></div>
+<p>And access it like this from the outside:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// to init the plugin</span><br />
+$<span class="br0">&#40;</span><span class="st0">'.selector'</span><span class="br0">&#41;</span>.<span class="me1">widget</span>.<span class="me1">init</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</br><br />
+</br><br />
+<span class="co1">// to access your custom function</span></br><br />
+$<span class="br0">&#40;</span><span class="st0">'.selector'</span><span class="br0">&#41;</span>.<span class="me1">widget</span>.<span class="me1">myFunc</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</br></div>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://robin-gloster.de" rel="nofollow">Robin</a>						</strong>
+						<strong>said 
+						on Apr 04, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks didn't quite understand that before :)<br />
+Very nice article!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Tim Koschuetzki&nbsp;						</strong>
+						<strong>said 
+						on Apr 04, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Jörn: Sorry, thought I had replied to you already.</p>
+<p>The jQuery UI widget factory looks cool to me - I didn't know about that before. :) I think it's a great alternative to my approach. Thanks for sharing.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f832a25-5818-4d38-9e39-097ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://beopoint.com" rel="nofollow">Ognian</a>						</strong>
+						<strong>said 
+						on Apr 09, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Really nice work! I was trying to do something in this shape but always end up with the design shown in the jquery tutorials. Thanks for opening my eyes!</p>
+<p>Do you mind if I translate the article in Bulgarian and publish it on my forum (with proper link to the original)?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Tim koschuetzki&nbsp;						</strong>
+						<strong>said 
+						on Apr 09, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>That's fine ognian, thanks. :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.pierre-martin.fr" rel="nofollow">Pierre Martin</a>						</strong>
+						<strong>said 
+						on Apr 16, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice article!</p>
+<p>Something I am doing more and more to "prevent designers breaking my plugin" is to use the HTML5 data-* attribute instead of classes as much as I can. It allows to make things more readable in the HTML (every data-* attribute is for the developers), and also to build the JS considering DOM elements as semantic objects with properties.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.nghienphim.net/" rel="nofollow">Leo Nguyen</a>						</strong>
+						<strong>said 
+						on Apr 24, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is very nice plugin and I found it is helpful for my project. Thank you so much. I recommended this for my colleagues.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.uzza.pl" rel="nofollow">Łukasz Lipiński</a>						</strong>
+						<strong>said 
+						on Apr 26, 2012:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Maybe you can write something about how to deal with components on the single page application ? Do you use any sort of managers ? which tracks current context (for example which window is opened) and destroys no longer used stuff ? Example:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> ComponentManager = <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="st0">&quot;use strict&quot;</span>;</br><br />
+</br><br />
+&nbsp; <span class="kw2">var</span> context_type = <span class="kw2">null</span>;</br><br />
+&nbsp; <span class="kw2">var</span> context_subtype = <span class="kw2">null</span>;</br><br />
+</br><br />
+&nbsp; <span class="co1">//Keeps instances of all registered components</span></br><br />
+&nbsp; <span class="kw2">var</span> components = <span class="br0">&#123;</span><span class="br0">&#125;</span>;</br><br />
+</br><br />
+&nbsp; <span class="co1">//Destroys objects which contains components</span></br><br />
+&nbsp; <span class="kw2">function</span> destroy<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; </br><br />
+&nbsp; <span class="br0">&#125;</span></br><br />
+</br><br />
+&nbsp; <span class="kw2">var</span> Module = <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; setContext : <span class="kw2">function</span><span class="br0">&#40;</span>subtype<span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; &nbsp; </br><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> old_subtype;</br><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span>,</br><br />
+</br><br />
+&nbsp; &nbsp; <span class="co1">//Registers component </span></br><br />
+&nbsp; &nbsp; register : <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; &nbsp; </br><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> objComponent;</br><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span>,</br><br />
+</br><br />
+&nbsp; &nbsp; <span class="co1">//Returns component instances depends on the specified arguments.</span></br><br />
+&nbsp; &nbsp; get : <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> objComponent;</br><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span>,</br><br />
+</br><br />
+&nbsp; &nbsp; &nbsp;<span class="co1">//Unregisters single component</span></br><br />
+&nbsp; &nbsp; unregister : <span class="kw2">function</span><span class="br0">&#40;</span><span class="kw3">name</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; &nbsp; </br><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span>,</br><br />
+</br><br />
+&nbsp; &nbsp; &nbsp;<span class="co1">//Its a helper function which displays registered components</span></br><br />
+&nbsp; &nbsp; showStatus : <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; </br><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span></br><br />
+&nbsp; <span class="br0">&#125;</span>;</br><br />
+</br><br />
+&nbsp; <span class="kw1">return</span> Module;</br><br />
+<span class="br0">&#125;</span>;</br></div>
+<p>BTW, you didn't write anything about defining your own events, did you forget ? or you don't like them ?:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+jQuery.<span class="me1">fn</span>.<span class="me1">button</span> = <span class="kw2">function</span><span class="br0">&#40;</span>params<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="st0">&quot;use strict&quot;</span>;</br><br />
+</br><br />
+&nbsp; <span class="kw2">var</span> settings = $.<span class="me1">extend</span><span class="br0">&#40;</span><span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; </br><br />
+&nbsp; <span class="br0">&#125;</span>, params<span class="br0">&#41;</span>;</br><br />
+</br><br />
+&nbsp; <span class="kw2">var</span> _self = <span class="kw1">this</span>, $el = $<span class="br0">&#40;</span><span class="kw1">this</span><span class="br0">&#41;</span>;</br><br />
+</br><br />
+&nbsp; <span class="kw2">function</span> bindEvents<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; $el.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'click.button touchend.button'</span>, <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>settings.<span class="me1">disabled</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span>;</br><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span></br><br />
+</br><br />
+&nbsp; &nbsp; &nbsp; _self.<span class="me1">trigger</span><span class="br0">&#40;</span><span class="st0">&quot;btn:click&quot;</span>, <span class="br0">&#91;</span>_self<span class="br0">&#93;</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; <span class="br0">&#125;</span></br><br />
+</br><br />
+&nbsp; <span class="kw1">this</span>.<span class="me1">disable</span> = <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw1">this</span>;</br><br />
+&nbsp; <span class="br0">&#125;</span>;</br><br />
+</br><br />
+&nbsp; <span class="kw1">this</span>.<span class="me1">destroy</span> = <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+</br><br />
+&nbsp; <span class="br0">&#125;</span>;</br><br />
+</br><br />
+&nbsp; <span class="kw2">var</span> initialize = <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; </br><br />
+&nbsp; <span class="br0">&#125;</span>;</br><br />
+</br><br />
+&nbsp; initialize<span class="br0">&#40;</span><span class="br0">&#41;</span>;</br><br />
+</br><br />
+&nbsp; <span class="kw1">return</span> <span class="kw1">this</span>;</br><br />
+<span class="br0">&#125;</span>;</br></div>
+<p>This approach gives possibility to do:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> component = $<span class="br0">&#40;</span><span class="st0">&quot;#component&quot;</span><span class="br0">&#41;</span>.<span class="me1">button</span><span class="br0">&#40;</span><span class="br0">&#123;</span>caption : <span class="st0">''</span>Some caption<span class="st0">'}).on(&quot;btn:click&quot;, function() {<br />
+&nbsp; &nbsp; &nbsp;//do something when user will click on the button</br><br />
+});</br></span></div>
+<p>(to prevent unnecessary comments - I know, my example won't work if selector will return more nodes, but so far I've never had situation when I wanted to initiate multiple components at once)</p>
+<p>Thanks for sharing your knowledge, I am looking for more articles :)<br />
+Regards</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

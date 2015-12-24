@@ -1,0 +1,577 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Code Insults Round 1 - Why switch blocks are dumb &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/code-insults-round-1---why-switch-blocks-are-dumb:4901d363-d210-482c-9794-65bd4834cda3">Code Insults Round 1 - Why switch blocks are dumb</a></h2>	<div class="posted-on">
+		<p>Posted on 27/10/08 by 
+		<a href="/nate">Nate Abele</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/nate_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Howdy folks,</p>
+<p>Sorry for not getting back to you sooner.  Between speaking engagements, framework releases and hard drive crashes, blog posting just gets lost in all the chaos sometimes.  You know how it is.</p>
+<p>So, today's code was randomly selected from the entries I've received since the <a href="http://debuggable.com/posts/i-will-insult-your-code!:48ac91d1-ca78-4e95-ad66-1e854834cda3">introductory post</a>.  The entire submission is actually two files, which together comprise a console script for interacting with a web service (the names of the entrants have been withheld to protect the identities of the guilty).  Rather than examine the full entry, we're going to take a look at one part which I find comes up fairly often: switch block overkill.</p>
+<p>Don't get me wrong, switch blocks are great, especially for flow control (which makes the title of this post slightly misleading and sensationalist), but they're often overused in ways that make your code less maintainable.  Let's take a look at the example:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">for</span><span class="br0">&#40;</span><span class="re0">$k</span>=<span class="nu0">0</span>; <span class="re0">$k</span>&lt;count<span class="br0">&#40;</span><span class="re0">$args</span><span class="br0">&#41;</span>; <span class="re0">$k</span>++<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$option</span> = <span class="re0">$args</span><span class="br0">&#91;</span><span class="re0">$k</span><span class="br0">&#93;</span>;<br />
+&nbsp; <span class="kw1">switch</span> <span class="br0">&#40;</span><span class="re0">$option</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">case</span> <span class="st0">'id'</span>:<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/mb_ereg"><span class="kw3">mb_ereg</span></a><span class="br0">&#40;</span><span class="st0">&quot;^[0-9 ,]+$&quot;</span>,<span class="re0">$args</span><span class="br0">&#91;</span><span class="re0">$k</span><span class="nu0">+1</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">id</span> = <a href="http://www.php.net/explode"><span class="kw3">explode</span></a><span class="br0">&#40;</span><span class="st0">','</span>,<a href="http://www.php.net/str_replace"><span class="kw3">str_replace</span></a><span class="br0">&#40;</span><span class="st0">' '</span>,<span class="st0">''</span>,<span class="re0">$args</span><span class="br0">&#91;</span><span class="re0">$k</span><span class="nu0">+1</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$k</span>++;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$err</span> = <span class="st0">'No id number found with id option'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="kw1">case</span> <span class="st0">'q'</span>:<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">verbose</span> = <span class="nu0">0</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">quiet</span> = <span class="kw2">true</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="kw1">case</span> <span class="st0">'v'</span>:<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">verbose</span> = <span class="nu0">1</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">quiet</span> = <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="kw1">case</span> <span class="st0">'V'</span>:<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">verbose</span> = <span class="nu0">2</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">quiet</span> = <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="kw1">case</span> <span class="st0">'D'</span>:<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">debug</span> = <span class="kw2">true</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">verbose</span> = <span class="nu0">2</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">quiet</span> = <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="kw1">case</span> <span class="st0">'T'</span>:<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">testrun</span> = <span class="kw2">true</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">quiet</span> = <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="kw1">case</span> <span class="st0">'L'</span>:<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/mb_ereg"><span class="kw3">mb_ereg</span></a><span class="br0">&#40;</span><span class="st0">&quot;^[0-9]+$&quot;</span>,<span class="re0">$args</span><span class="br0">&#91;</span><span class="re0">$k</span><span class="nu0">+1</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">limit</span> = <span class="re0">$args</span><span class="br0">&#91;</span><span class="re0">$k</span><span class="nu0">+1</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$k</span>++;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$err</span> = <span class="st0">'Limit param can only be a digit'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="kw2">default</span>: <br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$valid_args</span><span class="br0">&#91;</span><span class="re0">$option</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$err</span> = <span class="st0">'Uknown argument <span class="es0">\'</span>'</span>.<span class="re0">$option</span>.<span class="st0">'<span class="es0">\'</span>.'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$valid_args</span><span class="br0">&#91;</span><span class="re0">$option</span><span class="br0">&#93;</span> !== <span class="kw2">false</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$k</span>++;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>This code takes a list of arguments from the command line, and uses them to set the state of the shell object.  In other words, it is creating a mapping between the parameter flags and the shell object's properties.</p>
+<p>A key to writing flexible, maintainable code is realizing that your applications are basically comprised of two things: algorithms and data.  Algorithms are the code, the logic.  Data is what the algorithms operate on, though in many cases (like this one), data is showing up as part of the algorithm: it's too tightly bound up in logic, and unnecessarily so.</p>
+<p>Finding where data is tied up in your business logic can sometimes be subtle and hard to spot.  It might help to think about the distinction in these terms.  Logic (or algorithm) code <i>does</i> something: it causes a transition to the next state of execution within your application.  Conditionals (if/switch blocks) <i>branch</i>, loops <i>iterate</i>, etc.  Conversely, data code is declarative, it takes no direct action; i.e. setting a variable or object property.  (Unless <code>__set()</code> is involved, in which case you're invoking a method anyway, so it doesn't count.  Cheater.)</p>
+<p>Now, setting a variable does cause a change of state within the machine of your application, but in and of itself, this change has no value.  It requires some form of processing via logic code.  With that in mind, let's take a look at the re-written example:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$flags</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; <span class="st0">'q'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'verbose'</span> =&gt; <span class="nu0">0</span>, <span class="st0">'quiet'</span> =&gt; <span class="kw2">true</span><span class="br0">&#41;</span>,<br />
+&nbsp; <span class="st0">'v'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'verbose'</span> =&gt; <span class="nu0">1</span>, <span class="st0">'quiet'</span> =&gt; <span class="kw2">false</span><span class="br0">&#41;</span>,<br />
+&nbsp; <span class="st0">'V'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'verbose'</span> =&gt; <span class="nu0">2</span>, <span class="st0">'quiet'</span> =&gt; <span class="kw2">false</span><span class="br0">&#41;</span>,<br />
+&nbsp; <span class="st0">'D'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'debug'</span> =&gt; <span class="kw2">true</span>, <span class="st0">'verbose'</span> =&gt; <span class="nu0">2</span>, <span class="st0">'quiet'</span> =&gt; <span class="kw2">false</span><span class="br0">&#41;</span>,<br />
+&nbsp; <span class="st0">'T'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'testrun'</span> =&gt; <span class="kw2">true</span>, <span class="st0">'quiet'</span> =&gt; <span class="kw2">false</span><span class="br0">&#41;</span><br />
+<span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw1">for</span> <span class="br0">&#40;</span><span class="re0">$k</span> = <span class="nu0">0</span>; <span class="re0">$k</span> &lt; <a href="http://www.php.net/count"><span class="kw3">count</span></a><span class="br0">&#40;</span><span class="re0">$args</span><span class="br0">&#41;</span>; <span class="re0">$k</span>++<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+<br />
+&nbsp; <span class="re0">$option</span> = <span class="re0">$args</span><span class="br0">&#91;</span><span class="re0">$k</span><span class="br0">&#93;</span>;<br />
+&nbsp; <span class="re0">$value</span> = <span class="re0">$args</span><span class="br0">&#91;</span><span class="re0">$k</span> + <span class="nu0">1</span><span class="br0">&#93;</span>;<br />
+<br />
+&nbsp; <span class="kw1">switch</span> <span class="br0">&#40;</span><span class="kw2">true</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">case</span> <span class="br0">&#40;</span><span class="re0">$option</span> == <span class="st0">'id'</span><span class="br0">&#41;</span>:<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/mb_ereg"><span class="kw3">mb_ereg</span></a><span class="br0">&#40;</span><span class="st0">&quot;^[0-9 ,]+$&quot;</span>, <span class="re0">$value</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">id</span> = <a href="http://www.php.net/explode"><span class="kw3">explode</span></a><span class="br0">&#40;</span><span class="st0">','</span>, <a href="http://www.php.net/str_replace"><span class="kw3">str_replace</span></a><span class="br0">&#40;</span><span class="st0">' '</span>,<span class="st0">''</span>, <span class="re0">$value</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$k</span>++;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$err</span> = <span class="st0">'No id number found with id option'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="kw1">case</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$flags</span><span class="br0">&#91;</span><span class="re0">$option</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>:<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$flags</span><span class="br0">&#91;</span><span class="re0">$option</span><span class="br0">&#93;</span> <span class="kw1">as</span> <span class="re0">$key</span> =&gt; <span class="re0">$val</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="br0">&#123;</span><span class="re0">$key</span><span class="br0">&#125;</span> = <span class="re0">$val</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="kw1">case</span> <span class="br0">&#40;</span><span class="re0">$option</span> == <span class="st0">'L'</span><span class="br0">&#41;</span>:<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/mb_ereg"><span class="kw3">mb_ereg</span></a><span class="br0">&#40;</span><span class="st0">&quot;^[0-9]+$&quot;</span>, <span class="re0">$value</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">limit</span> = <span class="re0">$value</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$k</span>++;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$err</span> = <span class="st0">'Limit param can only be a digit'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="kw2">default</span>:<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$validArgs</span><span class="br0">&#91;</span><span class="re0">$option</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$err</span> = <span class="st0">'Uknown argument <span class="es0">\'</span>'</span> . <span class="re0">$option</span> . <span class="st0">'<span class="es0">\'</span>.'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$validArgs</span><span class="br0">&#91;</span><span class="re0">$option</span><span class="br0">&#93;</span> !== <span class="kw2">false</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$k</span>++;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>First of all, notice how the code formatting has been changed: things are now spaced out in a more consistent format that's easier to read, and an explaining variable (<code>$value</code>) has been added alongside <code>$option</code>, to make it more clear from the code which options support parameters, and which are stand-alone flags.  When you're writing code, even if you're in a hurry, it always helps to think of the next guy.  That next guy might be you in a couple months (or days) when you come back to the code and wonder what the heck you were doing there.</p>
+<p>Moving on: as we can see, the data mapping has been abstracted out of the logic and put at the top of the code block.  This means that (a) our data can expand infinitely with no logic duplication, and (b) the data can be moved around, manipulated, re-used, or loaded from an external source.  This highlights another property of logic vs. data: logic is fixed and immutable, while data is infinitely flexible.</p>
+<p>Okay... any questions/comments/snide remarks?</p>
+<p>No?  Good.</p>
+<p>Now get outta here and refactor your code!<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4901d363-d210-482c-9794-65bd4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcode-insults-round-1---why-switch-blocks-are-dumb%3A4901d363-d210-482c-9794-65bd4834cda3 &amp;title=Code+Insults+Round+1+-+Why+switch+blocks+are+dumb';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcode-insults-round-1---why-switch-blocks-are-dumb%3A4901d363-d210-482c-9794-65bd4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcode-insults-round-1---why-switch-blocks-are-dumb%3A4901d363-d210-482c-9794-65bd4834cda3&amp;title=Code+Insults+Round+1+-+Why+switch+blocks+are+dumb&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcode-insults-round-1---why-switch-blocks-are-dumb%3A4901d363-d210-482c-9794-65bd4834cda3&amp;title=Code+Insults+Round+1+-+Why+switch+blocks+are+dumb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/upcoming:-code-coverage-in-cakephp---test-how-well-you-test:4814f672-0d78-4585-a349-64c64834cda3">Upcoming: Code Coverage in CakePHP - Test How Well You Test</a></li>
+							<li><a href="/posts/cakephp-code-coverage-for-group-tests:483b2b77-c420-47e3-b337-653c4834cda3">CakePHP Code Coverage for Group Tests</a></li>
+							<li><a href="/posts/workshop-application-source-code-and-demo:48c7c350-6cac-48b3-8816-5e114834cda3">Workshop Application (Source Code + Demo)</a></li>
+							<li><a href="/posts/code-coverage-analysis-soon-in-cakephp---test-how-well-you-test:4814f6a0-fe60-4f50-be0b-07194834cda3">Code Coverage Analysis soon in CakePHP - Test How Well You Test</a></li>
+							<li><a href="/posts/php-code-beautifier-tool:480f4dfe-523c-455a-a2c9-4c6fcbdd56cb">PHP Code-Beautifier Tool</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/code-insults-round-1---why-switch-blocks-are-dumb:4901d363-d210-482c-9794-65bd4834cda3">17 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/code-insults-round-1---why-switch-blocks-are-dumb:4901d363-d210-482c-9794-65bd4834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4905f249-60f0-4755-a22c-2c614834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ee19521b6ffa4187371641b6e409d9bc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Daniel Watson&nbsp;						</strong>
+						<strong>said 
+						on Oct 27, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nate...</p>
+<p>We all know that switch statements are bad... We should definitely move back to the old-school way of doing things... if() elseif() elseif() elseif() elseif() elseif()elseif() elseif() elseif() elseif() else()</p>
+<p>Oh, and we need to be sure to make use of ternary operators, and dozens of includes. </p>
+<p>if($option == 'id') {<br />
+    include((file_exists('id.php')) ? 'id.php' : 'default.php');</br><br />
+elseif()...</br><br />
+...</br></p>
+<p>// End of snide remark.</p>
+<p>:-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4905f4a1-b698-4044-aac7-07504834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Oct 27, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Daniel Watson: Heh.  That's why I added "switch blocks are great, especially for flow control" ;-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4905fe54-3b90-4002-88f5-7e294834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fb3a3dcfb9e30579cd34020ef35bc979&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://robwilkerson.org" rel="nofollow">Rob Wilkerson</a>						</strong>
+						<strong>said 
+						on Oct 27, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I think the key thought here gets a little lost - perhaps because of the "sensational" title - in the reading.  It's not about switch blocks at all - they're perfectly useful constructs (when used well) - but rather about the separation of logic from data. Though it could be argued that switch blocks make it easier than it should be to munge it all together.</p>
+<p>As you say, "our data can expand infinitely with no logic duplication". That's the critical path. I had to read the article twice because the first time I was reading with an eye for why you thought that particular construct (or its general use) was flawed. I did better on the second reading because I dropped my preconception.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4906d8e3-607c-4124-84aa-0d914834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a8aec7de9c48b1953e59f7d3a6100255&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							keymaster&nbsp;						</strong>
+						<strong>said 
+						on Oct 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Data driven algorithms are often preferable, especially as the size of the data set grows.</p>
+<p>If the data set is small and unlikely to change, I'm not sure it's worth the loss of readability or the extra coding time, though.</p>
+<p>Thanks for giving us something to think about. Keep it up.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4907a6ec-3d74-4c78-a266-570a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Oct 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Nate Abele : good call, I see people commiting - literally - the same "error" more ofently than I would want to. You could have written a little about the {{{ switch (true) }}} that is wide seen on cakephp code, but I must admit that before I started with cake I had never seen such usage and it's very handy.</p>
+<p>@keymaster : do you think it's less readable? I think that the "proposed" - should I say "imposed"? ;-)- is much more readable, as the data structure shows everything you need to know about the flags</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4908f9a8-ae44-4a2e-b5fd-1c774834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=772633541a10fac44ee22cb26ce679a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Rogojine&nbsp;						</strong>
+						<strong>said 
+						on Oct 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Like keymaster, I think that the new code is far less readable. It makes you think that the first array contains all the possible parameters, and that's wrong. And the "switch(true)" might be handy, but does it really make the code clearer?</p>
+<p>And if you wanted to turn the parameter "-v" into an incremental one, the first code could easily be changed, whereas the second code would change completely (removing "-v" from the array and adding it to the switch).</p>
+<p>If you want to insult other people's code, get ready to some insults to ;)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4909096b-0cb4-42e3-88ce-17a64834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7d00dbf0d2c34e41b694e7ad8fafda02&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://wee.extend.ws" rel="nofollow">Loïc Hoguin</a>						</strong>
+						<strong>said 
+						on Oct 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>That's the kind of situations where getopt is good. But using it or not, the first thing to do is to transform your data into something usable, and then -but only then- to process it.</p>
+<p>In this example and in the "fixed" example, data transformation is done at the same time as the data processing. Both examples are bad. And... switch (true)? It's just like if/else but with a different syntax. If you're going to do this at least use if/else.</p>
+<p>The real solution for this specific example is to use getopt -or write a similar algorithm- which parse the command line and returns an array containing all the options, with their parameter if any. You can then iterate over this array and apply the appropriate actions when they're found in flags, and add individual tests for each of the "special values". This would become something similar to this:</p>
+<p>// define $flags and do getopt (or your own custom parsing operations) here</p>
+<p>foreach ($options as $name => $value) {<br />
+  if ($value !== false)</br><br />
+    continue; // Expecting an argument, skip</br></p>
+<p>  if (!isset($flags[$name]))<br />
+    die('Uknown argument \'' . $name . '\'.');</br></p>
+<p>  foreach ($flags[$name] as $key => $val)<br />
+    $this->{$key} = $val;</br><br />
+}</br></p>
+<p>if (isset($options['id'])) {<br />
+  // ...</br><br />
+}</br></p>
+<p>if (isset($options['L'])) {<br />
+  // ...</br><br />
+}</br></p>
+<p>Hoping the code won't get screwed up...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49093f49-8174-4ab0-88e1-1dbb4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6586c837627d382dcf1940b1047f15fb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Enc&nbsp;						</strong>
+						<strong>said 
+						on Oct 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Separation of algorithm and data.. hold on .. some words like encapsulation, data hiding, interface, contracts pop up all of a sudden? I wonder why? Perhaps, because it's 2008 and every half decent programmer already knows what you're talking about? Back in 1990 maybe your article wouldn't have wasted people's time. Stop writing about trivial things, please.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49094873-544c-4ca4-9dde-0dbd4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f0be2f57b40130d87bc651c949746143&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://nicholas.piasecki.name/" rel="nofollow">Nicholas Piasecki</a>						</strong>
+						<strong>said 
+						on Oct 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Two comments:</p>
+<p>A. </p>
+<p>I've written code that's like both of the examples. If I know the options ahead of time and they are unlikely to change, then I prefer the switch statement. It is in my opinion easier to read and easier for a maintenance programmer to easily digest.</p>
+<p>If I don't know all of the options ahead of time, or if the options might change frequently, or if the options available could be defined in an external configuration file, then I will code something like the second example. To add an option, I muck with the config file, and the parsing code does not change.</p>
+<p>B.</p>
+<p>We should also remember that language is important. While the second example is perfectly fine PHP code, it would be somewhat unusual in a statically-typed language: pulling out reflection to set some properties or invoke some setters is slow and not type safe. It certainly is done for the reasons described above, but if we're talking a total of 6 options here, there's nothing wrong with a switch.</p>
+<p>Just my two cents.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4909a4aa-9dcc-441b-9eb0-75864834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Oct 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Enc: We all know these words. This however is an edge case, as this discussion already shows and I totally second Nicholas Piasecki's opinion A (not sure about B though).</p>
+<p>Please don't flame on this blog. If you think it's all too trivial for you, you probably want to contribute yourself by insulting other people's code. Or might as well just start your own blog.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4909ce11-3c50-45f6-b07f-5d0b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7c86b2724491fd2756283fb693ada794&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.sysbliss.com" rel="nofollow">Jonathan Doklovic</a>						</strong>
+						<strong>said 
+						on Oct 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>just read the book Clean Code: A Handbook of Agile Software Craftsmanship (Robert C. Martin Series) and be done with the whole argument.</p>
+<p>It's on safari if you have an account.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4909d2a1-8ba8-4154-aaa5-2ea64834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Oct 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Jonathan Doklovic: So, you're saying there will never be another new concept in computer programming?  That seems unlikely.  ;-)  This is a series for people who want to learn something.  If you already know it all, great for you.</p>
+<p>Nicholas Piasecki: It was a real-world example used to highlight an abstract concept.  I'm not going to try and convince you that this applies 100% of the time.  Sure, for simple stuff, keep it simple.  The point is to be aware of your own assumptions while doing so.</p>
+<p>Enc: You say it's trivial, and yet I see programmers at all levels making the exact same mistake.  It's great that all this is so obvious to you, but to many other people, it isn't.  That said, maybe *you* should go teach them, rather than sitting around criticizing others for doing so. ;-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4909e927-04e0-474e-a0ac-16014834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=74cc83022ea14b42b49ea487b95d5f1e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://seanja.com/blog" rel="nofollow">SeanJA</a>						</strong>
+						<strong>said 
+						on Oct 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I hate switch statements... I always use if elseif...</p>
+<p>You should probably do:<br />
+$count = count($args)</br><br />
+for ($i = 0; $i < $count; $i+=1)</p>
+<p>so that your program doesn't count each time...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-490a00d0-06b0-4884-a947-2cfd4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Oct 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Switch statements are far better than if/else for flow-control.  They make it clear what's going on, the flow logically from one item to the next (often from more specific to more general, depending), and multiple case conditions are able to share code.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-490eae9e-2720-4c1f-a61f-2ca54834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5f7d4136aa418d38d89d8b4792a03f16&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.cake-toppings.com" rel="nofollow">primeminister</a>						</strong>
+						<strong>said 
+						on Nov 03, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nate, Thanks for getting that piece of my code (Yes, I recognize my code from far distance) ;)<br />
+That one was one of the things I thought that good be cleaner.</br><br />
+After reading the comments I think a lot the same like Nicholas Piasecki. The first example is still readable and good if the options doesn't change a lot. In this case they don't.</br><br />
+If they good change a lot then your solution would bet more nicer to change after a while.</br><br />
+Thanks again!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-494d4ba3-f4c8-46a4-882b-47584834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=deb0ff1a510fee8800f3899243c0a463&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.anti-gen.com" rel="nofollow">Jon</a>						</strong>
+						<strong>said 
+						on Dec 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>good stuff. thanks for the insight, nate et al.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-498097c3-7300-4166-a363-2cfa4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Jan 28, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>All: This is a much better explanation of the concept I was trying to illustrate: <a rel="nofollow" href="http://database-programmer.blogspot.com/2008/05/minimize-code-maximize-data.html">http://database-programmer.blogspot.com/2008/05/minimize-code-maximize-data.html</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

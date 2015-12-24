@@ -1,0 +1,580 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Screencast #1: Using vendor branching and CakePHP &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/screencast-using-vendor-branching-and-cakephp:480f4dd6-6cac-44cb-b685-4d6bcbdd56cb">Screencast #1: Using vendor branching and CakePHP</a></h2>	<div class="posted-on">
+		<p>Posted on 17/6/07 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hi folks,</p>
+<p>a long time ago I promised to do a screencast on unit testing. So as I sat down and tried to record it I noticed that it was quite an ambitious project. If you've never tried it then let me tell you: Doing a good screen cast is difficult. I've got deep respect for the people capable of doing so and I am in no way feeling qualified to join their league as of right now ; ). So I ended up giving up on the unit testing screencast for now and decided to start with something easier to get some experience first before trying to do difficult programming and entertaining talk at the same time as my early results where disastrous ... ^^. </p>
+<p>So here I go with my very first screencast to be published. The topic is how to use vendor branching with CakePHP which is one of <a href="http://www.thinkingphp.org/2006/09/15/dessert-4-keep-your-cake-fresh-use-svn-head/">many ways to keep your CakePHP version up to date</a>.</p>
+<p>To follow this screencast and try things at home you'll need:</p>
+<ul>
+<li>Windows OS (Sorry my dear Linux + Mac users, crank up your emulators)</li>
+<li>TortoiseSVN: The best subversion client there is, <a href="http://tortoisesvn.tigris.org/">download here</a>.</li>
+<li>Basic SVN knowledge, tolerance for my German accent and localized version of Windows</li>
+<li>Most likely have to leave your RSS reader and <a href="http://www.thinkingphp.org/2007/06/17/screencast-using-vendor-branching-and-cakephp/">visit this post directly</a></li>
+</ul>
+<p>Feedback is welcome and I recommend you to watch in fullscreen mode as the screencast was recorded in 800x600 and I only had room for 720x540 here on my blog.</p>
+<p>So here comes <a href="http://www.thinkingphp.org/2007/06/17/screencast-using-vendor-branching-and-cakephp/">the screencast</a> (16:45 minutes, 120 MB):</p>
+<p id="preview">The player will show in this paragraph</p>
+<script type="text/javascript" src="/js/vendors/swfobject.js"></script>
+<script type="text/javascript">var s1 = new SWFObject('/swf/player.swf','player','400','300','9'); s1.addParam('allowfullscreen','true'); s1.addParam('allowscriptaccess','always'); s1.addParam('flashvars','file=http://static.thinkingphp.org/screencasts/1.flv'); s1.write('preview');</script>
+<p>If you want to download the FLV file, please use this link: <a href="http://static.thinkingphp.org/screencasts/1.flv">Download screencast</a></p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-6cac-44cb-b685-4d6bcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fscreencast-using-vendor-branching-and-cakephp%3A480f4dd6-6cac-44cb-b685-4d6bcbdd56cb &amp;title=Screencast+%231%3A+Using+vendor+branching+and+CakePHP';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fscreencast-using-vendor-branching-and-cakephp%3A480f4dd6-6cac-44cb-b685-4d6bcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fscreencast-using-vendor-branching-and-cakephp%3A480f4dd6-6cac-44cb-b685-4d6bcbdd56cb&amp;title=Screencast+%231%3A+Using+vendor+branching+and+CakePHP&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fscreencast-using-vendor-branching-and-cakephp%3A480f4dd6-6cac-44cb-b685-4d6bcbdd56cb&amp;title=Screencast+%231%3A+Using+vendor+branching+and+CakePHP';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/drake-drupal-cakephp-101b-released:480f4dd6-42a0-47a1-aa7c-4aadcbdd56cb">Drake :: Drupal-CakePHP 1.0.1b Released</a></li>
+							<li><a href="/posts/cakephp-html-balancer-helper:4944c48d-7440-4f9d-8638-6e4b4834cda3">Cleaning Html with this HtmlCleaner for CakePHP</a></li>
+							<li><a href="/posts/command-line-fun-in-cakephp-12:480f4dd6-7ecc-41d1-83bb-43d2cbdd56cb">Command line fun in CakePHP 1.2</a></li>
+							<li><a href="/posts/your-cakephp-applications-homepage:49428953-d2ec-4362-b82e-1ee34834cda3">Your CakePHP application&#039;s Homepage</a></li>
+							<li><a href="/posts/upcoming:-code-coverage-in-cakephp---test-how-well-you-test:4814f672-0d78-4585-a349-64c64834cda3">Upcoming: Code Coverage in CakePHP - Test How Well You Test</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/3000-candles-on-the-cakephp-cake:480f4dd5-01f8-40e6-9acc-413bcbdd56cb">3000 candles on the CakePHP cake</a></li>
+							<li><a href="/posts/job-interested-in-working-on-a-huge-cakephp-project:480f4dd6-55b4-43ae-9e63-491dcbdd56cb">[Job] Interested in working on a huge CakePHP project?</a></li>
+							<li><a href="/posts/cakephp-argentina:4937042e-4864-48e1-98f0-6d3d4834cda3">CakePHP Argentina</a></li>
+							<li><a href="/posts/cakephp-workshop-in-raleigh-nc-sep-6-to-7:488a234d-39fc-4d06-9c57-65aa4834cda3">CakePHP Workshop in Raleigh, NC (Sep 6-7)</a></li>
+							<li><a href="/posts/buch-tip-webentwicklung-mit-cakephp:4912dccb-f594-4fa1-af20-6c564834cda3">Buchtipp: Webentwicklung mit CakePHP</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/screencast-using-vendor-branching-and-cakephp:480f4dd6-6cac-44cb-b685-4d6bcbdd56cb">24 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/screencast-using-vendor-branching-and-cakephp:480f4dd6-6cac-44cb-b685-4d6bcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4deb-4e34-4fb2-8601-4de1cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0ddfd368b2858f83f017c5ba40f43f17&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://snowdog.pl" rel="nofollow">snowdog</a>						</strong>
+						<strong>said 
+						on Jun 17, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Good job Felix, really nice screen cast</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-b1d8-47e9-a9ed-445ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5f4caf0268732affa08709107e369c0e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Beth&nbsp;						</strong>
+						<strong>said 
+						on Jun 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>Thanks for the creating the screencast :)</p>
+<p>BTW, what software are you using to create your screencasts?</p>
+<p>Thanks,</p>
+<p>Beth</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-9034-4386-be43-4f46cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Beth,</p>
+<p>good that you ask. I was looking around for quite a while before I was able to come up with this entirely free tool chain for screencasting:</p>
+<p>1. <a href="http://www.camstudio.org/" rel="nofollow" rel="nofollow" rel="nofollow" rel="nofollow">CamStudio</a>: Records the cast as an AVI file<br />
+2. <a href="http://www.rivavx.com/?encoder" rel="nofollow" rel="nofollow" rel="nofollow" rel="nofollow">Riva FLV Encoder</a>: Turns the AVI into streamable FLV</br><br />
+3. <a href="http://www.jeroenwijering.com/?item=Flash_Media_Player" rel="nofollow" rel="nofollow" rel="nofollow" rel="nofollow">Flash Media Player</a>: Embeds into this site and streams the video</br><br />
+4. <a href="http://alexrabe.boelinger.com/?page_id=20" rel="nofollow" rel="nofollow">WordTube</a>: WordPress plugin that eases managing and embedding screencasts</br></p>
+<p>Hope that helps,<br />
+Felix</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-dbcc-46dd-a30f-468acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.phpdeveloper.org/news/8062" rel="nofollow">PHPDeveloper.org</a>						</strong>
+						<strong>said 
+						on Jun 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p><strong>Felix Geisendörfer's Blog: Screencast #1: Using vendor branching and CakePHP...</strong></p>
+<p>...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-f89c-48ba-a203-4225cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.developercast.com/2007/06/18/felix-geisendofers-blog-screencast-1-using-vendor-branching-and-cakephp/" rel="nofollow">developercast.com &raquo; Felix Geisendofer&#8217;s Blog: Screen</a>						</strong>
+						<strong>said 
+						on Jun 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Felix Geisendorfer has a new post today showing off an example of his screencasting abilities. Specifically, the video looks at using vendor branching to keep your CakePHP installation up to date.   So here I go with my very first screencast to be published. The topic is how to use vendor branching with CakePHP which is one of many ways to keep your CakePHP version up to date. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-8758-439c-80ba-48b3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e6f1bb643f7ce1c8cf042949e3708dc6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.acmconsulting.eu" rel="nofollow">Drayen</a>						</strong>
+						<strong>said 
+						on Jun 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Really nicely done, thanks!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-7680-41fb-9dd1-4e08cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Jun 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well done Felix, thank you. :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-ab30-419f-9869-4af3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://php-coding-practices.com/cakephp-specific/felix-geisendorfers-cake-php-vendor-branching/" rel="nofollow">Felix Geisendörfer&#8217;s Cake PHP Vendor Branching | PHP Codin</a>						</strong>
+						<strong>said 
+						on Jun 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Hop on over and see it now.   Bookmark: These icons link to social bookmarking sites where readers can share and discover new web pages. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-0324-4cab-a5fa-44d8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5f4caf0268732affa08709107e369c0e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Beth&nbsp;						</strong>
+						<strong>said 
+						on Jun 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>Thanks for sharing the screencasting links ;)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-0f10-422a-a223-4de1cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=68f0049842700597b89972e1fbf6f542&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Travis Cline&nbsp;						</strong>
+						<strong>said 
+						on Jun 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix, Nice screencast, needs some more cli-action though  ;)</p>
+<p>The way you push the new drops on your vendor branch strays a bit from best practice -- imagine files that are deleted, renamed or moved in the vendor's repository.</p>
+<p>While in many cases such wouldn't break a system, it is possible.  For some environments having a completely accurate representation can be important.</p>
+<p>svn devs provide a perl helper called svn_load_dirs : http://subversion.tigris.org/tools_contrib.html#svn_load_dirs_pl<br />
+Usage is explained in the book here: http://svnbook.red-bean.com/en/1.0/ch07s04.html</br></p>
+<p>Another (nicer, IMO) alternative is instead of just pulling another export from the cake repo or dealing with svn_load_dirs, to merge between the revision of your current and :HEAD up live.</p>
+<p>(e.g. "svn merge -r5146:HEAD https://svn.cakephp.org/repo/branches/1.2.x.x ./current" -- then svn ci, svn cp)</p>
+<p>If you're feeling really ambitious and don't want to possibly preserve local core modifications you could just merge in such a way right onto your wc.</p>
+<p>Anyhow, sorry so long, don't mean to be a drag.<br />
+Cheers!</br></p>
+<p>Travis</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-5468-4e10-b536-4c26cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Travis, thanks for your comment. Yes, I know about svn_load_dirs and the imperfection of the method presented here. However I had actually forgotten about all of it after having never had problems with my simplified work flow ; ).</p>
+<p>Anyway, I do like your idea of directly merging changes from the svn repository, this seems kind of cool. However, you'll always have to remember what revision you updated to the last time this way or at least note it in the log messages ; ).</p>
+<p>So thanks for mentioning those details, they can be important depending on what one does.</p>
+<p>-- Felix</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-e228-4e69-a3e2-4b03cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5695d132647061781c8f95becd2ddb0f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Grant Cox&nbsp;						</strong>
+						<strong>said 
+						on Jun 20, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for the screencast Felix.  I've seen you (and others) mention vendor branching a few times, but it always seemed very complex.  And watching your screencast, it is!</p>
+<p>But I can certainly see the advantages - currently I'm using a svn:export, which means my app repository doesn't actually include the the CakePHP core, doesn't automatically store my core changes, and doesn't update the app files when they change in the core.  So I can see in the near future I need to update to using a vendor branch - and your screencast will certainly help me with that :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-dc80-4a41-a9dd-4808cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 20, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Grant: It's not all that complex, it's just a process involving a couple of steps, but as they are always the same it's not that difficult. If you find the overhead that comes with it too big you can also easily automate the process using some CL scripting ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-7bf4-4eb6-af88-4abdcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a3f9bbd1df1bd55bd1dce2181a388d27&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Derick&nbsp;						</strong>
+						<strong>said 
+						on Jun 20, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wonderful screencast, have been thinking of how to SVN my project for a while and this just introduces yet another option. Especially when I do hack a little into CakePHP's core when there are bugs which I have to submit a ticket for and then wait for the actual update before removing my "hack".</p>
+<p>For the current setup, do you create another app folder (differently named) in the trunk for your actual project folder? The other question is, why do we put all the folders in trunk instead of just the project folder (not necessary named "app"). I mean we can check out the vendor separately right? Or is it such that the lead can actually decide which CakePHP revision the trunk should hold.</p>
+<p>I think I will need to try and get hold of you on IRC man. :p</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-e73c-4c02-bcd1-4292cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a92e5d86be5f8a3408d46acc2943f99c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Lucian Lature&nbsp;						</strong>
+						<strong>said 
+						on Jun 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix!...Great post.</p>
+<p>However, check http://validator.w3.org/feed/check.cgi?url=http%3A%2F%2Ffeeds.feedburner.com%2Fthinkingphp , pls. My Thunderbird stopped updating the feeds :D</p>
+<p>Thank you very much!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-e538-4434-96b0-40d8cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Derick: I always keep all my project files (/app, /cake, /vendors) under SVN control. I don't run more then one project per /cake core. This has worked the best for me in the past but you're free to do things differently ; ).</p>
+<p>Lucian: Will have to investigate on that. I think the WP plugin for the screencast set's an enclosure without length property. May not be easy / soon fixed.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-5bc4-44be-8275-402dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2007/06/27/simple-global-ajax-activity-indicator-with-jquery/" rel="nofollow">ThinkingPHP and beyond &raquo; Simple global Ajax activity indic</a>						</strong>
+						<strong>said 
+						on Jun 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Some unrelated news: I don't know how many unique downloads my svn screencast received but my stats say it swallowed around 250 GB in traffic which is sort of nuts. When I found out about it I was kind of scared for a second but then remembered that I recently upgraded my web hosting plan to one where I have unlimited traffic - which saved me 100 euros in bandwidth fees ; ). [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-644c-48f6-9096-4ad8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=42c5bbf957f3ac0385fb5694d40992ef&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Mladen Mihajlovic&nbsp;						</strong>
+						<strong>said 
+						on Jul 03, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>"Travis, thanks for your comment. Yes, I know about svn_load_dirs and the imperfection of the method presented here. However I had actually forgotten about all of it after having never had problems with my simplified work flow ; )."</p>
+<p>The only problem would be files that were removed from the current cake repository. Those files would still be available in your cakephp\current repository as all you do is copy new files over existing files.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-78a8-4c2b-b4e5-4a02cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jul 03, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Mladen: Yes, this is part of what Travis said. Anything you'd like to add? ; )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df2-2ca8-4d78-9cbf-49e9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cbe637d94e9669bde5336864e226afca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://lijeeshms.com" rel="nofollow">Lijeesh</a>						</strong>
+						<strong>said 
+						on Nov 01, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hi, we have good alternative for tortoise svn in Linux in KDE, kdesvn. using xvidcap we can capture screen also. Number of tools to create flv is also there.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-9928-4bd1-9289-4593cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=909beaeeb64472c5f6ee25a08496d0dc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.fivebyfivedigital.com" rel="nofollow">Neil Crookes</a>						</strong>
+						<strong>said 
+						on Mar 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix, its Neil from CakeFest here. I'm interested in setting this up, but wanted to use the solution suggested by Travis, but I'm not sure of the specifics, do you know of any resources that explain this further?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-d594-4d0a-9790-43a9cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 09, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Neil: Contact me via one of the IMs listed here: http://debuggable.com/felix and I'll help you with the setup.</p>
+<p>Sorry for the late reply, I was on a asia trip with limited computer time for the past weeks.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a0c5840-01f4-46dd-90dc-5f134834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b33e2a3306115f64ee34b48d39ce3626&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Michael&nbsp;						</strong>
+						<strong>said 
+						on May 14, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for this screencast.  I was also looking into svn:externals.  As far as I can tell a drawback for the approach you are using is that any overrides to the vendor library would be available for that project only.  Any thoughts to making/maintaining a vendor copy and then having multiple projects point at that revised vendor copy?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a492410-ecf8-45af-af9f-1ded4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a3e81a7ab4f6e1f63638ee4f848cbabb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							newbie in cake&nbsp;						</strong>
+						<strong>said 
+						on Jun 29, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>felix i want to ask you about adding video in my cake website...<br />
+can you explain step by step.. how to add video player in our cake website???</br></p>
+<p>thaks before</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

@@ -1,0 +1,571 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Blog &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="paging">
+	<a href="/posts/index/page:42" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:39">39</a></span> | <span><a href="/posts/index/page:40">40</a></span> | <span><a href="/posts/index/page:41">41</a></span> | <span><a href="/posts/index/page:42">42</a></span> | <span class="current">43</span> | <span><a href="/posts/index/page:44">44</a></span> | <span><a href="/posts/index/page:45">45</a></span> | <span><a href="/posts/index/page:46">46</a></span> | <span><a href="/posts/index/page:47">47</a></span> <a href="/posts/index/page:44" class="next">Next &raquo;</a></div>
+	<div class="post">
+	<h2><a href="/posts/false-0-or-not:480f4dd6-b2f8-49ac-97fd-493acbdd56cb">False == 0, or not?</a></h2>	<div class="posted-on">
+		<p>Posted on 13/8/07 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>So far I've always thought false would evaluate to 0 when used in a computational context. Turns out that this isn't always the case.</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// The world as we know it:</span><br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="nu0">0</span> + <span class="nu0">1</span>; <span class="co1">// 1</span><br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="kw2">false</span> + <span class="nu0">1</span>; <span class="co1">// 1</span><br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="nu0">0</span> &nbsp;&gt; <span class="nu0">-1</span>; <span class="co1">// true</span><br />
+<br />
+<span class="co1">// But what is that ...?</span><br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="kw2">false</span> &nbsp;&gt; <span class="nu0">-1</span>; <span class="co1">// false</span></div>
+<p>Now if anybody does have an explanation for this, I'd be glad to hear it. I randomly stumbled upon this when arguing with Mariano today if setting Model::recursive to 'false' has the same effect as setting it to '-1'. Turns out that cake uses a statement like this: if ($recursive > -1) in the core which in turn makes -1 and false do exactly the same thing.</p>
+<p>Btw., if you need to work around this behavior you can use something like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="br0">&#40;</span>int<span class="br0">&#41;</span><span class="kw2">false</span> &gt; <span class="nu0">-1</span>; <span class="co1">// true</span></div>
+<p>More posts are to come,<br />
+-- Felix<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-b2f8-49ac-97fd-493acbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ffalse-0-or-not%3A480f4dd6-b2f8-49ac-97fd-493acbdd56cb &amp;title=False+%3D%3D+0%2C+or+not%3F';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Ffalse-0-or-not%3A480f4dd6-b2f8-49ac-97fd-493acbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ffalse-0-or-not%3A480f4dd6-b2f8-49ac-97fd-493acbdd56cb&amp;title=False+%3D%3D+0%2C+or+not%3F&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ffalse-0-or-not%3A480f4dd6-b2f8-49ac-97fd-493acbdd56cb&amp;title=False+%3D%3D+0%2C+or+not%3F';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/false-0-or-not:480f4dd6-b2f8-49ac-97fd-493acbdd56cb">14 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/false-0-or-not:480f4dd6-b2f8-49ac-97fd-493acbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/encode-html-entities-with-jquery:480f4dd6-13cc-4ce9-8071-4710cbdd56cb">Encode HTML entities with jQuery</a></h2>	<div class="posted-on">
+		<p>Posted on 21/7/07 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>just a quick tip, if you ever need to use something like PHP's htmlentities() function in JS and happen to use the excellent <a href="http://jquery.com/">jQuery library</a>, here is how to do it:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$<span class="br0">&#40;</span><span class="st0">'&lt;div/&gt;'</span><span class="br0">&#41;</span>.<span class="me1">text</span><span class="br0">&#40;</span><span class="st0">'This is fun &amp; stuff'</span><span class="br0">&#41;</span>.<span class="me1">html</span><span class="br0">&#40;</span><span class="br0">&#41;</span>; <span class="co1">// evaluates to &quot;This is fun &amp;amp; stuff&quot;</span></div>
+<p>Enjoy the magic,<br />
+-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-13cc-4ce9-8071-4710cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fencode-html-entities-with-jquery%3A480f4dd6-13cc-4ce9-8071-4710cbdd56cb &amp;title=Encode+HTML+entities+with+jQuery';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fencode-html-entities-with-jquery%3A480f4dd6-13cc-4ce9-8071-4710cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fencode-html-entities-with-jquery%3A480f4dd6-13cc-4ce9-8071-4710cbdd56cb&amp;title=Encode+HTML+entities+with+jQuery&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fencode-html-entities-with-jquery%3A480f4dd6-13cc-4ce9-8071-4710cbdd56cb&amp;title=Encode+HTML+entities+with+jQuery';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/encode-html-entities-with-jquery:480f4dd6-13cc-4ce9-8071-4710cbdd56cb">15 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/encode-html-entities-with-jquery:480f4dd6-13cc-4ce9-8071-4710cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/getting-serious-with-jquery-adding-custom-css-selectors:480f4dd6-e834-4cf6-a5cc-478ccbdd56cb">Getting serious with jQuery - Adding custom CSS selectors</a></h2>	<div class="posted-on">
+		<p>Posted on 17/7/07 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>in my upcoming task management application (which will btw. *fix* task management : ) I'm doing a *lot* of Javascript. In fact I want to make a statement before beginning this post: Javascript is now officially my favourite language. But don't worry, I won't give up on the PHP/etc. for the server side just yet (<a href="http://ejohn.org/blog/bringing-the-browser-to-the-server/">seen what John Resig has been up to as of lately?</a>) - JS doesn't compete in that category so far. I will however probably start to spend equal amounts of time working in JS and PHP which means you could see a lot more JS on this blog in future (you know, the future where I'll have time for some hardcore blogging again : ).</p>
+<p>Anyway, back to the topic - I'm writing a task management application and this is a greatly simplified version of the markup I'm using:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_html" style="white-space: wrap;white-space: nowrap;"><span class="sc2"><a href="http://december.com/html/4/element/table.html"><span class="kw2">&lt;table</span></a> <span class="kw3">class</span>=<span class="st0">&quot;tasks&quot;</span><span class="kw2">&gt;</span></a></span><br />
+&nbsp; &nbsp; <span class="sc2"><a href="http://december.com/html/4/element/tr.html"><span class="kw2">&lt;tr&gt;</span></a></span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="sc2"><a href="http://december.com/html/4/element/th.html"><span class="kw2">&lt;th&gt;</span></a></span>Task<span class="sc2"><span class="kw2">&lt;/th&gt;</span></span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="sc2"><a href="http://december.com/html/4/element/th.html"><span class="kw2">&lt;th&gt;</span></a></span>Time<span class="sc2"><span class="kw2">&lt;/th&gt;</span></span><br />
+&nbsp; &nbsp; <span class="sc2"><span class="kw2">&lt;/td&gt;</span></span><br />
+&nbsp; &nbsp; <span class="sc2"><a href="http://december.com/html/4/element/tr.html"><span class="kw2">&lt;tr</span></a> <span class="kw3">class</span>=<span class="st0">&quot;task&quot;</span><span class="kw2">&gt;</span></a></span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="sc2"><a href="http://december.com/html/4/element/td.html"><span class="kw2">&lt;td&gt;</span></a></span>Finish project X<span class="sc2"><span class="kw2">&lt;/td&gt;</span></span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="sc2"><a href="http://december.com/html/4/element/td.html"><span class="kw2">&lt;td&gt;</span></a></span>1 hour<span class="sc2"><span class="kw2">&lt;/td&gt;</span></span><br />
+&nbsp; &nbsp; <span class="sc2"><span class="kw2">&lt;/tr&gt;</span></span><br />
+&nbsp; &nbsp; <span class="sc2"><a href="http://december.com/html/4/element/tr.html"><span class="kw2">&lt;tr</span></a> <span class="kw3">class</span>=<span class="st0">&quot;task&quot;</span><span class="kw2">&gt;</span></a></span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="sc2"><a href="http://december.com/html/4/element/td.html"><span class="kw2">&lt;td&gt;</span></a></span>Write a blog entry<span class="sc2"><span class="kw2">&lt;/td&gt;</span></span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="sc2"><a href="http://december.com/html/4/element/td.html"><span class="kw2">&lt;td&gt;</span></a></span>1 hour 30 minutes<span class="sc2"><span class="kw2">&lt;/td&gt;</span></span><br />
+&nbsp; &nbsp; <span class="sc2"><span class="kw2">&lt;/tr&gt;</span></span><br />
+<span class="sc2"><span class="kw2">&lt;/table&gt;</span></span></div>
+<p>Since I'm getting fancy with JS these days I've written some jQuery plugins that allow me to interact with my DOM in a very nice way:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$<span class="br0">&#40;</span><span class="st0">'tr.task:nth(1)'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">task</span><span class="br0">&#40;</span><span class="st0">'field'</span>, <span class="st0">'name'</span>, <span class="st0">'Write a good blog entry'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">task</span><span class="br0">&#40;</span><span class="st0">'field'</span>, <span class="st0">'time'</span>, <span class="nu0">2</span>*<span class="nu0">60</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">task</span><span class="br0">&#40;</span><span class="st0">'save'</span><span class="br0">&#41;</span>;</div>
+<p>The sample above will select the second row (:nth is 0-indexed) in my table, change the 'Task' name to 'Write a good blog entry' and the 'Time' to '2 hours'. Pretty neat. But - I was lying earlier. At least partially. My actual markup is more complicated then the example above, but there is no 'task' class on the tr columns. Why? It's because I'm always looking for excuses to use jQuery's awesome selector engine and practice my CSS3 skills : ). So my code from above needs to be rewritten like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$<span class="br0">&#40;</span><span class="st0">'tr[:not(th)]:nth(1)'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">task</span><span class="br0">&#40;</span><span class="st0">'field'</span>, <span class="st0">'name'</span>, <span class="st0">'Write a good blog entry'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">task</span><span class="br0">&#40;</span><span class="st0">'field'</span>, <span class="st0">'time'</span>, <span class="nu0">2</span>*<span class="nu0">60</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">task</span><span class="br0">&#40;</span><span class="st0">'save'</span><span class="br0">&#41;</span>;</div>
+<p>So what does that do? Well instead of selecting all rows with a class 'task' it selects all rows that do not contain a 'th' element which comes down to the same elements. But you all know I'm a friend of simplicity, so even if jQuery offers us some nice selectors it might be possible to get even fancier. I've been thinking about it for a while and came to the conclusion that what I really want this selector to look like is this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$<span class="br0">&#40;</span><span class="st0">':task(2)'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">task</span><span class="br0">&#40;</span><span class="st0">'field'</span>, <span class="st0">'name'</span>, <span class="st0">'Write a good blog entry'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">task</span><span class="br0">&#40;</span><span class="st0">'field'</span>, <span class="st0">'time'</span>, <span class="nu0">2</span>*<span class="nu0">60</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">task</span><span class="br0">&#40;</span><span class="st0">'save'</span><span class="br0">&#41;</span>;</div>
+<p>Now that's crazy (!) I can hear some of your say, but I really wanted it so I've tried to figure out how. Today I came across one of <a href="http://www.malsup.com/jquery/expr/">Mike Alsup's pages</a> (who btw. makes some of the best jQuery plugins out there) and finally saw how to do it. My initial attempt was very much oriented at how most selectors work and got pretty complex because this seems to be meant for more simple selectors. Anyway here is the code for it:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+jQuery.<span class="me1">expr</span><span class="br0">&#91;</span><span class="st0">':'</span><span class="br0">&#93;</span>.<span class="me1">task</span> = <span class="st0">'(i==0 &amp;&amp; (arguments.callee.c = 0) || 1) <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; /tr/i.test(a.nodeName)<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; !jQuery.find(&quot;th&quot;,a).length<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; (arguments.callee.c++ || 1) <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; (m[3] === undefined || m[3] == arguments.callee.c)'</span>;</div>
+<p>Here is the short version of what it does: This expression is called up for every element the jQuery CSS engine loops through. If it evaluates to true then the element "matches", otherwise it's not included in the resulting jQuery array. My expression here only matches if the element is a 'tr', does does not contain a 'th' and if the :task(n) parameter matches the nth-task that was found (kept track of in arguments.callee.c). This of course is a very unreadable as it heavily depends on JS's short circuit logic (something PHP has as well) so I came up with a more readable version of it:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// Selector for :task and :task(n)</span><br />
+jQuery.<span class="me1">isTask</span> = <span class="kw2">function</span><span class="br0">&#40;</span>a, i, m<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// Reset our element counter if this function is called for the first time on the current set of elements</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>i == <span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; arguments.<span class="me1">callee</span>.<span class="me1">count</span> = <span class="nu0">0</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="co1">// If this is not a &lt;tr&gt; or contains &lt;th&gt; then we are not interested in it</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">/tr/i</span>.<span class="me1">test</span><span class="br0">&#40;</span>a.<span class="me1">nodeName</span><span class="br0">&#41;</span> || jQuery.<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'th'</span>, a<span class="br0">&#41;</span>.<span class="me1">length</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="co1">// Increment our element counter</span><br />
+&nbsp; &nbsp; arguments.<span class="me1">callee</span>.<span class="me1">count</span>++;<br />
+&nbsp; &nbsp; <span class="co1">// If no task# was given or it matches our current counter then return true</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="br0">&#40;</span>!m || m<span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span> === undefined<span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; ? <span class="kw2">true</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; : arguments.<span class="me1">callee</span>.<span class="me1">count</span> == m<span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span>;<br />
+<span class="br0">&#125;</span>;<br />
+jQuery.<span class="me1">expr</span><span class="br0">&#91;</span><span class="st0">':'</span><span class="br0">&#93;</span>.<span class="me1">task</span> = <span class="st0">'jQuery.isTask(a, i, m);'</span>;</div>
+<p>As you can see, this should pretty much do the same thing but is easier to maintain. For those of you still totally confused some hints about the code: 'a' is always the element we currently test. 'i' is the index of the element we are currently testing, but since we only count the ones we are interested in, we do our own counting in arguments.calllee.c / arguments.calllee.counter. 'm' is the array matched by the regular expression in jQuery internally. The regex used there are rather complex but in our case m looks like this: m = [':task(2)', ':', 'task', '2', undefined];. So when we check against m[3] we're accessing the :task(n) parameter.</p>
+<p>Soo, what value does this have if we're back at where our initial 'tr.task:nth(1)' has brought us? Good question ; ). How about this: Has anybody ever thought about providing a JS API for their application? Not one where you can remotely access the service - that's oldschool. No, I mean one where interested developers can directly hack the way your app works without using greasemonkey? I have, and I think there is some real potential to be unleashed here given that you can provide the right tools and security for the job. I mean I'm using Thunderbird for my emailing right now, but if Google would give me tools that would easily allow me to modify the way Gmail works to my liking - I'd be switching to it as my main interface right away! The possibilities this opens are really endless and I only see limited appliance in my little task management app. However some stuff like this surely would be worth implementing:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$<span class="br0">&#40;</span><span class="st0">':task(@done)'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">task</span><span class="br0">&#40;</span><span class="st0">'remove'</span><span class="br0">&#41;</span>;<br />
+<br />
+$<span class="br0">&#40;</span><span class="st0">':task(@name*=work)'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">task</span><span class="br0">&#40;</span><span class="st0">'field'</span>, <span class="st0">'date'</span>, <span class="st0">'tomorrow'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">task</span><span class="br0">&#40;</span><span class="st0">'save'</span><span class="br0">&#41;</span>;</div>
+<p>Anyway, now you know what has been getting me really excited as of lately. It's yet another proof of what a beautiful piece of art jQuery is. I checked EXT + prototype today and it doesn't seem as easy to extend them like this (if I'm wrong, please let me know!). So it's bedtime for me now and I can finally do this for tonight:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$<span class="br0">&#40;</span><span class="st0">'*:task'</span><span class="br0">&#41;</span>.<span class="me1">task</span><span class="br0">&#40;</span><span class="st0">'remove'</span><span class="br0">&#41;</span>;</div>
+<p>Thanks for reading and hopefully you got some useful information out of this,<br />
+-- Felix Geisendörfer aka the_undefined</p>
+<p>PS: If that technique I use to manipulate the tasks in my app interests you - I'll be releasing the JS script making it possible soon.</p>
+<p>PS2: I did not proof read this post and hitting bed now - it probably contains more typos and grammar issues then usual ^^.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-e834-4cf6-a5cc-478ccbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fgetting-serious-with-jquery-adding-custom-css-selectors%3A480f4dd6-e834-4cf6-a5cc-478ccbdd56cb &amp;title=Getting+serious+with+jQuery+-+Adding+custom+CSS+selectors';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fgetting-serious-with-jquery-adding-custom-css-selectors%3A480f4dd6-e834-4cf6-a5cc-478ccbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fgetting-serious-with-jquery-adding-custom-css-selectors%3A480f4dd6-e834-4cf6-a5cc-478ccbdd56cb&amp;title=Getting+serious+with+jQuery+-+Adding+custom+CSS+selectors&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fgetting-serious-with-jquery-adding-custom-css-selectors%3A480f4dd6-e834-4cf6-a5cc-478ccbdd56cb&amp;title=Getting+serious+with+jQuery+-+Adding+custom+CSS+selectors';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/getting-serious-with-jquery-adding-custom-css-selectors:480f4dd6-e834-4cf6-a5cc-478ccbdd56cb">17 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/getting-serious-with-jquery-adding-custom-css-selectors:480f4dd6-e834-4cf6-a5cc-478ccbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/composing-methods-remove-assignments-to-parameters:480f4dfe-5bd4-4ef7-8c05-4b5ecbdd56cb">Composing Methods: Remove Assignments to Parameters</a></h2>	<div class="posted-on">
+		<p>Posted on 6/7/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><strong>When your code assigns to a parameter in a function/method, use a temporary variable instead.</strong></p>
+<h1>Motivation</h1>
+<p>With assigning to a parameter I mean that when you pass in an object foo,  you do not make it refer to a different object. Changing a parameter object is perfectly cool and I do that myself all the time. Just do not make it reference another object, like:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> aFunction<span class="br0">&#40;</span><span class="re0">$foo</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$foo</span>-&gt;<span class="me1">modify</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="re0">$foo</span> = <span class="kw2">new</span> SomeOtherClass;<br />
+<span class="br0">&#125;</span></div>
+<p>The reason this is so awkward is the confusion between pass by value and pass by reference in PHP. Whereas in PHP4 everything was<br />
+passed in by value as default, PHP5 passes objects around by reference. In PHP4 when you assign the parameter another object this will not be reflected in the calling routine, which can lead to quite nasty bugs if you forget to insert the by-reference operator (&).</p>
+<p>In PHP5 this is not so much of a problem as it passes objects around by reference anyways. So if, in PHP5, you assign to a parameter you must have a good reason anyways, because you will change the parameter object also in the calling routine with your assignment. However, I find that in PHP5 there is another area of confusion making this refactoring worthwhile for both PHP4 and PHP5. That area of confusion is within the body of the code itself. It is much clearer to use only the parameter to represent what has been passed in, because that is consistent usage and therefore a good coding practice.</p>
+<p>It will make your code much more readable and prevents by-reference confusion and therefore big problems in the future. In PHP5, assigning to an parameter object within a method will not be reflected outside the method. So I suggest you just don't do it anyways. There seems to be no point in it anyways.</p>
+<p>Think of hairloss. ;] Haha, I seem to be bringing up hairloss all the time in connection with bug fixing. :]</p>
+<h1>Mechanics</h1>
+<ul>
+<li>Create a temporary variable for the parameter.</li>
+<li>Replace all references to the parameter, made after the assignment, to the temporary variable.</li>
+<li>Change the assignment to assign to the temporary variable.</li>
+<li>If you are on PHP5 or PHP4 (using the by-reference operator), look in the calling method to see if the parameter is used again afterward and try to understand what is changed where in your code and document that. Make sure you only return one value from the method. If more than one call-by-reference parameter is assigned to and returned, try to use a data clump or <a href="http://php-coding-practices.com/refactoring/composing-methods/how-to-compose-methods-the-extract-method-refactoring/">Extract Method</a>.</li>
+</ul>
+<h1>Code Example</h1>
+<p>Let's start with the following routine:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> price<span class="br0">&#40;</span><span class="re0">$inputVal</span>, <span class="re0">$quantity</span>, <span class="re0">$anotherFactor</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$inputVal</span> &gt; <span class="nu0">50</span><span class="br0">&#41;</span> <span class="re0">$inputVal</span> -= <span class="nu0">30</span>;<br />
+&nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$quantity</span> &gt; <span class="nu0">20</span><span class="br0">&#41;</span> <span class="re0">$inputVal</span> -= <span class="nu0">5</span>;<br />
+&nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$anotherFactor</span>&gt; <span class="nu0">1000</span><span class="br0">&#41;</span> <span class="re0">$inputVal</span> -= <span class="nu0">2</span>;<br />
+&nbsp; <span class="kw1">return</span> <span class="re0">$inputVal</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> price<span class="br0">&#40;</span><span class="nu0">50</span>, <span class="nu0">10</span>, <span class="nu0">1200</span><span class="br0">&#41;</span>;</div>
+<p>Replacing with a temp leads to:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> price<span class="br0">&#40;</span><span class="re0">$inputVal</span>, <span class="re0">$quantity</span>, <span class="re0">$anotherFactor</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$result</span> = <span class="re0">$inputVal</span>;<br />
+&nbsp; <br />
+&nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$inputVal</span> &gt; <span class="nu0">50</span><span class="br0">&#41;</span> <span class="re0">$result</span> -= <span class="nu0">30</span>;<br />
+&nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$quantity</span> &gt; <span class="nu0">20</span><span class="br0">&#41;</span> <span class="re0">$result</span> -= <span class="nu0">5</span>;<br />
+&nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$anotherFactor</span>&gt; <span class="nu0">1000</span><span class="br0">&#41;</span> <span class="re0">$result</span> -= <span class="nu0">2</span>;<br />
+&nbsp; <span class="kw1">return</span> <span class="re0">$result</span> ;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> price<span class="br0">&#40;</span><span class="nu0">50</span>, <span class="nu0">10</span>, <span class="nu0">1200</span><span class="br0">&#41;</span>;</div>
+<p>An easy refactoring, yet quite cool. I do it all the time. Will you, too?<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-5bd4-4ef7-8c05-4b5ecbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcomposing-methods-remove-assignments-to-parameters%3A480f4dfe-5bd4-4ef7-8c05-4b5ecbdd56cb &amp;title=Composing+Methods%3A+Remove+Assignments+to+Parameters';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcomposing-methods-remove-assignments-to-parameters%3A480f4dfe-5bd4-4ef7-8c05-4b5ecbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcomposing-methods-remove-assignments-to-parameters%3A480f4dfe-5bd4-4ef7-8c05-4b5ecbdd56cb&amp;title=Composing+Methods%3A+Remove+Assignments+to+Parameters&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcomposing-methods-remove-assignments-to-parameters%3A480f4dfe-5bd4-4ef7-8c05-4b5ecbdd56cb&amp;title=Composing+Methods%3A+Remove+Assignments+to+Parameters';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/composing-methods-remove-assignments-to-parameters:480f4dfe-5bd4-4ef7-8c05-4b5ecbdd56cb">9 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/composing-methods-remove-assignments-to-parameters:480f4dfe-5bd4-4ef7-8c05-4b5ecbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/how-table-migrations-in-cakephp-12-can-save-your-life:480f4dfe-d040-488e-8b2d-4369cbdd56cb">How Table Migrations In CakePHP 1.2 Can Save Your Life</a></h2>	<div class="posted-on">
+		<p>Posted on 2/7/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><strong>Migrations are a wonderful technique to keep your database in sync with your code. When working on a project as a team, migrations can save your life. Please join me and get a  quick introduction to migrations in cakephp and become a happier coder. :]</strong></p>
+<p>Yes, they are finally here! Migrations in cake! They are so powerful - especially in a team programming environment. However, what are they in the first place?</p>
+<h1>What Are Migrations In CakePHP?</h1>
+<p>Migrations are .yml files that contain information about how to construct a new SQL table and how to drop it. A typical migration file looks as follows:</p>
+<p>[code]<br />
+UP:<br />
+  create_table:<br />
+    posts:<br />
+      user_id:<br />
+        type: integer<br />
+      title:<br />
+        type: text<br />
+        length: 255<br />
+      body:<br />
+        type: text<br />
+      highlighted:<br />
+        type: boolean<br />
+        default: false<br />
+      flagged:<br />
+        type: boolean<br />
+        default: false<br />
+      resolved:<br />
+        type: boolean<br />
+        default: false        </p>
+<p>DOWN:<br />
+  drop_table: [posts]<br />
+[/code]</p>
+<p>Notice the "UP" and "DOWN" in the code. They represent what to do when you want to migrate "up" to the next database scheme version and what to do when you want to go down. The code above does not need much explanation I think. When migrating up, we create a table named posts, that has six fields with some default, type and length restrictions. When migrating "down", we drop that table again.</p>
+<h1>How Does One Execute Migrations?</h1>
+<p>For this to work you will need <a href="http://pear.php.net">PEAR</a> installed along with its <a href="http://pear.php.net/package/MDB2">MDB2 Package</a>. Installing pear is as easy as executing a bat file on windows. Too bad I am a WAMP guy and haven't done much yet with Linux. However, detailed instructions on how to install pear under linux can be found <a href="http://pear.php.net/manual/en/installation.php">here</a>.</p>
+<p>The second step is altering your php.ini's include_path to look in your pear installation, too, or else it will not be able to find the MDB2 package. My include_path directive looks like the following:</p>
+<p>[code]<br />
+; UNIX: "/path1:/path2"<br />
+;include_path = ".:/php/includes"<br />
+;<br />
+; Windows: "\path1;\path2"<br />
+include_path = ".;C:\wamp\php\pear;"<br />
+[/code]</p>
+<p>Note, that "." stands for "current directory". On windows you separate directories with a semicolon and on *nix with a colon. Php.ini's include_path is a powerful thing, allowing you to customise your php installation to a great deal. However, don't mess with it. :]</p>
+<p><strong>Important:</strong> PHP's command line interface will grab the ini file that is <strong>in the same directory as your php.exe</strong> or php-cli.exe (respectively). Set that one up correctly, especially enable the mysql module. Without mysql support, migrations will be useless. :]</p>
+<p>The next step is to grab <a href="http://bakery.cakephp.org/articles/view/cake-db-migrations-v2-1">Joel Moss' Migration Shell Code</a>. Place it into app/vendors/shells/ and then start up your shell. Navigate to your project folder and then into /cake/console.</p>
+<p>Now type in <strong>php cake.php migrate</strong> and it will migrate to the latest version. With <strong>php cake.php migrate -v 3</strong> you will migrate to the third migration and so on.</p>
+<p>Your command could look like "php5 cake.php migrate", too. On windows you can register any php.exe with your "Path" environment variable.</p>
+<h1>A Bit More On Migration Files</h1>
+<p>Okay, now that we got it working, here is a bit more about the construction of migration files.</p>
+<p>First thing to note is that migrations can only keep your code in sync with the database <i>scheme</i>. To insert some default data into your tables you will have to rely on <a href="http://cakephp.org">Cakephp</a>'s fixtures, which I will write about in a later article.</p>
+<p>Your migration files have to be placed in <strong>app/config/migrations</strong> and they need to include some kind of number at the beginning of the file name. This is to express the version number of the migration. Here is a possible migration folder:</p>
+<p>[code]<br />
+001_initial_tables.yml<br />
+002_network_table.yml<br />
+003_posts_table.yml<br />
+003_comments_table.yml<br />
+004_tags_table.yml<br />
+[/code]</p>
+<p>You can also include more than one table setup within one migration. Here is an example migratiion file:</p>
+<p>[code]<br />
+#<br />
+# migration YAML file<br />
+#<br />
+UP:<br />
+  create_tables:<br />
+    tip_categories:<br />
+      name:<br />
+      fkey: parent<br />
+    tips:<br />
+      title:<br />
+      content:<br />
+        type: text<br />
+      fkey: category<br />
+DOWN:<br />
+  drop_tables: [tip_categories, tips]<br />
+[/code]</p>
+<p>Should be self-explaining. Instead of the "create_table:" command we use "create_tables:" and go through the scheme data one table at a time.</p>
+<h1>Conclusion</h1>
+<p>Migrations are extremely powerful. They will save you much time, energey and prevent you from getting hairloss. Having a working codebase with the correct information in the database is all happy programmer needs on his local test installation, no? :]</p>
+<p>If you run into problems getting migrations working, please let me know by commenting on this article. I will try my best to help you out.</p>
+<p>Have a good one! By the way, that migraine is actually inspiring me to blog. :)</p>
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-d040-488e-8b2d-4369cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-table-migrations-in-cakephp-12-can-save-your-life%3A480f4dfe-d040-488e-8b2d-4369cbdd56cb &amp;title=How+Table+Migrations+In+CakePHP+1.2+Can+Save+Your+Life';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-table-migrations-in-cakephp-12-can-save-your-life%3A480f4dfe-d040-488e-8b2d-4369cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-table-migrations-in-cakephp-12-can-save-your-life%3A480f4dfe-d040-488e-8b2d-4369cbdd56cb&amp;title=How+Table+Migrations+In+CakePHP+1.2+Can+Save+Your+Life&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-table-migrations-in-cakephp-12-can-save-your-life%3A480f4dfe-d040-488e-8b2d-4369cbdd56cb&amp;title=How+Table+Migrations+In+CakePHP+1.2+Can+Save+Your+Life';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/how-table-migrations-in-cakephp-12-can-save-your-life:480f4dfe-d040-488e-8b2d-4369cbdd56cb">21 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/how-table-migrations-in-cakephp-12-can-save-your-life:480f4dfe-d040-488e-8b2d-4369cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="paging">
+	<a href="/posts/index/page:42" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:39">39</a></span> | <span><a href="/posts/index/page:40">40</a></span> | <span><a href="/posts/index/page:41">41</a></span> | <span><a href="/posts/index/page:42">42</a></span> | <span class="current">43</span> | <span><a href="/posts/index/page:44">44</a></span> | <span><a href="/posts/index/page:45">45</a></span> | <span><a href="/posts/index/page:46">46</a></span> | <span><a href="/posts/index/page:47">47</a></span> <a href="/posts/index/page:44" class="next">Next &raquo;</a></div>	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

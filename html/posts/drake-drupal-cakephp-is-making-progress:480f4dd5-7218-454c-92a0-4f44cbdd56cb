@@ -1,0 +1,630 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Drake (Drupal + CakePHP) is making progress &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/drake-drupal-cakephp-is-making-progress:480f4dd5-7218-454c-92a0-4f44cbdd56cb">Drake (Drupal + CakePHP) is making progress</a></h2>	<div class="posted-on">
+		<p>Posted on 25/1/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p>For all of you who have been looking at my <a href="http://drake.kdz-online.de/drake/tutorial">proof of concept</a> for joining the powers of CakePHP and Drupal there are good news: The project is coming along very nicely and I think within 1 or 2 weeks I'll be able to release the first Alpha version for public use.</p>
+<p>So here are some of the things I've recently been working on:</p>
+<h3>Drupal Theme Integration</h3>
+<p>Well one of the first things I needed to work when I started this project was that my website could use a theme of drupal but use the rendered view of a controller to show up inside of it.<br />
+While this hasn't been to difficult there was something that recently started bugging me. It would be stupid if I couldn't use all the cool CakePHP stuff for views in my layouts now. Especially the lag of helpers was the one most important thing I'd miss. So ... how to fix this? Luckily Drupal has build-in support for costum theming librariers (most notably smarty) so I started by making a copy of the standard engine <i>phptemplate</i> which basically just includes php files. Then I started modifying until the point where I could create a new View class which then would render all pages. Then I tried if it would work together with one of my themes, and ... it did! I didn't even have to make one change to it but I now I am able to use $html->link() etc. inside of my drupal themes now!</p>
+<h3>Drupal functions</h3>
+<p>Well while my setup allows me to use virtually any function of drupal I am writing a library which will ease the use of this with CakePHP. So you will have Models for all kind of drupal related data like the config, nodes, localization, etc. </p>
+<h3>Search Integration</h3>
+<p>Another thing that'll be in the package will be a handle for <i>controller not found</i> that will bring up the search function of drupal to the user. But the best thing: I want to have an Ajax autocomplete for it so it'll be really smothe to use ; ).</p>
+<h3>Now what do you want to see?</h3>
+<p>As the development is still in a very early stage I'm still trying to figure out what things should belong to the drake project. How do you want permission to be handled? ACL's or Drupal's Right managment? What other stuff are you interested in? Let me know and I'll try to integrate as much as possible of the idea's I like ^^.</p>
+<p>--Felix</p>
+<p>PS: Sorry about the fact that I've not updated this blog for a while, I didn't have time for devin' and even less for bloging the last couple days. I'll try to get better about it ^^.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-7218-454c-92a0-4f44cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdrake-drupal-cakephp-is-making-progress%3A480f4dd5-7218-454c-92a0-4f44cbdd56cb &amp;title=Drake+%28Drupal+%2B+CakePHP%29+is+making+progress';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdrake-drupal-cakephp-is-making-progress%3A480f4dd5-7218-454c-92a0-4f44cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdrake-drupal-cakephp-is-making-progress%3A480f4dd5-7218-454c-92a0-4f44cbdd56cb&amp;title=Drake+%28Drupal+%2B+CakePHP%29+is+making+progress&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdrake-drupal-cakephp-is-making-progress%3A480f4dd5-7218-454c-92a0-4f44cbdd56cb&amp;title=Drake+%28Drupal+%2B+CakePHP%29+is+making+progress';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/learning-from-the-cakephp-source-code-part-ii:480f4dd6-57fc-4715-8709-439acbdd56cb">Learning from the CakePHP source code - Part II</a></li>
+							<li><a href="/posts/using-cakephp-in-external-php-systems-cmss-weblogs-etc:480f4dd5-ed94-4186-acda-4443cbdd56cb">Using CakePHP in external PHP Systems (CMS&#039;s, Weblogs, etc.)</a></li>
+							<li><a href="/posts/how-to-organize-your-cakephp-app%e2%80%99s-javascript-ii:480f4dd6-a780-45dc-bd65-4284cbdd56cb">How to organize your CakePHP App’s Javascript II</a></li>
+							<li><a href="/posts/toogleing-associations-in-cakephp-models:480f4dd5-58b0-4ecf-bf4d-4637cbdd56cb">Toggling Associations in CakePHP Models</a></li>
+							<li><a href="/posts/migrating-a-database-table-for-use-with-the-cakephp-sluggable-behavior:4a2cee35-0e24-4d73-a545-3f514834cda3">Migrating a Database Table for use with the CakePHP Sluggable Behavior</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/cakephp-pluralize-helper:480f4dfe-fbf8-464a-95da-4764cbdd56cb">CakePHP Pluralize Helper</a></li>
+							<li><a href="/posts/handling-database-connection-errors-in-cakephp:480f4dd5-9570-421a-a04d-43cdcbdd56cb">Handling database connection errors in CakePHP</a></li>
+							<li><a href="/posts/use-html-401-in-cakephp-12:480f4dd6-ef94-4a7d-894c-46f6cbdd56cb">How-to: Use Html 4.01 in CakePHP 1.2</a></li>
+							<li><a href="/posts/yummy-cakephp-functions-you-should-know-about:480f4dd5-4528-4a53-a0ec-4aa8cbdd56cb">Yummy CakePHP functions you should know about!</a></li>
+							<li><a href="/posts/drake-drupal-cakephp-101b-released:480f4dd6-42a0-47a1-aa7c-4aadcbdd56cb">Drake :: Drupal-CakePHP 1.0.1b Released</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/drake-drupal-cakephp-is-making-progress:480f4dd5-7218-454c-92a0-4f44cbdd56cb">24 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/drake-drupal-cakephp-is-making-progress:480f4dd5-7218-454c-92a0-4f44cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dd7-0cbc-4ab8-bc4a-48c7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=71bb56cc8ace72081e1611dc962e8644&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							richard&nbsp;						</strong>
+						<strong>said 
+						on Jan 27, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>I'm currently using your Drupal + Cake = drake on one of my production environment , i call it production because i just recently transfered all my pure cake implementation into drake. So far it gives me a little bit confident on using it because i needed a very nice pre-built template system so that i can concentrate on pure development and leave the others to the designers..</p>
+<p>I'm just new to drupal so i cannot comment on which permission system will be used but i would suggest let the developer choose between the two , ACL or drupal's RM. I guess for me, that would be great so others could utilize the ACL's capability while at the same time using drake.</p>
+<p>BTW, where can i get the activities of drake? is it hosted at cakeforge? because in the long run i'll probably be using darke and in that way i can give you feedbacks, bugs and other suggestions. :). Let me know :)</p>
+<p>good job! More power. </p>
+<p>happy baking</p>
+<p>./richard</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-53bc-4d67-a8da-43fbcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							./richard &raquo; drake in progress&nbsp;						</strong>
+						<strong>said 
+						on Jan 27, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Felix of thinkingPHP has been making progress with (Drupal + Cakephp)= drake which is one of the most important combination as far as using cakephp framework. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-7068-4add-8ab3-4898cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 27, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey richard,</p>
+<p>I'm glad to hear somebody is using the code I've written, in fact I think your the first one.<br />
+Right now the project is only laying around on my computer and I mostly talk about it</br><br />
+in #cakephp on chat.freenode.net, but I intend to make it more open & available to public</br><br />
+as soon as it hits alpha status.</br></p>
+<p>Concerning the rights managment. I think I'd have to get real tricky about it if I want to use the one supported by drupal since it's based on functions in actual files (modules). But either code generation or dynamic function creation should be a possibilty so ^^ ... ACL will definitly supported I think.</p>
+<p>As for now I'd really like to get in touch with you because i'd be really happy to have someone test my code and give me feedback on it. I'm available over ICQ (124-330-907), Mail (FelixGe[at]web[dot]de) or you can catch me hanging around on IRC.</p>
+<p>Oh and before I forget, my name on #cakephp is "the_undefined". So you know if I'm online.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-0d90-4520-ab66-4146cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=71bb56cc8ace72081e1611dc962e8644&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							richard&nbsp;						</strong>
+						<strong>said 
+						on Jan 28, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hi Felix,</p>
+<p>Surely you can count on me and i'd be willing to participate. I'll probably help on other implementation and or drake improvements in a few weeks from now. Let me know some of your plans and will keep track on it. For the meantime i have to gather more info about drupal and your drake ...</p>
+<p>Do you have ym? i'm always online although we are quite far Lol " i'm here at Standard Time +0800 UTC", I am seldom on IRC.  :)</p>
+<p> Good luck</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-4c44-447d-9029-4fe6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9ff3bf9f287291bf6d0d377b6dd71bed&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.shanghaiguide.com" rel="nofollow">Lawrence Sheed</a>						</strong>
+						<strong>said 
+						on Jan 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>A big thing that people forget about is multilingual issues.</p>
+<p>Don't forget about that - the world isn't all english-centric.</p>
+<p>Support double-byte... </p>
+<p>Lawrence / www.shanghaiguide.com</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-18c4-415b-904f-40c3cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Lawrence,</p>
+<p>I'm not sure what you mean? One of the big reasons I started to base my CakePHP apps on Drupal is that drupal has excellent multi-language support build in which I am now able to use from within CakePHP. Or was your comment supposed to be a positive one for that reason?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-c750-4a82-a3e3-4454cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4dd15a0eda5946127fb7a71b51217a63&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://#" rel="nofollow">TreeFrog</a>						</strong>
+						<strong>said 
+						on Feb 22, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Terrific Blog you have. Peace Out.<br />
+TreeFrog</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-6634-4b17-b3c1-4efecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a27c4329a8a2feedb8a0ca5bdb32df2a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://#" rel="nofollow">JiggyWittit</a>						</strong>
+						<strong>said 
+						on Mar 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Kewl blog you got goin on up here.<br />
+Peace, JiggyWittit</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-11c8-439b-9d8f-4cf4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4e6115689d7f088f6470a9bb8a9d0fd2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Langdon&nbsp;						</strong>
+						<strong>said 
+						on Mar 23, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix</p>
+<p>This is great work, and I believe it is exactly what I have been searching for to reduce my work load.  I have no desire to build all of the functionality that Drupal offers.  Drake sounds like the future for me.</p>
+<p>I will be giving it a whirl very soon.</p>
+<p>Regards,<br />
+Langdon</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-4d74-4d3c-bf72-4907cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4e6115689d7f088f6470a9bb8a9d0fd2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Langdon&nbsp;						</strong>
+						<strong>said 
+						on Mar 24, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix</p>
+<p>I have tried out Drake and has some problems.  I have posted details in the Tutorial page.  If you have a chance to look at it I would be greatful for any input you can give me.</p>
+<p>Regards,<br />
+Langdon</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-f1dc-418f-8772-4eabcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e1411d936b08b2d76a05c619e4b40963&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nick&nbsp;						</strong>
+						<strong>said 
+						on Apr 10, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Very nice site!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-1914-4af4-bb51-4b0ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4e5a4f3c816f22d7b546bdf5a90cb284&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Leo&nbsp;						</strong>
+						<strong>said 
+						on Apr 11, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi ! Your site is very interesting. Thank you.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-3488-40cb-8b7c-47e9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=650a38b007937b30ec30ba4a9ec9b9e2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Jeff F&nbsp;						</strong>
+						<strong>said 
+						on Apr 28, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>In case someone is interested, you can also call drupal functionality from an external php script (CakePHP or otherwise) using Drupal's module_invoke function. So you can run drupal on part of your site, separate from your custom code, and reach into drupal only when needed. For example, the following will grab the thumbnail from content "node" #42 in drupal which you might want in your custom site to create a seamless link.</p>
+<p>require_once './includes/bootstrap.inc';<br />
+drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);</br><br />
+$thumbnail = module_invoke('image','display', node_load(42), 'thumbnail');</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-7868-44ef-b79b-47abcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 28, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Jeff, good stuff, thanks for sharing! ; )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-8ca0-4884-9083-4c7ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=016cc418057080361e28ba3470951938&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.ultra-marine.org" rel="nofollow">Torbjörn Österdahl</a>						</strong>
+						<strong>said 
+						on Apr 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Have someone considered binding a Cake application into Drupal as a module? The idea would be that the content from the Cake application appears as a Content Node in Drupal. The benefit would be that menus and other features of Drupal remain the same. - Torbjörn</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-b320-4dee-b717-413bcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Torbjörn: That's kind of what Drake is ment to do. But then again, there are different ways of doing this.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-a874-42d4-abc9-4be4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d45ffefa94a3e79ff2fd98ce2f1f50c7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Farooq Sadiq&nbsp;						</strong>
+						<strong>said 
+						on Aug 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I've experimented with this drake implementation for the last couple of days and have been very impresed with its simplicity.  I have it working multi-site drupal.  </p>
+<p>I would like to see cake ACL make use of drupal taxonomy_access.  A drupal user would setup 'Access Control Objects' acos using taxonomy_access in drupal and Cake would use drupals 'users', 'term_access' and 'term_access_default' tables for 'Access Request Objects 'acrs'.</p>
+<p>I was also able to get drake to use multiple databases, add function drake_connection in drake.module</p>
+<p>example of the setting.php I have a second db<br />
+ 'mysql',</br><br />
+                                  'connect'  =&gt; 'drupal_connection',</br><br />
+            ..................................</br><br />
+             var \$posts = array('driver'    =&gt; 'mysql',</br><br />
+                                  'connect'  =&gt; 'drake_connection',</br><br />
+.....................</br><br />
+?&gt;</br><br />
+Posts Model uses  the second database</br><br />
+models/posts.php</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-6fb0-42a7-aa43-40d0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d45ffefa94a3e79ff2fd98ce2f1f50c7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Farooq Sadiq&nbsp;						</strong>
+						<strong>said 
+						on Aug 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>function &amp;drake_connection($server, $username, $password) {</p>
+<p>	$new_link = true;<br />
+	$dbConnection =  mysql_connect($server, $username, $password, $new_link);</br></p>
+<p>	if ( ! $dbConnection ) {<br />
+		die('could not connect to DB '.$server. $username . mysql_error());</br><br />
+	}</br><br />
+	return $dbConnection;</br></p>
+<p>}</p>
+<p>example of the setting.php I have a second db<br />
+  eval("class DATABASE_CONFIG</br><br />
+         {</br><br />
+             var \$default = array('driver'    =&gt; 'mysql',</br><br />
+                                  'connect'  =&gt; 'drupal_connection',</br><br />
+            ..................................</br><br />
+             var \$posts = array('driver'    =&gt; 'mysql',</br><br />
+                                  'connect'  =&gt; 'drake_connection',</br><br />
+.....................</br></p>
+<p>Posts Model uses  the second database<br />
+models/posts.php</br></p>
+<p>class Post extends AppModel<br />
+{</br><br />
+    var $name = 'Post';</br><br />
+    var $useDbConfig = 'posts';  // cannot get it to use another DB</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddd-a93c-493d-963e-47accbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f258c0d85f078e42323195c84348b770&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Vijay&nbsp;						</strong>
+						<strong>said 
+						on Sep 20, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>I cannot get drupal and cakephp working together. I am using their latest versions.</p>
+<p>Regards</p>
+<p>Vijay</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-d8b0-4a59-b3a7-42ffcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4eb69c37d5f933e48d8238de84fb037c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://jheslop.com" rel="nofollow">Jeremy</a>						</strong>
+						<strong>said 
+						on Nov 14, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I checked out the drake tutorial and walked through it. There are a few things that need to be added for the manual tutorial to work that I got stumped on. First off the drupal_module.zip does not include the drake-config.php or database.sql files to put into the /drake folder. The drake.module file also does not have the use_drupal_layout() function needed to work. I had to download the drake_sample.zip to figure out about the files mentioned above and to copy over the correct version of drake.module that would work. So everything is up and running now. I just wanted to let you know. Thanks for a great addition to drupal and cake.</p>
+<p>Jeremy</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-dc04-4e4f-8439-4082cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=aff9039dc673beda1d2f37e836c58271&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.gigapromoters.com" rel="nofollow">Max</a>						</strong>
+						<strong>said 
+						on Nov 28, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Few days back, I was thinking about merging CakePHP and Joomla, it has given me even more confidence to start my project now ;)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-bdd8-4868-8867-4e6dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2a4f4f2259921a89fbb16f44034f395a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.marianoiglesias.com.ar" rel="nofollow">Mariano Iglesias</a>						</strong>
+						<strong>said 
+						on Feb 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Felix,</p>
+<p>What's up! Weird to see you outside of CakePHP google group ;)</p>
+<p>Have a question, what's the status of this project? Can I extend it? </p>
+<p>Using the same procedures I used for building Jake (following Max's work, now available at http://dev.sypad.com/projects/jake) I just built a module for Drupal 5.1 that:</p>
+<p>1. Same as Jake, allows your CakePHP application to run with or without Drupal, with no code modifications at either end.</p>
+<p>2. Handles the possibility that Drupal &amp; CakePHP may be using different databases.</p>
+<p>3. Properly manages sessions (since Drupal may use a session handler that is not the same as Cake, plus Cake brings by default the AUTO_SESSION which would make your Cake application to complain when running inside Drupal): sessions are closed before running the application and restored afterwards, so your CakePHP application can use sessions at will, and Drupal doesn't loose its session information.</p>
+<p>4. No need to change any links or anything in your CakePHP application, the module automatically makes every link/AJAX resource to go through Drupal (*if* the CakePHP application is running on Drupal in the first place)</p>
+<p>Well and a lot more things, so I was wondering how we can combine efforts.</p>
+<p>Thanks mate! :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-4df0-4f6b-ab90-42eacbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Mariano: Sounds awesome! I'm not really playing around with drupal any more these days, but I would welcome you to use the name 'Drake' for your project. Reminds me there is something I wanted to talk with you about anyway (PayPal stuff), so let me send you an email ... ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-2044-4270-9ef0-41a4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							drake in progress - part 2 &laquo; richard&nbsp;						</strong>
+						<strong>said 
+						on Mar 01, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] March 1st, 2007   This is my second post about Drake which is a combination of Drupal + CakePHP = Drake. I&#8217;ve used Drake few days after Felix of thinkingphp.org released it to the public as part of his proof of concept, it was very experimental during that time where in fact CakePHP wasn&#8217;t in its stable stage but Drupal was very stable, knowing CakePHP&#8217;s core gave me confidence to use Drake in my own production project and it went pretty well, there were some minor glitches but not a show stopper in production. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

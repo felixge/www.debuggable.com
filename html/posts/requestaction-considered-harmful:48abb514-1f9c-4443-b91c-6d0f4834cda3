@@ -1,0 +1,623 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>requestAction considered harmful &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/requestaction-considered-harmful:48abb514-1f9c-4443-b91c-6d0f4834cda3">requestAction considered harmful</a></h2>	<div class="posted-on">
+		<p>Posted on 20/8/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>this is post #1 of my <a href="http://debuggable.com/posts/time-to-grow-again-or-loose-money:48ab3665-2054-4e55-b13f-0c104834cda3">30 day challenge</a>. If you have ever written a modestly complex application in CakePHP, you probably noticed that it is very tempting to use requestAction to glue together pieces from different controller actions. While initially that sounds like a good idea, I think requestAction should be avoided wherever possible.</p>
+<blockquote><p>Avoid requestAction in your application wherever you can - it will save you from terrible debugging nightmares.</p></blockquote>
+<p>For one, the speed penalty of using requestAction is quite prohibitive. The main slowdown is that every time you call requestAction, a full dispatch cycle takes place. This is pretty inefficient given that you probably already know what exact Controller/action you want to call up. A much bigger reason is that you will create a debugging nightmare for yourself. As soon has you have requestAction calls that invoke requestAction calls that invoke requestAction calls - you're screwed. If somewhere along the chain odd things happen (like a bug in your Auth system, some controller's / component's beforeFilter) debugging is going to become a major pain.</p>
+<p>But worry not. This doesn't mean that you have to overload your dashboard / profile pages with ridiculous amounts of logic. The approach to use is to create <a href="http://debuggable.com/posts/implementing-different-types-for-cake's-model::find()-method:485030de-4778-456e-8400-44d84834cda3">named find calls</a> and move all logic there. Once you have done that, getting the data for a complex view is simply a matter of making the right find calls and rendering a bunch of elements. You can even render other controllers views where it makes sense. For example lets say you want to re-use posts/view.ctp inside posts/edit.ctp to show the user a preview of the currently edited post. Instead of using requestAction, try this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$this</span>-&gt;<span class="me1">element</span><span class="br0">&#40;</span><span class="st0">'../posts/view'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'post'</span> =&gt; <span class="re0">$this</span>-&gt;<span class="me1">data</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>Again, there are some legitimate cases for using requestAction. All I'm saying here is that you should avoid creating an architecture that depends on requestAction at all costs. I've seen (and rewritten) applications that have gone that route and it has never been pretty so far ; ).</p>
+<p>HTH,<br />
+-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/48abb514-1f9c-4443-b91c-6d0f4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frequestaction-considered-harmful%3A48abb514-1f9c-4443-b91c-6d0f4834cda3 &amp;title=requestAction+considered+harmful';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Frequestaction-considered-harmful%3A48abb514-1f9c-4443-b91c-6d0f4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frequestaction-considered-harmful%3A48abb514-1f9c-4443-b91c-6d0f4834cda3&amp;title=requestAction+considered+harmful&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frequestaction-considered-harmful%3A48abb514-1f9c-4443-b91c-6d0f4834cda3&amp;title=requestAction+considered+harmful';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/dessert-12-debugging-requestaction:480f4dd5-bca4-4e86-820c-4f4dcbdd56cb">Dessert #12 - Debugging requestAction</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/requestaction-considered-harmful:48abb514-1f9c-4443-b91c-6d0f4834cda3">27 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/requestaction-considered-harmful:48abb514-1f9c-4443-b91c-6d0f4834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-48abef8b-606c-4e73-919d-47f54834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5bf3d56fbce3df494d829d4a4e860521&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://klevo.sk" rel="nofollow">klevo</a>						</strong>
+						<strong>said 
+						on Aug 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Very good post, especially the solutions to avoid using requestAction. But the title may be a bit misleading. It implies there is something broken or some security risk with requestAction, while that is not true. It's use may be limited, but it's good to have it as an option.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ac062f-db2c-4913-bdd7-4d4d4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>klevo: Glad you like the post : ). About the title: english is my second language so I might be wrong, but I think I've used the term correctly:</p>
+<p><a rel="nofollow" href="http://en.wikipedia.org/wiki/Considered_harmful">http://en.wikipedia.org/wiki/Considered_harmful</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ac1397-c49c-4dfc-b7f6-25604834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Aug 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>klevo: I'd say his usage is spot on, particularly considering the issues he's highlighting.  As a general comment, I will say that in all the Cake apps I've built, I've only ever used requestAction once.  Over-use (or sometimes just use) of requestAction is a indicative of poor design, and often means you need to push more application logic down into your models, or sometimes into a shared component.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ac1d92-136c-4893-a550-743e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b827ecd1c6f54af0be4a762de2202214&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://mbavio.com.ar" rel="nofollow">Martin Bavio</a>						</strong>
+						<strong>said 
+						on Aug 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Very good post Felix, and good luck with your 30 days challenge. Only one question for you:</p>
+<p>Suppose I wanna show my best posts in a navbar in my website, and it has to repeat over the site. How do you handle this without using requestAction or trying AD7six Mini Components? I would love to have an easier and better solution for this very common scenario.</p>
+<p>Cheers</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ac2630-945c-4cf2-aba7-3ca04834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7b813591ce10b09809e950fdeabc5ed3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://physicsforpoets.com" rel="nofollow">Ryan</a>						</strong>
+						<strong>said 
+						on Aug 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I admittedly use requestAction ALL the time to bind together different pieces of the application; what would your advice be in a situation where you wanted to show 5 recent "posts" on events/index? Would you prefer to include the Posts model in the Events controller and keep the find/set in the Events/index action?  Isn't this "breaking" mvc rules?</p>
+<p>Not trying to flame, I'm just actually curious as I do this (using requestAction) quite often, and I've never really had any kind of performance/debug issues.</p>
+<p>While I'm thinking of it, another case I use requestAction for quite frequently is where I want to perform some AJAX refreshing.  Say I have a list of Posts that I want AJAX paging applied to - in order to keep from having the logic/view code in more than 1 place, I'll use a requestAction with a return = true or a requestAction combined with an element to display the initial page and let AJAX take over from there.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ac386f-6e0c-43dc-865b-74184834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Aug 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Not saying it's right or not - even thinking it's not...  just asking:<br />
+What do you all think about the spartan's approach of getting data loaded in some sort of a DataHelper - loading models and executing basic data selections...</br></p>
+<p>It's something i've seen but named WidgetHelper, and it worked like this in the view: foreach($widget->retrieve('Comment', 'latests')): // display...</p>
+<p>in WidgetHelper::retrieve() it loaded Comment via ClassRegistry and executed find('latests')...</p>
+<p>It felt so wrong and nasty, but so simply handy, as all the code needed was straight-from-the-db-data, no complex logic nor any sort of app's business logic.</p>
+<p>So, how do you all feel about it?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ac3a33-b2dc-4cac-b1fd-5f4e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Aug 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>oh ok, I was a bit lazy writing the post, but you got the picture...</p>
+<p>@Martin : why people love to talk about breaking "MVC rules"?</p>
+<p>@Ryan : your pagination feature seems a little bit inacurrate, maybe you should try read the manual on paginator or explain yourself better...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ac3b29-fce8-4229-812f-5ca64834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1f27710d8568b64fa5b3c1e08e7a55de&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							HeathNail&nbsp;						</strong>
+						<strong>said 
+						on Aug 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Ryan<br />
+One approach would be to render and cache a recent posts element any time a new post is made. Then call the element in your views where ever its appropriate.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ac434a-0e8c-4fdf-88d9-4df54834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e0a3d8bad3526a207b8234539681cd8e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.steveoliviera.com" rel="nofollow">Steve Oliveira</a>						</strong>
+						<strong>said 
+						on Aug 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@rafaelbandeira3: I really like that approach even though it's supposedly not MVC kosher. It's definitely faster than requestAction, but I'm sure you'll receive complaints about accessing a model in a helper.... even though the Form helper does this.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ac4e88-d668-48fa-b6ac-1d754834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Aug 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Steve Oliveira : Yes, that was the first thing that came in my mind, but there's one thing, it doesn't access db data...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ac4edf-3260-460e-8ad9-7e794834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b827ecd1c6f54af0be4a762de2202214&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://mbavio.com.ar" rel="nofollow">Martin Bavio</a>						</strong>
+						<strong>said 
+						on Aug 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@rafaelbandeira3: Ah? What are u talking about? I didnt say anything about MVC rules...</p>
+<p>Anyway, I´m still waiting for Felix answer to my question.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ac57be-6584-4d83-9fb7-6e104834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Aug 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Martin Bravio : doh... it was Ryan... sorry...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48acc3e0-3934-4cff-8c23-64934834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7b813591ce10b09809e950fdeabc5ed3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://physicsforpoets.com" rel="nofollow">Ryan</a>						</strong>
+						<strong>said 
+						on Aug 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@rafaelbandeira3 - the pagination thing was just an example that popped into mind; doing ajax pagination on a page before the paginator was even invented</p>
+<p>@HeathNail & @rafaelbandeira3 - rules is rules, I don't know... I just like to stick as much to the MVC approach as possible (most of the time) and in the examples I tried to give, I was trying to point out times when you would definitely need to access data from other controllers, and I love requestAction for that - for instance a home page with Posts, Events, Galleries, etc etc - I can have a simple page setup in /pages/home.ctp and plop down a bunch of requestAction's to the other various elements I need and either return the view (which is apparently frowned upon) or render an element - that's exactly what I did here: <a rel="nofollow" href="http://reaxmusic.com/">http://reaxmusic.com/</a> and it's really really handy, and I didn't notice any kind of performance hit (perhaps 5 requestActions isn't too extreme)</p>
+<p>just giving my 2 cents, not saying i'm necessarily "right"</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ad518f-6b7c-4d26-a9e7-24164834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Aug 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Ryan - Just a suggestion, ref'ing your pagination feature, try to always stick to the core.</p>
+<p>@Ryan - actually 5 requestAction() are the almost the same as load 6 pages in one single hit, except that you have just one Http request. Even Felix wich is one of the most not-worried-about-performance issues - tried to find the links to prove, but I suck and don't find them, but you all know - is suggesting not to use it because of performance worries. I think requestAction is a great tool, but completely missused. What is all that logic that you need from controller's action to get the latests events? My EventsController::latests(), in a public - non-auth-needed - fashion wouldn't be bigger than this:</p>
+<p>function latests($ammount = 5) {<br />
+    $data = $this->Event->findLatests($ammount);</br><br />
+    $this->set(compact('data'));</br><br />
+    return $data;</br><br />
+}</br></p>
+<p>Why would I need all the Dispatcher -> Router -> Controller -> Components -> Models path to get this?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ad5227-5b38-4183-bc07-24924834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Aug 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>oh.. it's not an object chain... "doh"...</p>
+<p>@Ryan : even with the large amount of requestActions: nice website!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ad54c8-8e84-4a8b-8f06-6f0e4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Aug 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@rafaelbandeira3: Agreed. However, one thing, why do you do something like $this->set(compact('data')). Isn't everything data? Shouldn't you be more specific ?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ad586c-8d90-4d91-9314-7e6f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Aug 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Tim : actually it's a code standard we use... somewhere at line 240 of our doc book, mainly written by myself, says something like:<br />
+"For main data handling on view layer, use var named $data"</br></p>
+<p>So we can share main data handling trough helpers - grabbing View instance on ClassRegistry and then $View->viewVars['data'], easily find data entrys we want, quickly add new data display, and avoid seing redundant stuff like:<br />
+echo $post['Post']['author'];</br><br />
+// instead I do</br><br />
+echo $data['Post']['author'];</br></p>
+<p>// or in a multiple row data set<br />
+foreach($posts as $post):</br><br />
+   echo $post['Post']['title'];</br><br />
+// .. instead I do</br><br />
+foreach($data as $entry):</br><br />
+   echo $entry['Post']['title'];</br></p>
+<p>oh... there's also a line wich says: "Main data is the data returned by controller's action". So you can set secondary data to the view, but it isn't the data wich is returned....</p>
+<p>that's my design, not saying it's right... but it's very productive. What do you think?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48adad28-9ff0-4700-a3ae-44064834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=669144d1ab0a861af5d54175371bc586&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://mark-story.com" rel="nofollow">Mark Story</a>						</strong>
+						<strong>said 
+						on Aug 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix Geisendörfer: I think we feel the same about this subject, I posted similar recommendations a few days ago. I focused more on using elements, but reusing your controller views is a great alternative.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48adad4e-f9dc-4ff5-b8cc-54b64834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Aug 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Can you show an example helper and/or view that makes use of this? :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ade182-2354-4ca3-af98-266f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=29e2d6431d4a86cdc18df0dd4c699a38&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://zeroasterisk.com/" rel="nofollow">Alan Blount</a>						</strong>
+						<strong>said 
+						on Aug 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>An excellent post... In my work (with 1.1 only) I too have determined this to be the case.  Especially if your application sticks way too much into app_controller and a beforeFilter() -- like all of mine end up doing.  Thanks for the post and this blog - getting useful stuff out already.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ae006b-9a5c-49c0-9aef-3efc4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3bb1b1d5bc56b489dc3d7139b43a8d29&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Doug&nbsp;						</strong>
+						<strong>said 
+						on Aug 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I used a requestAction call to generate an element on my home page. The home page is driven by the PagesController. I tried to use the method that this post demonstrates but I cannot seem to get the element to work. The view that I am trying to render is from another controller, DomainsController, in this case. So I call echo $this->element('../domains/renewals',array('post' => $this->data));  The view renders just fine when called directly but not on the home page. Any advice? I told PagesController to use the Domain model but that didn't change anything.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48aea0c1-e58c-4f49-8996-74ef4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Tim Koschützki : was it for me?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48aea386-f9b8-4b03-b312-1ffe4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Aug 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>anyway... if you want to know what I mean : <a rel="nofollow" href="http://bin.cakephp.org/view/1546157175">http://bin.cakephp.org/view/1546157175</a></p>
+<p>... of course it wont last forever!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a346c64-3eb0-4e7d-a8cb-7c294834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d76803f5987ba05e573fba14bf72db2f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://jamienay.com" rel="nofollow">Jamie</a>						</strong>
+						<strong>said 
+						on Jun 14, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'm a little (a lot) late to the party, but while looking for an alternative to requestAction to access database content from any controller, I came across this post. I was intrigued by Rafael Bandeira's idea of making a Widget helper, so I did my own version of it and came up with a Widget Component: <a rel="nofollow" href="http://jamienay.com/2009/06/a-quick-dirty-and-useful-widget-component-for-cakephp/">http://jamienay.com/2009/06/a-quick-dirty-and-useful-widget-component-for-cakephp/</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a34b5b8-c3bc-4dcf-a22d-0e964834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Jun 14, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@rafaelbandeira3 : That is interesting indeed. Thanks for sharing.</p>
+<p>@Jamie : Well I myself like to use custom find methods as well, but I keep calling them from the controller actions again and again. This is not duplicate code in my opinion. Example:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> index<span class="br0">&#40;</span><span class="re0">$slug</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp;<span class="re0">$article</span> = <span class="re0">$this</span>-&gt;<span class="me1">Article</span>-&gt;<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'by_slug'</span>, <a href="http://www.php.net/compact"><span class="kw3">compact</span></a><span class="br0">&#40;</span><span class="st0">'slug'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; &nbsp;<span class="re0">$recentArticles</span> = <span class="re0">$this</span>-&gt;<span class="me1">Article</span>-&gt;<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'recent'</span>, <a href="http://www.php.net/compact"><span class="kw3">compact</span></a><span class="br0">&#40;</span><span class="st0">'slug'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; &nbsp;<span class="re0">$relatedArticles</span> = <span class="re0">$this</span>-&gt;<span class="me1">Article</span>-&gt;<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'related'</span>, <a href="http://www.php.net/compact"><span class="kw3">compact</span></a><span class="br0">&#40;</span><span class="st0">'slug'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; &nbsp;<span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><a href="http://www.php.net/compact"><span class="kw3">compact</span></a><span class="br0">&#40;</span><span class="st0">'article'</span>, <span class="st0">'recentArticles'</span>, <span class="st0">'relatedArticles'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</br><br />
+<span class="br0">&#125;</span></br></div>
+<p>This is just for me to know what's going on and what is loaded for each action by simply looking at the controller action code. Scattering code that loads data from models across components, etc. doesn't make so much sense to me.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a351623-3ca0-41b7-a40e-44f24834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d76803f5987ba05e573fba14bf72db2f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://jamienay.com" rel="nofollow">Jamie</a>						</strong>
+						<strong>said 
+						on Jun 14, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Tim Koschützki : That works, but the reason I stay away from that method is that (presumably) in every controller you want to load the most recent articles from, you need to associate the Article model with that controller's model. And if you're putting the latest articles, in, say, a sidebar that displays on every page, that means you need to associate the Article model with every other model. To me that just doesn't make sense semantically: an Article has nothing to do, with, say, a Calendar of Events, but if you want to stick all of the find logic in individual controllers, you'll need to add that association. You can simplify things by adding the association to AppModel, but that's still a lot of redundant code.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a351bdd-5c88-46e2-864b-2e4d4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Jun 14, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Jamie : You can just use AppController::beforeRender() and then use ClassRegistry::init('ModelName') there.</p>
+<p>That's how I do it all the time.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

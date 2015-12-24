@@ -1,0 +1,254 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Problems with repetitive source code or better: Don't repeat yourself &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/problems-with-repeatitive-source-code-or-better-dont-repeat-yourself:480f4dfd-ac70-4f1b-907b-4eb4cbdd56cb">Problems with repetitive source code or better: Don't repeat yourself</a></h2>	<div class="posted-on">
+		<p>Posted on 23/4/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<h2>Introduction</h2>
+<p>As php programmers, we collect, organize, maintain and use knowledge and information. We document our knowledge in specifications, use it when we test and write the source code of our application. </p>
+<p>Alas, our knowledge changes, everyday and quite quickly, too. When a client wants us to add, change or remove a feature, when government sets out a new rule that lets our program's functionality become nonsense, our knowledge changes. When our knowledge changes, we have to reorganize. Most people think, maintaining the project starts when it is released. Actually, maintaining starts with the first word about the project written anywhere. As programmers we are in a constant state of maintaining our codebase. As project managers we are in a constant state of maintaining our documentation, plans, glossars, etc.</p>
+<h2>Avoid knowledge duplication</h2>
+<p>When the project's requirements change, we have to alter all code that is written on top of that knowledge. We will spend a lot of time finding all that code. We will have to write tests that document that everything we changed behaves in the new way we want it to.</p>
+<p>According to the <a href="http://pragmaticprogrammers.com">Pragmatic Programmers</a> the principle to avoid duplication of knowledge is called the DRY-principle ("Don't repeat yourself"). What does that mean? It means you should ensure that every bit of knowledge of your system, be it in the source code, its documentation or any other documentation, should have a single representation.</p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>The alternative is to write down the same bit of knowledge on multiple places. When something changes, you have to update all places or else your requirements list, project documentation or source code documentation becomes out of date.</p>
+<h2>Possible problems with repetitive knowledge</h2>
+<p>Most problems caused by knowledge repetition, belong to one or more of the following categories:</p>
+<ul>
+<li><strong>Enforced repetition</strong> - Programmers think they have no choice. Circumstances seem to enforce the duplication.</li>
+<li><strong>Undeliberate repetition</strong></li>
+<p> - We programmers don't recognize that we repeat information.</p>
+<li><strong>Repetition due to impatience</strong></li>
+<p> - We get lazy and put repetitions in because the situation seems to get easier with them.</p>
+<li><strong>Repetition due to many developers</strong></li>
+<p> - Different developers from the same team (or different teams) repeat information.</p>
+<li><strong>Repetition caused by deadlines</strong></li>
+<p> - This often happens in php webdevelopment. A client needs the job done today, so we hack away without thinking about repetition.
+</ul>
+<p>Let's look at them in more detail.</p>
+<h2>Enforced repetition</h2>
+<p>Sometimes we seem to be enforced to repeat information. Project standards might force us to develop documents about our source code, which of course will contain duplicate information. What can you do to make changes possible and avoid knowledge repetition?</p>
+<ul>
+<li>Use scripts and generators that generate code and all the documents.</li>
+<li>Write abstract explanations <em>why</em> you do something in the source code the way you do it. Don't repeat what the source code is already telling the reader.</li>
+<li>Document information to use code in your phpdoc comments and document details that someone doesn't need to know to <em>use</em> your code in the implementation.</li>
+</ul>
+<h2>Undeliberate repetition</h2>
+<p>Everybody has a bad day once. We often struggle with different problems, probably from our family, friends and what not. Don't let them too close to you! </p>
+<p>Programming is a highly sophisticated action that requires lots of concentration. Only program when you are really conscious, feel fine and are relaxed. Try to avoid repetition. When you cannot avoid it now, then document that repetition and fix it later.</p>
+<h2>Repetition due to impatience</h2>
+<p>That's what I find myself doing quite often. I want the project to be done now and don't abide by the DRY-principle. This is the wrong way to go about it. Why? Because you will end up in a repetition mess making it impossible to find all the things you need to change to fix the repetition. Often projects fail due to such repetition messes. This happens when nobody, not even the project leader, knows what's going on and what documents are the once the team should use. Fixing repetitions will make you spend precious time and very much of it! Code without repeating information in the first place and you will be fine. <strong>You may save a couple of minutes today at the potential risk to lose hours later.</strong> Code disciplined!</p>
+<h2>Repetition due to many developers</h2>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>This is the most difficult form of repetition to find out and to fix. The only thing, in my opinion, which you can do about it, is to enforce communication among the team and across multiple teams. Ensure everybody is hacking away at a different piece of the system to avoid conflicts. Set up discussion forums, trac and what not to avoid the repetition. Regular meetings help, too. Fix any repetition as you find it.</p>
+<h2>Repetition caused by deadlines</h2>
+<p>This is also another very difficult one and I must admit I am not really sure yet what the best way is to handle it. On the one hand I agree that when the deadline is close you must make the code <em>work</em>. As long as it performs well, is secure and fulfills all requirements you are fine. If the deadline is still a week away, you should code with repetition in mind, though. Avoid it at all costs, or else it could lose you many hours, which may in turn cost you the deadline.</p>
+<h2>Conclusion</h2>
+<p>Make reusability easy. Try to build up an environment that lets you reuse and alter information easily. If something is not easy, people will not use it. Think about it.</p>
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfd-ac70-4f1b-907b-4eb4cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fproblems-with-repeatitive-source-code-or-better-dont-repeat-yourself%3A480f4dfd-ac70-4f1b-907b-4eb4cbdd56cb &amp;title=Problems+with+repetitive+source+code+or+better%3A+Don%27t+repeat+yourself';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fproblems-with-repeatitive-source-code-or-better-dont-repeat-yourself%3A480f4dfd-ac70-4f1b-907b-4eb4cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fproblems-with-repeatitive-source-code-or-better-dont-repeat-yourself%3A480f4dfd-ac70-4f1b-907b-4eb4cbdd56cb&amp;title=Problems+with+repetitive+source+code+or+better%3A+Don%27t+repeat+yourself&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fproblems-with-repeatitive-source-code-or-better-dont-repeat-yourself%3A480f4dfd-ac70-4f1b-907b-4eb4cbdd56cb&amp;title=Problems+with+repetitive+source+code+or+better%3A+Don%27t+repeat+yourself';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/learning-from-the-cakephp-source-code-part-ii:480f4dd6-57fc-4715-8709-439acbdd56cb">Learning from the CakePHP source code - Part II</a></li>
+							<li><a href="/posts/problems-with-base-path-in-layouts-when-using-plugins:480f4dd5-0060-4557-a1b2-4f4fcbdd56cb">Problems with base Path in Layouts when using Plugins</a></li>
+							<li><a href="/posts/should-i-refactor-this-piece-of-code:480f4dd6-eafc-4fd3-9302-4f44cbdd56cb">Should I refactor this piece of code?</a></li>
+							<li><a href="/posts/i-will-insult-your-code!:48ac91d1-ca78-4e95-ad66-1e854834cda3">I will insult your code!</a></li>
+							<li><a href="/posts/amazon-associates-api-data-source-for-cakephp:4891ecd6-0330-47c7-b338-0dd34834cda3">Amazon Associates API (data source) for CakePHP</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/The_open_source_business_model:4aab63c1-bf9c-42e8-be7e-5607cbdd56cb">The open source business model</a></li>
+							<li><a href="/posts/php-code-generator:48d2112f-53b4-4a15-b6c5-5d5f4834cda3">PHP code generator</a></li>
+							<li><a href="/posts/learning-from-the-cakephp-source-code-part-i:480f4dd6-28d0-445e-a1dc-4ceacbdd56cb">Learning from the CakePHP source code - Part I</a></li>
+							<li><a href="/posts/quitting-open-source:4bb448b6-6414-45a3-a282-16c7cbdd56cb">Quitting open source</a></li>
+							<li><a href="/posts/how-design-patterns-solve-problems:480f4dfd-ca2c-4ba6-bdd1-4814cbdd56cb">How Design Patterns solve Problems</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/problems-with-repeatitive-source-code-or-better-dont-repeat-yourself:480f4dfd-ac70-4f1b-907b-4eb4cbdd56cb">3 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/problems-with-repeatitive-source-code-or-better-dont-repeat-yourself:480f4dfd-ac70-4f1b-907b-4eb4cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dff-d008-41ba-b497-4a29cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.poolsuppliesa2.info/?f=Hayward+Pro+Series+24+Inch+In+Ground+Pool+Sand+Filter" rel="nofollow">Hayward Pro Series 24 Inch In Ground Pool Sand Filter</a>						</strong>
+						<strong>said 
+						on Apr 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p><strong>My Thoughts On Recent Events...</strong></p>
+<p>[...] With this in mind I went on a quest to find similar sites [...]...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-8e9c-4447-948a-4c80cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://php-coding-practices.com/refactoring/principles-in-refactoring/" rel="nofollow">Principles in Refactoring | PHP-Coding-Practices.com</a>						</strong>
+						<strong>said 
+						on May 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] bigger picture. An important aspect of improving existing code is to eliminate duplication. Check Problems with repetitive source code or better: Don&#8217; t repeat yourself. The importance of this lies in future modifications to the code. The more code there is and the [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e01-8b58-4216-9d65-4be7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://php-coding-practices.com/refactoring/composing-methods/composing-methods-replace-temp-with-query/" rel="nofollow">Composing Methods: Replace Temp With Query | PHP Coding Practice</a>						</strong>
+						<strong>said 
+						on Jun 14, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Of course there are different forms of this. In one case the expression that generates the contents for the temp is free of side effects. You can simply copy that expression to the query method. Other cases are trickier.. for example if the temp is to collect a result, for example by summing over a loop, you need to copy some logic (the entire loop) into the query method. Sometimes a loop is to calculate multiple values. Here you need to duplicate the loop for each temp and then use "Replace Temp With Query" on each of them. As you can guess, there is a thin border to repetitive source code. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

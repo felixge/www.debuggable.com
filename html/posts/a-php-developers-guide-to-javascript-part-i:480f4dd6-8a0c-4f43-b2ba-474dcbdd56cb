@@ -1,0 +1,706 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>A PHP developers guide to JavaScript - Part I &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/a-php-developers-guide-to-javascript-part-i:480f4dd6-8a0c-4f43-b2ba-474dcbdd56cb">A PHP developers guide to JavaScript - Part I</a></h2>	<div class="posted-on">
+		<p>Posted on 30/12/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>after the <a href="http://www.thinkingphp.org/2006/12/17/long-time-no-post-where-ive-been-hiding/">overwhelming interest</a> in me writing a little bit about javascript on this blog, here comes my first post on that topic. It's actually the beginning of a little series (2 or 3 parts) that is going to be targeted at php developers who've only used JS by merging snippets/libraries together without really learning the language itself. For all of those posts please keep in mind that I'm mainly on the php site of town as well, but my recent trips to downtown javascript have hopefully taught me well ; ).</p>
+<h2>The JS developer toolkit</h2>
+<p>Coming from PHP you are probably spoiled with some good developer tools, especially Zend Studio or Ecplipse PHP. In javascript land there are not as many good editors out there. From the ones I've worked with I would recommend <a href="http://notepad-plus.sourceforge.net/uk/site.htm">Notepad++</a>. It's very light weight, supports numerous languages, can completely replace your windows notepad and I use it for all my JS (and CSS) needs right now. If you don't run the beautiful microsoft operating system (...) you might find <a href="http://www.aptana.com/">Aptana</a> interesting. It's based on eclipse and therefor runs on most major operating systems. It also has advanced support for code completion and some other gimmicks. Personally I don't use it because it's too memory hungry, especially when my php IDE is already opened. Other then that it's a really comfortable IDE to work with.</p>
+<p>Now that you have an editor (no matter which one) you might want to start coding right away. But you shouldn't. Not because you couldn't, but because you still lack the most important JS (and web dev) tool that is available these days: <a href="http://www.getfirebug.com/">Firebug</a>. Without any question, it is the most advanced debugging tool out there. So please take some time to get to know it's features and learn how to use it, it will make your day.</p>
+<h2>The Basics</h2>
+<p>As all of you are already familiar with coding in php, I won't start at "Hello World", but I'll try to show some important differences in JS (from PHP) and point you to some resources for further reading. The first one would be <a href="http://start.gotapi.com/">gotAPI.com</a>. If you see me using a function you are not familiar with, that's always a good place too look it up. (Side note: It also has support for the CakePHP/jQuery API).</p>
+<h3>Variables:</h3>
+<p>Just like PHP, javascript is a weakly typed language. This means you won't have to declare variable types (even so you can) and all variable types are converted to strings automatically when needed. The symbol used for gluing different strings together is '+' and not '.' like in php.</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> myVariableA = <span class="st0">'Thinking'</span>;<br />
+<span class="kw2">var</span> myVariableB = <span class="st0">'PHP'</span><br />
+<br />
+<span class="co1">// Logs: ThinkingPHP</span><br />
+console.<span class="me1">log</span><span class="br0">&#40;</span>myVariableA+myVariableB<span class="br0">&#41;</span>;</div>
+<p>Oh and in case you wonder: 'console' is no default javascript object. It's only available when using firebug (or <a href="http://www.getfirebug.com/lite.html">Firebug Lite</a>). The usual JS way to get information is to use the alert() function. But the first time you produce and endless loop with an alert in it, you'll get to appreciate the console.log function offered by Firebug ; ). Another thing you just learned is that object functions/properties are accessed via '.' (as opposed to '->' in php), but more about this later.</p>
+<h3>Arrays</h3>
+<p>The good news is, javascript has decent support for indexed arrays. The bad news is, it's lacking associative arrays (that we php folks all know and love). But don't you worry, there is a workaround to fix this.</p>
+<p>Working arrays in JS is very much like working with arrays in php. The only difference is that arrays (like everything else) in JS are actual objects not only variables containing literals. But that's a no-brainer, just have a look at the following examples:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// Note: var myArray = []; works just as well).</span><br />
+<span class="kw2">var</span> myArray = <span class="kw2">new</span> Array<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Assign three values to the array.</span><br />
+myArray<span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span> = <span class="st0">'ThinkingPHP'</span>;<br />
+myArray<span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span> = <span class="st0">'suddenly'</span>;<br />
+myArray<span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span> = <span class="st0">'thinks'</span>;<br />
+<br />
+<span class="co1">// Now to show you we are working with an object:</span><br />
+console.<span class="me1">log</span><span class="br0">&#40;</span>myArray.<span class="me1">length</span><span class="br0">&#41;</span>; <span class="co1">// Will log: 3</span><br />
+<br />
+<span class="co1">// myArray[] = 'value'; does not work in javascipt, so we have to use Array.push</span><br />
+myArray.<span class="me1">push</span><span class="br0">&#40;</span><span class="st0">'JavaScript'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Will log: ThinkingPHP suddenly thinks JavaScript.</span><br />
+console.<span class="me1">log</span><span class="br0">&#40;</span>myArray.<span class="me1">join</span><span class="br0">&#40;</span><span class="st0">' '</span><span class="br0">&#41;</span>+<span class="st0">'.'</span><span class="br0">&#41;</span>;</div>
+<p>Now without really getting to the objects part yet, the Arrays are a good example to show another default behavior of the javascript language:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// This is notation to declare an array with one or more values (comma separated)</span><br />
+<span class="kw2">var</span> varA = <span class="br0">&#91;</span><span class="st0">'Thinking'</span><span class="br0">&#93;</span>;<br />
+<span class="kw2">var</span> varB = varA;<br />
+<br />
+<span class="co1">// Push PHP at the end of array varB</span><br />
+varB.<span class="me1">push</span><span class="br0">&#40;</span><span class="st0">'PHP'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Display the results: [&quot;Thinking&quot;, &quot;PHP&quot;]</span><br />
+console.<span class="me1">log</span><span class="br0">&#40;</span>varA<span class="br0">&#41;</span>;</div>
+<p>In case the result of this little test surprises you, here is what happened: When executing 'var varB = varA;' you are not simply copying the value of variable 'varA', you are actually creating a reference to it. So if we would want to port this snippet to PHP, it would look like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$varA</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Thinking'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$varB</span> = &amp;<span class="re0">$varA</span>;<br />
+<br />
+<span class="co1">// Push PHP at the end of array varB</span><br />
+<a href="http://www.php.net/array_push"><span class="kw3">array_push</span></a><span class="br0">&#40;</span><span class="re0">$varB</span>, <span class="st0">'PHP'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Prints: Array ( [0] =&gt; Thinking [1] =&gt; PHP )</span><br />
+<a href="http://www.php.net/print_r"><span class="kw3">print_r</span></a><span class="br0">&#40;</span><span class="re0">$varA</span><span class="br0">&#41;</span>;</div>
+<p>So in case you actually wanted to create a copy of varA, this is how to do it in JS:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> varA = <span class="br0">&#91;</span><span class="st0">'Thinking'</span><span class="br0">&#93;</span>;<br />
+<br />
+<span class="co1">// Clone the array</span><br />
+<span class="kw2">var</span> varB = <span class="kw2">new</span> Array<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="kw1">for</span> <span class="br0">&#40;</span><span class="kw2">var</span> i=<span class="nu0">0</span>; i&lt;varA.<span class="me1">length</span>; i++<span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; varB<span class="br0">&#91;</span>i<span class="br0">&#93;</span> = varA<span class="br0">&#91;</span>i<span class="br0">&#93;</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+varB.<span class="me1">push</span><span class="br0">&#40;</span><span class="st0">'PHP'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Logs: [&quot;Thinking&quot;]</span><br />
+console.<span class="me1">log</span><span class="br0">&#40;</span>varA<span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Logs [&quot;Thinking&quot;, &quot;PHP&quot;]</span><br />
+console.<span class="me1">log</span><span class="br0">&#40;</span>varB<span class="br0">&#41;</span>;</div>
+<p>Of course there are ways to do this in a more elegant way by creating a clone function, but let's keep it simple for now. Let's go back to what I said at the beginning of the array section: "Javscript does not support associative arrays". Yes, this is really a bummer at first. But the workaround is fairly simple, all it takes is to use objects instead:</p>
+<h3>Objects</h3>
+<p>One of the things that really have caused my to like javascript a lot recently is the great flexibility it offers. This really shows when working with objects the first time. In PHP you think of an object as an instance of a specific (fixed) class that basically consists of functions and properties. Well this is true for objects in JS as well. They have functions and properties. Where JS is different is the way you create an object. Unlike PHP where you define types of objects as classes, in javascript you often create objects on the fly. Another important point is that JS objects often do behave like associative arrays in php as well (but they are usually called hashes in JS).</p>
+<p>Just consider the following example:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// same as var myJsObject= {};</span><br />
+<span class="kw2">var</span> myJsObject = <span class="kw2">new</span> Object<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// This looks like a typical associative array in PHP</span><br />
+myJsObject<span class="br0">&#91;</span><span class="st0">'varA'</span><span class="br0">&#93;</span> = <span class="st0">'Thinking'</span>;<br />
+myJsObject<span class="br0">&#91;</span><span class="st0">'varB'</span><span class="br0">&#93;</span> = <span class="st0">'PHP'</span>;<br />
+<br />
+<span class="co1">// But what's that? We are attaching a function to the object on the fly</span><br />
+myJsObject<span class="br0">&#91;</span><span class="st0">'ThinkingWhat'</span><span class="br0">&#93;</span> = <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// 'this' refers to the class this function resides in here. However this is not always the case in JS, more about this later.</span><br />
+&nbsp; &nbsp; console.<span class="me1">log</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">varA</span>, <span class="kw1">this</span>.<span class="me1">varB</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="co1">// Call the ThinkingWhat function</span><br />
+myJsObject<span class="br0">&#91;</span><span class="st0">'ThinkingWhat'</span><span class="br0">&#93;</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// is the same as</span><br />
+myJsObject.<span class="me1">ThinkingWhat</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>Ok, I hope you are not too confused right now. You basically have to accept that in Javascript there is no difference between the object['propery'] and object.property notation. Another good example would be the little Array snippet we've already used:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> varA = <span class="br0">&#91;</span><span class="st0">'Thinking'</span><span class="br0">&#93;</span>;<br />
+<span class="kw2">var</span> varB = varA;<br />
+<br />
+<span class="co1">// Instead of varB.push('PHP') we can write:</span><br />
+varB<span class="br0">&#91;</span><span class="st0">'push'</span><span class="br0">&#93;</span><span class="br0">&#40;</span><span class="st0">'PHP'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Display the results: [&quot;Thinking&quot;, &quot;PHP&quot;]</span><br />
+console.<span class="me1">log</span><span class="br0">&#40;</span>varA<span class="br0">&#41;</span>;</div>
+<p>Now that you know this little JS secret, it's time to show you another one. The object we created on the fly a second ago, could have equally well been written like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> myJsObject = <br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; varA: <span class="st0">'Thinking'</span>,<br />
+&nbsp; &nbsp; varB: <span class="st0">'PHP'</span>,<br />
+&nbsp; &nbsp; ThinkingWhat: <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; console.<span class="me1">log</span><span class="br0">&#40;</span><span class="kw1">this</span>.<span class="me1">varA</span>, <span class="kw1">this</span>.<span class="me1">varB</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span>;</div>
+<p>The two syntaxes are equal to one another. One of the most popular usages of the second syntax right now is <a href="http://en.wikipedia.org/wiki/JSON">JSON</a>. So if you didn't know what JSON was so far, it's simply sending javascript objects via AJAX and then eval'ing them on the client site so they can directly be accessed. However, please keep in mind that in JSON you always have to put quotes around object properties (!).</p>
+<h3>Functions</h3>
+<p>Alright, even if you've not done much JS coding so far, you've probably seen a simple JS function before:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// Logs: ThinkingPHP</span><br />
+console.<span class="me1">log</span><span class="br0">&#40;</span>ThinkingWhat<span class="br0">&#40;</span><span class="st0">'PHP'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// A simple function with one argument</span><br />
+<span class="kw2">function</span> ThinkingWhat<span class="br0">&#40;</span>what<span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// Return 'Thinking' plus the contents of the what argument</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'Thinking'</span>+what;<br />
+<span class="br0">&#125;</span></div>
+<p>Now before I'll continue and reveal javascript's dark & nasty secret about functions (don't be scared, it's actually cool once you know how to deal with it), I want to show you a little bit more about passing arguments:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// Logs: ThinkingPHP</span><br />
+console.<span class="me1">log</span><span class="br0">&#40;</span>ThinkingWhat<span class="br0">&#40;</span><span class="st0">'PHP'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Logs: Thinkungundefined (and display no error)</span><br />
+<span class="co1">// This means: Unlike in PHP, all function arguments in JS are optional on default (!)</span><br />
+console.<span class="me1">log</span><span class="br0">&#40;</span>ThinkingWhat<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// A simple function with one argument</span><br />
+<span class="kw2">function</span> ThinkingWhat<span class="br0">&#40;</span>what<span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// Return 'Thinking' plus the contents of the what argument</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'Thinking'</span>+what;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="co1">// Logs: ThinkingPHP</span><br />
+console.<span class="me1">log</span><span class="br0">&#40;</span>FreeThinking<span class="br0">&#40;</span><span class="st0">'Thinking'</span>, <span class="st0">'PHP'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw2">function</span> FreeThinking<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// In all functions the arguments object is available. It's an array </span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> arguments<span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span>+arguments<span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Alright, this should be simple to understand. The two main lessons learned here are that in JS all function arguments are optional on default, and you always have access to an arguments object inside a function. You can think of it similiar to "$arguments = func_get_args()" in PHP. Now one thing you might miss is the ability to assign default values to parameters (like you do with optional parameters in PHP). Here is what to do:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// Logs: ThinkingPHP</span><br />
+console.<span class="me1">log</span><span class="br0">&#40;</span>ThinkingWhat<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Logs: ThinkungJS</span><br />
+console.<span class="me1">log</span><span class="br0">&#40;</span>ThinkingWhat<span class="br0">&#40;</span><span class="st0">'JS'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// A simple function with one argument</span><br />
+<span class="kw2">function</span> ThinkingWhat<span class="br0">&#40;</span>what<span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// If what doesn't contain a value (that would evaluate to true) then assign 'PHP' to it</span><br />
+&nbsp; &nbsp; what = what || <span class="st0">'PHP'</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="co1">// Return 'Thinking' plus the contents of the what argument</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'Thinking'</span>+what;<br />
+<span class="br0">&#125;</span></div>
+<p>I really like the elegance this has. I know I often find myself writing if statements for checking empty variables and overwriting their contents with something else in PHP, so this is definitely a pretty cool feature of the JS language.</p>
+<p>Ok, do you still remember me talking about the JS dirty little secret about functions? Well here it comes: The things what we just have looked at as 'functions' are actually a little bit more in JS. They are fully qualified class definitions (and btw. the only way to create them). This is probably the point were PHP developers feel odd and I agree that this takes a while to get used to. Nevertheless, check out this example to see how your innocent little function becomes a class:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// Defines a class named Blog</span><br />
+<span class="kw2">function</span> Blog<span class="br0">&#40;</span>url, author<span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">url</span> &nbsp; &nbsp;= url;<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">author</span> = author;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">visit</span> = <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Redirects the user to the url of this blog</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; window.<span class="me1">location</span>.<span class="me1">href</span> = <span class="kw1">this</span>.<span class="me1">url</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="co1">// Creates an instance of the Blog class called ThinkingPHP</span><br />
+<span class="kw2">var</span> ThinkingPHP = <span class="kw2">new</span> Blog<span class="br0">&#40;</span><span class="st0">'http://www.thinkingphp.org'</span>, <span class="st0">'Felix Geisendörfer'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Logs: 'http://www.thinkingphp.org'</span><br />
+console.<span class="me1">log</span><span class="br0">&#40;</span>ThinkingPHP.<span class="me1">url</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Navigates to 'http://www.thinkingphp.org'</span><br />
+ThinkingPHP.<span class="me1">visit</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>Now as you can see the Blog function now doesn't just serve as a static function any longer. It has become the constructor and wrapper for the class Blog that contains two member variables (url and author) as well as one function (visit).</p>
+<p>One of the most powerful JS features related to classes is the prototype property. It is a list of all members any given class has and can also be used to modify already created classes (and all instances of it). You've probably heard about the <a href="http://prototype.conio.net/">Prototype framework</a> which makes extensive usage of this feature by adding new functions to already existing DOM element classes. Personally I don't use this feature very often and prefer to not modify existing objects (that's also one of the reasons I prefer <a href="http://jquery.com/">jQuery</a> over Prototype), but here is how to work with the prototype property regardless of that:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// Defines a class named Blog</span><br />
+<span class="kw2">function</span> Blog<span class="br0">&#40;</span>url, author<span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">url</span> &nbsp; &nbsp;= url;<br />
+&nbsp; &nbsp; <span class="kw1">this</span>.<span class="me1">author</span> = author;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="co1">// Creates an instance of the Blog class called ThinkingPHP</span><br />
+<span class="kw2">var</span> ThinkingPHP = <span class="kw2">new</span> Blog<span class="br0">&#40;</span><span class="st0">'http://www.thinkingphp.org'</span>, <span class="st0">'Felix Geisendörfer'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// This adds the function getAuthorFirstName to *all* Blog classes (also already created instances like ThinkingPHP)</span><br />
+Blog.<span class="me1">prototype</span>.<span class="me1">getAuthorFirstName</span> = <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// Splits the author string at ' ' and returns the first value of that array</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw1">this</span>.<span class="me1">author</span>.<span class="me1">split</span><span class="br0">&#40;</span><span class="st0">' '</span><span class="br0">&#41;</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="co1">// Logs: 'Felix'</span><br />
+console.<span class="me1">log</span><span class="br0">&#40;</span>ThinkingPHP.<span class="me1">getAuthorFirstName</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>As you can see, even so we added the getAuthorFirstName function after we created the ThinkingPHP instance of the Blog class, it's still available in the instance of it. If you wonder of the practical usage of this: I find this feature pretty useful to modify 3rd party JS classes without actually touching the source of them. Because just like you can add class members using their prototype property, you can also overwrite existing ones.</p>
+<h3>This was part I</h3>
+<p>Alright, this was the first part of my 'A PHP developers guide to JavaScript' series. I hope you guys enjoyed it and I was able to communicate the most important aspects of JS in an easy-to-understand manner. I'm sorry it took me so long to publish this, but writing this required several hours so I had to split it up over several days. If you find errors, have questions or want to suggest anything I'd appreciate a comment ; ).</p>
+<p>For Part II, I plan to cover things like scope, events, some JS coding techniques and will probably also start talking about jQuery a little bit. Meanwhile I'd recommend everybody to read Sergio Pereira's <a href="http://www.sergiopereira.com/articles/advjs.html">Quick guide to somewhat advanced JavaScript</a> which I think has a lot of good information in it and is a little bit more detailed then my post on here.</p>
+<p>Oh and before I forget: A Happy New Year to all of you! (Sorry I didn't care enough about Christmas to send out a greeting ^^). And also Happy Birthday to Daniel's <a href="http://cakebaker.42dh.com/">cakebaker blog</a> that <a href="http://cakebaker.42dh.com/2006/12/29/cakebaker-is-one-year-old/">just turned 1 year old</a>!</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-8a0c-4f43-b2ba-474dcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-php-developers-guide-to-javascript-part-i%3A480f4dd6-8a0c-4f43-b2ba-474dcbdd56cb &amp;title=A+PHP+developers+guide+to+JavaScript+-+Part+I';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-php-developers-guide-to-javascript-part-i%3A480f4dd6-8a0c-4f43-b2ba-474dcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-php-developers-guide-to-javascript-part-i%3A480f4dd6-8a0c-4f43-b2ba-474dcbdd56cb&amp;title=A+PHP+developers+guide+to+JavaScript+-+Part+I&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-php-developers-guide-to-javascript-part-i%3A480f4dd6-8a0c-4f43-b2ba-474dcbdd56cb&amp;title=A+PHP+developers+guide+to+JavaScript+-+Part+I';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/javascript-meetup-berlin-slides:4b4d98bc-034c-451d-b8f1-5377cbdd56cb">JavaScript Meetup Berlin + Slides</a></li>
+							<li><a href="/posts/learning-from-the-cakephp-source-code-part-i:480f4dd6-28d0-445e-a1dc-4ceacbdd56cb">Learning from the CakePHP source code - Part I</a></li>
+							<li><a href="/posts/ten-simple-tricks-that-will-make-you-a-valuable-colleague-part-i:480f4dfe-dfe0-44f3-9af7-46a0cbdd56cb">Ten Simple Tricks That Will Make You A Valuable Colleague, Part I</a></li>
+							<li><a href="/posts/javascript-meetup-hamburg-slides:4b8f9986-4e64-4755-b420-074dcbdd56cb">JavaScript Meetup Hamburg + Slides</a></li>
+							<li><a href="/posts/relative-urls-in-javascript:48cd078b-46e4-4995-903a-0ed74834cda3">Relative urls in JavaScript</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/how-to-group-by-in-cakephps-new-release-part-2:4850d2c9-edbc-4f0e-9e0e-07d64834cda3">How to Group By in CakePHP&#039;s new release Part 2</a></li>
+							<li><a href="/posts/unit-testing-in-cakephp-part-1---introduction-to-unit-testing:48102610-c5d0-4398-a010-76974834cda3">Unit Testing in CakePHP Part 1 - Introduction to Unit Testing</a></li>
+							<li><a href="/posts/introduction-to-test-driven-development-tdd-part-1:480f4dfd-e8f4-4a82-923c-4625cbdd56cb">Introduction to Test-Driven-Development (TDD) - Part 1</a></li>
+							<li><a href="/posts/7+8===7-in-javascript:4acba016-d204-489b-b5a0-1fd0cbdd56cb">7 + 8 === 7 in JavaScript</a></li>
+							<li><a href="/posts/passing-controller-variables-to-your-javascript:48b4f0c6-c718-47b2-bca1-05794834cda3">Passing controller variables to your JavaScript</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/a-php-developers-guide-to-javascript-part-i:480f4dd6-8a0c-4f43-b2ba-474dcbdd56cb">18 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/a-php-developers-guide-to-javascript-part-i:480f4dd6-8a0c-4f43-b2ba-474dcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4de3-4230-4b99-88c7-43b8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f4112f3023c643bf2f7b32c9c5dcfcba&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakebaker.42dh.com" rel="nofollow">Daniel Hofstetter</a>						</strong>
+						<strong>said 
+						on Dec 30, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for this informative post (and the gratulations). Is that correct, that you have to remove the console.log statements if you put the scripts live?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-611c-4c27-ab1f-4e28cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=720a677756da76903bec783c6534a0b2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://divinedominion.art-fx.org" rel="nofollow">Christian Tietze</a>						</strong>
+						<strong>said 
+						on Dec 30, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wow Felix, this post is a pretty cool introduction to JS! I understand the "language quirks" a lot better now and don't have to read lots of tutorials which show me how to show "Hello World" or the basics of programming.</p>
+<p>I really like this article the way it is :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-4854-4b48-819e-44cbcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Dec 30, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Daniel: Well if you target browsers other then FF with Firebug installed then yes, you should probably remove them ; ). But if you don't want to do this, you can either include Firebug lite (http://www.getfirebug.com/lite.html), a JS script that will provide the console for other browser, or you can also write your own log function like this:</p>
+<p>if (!console || !console.log)<br />
+{</br><br />
+    var console =</br><br />
+    {</br><br />
+        log: function()</br><br />
+        {</br><br />
+            alert(arguments.join(', '));</br><br />
+        }</br><br />
+    }</br><br />
+}</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-0f64-48ca-ba73-4804cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6fd8e5b2b94939dc059a0a9c83b97582&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.chnorton.com.au" rel="nofollow">Chris Norton</a>						</strong>
+						<strong>said 
+						on Dec 30, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Kudos on a great little introduction! I've been dabbling in Javascript a nit lately so this post was timely for me.</p>
+<p>I must say, I've used Notepad++ as my primary text editor almost a year now and I love it. In fact, when I moved to Linux several months ago I tried out Wine (www.winehq.com) just to see if I could get it running! For those interested: yes, it runs fine under Linux + Wine. :)</p>
+<p>As for Aptana I think it is a great editor and has plenty of features to make me want to use it (eg. FTP sync, code templates, CVS/Subversion integration) but unfortunately it is completely unstable (at least with Ubuntu 6.10 running Java 1.5) which makes it unusable. Hopefully this problem will clear up soon and I can give it a real test run.</p>
+<p>I'm looking forward to reading the next articles in the series!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-9894-46b3-b32e-4146cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f2b8a45c5431b462a8a038c975397e35&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.tommmy.de" rel="nofollow">Tom</a>						</strong>
+						<strong>said 
+						on Dec 30, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks a lot Felix, in Austria there's a charity called "Licht ins Dunkel", thats the same you did with the JS thingy to my brain ;)</p>
+<p>PS: Is there a digg story i'd love to push?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-f454-41c1-b9ec-4ca4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=40588c000288726274fab3ef56b71245&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							DingoNV&nbsp;						</strong>
+						<strong>said 
+						on Dec 30, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>thanks felix!<br />
+i suddenly feel the ice of javascript objects melting away quickly ;)</br><br />
+my understanding of JS objects has just jumped the fence to teh enlightened side.</br><br />
+I can't wait for parts 2 and 3, and teh firebug recommendation was definitely a huge help too!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-db08-4ec6-8c28-4ef3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=42c5bbf957f3ac0385fb5694d40992ef&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.wizardworx.co.za" rel="nofollow">Mladen Mihajlovic</a>						</strong>
+						<strong>said 
+						on Dec 31, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Felix that's great, thanks. I really like how you explain these things in a very simple and easy to understand way.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-4d9c-4690-b198-4e54cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a03537ac14581e7c2de772104d21ba39&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.blog.mediaprojekte.de" rel="nofollow">MP:Schorsch</a>						</strong>
+						<strong>said 
+						on Dec 31, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>great .. it took me a while to find this stuff out after i started with jQuery half a year ago. So this will definitly be of great use for JS Beginners</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-a0d0-4c39-82d3-4d22cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Dec 31, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>MP:Schorsch: Yeah, I didn't know much JS before jQuery either. When playing around with prototype before, I picked up some knowledge but not too much. The amazing elegance of jQuery was what finally made me really interested in JS and I learned a lot by just reading the jQuery source code (even so it tends to be a little cryptic for compression reasons sometimes).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-4074-42b4-9172-4ac4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3eda6fcd3204ef285fa52176c28c4d3e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							anonymous&nbsp;						</strong>
+						<strong>said 
+						on Jan 02, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>s/getAuhtorFirstName/getAuthorFirstName/</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-4ee0-40d6-8eaa-4c09cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 02, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey anonymous, I initially wasn't sure if your comment was SPAM but a closer look at it made me recognize that you compressed your communication efforts and pointed out a typo in my post ; ). Thanks for that.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-7cf0-4888-88cd-4b97cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5afbce93808315f4a1e29138773adecd&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.phpmystery.com" rel="nofollow">Nima</a>						</strong>
+						<strong>said 
+						on Jan 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I eagerly waiting for other parts, your article save my time alot.<br />
+Thanks.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-4f80-493b-a807-4464cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0fb7bf247eeb935b5e955693f14b8d12&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							konqueror user&nbsp;						</strong>
+						<strong>said 
+						on Jan 05, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>whats good:</p>
+<p>It's a nice approach to compare php and js syntax. Both languages are somehow depening on each other more and more every day.<br />
+Everything is explained in a simple way, definately the way one must talk to php programmers.</br></p>
+<p>whats bad:</p>
+<p>Is that an article on javascript or an advertisement for some firefox XUL debugger tool ? </p>
+<p>In this article, the code snippets are useless unless the reader has the same configuration as the writer. That's a big mistake a lot of web-designers do .. believing the whole world is like their own screen ... billions of coulours and huge monitor.</p>
+<p>Please provide a substitute to this console stuff in your examples, this article just confused me into downloading and compiling some crappy crippled commercial version of FF, just because of a buggy-console-that mixes-css/js/xml-warnings-all-together appears to be mandatory in the examples .. </p>
+<p>next try it'd be nice not to confuse your readers introducing XUL apps calls in your JS/PHP example ...  or call it "A PHP developers guide to JavaScript/XUL - Part I"</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-6384-4939-9077-4151cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 05, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey konqueror user,</p>
+<p>thanks for your feedback. I wrote this article on a 17" screen with 1024x768 so I might not fit the typical web developer with real world blindness clichee. It's true that all code posted here depends on the console.log() funtion, but right after the first code snippet I explained what it was, how to use it *without* Firebug (Firebug Lite, a JS snippet to simply include) and I also mentioned that alert() is the usual way for output things in JS.</p>
+<p>Now I agree that it might not be a good idea to confront somebody new to programming and JS by depending on an XUL tool for FF, but that's not my target audience. My audience are people who have a good understanding for php programming, web development and most of them (71%) use Firefox as their main browser. And Firebug itself is a truly exceptional and amazing web development tool, I cannot see how anybody would not prefer it over polluting his code with alert() statements. But I'll try to be more clear about the things I said above in my next post, because I certainly didn't mean to make anybodies life harder with the console.log() stuff, I just thought that's one of the things I wished to have had from day 1.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-063c-4729-b3cf-4391cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2007/01/22/how-to-properly-create-a-model-instance-manually/" rel="nofollow">ThinkingPHP and beyond &raquo; How to properly create a Model in</a>						</strong>
+						<strong>said 
+						on Jan 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] sorry for my low activity on here again. The 2nd part of my A PHP developers guide to JavaScript series is in the works but I might need some more days to finish it since I'm still very busy. I've just done 2 little side projects next to my big client project and I'm also working hard on releasing my first own web application (it's still secret - somewhat) so there was little time for blogging. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de8-0f14-46a0-a7b7-4d4ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=81cd57eb288a536f76dea229cb5bab45&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.octabox.com" rel="nofollow">Eran Galperin</a>						</strong>
+						<strong>said 
+						on Apr 26, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>In JavaScript, Objects can (and should) be used as associative arrays. There's a blog on the subject by Andrew Dupont - here http://www.andrewdupont.net/2006/05/18/javascript-associative-arrays-considered-harmful/</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489f4cb1-fa48-44a9-88ef-17c74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=aecc45690938d3d129a63aeb2b5eaedb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.napalmriot.com/" rel="nofollow">Spot</a>						</strong>
+						<strong>said 
+						on Aug 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix,</p>
+<p>This is exactly what I have been looking for. Something to learn JS by anchoring it to my PHP experience. Just wonderful.</p>
+<p>Where are the other two?! Please!! :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49704ecb-892c-4bb5-b6e8-77ec4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b7967e8559eaa536022220598b1e569f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							saran&nbsp;						</strong>
+						<strong>said 
+						on Jan 16, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>how can access php variables into java file?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

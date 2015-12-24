@@ -1,0 +1,587 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Wildflower, a CakePHP CMS &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/wildflower-a-cakephp-cms:48d7a0d6-ce78-4a2a-bf48-262a4834cda3">Wildflower, a CakePHP CMS</a></h2>	<div class="posted-on">
+		<p>Posted on 22/9/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>This is a <strong>guest post</strong> by Róbert "klevo" Starší, developer of the <a href="http://wf.klevo.sk/">open source CakePHP CMS wildflower</a>. I came across the project a few weeks ago and really liked what I saw. So I contacted Róbert to see if he was interested in writing a little post about it. He said yes, and here is what I think will be an excellent read for anybody working on CMS systems in CakePHP.</p>
+<p>-- Felix Geisendörfer aka the_undefined</p>
+<h3>Wildflower, a CakePHP CMS</h3>
+<p>There are hundreds of PHP Content Management Systems. Why would a decently earning freelancer, hacking Wordpress to fit any clients need decide to write one from scratch? The reason is CakePHP. When I picked up CakePHP it was a little revolution. The quality of my apps got better, I growed a lot as a coder thanks to it and I did stuff faster. But when the time to build a relative simple client site came, I always resorted to Wordpress. You know the classic requirements: content managed pages, some news section. Every client also throws something specific into the mix, like a booking form, availability calendar a page pulling RSS from somewhere... I always had a hard time coming back from happy baking to plugin fixing and hacking together procedural PHP. Don't get me wrong, Wordpress is great and it has and will have it's huge user base. But we Cakers know better, don't we?</p>
+<p>So what does a programmer do when he's not comfortable with the tool he uses? He programs a new one. It's slightly more than a year that I started a project called <a href="http://wf.klevo.sk/">Wildflower</a>. The tag line is A CakePHP CMS.</p>
+<h3>What's in the box?</h3>
+<p>The currently released version is 1.2 Beta. It has many similarities to the status of CakePHP 1.2 branch. It's not finished, but I use it in production and with success. Stuff gets fixed along the way, depending on the real world requirements. You get the classic components that you would expect in a CMS:</p>
+<ul>
+<li>Content managed pages</li>
+<li>Blog (or posts) with categories and comments</li>
+<li>Contact form with messages archive</li>
+<li>File manager</li>
+<li>User accounts</li>
+</ul>
+<p>Under the hood runs CakePHP 1.2 and I permanently update it with the latest revision. A picture is worth a thousand words:</p>
+<p><img src="http://static.thinkingphp.org/img/wildflower/1.2beta-page-edit.png" alt="Wildflower page edit" /></p>
+<p><img src="http://static.thinkingphp.org/img/wildflower/1.2beta-posts.png" alt="Wildflower posts list" /></p>
+<h3>The user interface</h3>
+<p>I think the user interface is the most important part from your clients perspective. You don't want to explain how to post a page. I actually prefer zero explanation. So it must be very intuitive. When designing it my inspiration was the stuff from Apple and 37signals. So far, I've got very positive reactions. We'll see as the user base grows. As everything, it will constantly get better based on the input.</p>
+<h3>The developer experience</h3>
+<p>Since I was building this tool for myself, I wanted it to help me with my work as much as possible. So I baked in a few things to help with some less exciting aspects of developing.</p>
+<p>When you move your site from the development machine to a real domain or from a folder to a sub-folder, etc., there's zero work involved. No running trough a SQL dump and replacing localhost with mysite.com. This is also true for the database config. You can define all the configurations for all the machines the app runs on and they are switched automatically based on the current domain name. By uncommenting one line in the root .htaccess file you switch your site to 'offline' mode, so you can safely deploy a new version.</p>
+<p>These are details. But together they can save time.</p>
+<h3>jQuery Light MVC [JLM]</h3>
+<p>If you check the <em>install-dir/wildflower/jlm</em> directory, you'll notice a familiar directory structure there. Inside is a bunch of JavaScript files to be found. This is my approach to the problem of JavaScript code separation and organization.</p>
+<p>JLM is in it's core a standalone jQuery plugin, providing binding of your JS code to Cake actions. It provides a set of helper functions too. Combined with the <em>assets_controller</em>, it allows a very comfortable JavaScript templating, based on the <a href="http://code.google.com/p/trimpath/">Trimpath</a> library. Browse the <em>install-dir/wildflower/jlm/views</em> to get a picture. JLM is used excusively in the admin interface for all the fancy JavaScript stuff.</p>
+<p>Another feature of the <em>assets_controller</em> is the ability to use Cakes internalization function <code>__()</code> in your JavaScript files. Any string you want to be parsed by this function you enclose in a <code>&lt;l18n&gt;</code> tag. This works globaly for all the JLM files.</p>
+<p>If this sound a little crazy to you, don't be afraid. You're not locked into this. You can do your JS on your Wildflower powered sites the way you want.</p>
+<p>The bad news is there is zero documentatio for this at the moment. With the exception of code documentation, which I try to write as much as possible in the whole project.</p>
+<h3>Roadmap</h3>
+<p>The current goal is to polish the 1.2 version and make a great stable release. This includes the move to a CakePHP plugin architecture. Currently I am using the Cake's additional MVC paths feature, defined in bootstrap.php. This approach makes it a little trickier to merge Wildflower with an existing CakePHP application.</p>
+<p>Internalization could or could not make it to the final 1.2 release. There is one company working on this with me, but I haven't seen any code from them yet. The documentation also needs to be looked at as soon as possible.</p>
+<h3>Who's responsible</h3>
+<p>My name is Róbert "klevo" Starší and I am freelance web developer from a small European country - Slovakia. I do this for a few years and I really enjoy the ride. Along the way I've touched the dark side of ASP.NET, been riding Rails and deployed a million Wordpress sites. Currently I am exploring (thanks to <a href="http://tennismanager.sk/">this project</a>) the often forgotten database alternative - PostgreSQL and I am really starting to wonder why we use MySQL all the time.</p>
+<h3>Get involved</h3>
+<p>Help is welcome. Critique is welcome too. The easiest way to help this project is to try the CMS for yourself and <a href="http://code.google.com/p/wildflower/issues/list">report any bugs or enhancements</a> you find along the way. You can also join the core team, which currently consist of <a href="http://klevo.sk">me</a>. But first make your homework and submit some great patches. Then I'll gladly give you the SVN access. The point is however, to keep the code quality at least at the current level. Another important thing is to follow the projects coding style.</p>
+<h3>Links</h3>
+<ul>
+<li><a href="http://wf.klevo.sk/">Wildflower home page</a></li>
+<li><a href="http://code.google.com/p/wildflower/">Google Code project page</a>, including the SVN repository and bug reporting</li>
+<li><a href="http://forums.wf.klevo.sk/">Forums</a></li>
+</ul>
+<p>Thanks to Felix for making this guest post happen.</p>
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/48d7a0d6-ce78-4a2a-bf48-262a4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwildflower-a-cakephp-cms%3A48d7a0d6-ce78-4a2a-bf48-262a4834cda3 &amp;title=Wildflower%2C+a+CakePHP+CMS';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwildflower-a-cakephp-cms%3A48d7a0d6-ce78-4a2a-bf48-262a4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwildflower-a-cakephp-cms%3A48d7a0d6-ce78-4a2a-bf48-262a4834cda3&amp;title=Wildflower%2C+a+CakePHP+CMS&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwildflower-a-cakephp-cms%3A48d7a0d6-ce78-4a2a-bf48-262a4834cda3&amp;title=Wildflower%2C+a+CakePHP+CMS';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/how-to-do-group-by-conditions-in-model-find()-calls:483fdc1c-8454-4593-a55e-37244834cda3">How to do Group By conditions in Model find() calls in the CakePHP RC1</a></li>
+							<li><a href="/posts/screencast-using-vendor-branching-and-cakephp:480f4dd6-6cac-44cb-b685-4d6bcbdd56cb">Screencast #1: Using vendor branching and CakePHP</a></li>
+							<li><a href="/posts/berlin-cakephp-meetup-next-friday-jan-30:497859a4-7460-4177-ba2e-46fd4834cda3">Berlin CakePHP Meetup, Next Friday (Jan 30)</a></li>
+							<li><a href="/posts/cakephp-1.2-stable-come-and-help:4829b3ac-903c-4f56-94dc-27af4834cda3">CakePHP 1.2 Stable! Come and help</a></li>
+							<li><a href="/posts/job-interested-in-working-on-a-huge-cakephp-project:480f4dd6-55b4-43ae-9e63-491dcbdd56cb">[Job] Interested in working on a huge CakePHP project?</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/how-to-execute-only-specific-test-methods-in-cakephp-unit-tests:4858fa7b-7194-4652-9c7f-47784834cda3">How To Execute Only Specific Test Methods in CakePHP Unit Tests</a></li>
+							<li><a href="/posts/3000-candles-on-the-cakephp-cake:480f4dd5-01f8-40e6-9acc-413bcbdd56cb">3000 candles on the CakePHP cake</a></li>
+							<li><a href="/posts/cakephp-html-balancer-helper:4944c48d-7440-4f9d-8638-6e4b4834cda3">Cleaning Html with this HtmlCleaner for CakePHP</a></li>
+							<li><a href="/posts/cakephp-pluralize-helper:480f4dfe-fbf8-464a-95da-4764cbdd56cb">CakePHP Pluralize Helper</a></li>
+							<li><a href="/posts/cakephp-authsome-debuggable-s-xmas-gift:4b34b4e6-9ca4-4673-bea6-4776cbdd56cb">CakePHP Authsome - Debuggable&#039;s Xmas Gift</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/wildflower-a-cakephp-cms:48d7a0d6-ce78-4a2a-bf48-262a4834cda3">24 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/wildflower-a-cakephp-cms:48d7a0d6-ce78-4a2a-bf48-262a4834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-48d7b9ca-127c-4d58-ba4e-7d5d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d54b56a3a893b983fffbb8381de9890b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.matsimitsu.nl" rel="nofollow">Matsimtisu</a>						</strong>
+						<strong>said 
+						on Sep 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thank you for creating this great CMS!<br />
+I've used it for a customer and he's really happy about it.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d7c5a8-2c9c-4bbc-aedf-6cce4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ee19521b6ffa4187371641b6e409d9bc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Daniel Watson&nbsp;						</strong>
+						<strong>said 
+						on Sep 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>We have been debating between using wildflower on our next site upgrade or integrating Wordpress somehow as a plugin. I'm leaning towards wildflower.  Thanks for such a great app.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d7f5a9-c60c-4ce2-84bf-4de94834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=edfc4a8478edaf01fe35371a5e895ff4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Khaled&nbsp;						</strong>
+						<strong>said 
+						on Sep 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'm looking for such a project for a while, sure I'll try it very soon. BTW, Felix is "drake" still alive?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d80add-f530-4e29-81c2-65c24834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9a41db71338d383202578de4ba3a8276&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://loudbaking.myeasyscripts.com" rel="nofollow">JadB</a>						</strong>
+						<strong>said 
+						on Sep 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice looking CMS! I quickly hit the download to check how the code is, one thing that directly struck me was your choice of not using the AuthComponent for the authentication/authorization but instead your own simplistic model method. There is nothing wrong with going simple but if you are aiming at having CakePHP devels to be using it with their current apps, don't you think it should embrace the general way of doing things?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d8800f-e690-4950-b3ba-25b04834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=aed4764c437801c47c596131f070e44e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://marcgrabanski.com" rel="nofollow">Marc Grabanski</a>						</strong>
+						<strong>said 
+						on Sep 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It would be great to someday have a stable, elegant CMS system built on CakePHP that competes with Wordpress. Nice work.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d88567-49c8-4c2d-b792-57bd4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a4d64bc52fe24677bacd604d01f487aa&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							paulus&nbsp;						</strong>
+						<strong>said 
+						on Sep 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great to see wildflower getting some space on debuggable. I have been watching wildflower for a while, as I have too been striving to create a good little cms plugin package in cake. One day i mite actually get to finish it! </p>
+<p>Anyway, good job on wildflower, some interesting work!!!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d8b110-36bc-4423-8737-552d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5bf3d56fbce3df494d829d4a4e860521&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://klevo.sk" rel="nofollow">klevo</a>						</strong>
+						<strong>said 
+						on Sep 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@JadB: The AuthComponent will be integrated soon. I totally agree with you.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d90c61-7358-483d-a419-2f724834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4741574f03892c61d2b0fea7977c6563&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://fornicode.com/" rel="nofollow">b-rye</a>						</strong>
+						<strong>said 
+						on Sep 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks a million, Felix (and Klevo),</p>
+<p>I have to say over the last year or so I've really benefited from your work.  I definitely can attest that you're succeeding with your motto: We want to help people. We want to make them more productive, knowledgeable and enjoy the work they do a lot more than they do now.   </p>
+<p>(So if you need a testimonial for a TV commercial I'll be happy to do it for free :) ) </p>
+<p>Please, please keep up the excellent (and very generous) work!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48da6eb9-6cc0-4ade-9577-245e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c35b71991703e62a8dfdb6eb404539c7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							sams&nbsp;						</strong>
+						<strong>said 
+						on Sep 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wildfower is filed with benefical features; Its a great use of cake blended together with other wholesome ingredients.  Its a nutritious and tasty!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48daad3b-9554-48cf-9c87-6f994834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b3cd66de50ee4997396c3c08f7fd8f78&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.svest.org" rel="nofollow">Stoyan Kyosev</a>						</strong>
+						<strong>said 
+						on Sep 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I looked at the source code. It appears to be well-arranged and clean. But from the code-design point of view I did't like the fact that there is no clean separation between admin and front. Both share the same controllers and the same view folders. From my personal experience it is very important to separate the backend and the frontend as different modules as the complexity of their logic grows with the growth of the application itself. Also it happens often that one developer works on the backend, another on the front end.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48daaedb-5630-4e19-8847-7d014834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=29e2d6431d4a86cdc18df0dd4c699a38&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://zeroasterisk.com/" rel="nofollow">Alan Blount</a>						</strong>
+						<strong>said 
+						on Sep 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I love seeing good quality, open source, cakephp applications... very useful for developers to see other developer's work.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48dcb560-6184-41a1-a027-1dbd4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=642716638958259c02825da648879e72&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://srganesan.wordpress.com" rel="nofollow">srganesan</a>						</strong>
+						<strong>said 
+						on Sep 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great job Felix its very use ful for developers :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48dccada-97ec-4de1-af88-2ca94834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>srganesan: This is Roberts work, not mine ; )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48dd52d7-ec18-4c74-9128-5dee4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e0a3d8bad3526a207b8234539681cd8e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.steveoliveira.com" rel="nofollow">Steve</a>						</strong>
+						<strong>said 
+						on Sep 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This looks awesome. I'll be trying it out tonight.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48e0703e-a544-4e26-8923-36724834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=dc7b52dc8eeec4ff6a10626d587c974a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Linked&nbsp;						</strong>
+						<strong>said 
+						on Sep 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Downloaded and tried this before and I have learned a lot of cake 'best practice' from examining its code. This has been a big help for me for my first major cake project.</p>
+<p>Is multi site capability part of the future release? I need a CMS capability for my app and I'm currently integrating my cakeapp to wordpress mu.</p>
+<p>By the way, thank Robert for sharing this project, and Felix for supporting it. :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48e3b3af-9658-43e3-8593-2e184834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99d6b29335be4b038d6330c9d08fe507&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://hedensatriya.info" rel="nofollow">Heden</a>						</strong>
+						<strong>said 
+						on Oct 01, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>big thanks</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48e4d159-d550-4ae2-a914-6c6c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a2b0c331d3c603339eb3920e5909d6fc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dumitru&nbsp;						</strong>
+						<strong>said 
+						on Oct 02, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great job, dude! It's the best thing running on CakePHP I ever found! Keep developing it! Maybe someday it will became better then Wordpress and Drupal...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48e81e31-a6c8-43ad-bbe5-24fb4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8a84c0c1454c4090af45e54c474ed231&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Alit Atmaja&nbsp;						</strong>
+						<strong>said 
+						on Oct 05, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Robert,</p>
+<p>Thanks for the idea and the work.<br />
+I haven't try it yet. But This will help a lot (I think so).</br><br />
+Already download the beta version.</br></p>
+<p>WF rocks!!!</p>
+<p>Cheers,<br />
+ketut</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49689425-add0-41d4-a838-6e974834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c0a7f95ff53c679bff1739e6baa89740&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Eye&nbsp;						</strong>
+						<strong>said 
+						on Jan 10, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi !</p>
+<p>Thanks for the work.<br />
+Could you tell us if a new version will be released ?</br></p>
+<p>Bye !</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49999978-8808-4371-86fd-7dc34834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7f8ce120585cda3e16060a2e51c5705e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakedojo.com" rel="nofollow">Jonathan</a>						</strong>
+						<strong>said 
+						on Feb 16, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'm currently using it right now on my site and personally I love it. Its extremely well written and easy to extend.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-499cc8cf-4800-44e3-b839-35804834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2cf6c2faa41d85f3672b5cbb2d1fdc83&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.irishurls.com" rel="nofollow">Paul McClean</a>						</strong>
+						<strong>said 
+						on Feb 19, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Felix, looks impressive from the screenshots. I like the style of the backend. Keep up the great work.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-499cc90a-d8ec-45ec-8a6c-440e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2cf6c2faa41d85f3672b5cbb2d1fdc83&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.irishurls.com" rel="nofollow">Paul McClean</a>						</strong>
+						<strong>said 
+						on Feb 19, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sorry, I meant Robert :)</p>
+<p>(Don't worry Felix, you're awesome too)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49ff09e2-c3e8-44e5-8f38-7fbc4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6bd8a849d5b9ba2f1f819fec673a35f1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.grayloon.com" rel="nofollow">Gray Loon</a>						</strong>
+						<strong>said 
+						on May 04, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I downloaded Wildflower and installed it, but my install doesn't look anything like the screenshots above. Where did I screw up?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a851682-e508-4f12-9bb7-09b4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=30754feada04dc3cb78e29c4a8a5b515&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							awh&nbsp;						</strong>
+						<strong>said 
+						on Aug 14, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>did u enable mod_rewrite (rewrite module) on ur apache server?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

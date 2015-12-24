@@ -1,0 +1,362 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Title to url slug conversion &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/title-to-url-slug-conversion:480f4dd6-a398-4c76-895c-4844cbdd56cb">Title to url slug conversion</a></h2>	<div class="posted-on">
+		<p>Posted on 19/10/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p>As those of you who run a WordPress install probably already know, WP has a nice feature that converts the title of any post one writes into a more url friendly version, a so called post slug. The method it uses is pretty simple: lowercase everything, replace whitespaces with hyphens and convert non url friendly characters into ones that are. Now as I already mentioned in a post a while back, <a href="http://www.thinkingphp.org/2006/09/18/dessert-11-welcome-back-friendly-urls/">I'm using pretty url's that are RESTful</a> these days. So in the early phase of the app that I'm finishing up right now, I simply had a field called URL Slug where I had to enter this url suffix manually. But since neither I, nor the client this app will ship to are into filling in this field all the times, I made it optional and created a WP-like function for creating the url slug from the title if the field was left blank by the user.</p>
+<p>After talking to nate I decided to throw this function into a CommonComponent. It's not scrictly OOP to do so, but I had felt the need for having a namespace within CakePHP for stand-alone functions since a while, and this seemed like a reasonable candidate to go in there:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> CommonComponent <span class="kw2">extends</span> Object <br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> stringToUrlSlug<span class="br0">&#40;</span><span class="re0">$string</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$unPretty</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'/ä/'</span>, <span class="st0">'/ö/'</span>, <span class="st0">'/ü/'</span>, <span class="st0">'/Ä/'</span>, <span class="st0">'/Ö/'</span>, <span class="st0">'/Ü/'</span>, <span class="st0">'/ß/'</span>, <span class="st0">'/<span class="es0">\s</span>?-<span class="es0">\s</span>?/'</span>, <span class="st0">'/<span class="es0">\s</span>?_<span class="es0">\s</span>?/'</span>, <span class="st0">'/<span class="es0">\s</span>?<span class="es0">\/</span><span class="es0">\s</span>?/'</span>, <span class="st0">'/<span class="es0">\s</span>?<span class="es0">\\</span><span class="es0">\s</span>?/'</span>, <span class="st0">'/<span class="es0">\s</span>/'</span>, <span class="st0">'/&quot;/'</span>, <span class="st0">'/<span class="es0">\'</span>/'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$pretty</span> &nbsp; = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'ae'</span>, <span class="st0">'oe'</span>, <span class="st0">'ue'</span>, <span class="st0">'Ae'</span>, <span class="st0">'Oe'</span>, <span class="st0">'Ue'</span>, <span class="st0">'ss'</span>, <span class="st0">'-'</span>, <span class="st0">'-'</span>, <span class="st0">'-'</span>, <span class="st0">'-'</span>, <span class="st0">'-'</span>, <span class="st0">''</span>, <span class="st0">''</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> low<span class="br0">&#40;</span><a href="http://www.php.net/preg_replace"><span class="kw3">preg_replace</span></a><span class="br0">&#40;</span><span class="re0">$unPretty</span>, <span class="re0">$pretty</span>, <span class="re0">$string</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> &nbsp; <br />
+<span class="br0">&#125;</span></div>
+<p>And here comes a usage example from my application:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> admin_save<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span> &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">data</span><span class="br0">&#91;</span><span class="st0">'Page'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'url_suffix'</span><span class="br0">&#93;</span><span class="br0">&#41;</span> &amp;&amp; !<a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">data</span><span class="br0">&#91;</span><span class="st0">'Page'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'title'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">data</span><span class="br0">&#91;</span><span class="st0">'Page'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'url_suffix'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">Common</span>-&gt;<span class="me1">stringToUrlSlug</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">data</span><span class="br0">&#91;</span><span class="st0">'Page'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'title'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Well one thing I have to mention is that this function is pretty German-biased and does not contain a complete list of possible replacements. I'm sure there are characters in other languages such as French that are not URL suitable as well and can be replaced with standard latin ones too, but I'm not expert on this topic. So if you have things to add, feel free to do so.</p>
+<p>Oh and while I'm already talking about url's in CakePHP, here is another little pattern I adopted for my <a href="http://www.thinkingphp.org/2006/09/18/dessert-11-welcome-back-friendly-urls/">RESTful Url's</a>:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<a href="http://www.php.net/define"><span class="kw3">define</span></a><span class="br0">&#40;</span><span class="st0">'PAGE_HIDDEN'</span>, <span class="nu0">0</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/define"><span class="kw3">define</span></a><span class="br0">&#40;</span><span class="st0">'PAGE_PUBLISHED'</span>, <span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw2">class</span> Page <span class="kw2">extends</span> AppModel<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">'Page'</span>; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$validate</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'title'</span> =&gt; VALID_NOT_EMPTY,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'url_suffix'</span> =&gt; VALID_NOT_EMPTY,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'text'</span> =&gt; VALID_NOT_EMPTY<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw2">function</span> getUrl<span class="br0">&#40;</span><span class="re0">$page</span> = <span class="kw2">null</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$page</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$page</span> = <span class="re0">$this</span>-&gt;<span class="me1">data</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'/page/'</span>.<span class="re0">$page</span><span class="br0">&#91;</span><span class="st0">'Page'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'id'</span><span class="br0">&#93;</span>.<span class="st0">':'</span>.<span class="re0">$page</span><span class="br0">&#91;</span><span class="st0">'Page'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'url_suffix'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>As you can see I added a getUrl() function to my page Model. This can than statically be used from within the view like Page::getUrl($page); in order to create a url for HtmlHelper::link(). Now you could argue that the url logic has nothing to do with the page itself. That's correct, but because every Page has the field url_suffix in it, it becomes part of the Model and therefor I think it's ethically correct to let the Model handle the Url generation ; ).</p>
+<p>Alright, I hope this helps some folks out there, and I'd be happy to hear your thoughts on the technics I use.</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-a398-4c76-895c-4844cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftitle-to-url-slug-conversion%3A480f4dd6-a398-4c76-895c-4844cbdd56cb &amp;title=Title+to+url+slug+conversion';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftitle-to-url-slug-conversion%3A480f4dd6-a398-4c76-895c-4844cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftitle-to-url-slug-conversion%3A480f4dd6-a398-4c76-895c-4844cbdd56cb&amp;title=Title+to+url+slug+conversion&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftitle-to-url-slug-conversion%3A480f4dd6-a398-4c76-895c-4844cbdd56cb&amp;title=Title+to+url+slug+conversion';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/title-to-url-slug-conversion:480f4dd6-a398-4c76-895c-4844cbdd56cb">8 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/title-to-url-slug-conversion:480f4dd6-a398-4c76-895c-4844cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4de1-ce60-45ad-bef0-4170cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4a1e7ccf9ec98a3d31548bc415e138a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://omnibuscreative.com" rel="nofollow">ben hirsch</a>						</strong>
+						<strong>said 
+						on Oct 21, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Would be cool to have a reverse function to convert back from a slug.. But that might require a different approach to the slug making function in order to make it reversible.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-ac18-4a84-9557-43a2cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=aada563a822e75226e088412f64c8526&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							wluigi&nbsp;						</strong>
+						<strong>said 
+						on Oct 22, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>why didn't you use urlencode ?<br />
+ok it s less friendly but it sn t "German-biased"</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-cb94-47bb-8a48-434ecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 22, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>ben: The url slug does not contain all information required to convert it back into the original title, that's correct. But as I mentioned early, my url's look like /page/5:my-pretty-title, so I already have the id of the database entry, and the url slug only serves as SE food. I really do believe that you should not use titles as secondary primary keys, it's a bad idea.</p>
+<p>wluigi: I thought about using urlencode, and if it helps you feel free to add it. However, I discovered that urlencode would replace characters that don't get replaced by the browser when following a link containing them, and the reason I wrote this function was to not have %21 and similiar codes in my url, so I decided to not use urlencode at all.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-7e2c-4c5b-92d6-4d2acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8431a6d63f59ec43d37785eae8ad7d04&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Grant Cox&nbsp;						</strong>
+						<strong>said 
+						on Oct 23, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I've borrowed your implementation above for my app.  In this case it is for matching attribute names, where people may mess up case, punctuation and whitespace.  Seems to work well for the moment, except I'm thinking it might be worth removing all whitespace rather than reducing and converting to hyphens, as our users may miss out spaces altogether.</p>
+<p>/////////////////<br />
+	function title_slug( $title )</br><br />
+	{</br><br />
+		$slug = $title;</br></p>
+<p>		$bad = array(	'Š','Ž','š','ž','Ÿ','À','Á','Â','Ã','Ä','Å','Ç','È','É','Ê','Ë','Ì','Í','Î','Ï','Ñ',<br />
+					'Ò','Ó','Ô','Õ','Ö','Ø','Ù','Ú','Û','Ü','Ý','à','á','â','ã','ä','å','ç','è','é','ê',</br><br />
+					'ë','ì','í','î','ï','ñ','ò','ó','ô','õ','ö','ø','ù','ú','û','ü','ý','ÿ',</br><br />
+					'Þ','þ','Ð','ð','ß','Œ','œ','Æ','æ','µ',</br><br />
+					'"',"'",'“','”',"\n","\r",'_');</br></p>
+<p>		$good = array(	'S','Z','s','z','Y','A','A','A','A','A','A','C','E','E','E','E','I','I','I','I','N',<br />
+					'O','O','O','O','O','O','U','U','U','U','Y','a','a','a','a','a','a','c','e','e','e',</br><br />
+					'e','i','i','i','i','n','o','o','o','o','o','o','u','u','u','u','y','y',</br><br />
+					'TH','th','DH','dh','ss','OE','oe','AE','ae','u',</br><br />
+					'','','','','','','-');</br></p>
+<p>		// replace strange characters with alphanumeric equivalents<br />
+		$slug = str_replace( $bad, $good, $slug );</br></p>
+<p>		$slug = trim($slug);</p>
+<p>		// remove any duplicate whitespace, and ensure all characters are alphanumeric<br />
+		$bad_reg = array('/\s+/','/[^A-Za-z0-9\-]/');</br><br />
+		$good_reg   = array('-','');</br><br />
+		$slug = preg_replace($bad_reg, $good_reg, $slug);</br></p>
+<p>		// and lowercase<br />
+		$slug = strtolower($slug);</br></p>
+<p>		return $slug;<br />
+	}</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-6edc-4703-b8bf-4ef3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=720a677756da76903bec783c6534a0b2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://divinedominion.art-fx.org" rel="nofollow">Christian Tietze</a>						</strong>
+						<strong>said 
+						on Nov 11, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Doesn't work for me. Something with my encoding seems to be wrong, but I checked everything twice now: utf-8 is set :( Nevertheless umlauts etc. are replaced with strange characters or not replaced at all because they're handled as the strange characters that appear, don't know.  Grant Cox solution doesn't insert such chars but ö gets a instead of o :S</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dee-e3d4-44c3-88e4-4fa6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bf888894a4c60e6658c85f18f07ba87e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Chris&nbsp;						</strong>
+						<strong>said 
+						on Aug 31, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I am having the same problem.. when i am trying it in normal php file it works ok, but in cakephp when it saves to the db it saves as a a.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4959faf7-494c-4271-9c7a-0d2a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a602c2166ef832f175c8728c8f929e4a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.aqquatica.com" rel="nofollow">ignacio</a>						</strong>
+						<strong>said 
+						on Dec 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>it does not work beacuse you are using UTF8 characters. Try to convert them to ISO-8859-1 with   utf8_decode.  (ie $slug = utf8_decode($title);<br />
+ )</br></p>
+<p>and it´ll work.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a856d26-3704-4625-93c5-09b7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9bd4025ab3c352e5129f67ab5f1be8b5&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://iphoneitalia.com" rel="nofollow">Nico</a>						</strong>
+						<strong>said 
+						on Aug 14, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I had the same problem as Chris and Christian and tried the solution suggested by ignacio, but still doesn't work.</p>
+<p>I solved simply by adding the HTML tag</p>
+<p>meta http-equiv="Content-Type" content="text/html; charset=UTF-8"</p>
+<p>this way encoding is correct and the script works fine.</p>
+<p>hope this helps,<br />
+cheers</br></p>
+<p>/n.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

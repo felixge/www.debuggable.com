@@ -1,0 +1,1069 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Blog &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="paging">
+	<a href="/posts/index/page:47" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:44">44</a></span> | <span><a href="/posts/index/page:45">45</a></span> | <span><a href="/posts/index/page:46">46</a></span> | <span><a href="/posts/index/page:47">47</a></span> | <span class="current">48</span> | <span><a href="/posts/index/page:49">49</a></span> | <span><a href="/posts/index/page:50">50</a></span> | <span><a href="/posts/index/page:51">51</a></span> | <span><a href="/posts/index/page:52">52</a></span> <a href="/posts/index/page:49" class="next">Next &raquo;</a></div>
+	<div class="post">
+	<h2><a href="/posts/parsing-xml-using-simplexml:480f4dfe-6a58-4a17-a133-455acbdd56cb">Parsing XML using SimpleXML</a></h2>	<div class="posted-on">
+		<p>Posted on 3/5/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Parsing XML Data with PHP's SimpleXML</p>
+<h1>Introduction</h1>
+<p>Extensible Markup Language (XML) has become the number one format for disparate systems to communicate. Its most common applications are probably the Really Simple Syndication (RSS) Feeds embraced by the blogging community - including http://php-coding-practices.com. :)</p>
+<p>One of the most significant changes made to PHP5 is the way it handles XML data. A few seamless set of XML parsing tools have been integrated directly into the language itself. The old days where us poor programmers had to use external tools and libraries are finally over! The purpose of this article is to give a closer look on one the cool new xml libraries - SimpleXML.</p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<h1>Short XML-Roundup</h1>
+<p>If you have ever worked with XHTML (Extensible Hypertext Markup Language), then you'are familiar with an application of XML, since XHTML is a reformulation of HTML4 as XML. I assume you are familiar with XML already. If not, head over to the <a href="http://w3schools.com">W3 Schools Site</a> and learn about it.</p>
+<h2>Important things in an XML Document</h2>
+<p>The most important things in an XML document are the following:</p>
+<ul>
+<li><strong>Entity:</strong> An entity is a named unit of storage. Entities can work as "variables" in an XML document. They can also be used to embed angular brackets or other characters that can normally not be part of an XML document. Entities can be included directly into the script or from en external source.</li>
+<li><strong>Element:</strong> A data object that can contain other elements or raw textual data. Elements can also feature one or more attributes.</li>
+<li><strong>Document Type Declaration</strong> A set of instructions that describes the accepted structure of the XML file. They can be embedded or externally defined.</li>
+</ul>
+<p>XML documents should be valid. That means they are well-formed (all tags are nested recursively and correctly) and they contain a Document Type Declaration (DTD). The DTD is not a requirement and in fact, you will see many documents without a DTD. You should stick to it, though. This is not a php coding best practice, but an XML one. Think about it. ;)</p>
+<h2>An Example of valid XML Documents</h2>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot;?&gt;</span></div>
+<p>The above document is only well-formed, but it is not valid. This is because it contains no DTD. Let's fix that:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot;?&gt;</span><br />
+<span class="sc3"><span class="re1">&lt;</span> !DOCTYPE message SYSTEM <span class="st0">&quot;message.dtd&quot;</span><span class="re2">&gt;</span></span></div>
+<p>Now that is a valid XML document! It is well-formed, all tags are nested correctly and it contains a DTD.</p>
+<h1>Introduction to SimpleXML</h1>
+<p>Over are the difficult days of PHP4 when external libraries had to be used to parse and change XML files. With PHP5 came a number of integrated XML libraries - one of which is SimpleXML.<br />
+True to its namestake, it provides an easy way to work with xml documents. SimpleXML, however, is geared through parsing and reading xml files and is rather inferior when it comes to alternating documents. Yes, you can alter xml documents with SimpleXML, but the dom library, among others, is far superior in this field. The good news is that you can juggle parsed xml file objects back and forth between the new built-in libraries, which makes the overall task pretty easy.</p>
+<h1>Creating an XML Document</h1>
+<p>In order to learn how to parse XML files with PHP SimpleXML, we will need a document first. For that, we simply use the current sitemap.xml file for http://php-coding-practices.com. You can view or download it from http://php-coding-practices.com/sitemap.xml.</p>
+<p>Here is an excerpt:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- generator=&quot;wordpress/2.1.1&quot; --&gt;</span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- sitemap-generator-url=&quot;http://www.arnebrachhold.de&quot; sitemap-generator-version=&quot;2.7.1&quot; &nbsp;--&gt;</span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- Debug: Total comment count: 8 --&gt;</span></span><br />
+<span class="sc3"><span class="re1">&lt;urlset</span> <span class="re0">xmlns</span>=<span class="st0">&quot;http://www.google.com/schemas/sitemap/0.84&quot;</span><span class="re2">&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T21:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>daily<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>1<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- Debug: Start Postings --&gt;</span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- Debug: Priority report of postID 55: Comments: 0 of 8 = 0 points --&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/beautifying-your-code/php-code-beautifier-tool/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T22:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>weekly<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>0.1<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- Debug: Priority report of postID 54: Comments: 2 of 8 = 0.3 points --&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/refactoring/refactoring-a-first-example/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T16:16:22+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>weekly<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>0.3<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span></div>
+<p>The document should be pretty straightforward if you are familiar with XML. It provides a number of urls that each have a location, a last modification date, a change frequency and a priority. It is used with the Google Webmaster Tools to make it easier for google to index all pages on http://php-coding-practices.com.</p>
+<h1>Loading an XML File</h1>
+<p>Let's get a head start with SimpleXML on our sitemap.xml. Create a new simplexml.php file within the same directory where you placed the sitemap.xml file. Make sure both files are in your htdocs directory somewhere so you can access the php file on your local php-enabled system. Put the following source code into the simplexml.php file:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$source</span> = <span class="st0">'sitemap.xml'</span>;<br />
+<br />
+<span class="co1">// load as string</span><br />
+<span class="re0">$xmlstr</span> = <a href="http://www.php.net/file_get_contents"><span class="kw3">file_get_contents</span></a><span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$sitemap1</span> = simplexml_load_string<span class="br0">&#40;</span><span class="re0">$xmlstr</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// load as file</span><br />
+<span class="re0">$sitemap2</span> = simplexml_load_file<span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span>;</div>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>The code is pretty straightforward. First of we use SimpleXML's simplexml_load_string function to load a previously read xml file (which got stored in a string) as a string. Secondly, we parse the xml directly from the file using simplexml_load_file(), which is faster and makes more sense.<br />
+The file could also be a path to a remote xml file, depending on your allow_url_fopen php.ini setting. Note, that both $sitemap1 and $sitemap2 are instances of the SimpleXMLElement class.</p>
+<p>SimpleXML also has an OOP-centric approach, where you can create those SimpleXMLElement objects on the fly:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$source</span> = <span class="st0">'sitemap.xml'</span>;<br />
+<br />
+<span class="co1">// load as string</span><br />
+<span class="re0">$xmlstr</span> = <a href="http://www.php.net/file_get_contents"><span class="kw3">file_get_contents</span></a><span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$sitemap</span> = <span class="kw2">new</span> SimpleXMLElement<span class="br0">&#40;</span><span class="re0">$xmlstr</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// load as file</span><br />
+<span class="re0">$sitemap</span> = <span class="kw2">new</span> SimpleXMLElement<span class="br0">&#40;</span><span class="re0">$source</span>,<span class="kw2">null</span>,<span class="kw2">true</span><span class="br0">&#41;</span>;</div>
+<p>Not much need of explanation here, except that, as you see, the constructor of the SimpleXMLElement class can receive two optional parameters. The first parameter can hold additional information on how the file should be parsed, whereas the second one informs the class that the first parameter is a path to a file instead of a string.<br />
+We left the second parameter to null at this point, because we do not need it for journey. If you are eager to learn what you can do with it, check out the <a href="http://www.php.net/manual/en/ref.libxml.php#libxml.constants">optional constants</a> you can provide as an array for the second parameter.</p>
+<h1>Accessing Children</h1>
+<p>SimpleXML is so cool and easy, because when you parse a document as we have done now, all children are stored as nodes of the SimpleXMLElement object - allowing us to access them easily. Let's look at this now:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// load as file</span><br />
+<span class="re0">$sitemap</span> = <span class="kw2">new</span> SimpleXMLElement<span class="br0">&#40;</span><span class="re0">$source</span>,<span class="kw2">null</span>,<span class="kw2">true</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$sitemap</span> <span class="kw1">as</span> <span class="re0">$url</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;{$url-&gt;loc} - {$url-&gt;lastmod} - {$url-&gt;changefreq} - {$url-&gt;priority}<span class="es0">\r</span><span class="es0">\n</span>&quot;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>The result is a great list of all urls and their sub-nodes. The drawback is here that we need to know about all the names of the nodes. If the xml document changes, we would need to change our client code, too. Let's take care of that:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$sitemap</span>-&gt;<span class="me1">children</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="kw1">as</span> <span class="re0">$child</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$child</span>-&gt;<span class="me1">getName</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="st0">&quot;:<br />
+&quot;</span>;<br />
+&nbsp; <br />
+&nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$child</span>-&gt;<span class="me1">children</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="kw1">as</span> <span class="re0">$subchild</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;---&gt;&quot;</span>.<span class="re0">$subchild</span>-&gt;<span class="me1">getName</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="st0">&quot;: &quot;</span>.<span class="re0">$subchild</span>.<span class="st0">&quot;<br />
+&quot;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Coolness! What we have done here is simply using the children() method of the SimpleXMLElement class that provides an iteration interface to iterate over all children of a node. Your output should be something like this:</p>
+<blockquote><p>
+url:<br />
+--->loc: http://php-coding-practices.com/<br />
+--->lastmod: 2007-05-02T21:51:04+00:00<br />
+--->changefreq: daily<br />
+--->priority: 1<br />
+url:<br />
+--->loc: http://php-coding-practices.com/beautifying-your-code/php-code-beautifier-tool/<br />
+--->lastmod: 2007-05-02T22:51:04+00:00<br />
+--->changefreq: weekly<br />
+--->priority: 0.1
+</p></blockquote>
+<p>Now what if you simply want to dump all xml data recursively with all children? You would not want to create 20 foreach-loops right? SimpleXML itself does not provide an easy recursive function that does that. However, we can easily do it on our own:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+displayChildrenRecursive<span class="br0">&#40;</span><span class="re0">$sitemap</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw2">function</span> displayChildrenRecursive<span class="br0">&#40;</span><span class="re0">$xmlObj</span>,<span class="re0">$depth</span>=<span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$xmlObj</span>-&gt;<span class="me1">children</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="kw1">as</span> <span class="re0">$child</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <a href="http://www.php.net/str_repeat"><span class="kw3">str_repeat</span></a><span class="br0">&#40;</span><span class="st0">'-'</span>,<span class="re0">$depth</span><span class="br0">&#41;</span>.<span class="st0">&quot;&gt;&quot;</span>.<span class="re0">$child</span>-&gt;<span class="me1">getName</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="st0">&quot;: &quot;</span>.<span class="re0">$subchild</span>.<span class="st0">&quot;<br />
+&quot;</span>;<br />
+&nbsp; &nbsp; displayChildrenRecursive<span class="br0">&#40;</span><span class="re0">$child</span>,<span class="re0">$depth</span><span class="nu0">+1</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>The recursive function is provided with a SimpleXMLElement object and a recursion depth. Then it dumps all of the object's children one by one and calls itself on the fly to process all subchilds of the current child.</p>
+<h1>Accessing Attributes</h1>
+<p>If our xml document contained attributes - for example if the urls had an id or number - we could access them as well. XML Example:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- generator=&quot;wordpress/2.1.1&quot; --&gt;</span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- sitemap-generator-url=&quot;http://www.arnebrachhold.de&quot; sitemap-generator-version=&quot;2.7.1&quot; &nbsp;--&gt;</span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- Debug: Total comment count: 8 --&gt;</span></span><br />
+<span class="sc3"><span class="re1">&lt;urlset</span> <span class="re0">xmlns</span>=<span class="st0">&quot;http://www.google.com/schemas/sitemap/0.84&quot;</span><span class="re2">&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url</span> <span class="re0">num</span>=<span class="st0">&quot;1&quot;</span><span class="re2">&gt;</span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T21:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>daily<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>1<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- Debug: Start Postings --&gt;</span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- Debug: Priority report of postID 55: Comments: 0 of 8 = 0 points --&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url</span> <span class="re0">num</span>=<span class="st0">&quot;2&quot;</span><span class="re2">&gt;</span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/beautifying-your-code/php-code-beautifier-tool/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T22:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>weekly<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>0.1<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- Debug: Priority report of postID 54: Comments: 2 of 8 = 0.3 points --&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url</span> <span class="re0">num</span>=<span class="st0">&quot;3&quot;</span><span class="re2">&gt;</span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/refactoring/refactoring-a-first-example/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T16:16:22+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>weekly<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>0.3<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span></div>
+<p>Here is how we would parse them with the first method:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// load as file</span><br />
+<span class="re0">$sitemap</span> = <span class="kw2">new</span> SimpleXMLElement<span class="br0">&#40;</span><span class="re0">$source</span>,<span class="kw2">null</span>,<span class="kw2">true</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$sitemap</span> <span class="kw1">as</span> <span class="re0">$url</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;Number: {$url['num']}: {$url-&gt;loc} - {$url-&gt;lastmod} - {$url-&gt;changefreq} - {$url-&gt;priority}<span class="es0">\r</span><span class="es0">\n</span>&quot;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Look at that array-like approach for attributes. Isn't that cool? Here is the implementation using the attributes() method of the SimpleXMLElement object:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$sitemap</span>-&gt;<span class="me1">children</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="kw1">as</span> <span class="re0">$child</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$child</span>-&gt;<span class="me1">getName</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="st0">&quot;:<br />
+&quot;</span>;<br />
+&nbsp; <br />
+&nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$child</span>-&gt;<span class="me1">attributes</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="kw1">as</span> <span class="re0">$attr</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;-&gt;&quot;</span>.<span class="re0">$attr</span>-&gt;<span class="me1">getName</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="st0">&quot;: &quot;</span>.<span class="re0">$attr</span>.<span class="st0">&quot;<br />
+&quot;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$child</span>-&gt;<span class="me1">children</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="kw1">as</span> <span class="re0">$subchild</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;---&gt;&quot;</span>.<span class="re0">$subchild</span>-&gt;<span class="me1">getName</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="st0">&quot;: &quot;</span>.<span class="re0">$subchild</span>.<span class="st0">&quot;<br />
+&quot;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Simple, isn't it?</p>
+<h1>XPath Queries</h1>
+<p>The XML Path Language (XPath) is a W3C standardized language that is used to access and search XML documents. It is used extensively in Extensible Stylesheet Language Transformation (XSLT) and forms the basis for XML Query (XQuery) and XML Pointer (XPointer). It is a query language to access specific nodes deep in the XML tree in a comfortable way.</p>
+<p>SimpleXMLElement comes with its <a href="http://www.php.net/manual/de/function.simplexml-element-xpath.php">xpath()</a> method, that does all the bulk work for us. Keep in mind that xpath() searches only within the node from which it is accessed.<br />
+If you use xpath() on the root SimpleXMLElement it searches the entire document - if you use it with a child, it searches only within the child and so on. It returns an array of SimpleXMLElement objects - even if only a single element is returned.</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$xml</span> = &lt; &lt;&lt;XML<br />
+&lt;?xml version=<span class="st0">&quot;1.0&quot;</span> encoding=<span class="st0">&quot;UTF-8&quot;</span><span class="kw2">?&gt;</span><br />
+&lt;urlset&gt;<br />
+&nbsp; &lt;url&gt;<br />
+&nbsp; &nbsp; &lt;loc&gt;http://php-coding-practices.com/&lt;/loc&gt;<br />
+&nbsp; &nbsp; &lt;lastmod&gt;2007-05-02T21:51:04+00:00&lt;/lastmod&gt;<br />
+&nbsp; &nbsp; &lt;changefreq&gt;daily&lt;/changefreq&gt;<br />
+&nbsp; &nbsp; &lt;priority&gt;1&lt;/priority&gt;<br />
+<br />
+&nbsp; &lt;/url&gt;<br />
+&nbsp; &lt;url&gt;<br />
+&nbsp; &nbsp; &lt;loc&gt;http://php-coding-practices.com/beautifying-your-code/php-code-beautifier-tool/&lt;/loc&gt;<br />
+&nbsp; &nbsp; &lt;lastmod&gt;2007-05-02T22:51:04+00:00&lt;/lastmod&gt;<br />
+&nbsp; &nbsp; &lt;changefreq&gt;weekly&lt;/changefreq&gt;<br />
+&nbsp; &nbsp; &lt;priority&gt;0.1&lt;/priority&gt;<br />
+<br />
+&nbsp; &lt;/url&gt;<br />
+&lt;/urlset&gt;<br />
+XML;<br />
+<br />
+$sitemap = new SimpleXMLElement($xml);<br />
+$results = $sitemap-&gt;xpath('url/loc');<br />
+print_r($results);<br />
+foreach($results as $location) {<br />
+&nbsp; echo $location.'<br />
+';<br />
+}</div>
+<p><strong>Important Note:</strong> The sitemap.xml file that we use doesn't seem to be liked by xpath, because it contains comments and contained a namespace on the urlset-node:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt;urlset xmlns=&quot;http://www.google.com/schemas/sitemap/0.84&quot;&gt;</span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T21:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>daily<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>1<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span><br />
+...<br />
+[/urlset]</div>
+<p>If we do not register the namespace with xpath, it will not work. For now, let's remove the namespace (xmlns="http://www.google.com/schemas/sitemap/0.84"). A way we can make XPath work alongside namespaces will be discussed later.</p>
+<h1>Modifying XML Documents with SimpleXML</h1>
+<h2>Adding elements and attributes</h2>
+<p>Prior to PHP 5.1.3, SimpleXML had no means to change an xml document, meaning it could not add or remove elements or attributes. Yes it could change their values, but the only way to add or remove elements or attributes was to export the SimpleXMLElement object to the DOM library. However, with PHP 5.1.3 the method addChild() and addAttribute() were introduced to the SimpleXMLElement object.</p>
+<p>Let's look at the addChild() method first:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$url</span> = <span class="re0">$sitemap</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'url'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'loc'</span>,<span class="st0">'http://php-design-patterns.com'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'lastmod'</span>,<span class="st0">'2007-05-02T21:51:04+00:00'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'changefreq'</span>,<span class="st0">'daily'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'priority'</span>,<span class="st0">'0.5'</span><span class="br0">&#41;</span>;<br />
+<br />
+<a href="http://www.php.net/header"><span class="kw3">header</span></a><span class="br0">&#40;</span><span class="st0">'Content-type: text/xml'</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$sitemap</span>-&gt;<span class="me1">asXML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>The addChild() method returns a SimpleXMLElement itself, to which you can add childs again. It accepts three parameters - the node's name, an optional value and an optional namespace. We will come to namespaces in a minute. </p>
+<p>Via the asXML() method of the SimpleXMLElement you can also output the entire document again, which comes in handy with the header() function to tell the browser that your script's output has to be treated as XML content. The asXML() method also accepts a file path parameter to which it can save the document. In this case it returns a boolean value indicating whether the safe operation was successful or not.</p>
+<p>The addAttribute() method is quite similar:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$url</span> = <span class="re0">$sitemap</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'url'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addAttribute</span><span class="br0">&#40;</span><span class="st0">'featured'</span>,<span class="st0">'true'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'loc'</span>,<span class="st0">'http://php-design-patterns.com'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'lastmod'</span>,<span class="st0">'2007-05-02T21:51:04+00:00'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'changefreq'</span>,<span class="st0">'daily'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'priority'</span>,<span class="st0">'0.5'</span><span class="br0">&#41;</span>;<br />
+<br />
+<a href="http://www.php.net/header"><span class="kw3">header</span></a><span class="br0">&#40;</span><span class="st0">'Content-type: text/xml'</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$sitemap</span>-&gt;<span class="me1">asXML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>.</p>
+<p>We have now added an attribute "featured" with the value "true" to our url node, as we can see in the script's output:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">....</span><br />
+<span class="sc0">&lt;url featured=&quot;true&quot;&gt;</span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-design-patterns.com<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T21:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>daily<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>0.5<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span></div>
+<p>The addAttribute() method can also receive an optional namespace.</p>
+<h2>Removing elements and attributes</h2>
+<p>While SimpleXML provides the functionality for adding childs and attributes, it does not provide a means to remove them - at least not directly via its API. However, you can remove an element with:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<a href="http://www.php.net/unset"><span class="kw3">unset</span></a><span class="br0">&#40;</span><span class="re0">$sitemap</span>-&gt;<span class="me1">url</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;</div>
+<p>This will not remove attributes from the element at the url level. You could set the attribute value to null as well, but that would not actually remove it. The attribute will only become empty. To really remove attributes and elements, you have to export your SimpleXMLElement objects to the DOM library (explained in a later article).</p>
+<h1>Working with Namespaces</h1>
+<p>The use of namespaces allows you to associate certain element and attribute names with namespaces identified by URIs. This has the benefit of avoiding naming conflicts when two elements of the same name exist, but contain different data.</p>
+<p>Our sitemap contains a namespace already - check for the string xmlns="http://www.google.com/schemas/sitemap/0.84" in the urlset node. Let's add a few more:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br />
+<span class="sc3"><span class="re1">&lt;urlset</span> <span class="re0">xmlns</span>=<span class="st0">&quot;http://www.google.com/schemas/sitemap/0.84&quot;</span><br />
+&nbsp; <span class="re0">xmlns:meta</span>=<span class="st0">&quot;http://example.com/meta/&quot;</span><br />
+&nbsp; <span class="re0">xmlns:foo</span>=<span class="st0">&quot;http://example.com/foo/&quot;</span><span class="re2">&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T21:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>daily<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>1<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/beautifying-your-code/php-code-beautifier-tool/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T22:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>weekly<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>0.1<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span><br />
+...</div>
+<p>Since PHP 5.1.3, SimpleXML has had the ability to return all namespaces declared in a document (getDocNamespaces()), return all namespaces used in a document (getNamespaces()) and register a namespace prefix used in making an XPath query (registerXPathNamespace()). Here is an example for getDocNamespaces() :</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$namespaces</span> = <span class="re0">$sitemap</span>-&gt;<span class="me1">getDocNamespaces</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$namespaces</span> <span class="kw1">as</span> <span class="re0">$key</span> =&gt; <span class="re0">$value</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;{$key} =&gt; {$value}<br />
+&quot;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>This will output</p>
+<blockquote><p>
+=> http://www.google.com/schemas/sitemap/0.84<br />
+meta => http://example.com/meta/<br />
+foo => http://example.com/foo/
+</p></blockquote>
+<p>Fair enough, our initial namespace didn't have a name, so that first line looks a bit weird. </p>
+<p>A call to getNamespaces() will return nothing, since we do not use any yet. if we used namespaces within our document, by typing something like</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt;url&gt;</span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/beautifying-your-code/php-code-beautifier-tool/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T22:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>weekly<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;meta</span> :priority<span class="re2">&gt;</span></span>0.1
+</div>
+<p>getNamespaces() would return an array of used namespaces.</p>
+<p>The tricky thing is to use namespaces and XPath with registerXPathNamespace(). The function creates a prefix/ns context for the next XPath query. In particular, this is helpful if the provider of the given XML document alters the namespace prefixes. registerXPathNamespace() will create a prefix for the associated namespace, allowing one to access nodes in that namespace without the need to change code to allow for the new prefixes dictated by the provider.</p>
+<p>Example:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$sitemap</span>-&gt;<span class="me1">registerXPathNamespace</span><span class="br0">&#40;</span><span class="st0">'c'</span>, <span class="st0">'http://www.google.com/schemas/sitemap/0.84'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$result</span> = <span class="re0">$sitemap</span>-&gt;<span class="me1">xpath</span><span class="br0">&#40;</span><span class="st0">'//c:loc'</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/print_r"><span class="kw3">print_r</span></a><span class="br0">&#40;</span><span class="re0">$result</span><span class="br0">&#41;</span>;<br />
+<span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$result</span> <span class="kw1">as</span> <span class="re0">$value</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$value</span>.<span class="st0">'<br />
+'</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Voila, our XPath query works now and lists all url locations. :]</p>
+<h1>Conclusion</h1>
+<p>We have come to the end of our little SimpleXML journey. As you see, SimpleXML is a very lightweight and easy-to-use xml parser that provides simple yet effective solutions to the most common xml needs.</p>
+<p>If you need to change an xml document, then SimpleXML is not the way to go. We will have a look at an according library for this, namely the DOM library, in a later article.</p>
+<p>Thanks for reading! Have a good one. :)<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-6a58-4a17-a133-455acbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fparsing-xml-using-simplexml%3A480f4dfe-6a58-4a17-a133-455acbdd56cb &amp;title=Parsing+XML+using+SimpleXML';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fparsing-xml-using-simplexml%3A480f4dfe-6a58-4a17-a133-455acbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fparsing-xml-using-simplexml%3A480f4dfe-6a58-4a17-a133-455acbdd56cb&amp;title=Parsing+XML+using+SimpleXML&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fparsing-xml-using-simplexml%3A480f4dfe-6a58-4a17-a133-455acbdd56cb&amp;title=Parsing+XML+using+SimpleXML';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/parsing-xml-using-simplexml:480f4dfe-6a58-4a17-a133-455acbdd56cb">43 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/parsing-xml-using-simplexml:480f4dfe-6a58-4a17-a133-455acbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/php-code-beautifier-tool:480f4dfe-523c-455a-a2c9-4c6fcbdd56cb">PHP Code-Beautifier Tool</a></h2>	<div class="posted-on">
+		<p>Posted on 1/5/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Today I discovered a good tool for beautifying existing PHP Code. It works via a web interface. You can either upload a script or directly input it. The code is beautified according to the PHP PEAR Standard Requirements. It does not change or debug your code in any way. What it does is the following:</p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<blockquote><p>
+    * Tries to set missing curly braces around single conditional statements. This may not work in all situations.<br />
+    * Indents with four spaces.<br />
+    * Uses "one true brace" style in function definitions.<br />
+    * Sets one space between control keyword and condition.<br />
+    * Removes space between function calls, parenthesis and beginning of argument list.
+</p></blockquote>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>Nice tool!</p>
+<p>You can download it <a href="http://www.tote-taste.de/X-Project/beautify/">here</a>.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-523c-455a-a2c9-4c6fcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fphp-code-beautifier-tool%3A480f4dfe-523c-455a-a2c9-4c6fcbdd56cb &amp;title=PHP+Code-Beautifier+Tool';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fphp-code-beautifier-tool%3A480f4dfe-523c-455a-a2c9-4c6fcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fphp-code-beautifier-tool%3A480f4dfe-523c-455a-a2c9-4c6fcbdd56cb&amp;title=PHP+Code-Beautifier+Tool&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fphp-code-beautifier-tool%3A480f4dfe-523c-455a-a2c9-4c6fcbdd56cb&amp;title=PHP+Code-Beautifier+Tool';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/php-code-beautifier-tool:480f4dfe-523c-455a-a2c9-4c6fcbdd56cb">7 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/php-code-beautifier-tool:480f4dfe-523c-455a-a2c9-4c6fcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/refactoring-a-first-example:480f4dfe-c26c-4b1b-8649-4b5ccbdd56cb">Refactoring - A first example</a></h2>	<div class="posted-on">
+		<p>Posted on 30/4/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Today we will look at a first php example of refactoring, to start creating a sense for it.</p>
+<p>Think about the following scenario: You want to dynamically add workers to a department and then display that department's workers as an unordered list. Pretty easy eh? However, we will discover that there are some pitfalls and ways to improve from our initial code. We'll start off with the following:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> Department <span class="br0">&#123;</span><br />
+&nbsp; protected <span class="re0">$name</span>;<br />
+&nbsp; protected <span class="re0">$workers</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> addWorker<span class="br0">&#40;</span><span class="re0">$name</span>,<span class="re0">$isChief</span>,<span class="re0">$salary</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">workers</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="re0">$name</span>,<span class="re0">$isChief</span>,<span class="re0">$salary</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> listWorkers<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;ul&gt;'</span>;<br />
+&nbsp; &nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">workers</span> <span class="kw1">as</span> <span class="re0">$worker</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;&lt;li&gt;{$worker[0]} - {$worker[1]} - {$worker[2]}&quot;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;/li&gt;&lt;/ul&gt;'</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="re0">$dept</span> = <span class="kw2">new</span> Department;<br />
+<span class="re0">$dept</span>-&gt;<span class="me1">addWorker</span><span class="br0">&#40;</span><span class="st0">'Felix Broda'</span>,<span class="nu0">1</span>,<span class="nu0">2000</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dept</span>-&gt;<span class="me1">addWorker</span><span class="br0">&#40;</span><span class="st0">'Stefan Muster'</span>,<span class="nu0">0</span>,<span class="nu0">1400</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dept</span>-&gt;<span class="me1">addWorker</span><span class="br0">&#40;</span><span class="st0">'Klaus Schmidt'</span>,<span class="nu0">0</span>,<span class="nu0">1350</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dept</span>-&gt;<span class="me1">listWorkers</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>There are a couple of really bad <a href="http://c2.com/xp/CodeSmell.html" title="What are code smells?">Code Smells</a>in it, unfortunately. </p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<h2>Our first refactoring</h2>
+<p>The first thing that comes to mind is the very bad way of storing the workers in the Department class. I mean an array is by all means fine. However, look at the 13th line: We will always depend on our implementation and have to go to the addWorker function to remember the order in which we stored the data. How can we fix this? Introduce a class for a Worker:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> Worker <span class="br0">&#123;</span><br />
+&nbsp; protected <span class="re0">$name</span>;<br />
+&nbsp; protected <span class="re0">$isChief</span> = <span class="kw2">false</span>;<br />
+&nbsp; protected <span class="re0">$salary</span> = <span class="nu0">0</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Now we can change the addWorker method of the Department class:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">public</span> <span class="kw2">function</span> addWorker<span class="br0">&#40;</span><span class="re0">$worker</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">workers</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <span class="re0">$worker</span>;<br />
+&nbsp; <span class="br0">&#125;</span></div>
+<p>Okay, so we can change the client code now in the listWorkers() method:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">public</span> <span class="kw2">function</span> listWorkers<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;ul&gt;'</span>;<br />
+&nbsp; &nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">workers</span> <span class="kw1">as</span> <span class="re0">$worker</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;&lt;li&gt;{$worker-&gt;name} - {$worker-&gt;isChief} - {$worker-&gt;salary}&quot;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;/li&gt;&lt;/ul&gt;'</span>;<br />
+&nbsp; <span class="br0">&#125;</span></div>
+<p>Okay looking good now. :)</p>
+<h2>Our second refactoring</h2>
+<p>When executing the code we see that the attributes of the Worker class must be public in order to work. A quick refactoring, let's fix it up:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> Worker <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">public</span> <span class="re0">$name</span>;<br />
+&nbsp; <span class="kw2">public</span> <span class="re0">$isChief</span> = <span class="kw2">false</span>;<br />
+&nbsp; <span class="kw2">public</span> <span class="re0">$salary</span> = <span class="nu0">0</span>;<br />
+<span class="br0">&#125;</span></div>
+<h2>Making our list standards-compliant</h2>
+<p>There are actually two smaller problems now with our list generation: We are missing the closing list-tags:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;&lt;li&gt;{$worker-&gt;name} - {$worker-&gt;isChief} - {$worker-&gt;salary}&lt;/li&gt;&quot;</span>;</div>
+<p>Okay this took us 5 seconds, but it was worth it. Now we notice that when we are outputting a department-list before adding workers to it, we get an unordered list that has starting ul-tags, but no li-tags. This is not standards-compliant, so we fix it:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">public</span> <span class="kw2">function</span> listWorkers<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><a href="http://www.php.net/count"><span class="kw3">count</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">workers</span><span class="br0">&#41;</span> &gt; <span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;ul&gt;'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">workers</span> <span class="kw1">as</span> <span class="re0">$worker</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;&lt;li&gt;{$worker-&gt;name} - {$worker-&gt;isChief} - {$worker-&gt;salary}&quot;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;/li&gt;&lt;/ul&gt;'</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;p&gt;Sorry, there are no workers to display.&lt;/p&gt;'</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span></div>
+<h2>Switching hats again - adding a feature</h2>
+<p>Switching hats now, because our customer told us, that he wants the number of department workers displayed at the end of each list. We are wearing our feature-hat now. This feature is a quick thing, so we implement it right away:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">public</span> <span class="kw2">function</span> listWorkers<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><a href="http://www.php.net/count"><span class="kw3">count</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">workers</span><span class="br0">&#41;</span> &gt; <span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;ul&gt;'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">workers</span> <span class="kw1">as</span> <span class="re0">$worker</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;&lt;li&gt;{$worker-&gt;name} - {$worker-&gt;isChief} - {$worker-&gt;salary}&quot;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;/li&gt;&lt;/ul&gt;'</span>;<br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;&lt;p&gt;There are {count($this-&gt;workers} workers in this department.&lt;/p&gt;&quot;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;p&gt;Sorry, there are no workers to display.&lt;/p&gt;'</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span></div>
+<h2>More refactoring</h2>
+<p>Looking at our code now we use the count() function twice to receive the same bit of information. Now we could call count() once and store its result in a variable. However, that would tie our interface to the implementation. Let's add a new method instead that counts the number of workers for us:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">public</span> <span class="kw2">function</span> numWorkers<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/count"><span class="kw3">count</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">workers</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span></div>
+<p>Our altered listWorkers() method looks as follows:</p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">public</span> <span class="kw2">function</span> listWorkers<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$numWorkers</span> = <span class="re0">$this</span>-&gt;<span class="me1">numWorkers</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><span class="re0">$numWorkers</span> &gt; <span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;ul&gt;'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">workers</span> <span class="kw1">as</span> <span class="re0">$worker</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;&lt;li&gt;{$worker-&gt;name} - {$worker-&gt;isChief} - {$worker-&gt;salary}&quot;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;/li&gt;&lt;/ul&gt;'</span>;<br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;&lt;p&gt;There are {$numWorkers} workers in this department.&lt;/p&gt;&quot;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;p&gt;Sorry, there are no workers to display.&lt;/p&gt;'</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span></div>
+<p>Cool stuff. :) Let's see what we currently have:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> Department <span class="br0">&#123;</span><br />
+&nbsp; protected <span class="re0">$name</span>;<br />
+&nbsp; protected <span class="re0">$workers</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> addWorker<span class="br0">&#40;</span><span class="re0">$worker</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">workers</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <span class="re0">$worker</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> listWorkers<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$numWorkers</span> = <span class="re0">$this</span>-&gt;<span class="me1">numWorkers</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><span class="re0">$numWorkers</span> &gt; <span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;ul&gt;'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">workers</span> <span class="kw1">as</span> <span class="re0">$worker</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;&lt;li&gt;{$worker-&gt;name} - {$worker-&gt;isChief} - {$worker-&gt;salary}&quot;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;/li&gt;&lt;/ul&gt;'</span>;<br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;&lt;p&gt;There are {$numWorkers} workers in this department.&lt;/p&gt;&quot;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;p&gt;Sorry, there are no workers to display.&lt;/p&gt;'</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> numWorkers<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/count"><span class="kw3">count</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">workers</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">class</span> Worker <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">public</span> <span class="re0">$name</span>;<br />
+&nbsp; <span class="kw2">public</span> <span class="re0">$isChief</span> = <span class="kw2">false</span>;<br />
+&nbsp; <span class="kw2">public</span> <span class="re0">$salary</span> = <span class="nu0">0</span>;<br />
+<span class="br0">&#125;</span></div>
+<h2>Adding some client code into the mix</h2>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$felix</span> = <span class="kw2">new</span> Worker;<br />
+<span class="re0">$felix</span>-&gt;<span class="me1">name</span> = <span class="st0">'Felix Broda'</span>;<br />
+<span class="re0">$felix</span>-&gt;<span class="me1">isChief</span> = <span class="kw2">true</span>;<br />
+<span class="re0">$felix</span>-&gt;<span class="me1">salary</span> = <span class="nu0">2000</span>;<br />
+<br />
+<span class="re0">$stefan</span> = <span class="kw2">new</span> Worker;<br />
+<span class="re0">$stefan</span>-&gt;<span class="me1">name</span> = <span class="st0">'Stefan Muster'</span>;<br />
+<span class="re0">$stefan</span>-&gt;<span class="me1">salary</span> = <span class="nu0">1400</span>;<br />
+<br />
+<span class="re0">$klaus</span> = <span class="kw2">new</span> Worker;<br />
+<span class="re0">$klaus</span>-&gt;<span class="me1">name</span> = <span class="st0">'Klaus Schmidt'</span>;<br />
+<span class="re0">$klaus</span>-&gt;<span class="me1">salary</span> = <span class="nu0">1350</span>;<br />
+<br />
+<br />
+<span class="re0">$dept</span> = <span class="kw2">new</span> Department;<br />
+<span class="re0">$dept</span>-&gt;<span class="me1">addWorker</span><span class="br0">&#40;</span><span class="re0">$felix</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dept</span>-&gt;<span class="me1">addWorker</span><span class="br0">&#40;</span><span class="re0">$stefan</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dept</span>-&gt;<span class="me1">addWorker</span><span class="br0">&#40;</span><span class="re0">$klaus</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dept</span>-&gt;<span class="me1">listWorkers</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>Now it's all working well, but darn that client code is so much for what it does. Let's refactor a bit more and add a handy constructor to the Worker class:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> Worker <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">public</span> <span class="re0">$name</span>;<br />
+&nbsp; <span class="kw2">public</span> <span class="re0">$isChief</span> = <span class="kw2">false</span>;<br />
+&nbsp; <span class="kw2">public</span> <span class="re0">$salary</span> = <span class="nu0">0</span>;<br />
+&nbsp; <br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> __construct<span class="br0">&#40;</span><span class="re0">$name</span>,<span class="re0">$salary</span>,<span class="re0">$isChief</span>=<span class="kw2">false</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">name</span> = <span class="re0">$name</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">salary</span> = <span class="re0">$salary</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">isChief</span> = <span class="re0">$isChief</span>;&nbsp; &nbsp; <br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Note that we put the isChief variable as an optional parameter with the default value of false. This is handy, because most workers will not be chiefs, leaving us without the need to explicitely tell every new worker object that it is not a chief.</p>
+<p>Now our new client code:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$felix</span> = <span class="kw2">new</span> Worker<span class="br0">&#40;</span><span class="st0">'Felix Broda'</span>,<span class="nu0">2000</span>,<span class="kw2">true</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$stefan</span> = <span class="kw2">new</span> Worker<span class="br0">&#40;</span><span class="st0">'Stefan Muster'</span>,<span class="nu0">1400</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$klaus</span> = <span class="kw2">new</span> Worker<span class="br0">&#40;</span><span class="st0">'Klaus Schmidt'</span>,<span class="nu0">1350</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$dept</span> = <span class="kw2">new</span> Department;<br />
+<span class="re0">$dept</span>-&gt;<span class="me1">addWorker</span><span class="br0">&#40;</span><span class="re0">$felix</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dept</span>-&gt;<span class="me1">addWorker</span><span class="br0">&#40;</span><span class="re0">$stefan</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dept</span>-&gt;<span class="me1">addWorker</span><span class="br0">&#40;</span><span class="re0">$klaus</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dept</span>-&gt;<span class="me1">listWorkers</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>Ah many less lines - much better. :)</p>
+<h2>Shortening the code more</h2>
+<p>Let's add the ability to add an array of workers all at once. Our goal is to make the following line valid:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$dept</span>-&gt;<span class="me1">addWorker</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="re0">$felix</span>,<span class="re0">$stefan</span>,<span class="re0">$klaus</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>Our altered addWorker() method:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">public</span> <span class="kw2">function</span> addWorker<span class="br0">&#40;</span><span class="re0">$worker</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><a href="http://www.php.net/is_array"><span class="kw3">is_array</span></a><span class="br0">&#40;</span><span class="re0">$worker</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$worker</span> <span class="kw1">as</span> <span class="re0">$w</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">workers</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <span class="re0">$w</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">workers</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <span class="re0">$worker</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span></div>
+<p>Now was this a feature or a refactoring?</p>
+<h2>Adding tax rates</h2>
+<p>Our client wants us to display the actual salaries of all workers of a department. We add the feature in our listWorkers() method:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">public</span> <span class="kw2">function</span> listWorkers<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$numWorkers</span> = <span class="re0">$this</span>-&gt;<span class="me1">numWorkers</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><span class="re0">$numWorkers</span> &gt; <span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;ul&gt;'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">workers</span> <span class="kw1">as</span> <span class="re0">$worker</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$salary</span> *= <span class="nu0">1.07</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;&lt;li&gt;{$worker-&gt;name} - {$worker-&gt;isChief} - {$salary}&quot;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;/li&gt;&lt;/ul&gt;'</span>;<br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;&lt;p&gt;There are {$numWorkers} workers in this department.&lt;/p&gt;&quot;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;p&gt;Sorry, there are no workers to display.&lt;/p&gt;'</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span></div>
+<p>However, we just introduced another Code Smell. We should not hard code the calculation of the sales tax into our client code. If the calculation changes we would have to adjust all client code that depends on it. Let's make the overall flow by introducing a method in the Worker class clearer:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">public</span> <span class="kw2">function</span> calcTotalSalary<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/round"><span class="kw3">round</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">salary</span> * <span class="nu0">1.07</span>,<span class="nu0">2</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span></div>
+<p>Now we can rewrite listWorkers() as follows:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">public</span> <span class="kw2">function</span> listWorkers<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$numWorkers</span> = <span class="re0">$this</span>-&gt;<span class="me1">numWorkers</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><span class="re0">$numWorkers</span> &gt; <span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;ul&gt;'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">workers</span> <span class="kw1">as</span> <span class="re0">$worker</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;&lt;li&gt;{$worker-&gt;name} - {$worker-&gt;isChief} - {$worker-&gt;calcTotalSalary()}&quot;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;/li&gt;&lt;/ul&gt;'</span>;<br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;&lt;p&gt;There are {$numWorkers} workers in this department.&lt;/p&gt;&quot;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">'&lt;p&gt;Sorry, there are no workers to display.&lt;/p&gt;'</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span></div>
+<h2>Introducing a constant for the tax rate</h2>
+<p>Now tax rates change and our code should account for them. Let's introduce a constant for the tax rate to save us a lot of trouble changing client code later when the tax rate changes:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<a href="http://www.php.net/define"><span class="kw3">define</span></a><span class="br0">&#40;</span><span class="st0">'TAX_RATE'</span>,<span class="st0">'17'</span><span class="br0">&#41;</span>;<br />
+<span class="kw2">class</span> Worker <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">public</span> <span class="re0">$name</span>;<br />
+&nbsp; <span class="kw2">public</span> <span class="re0">$isChief</span> = <span class="kw2">false</span>;<br />
+&nbsp; <span class="kw2">public</span> <span class="re0">$salary</span> = <span class="nu0">0</span>;<br />
+&nbsp; <br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> __construct<span class="br0">&#40;</span><span class="re0">$name</span>,<span class="re0">$salary</span>,<span class="re0">$isChief</span>=<span class="kw2">false</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">name</span> = <span class="re0">$name</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">salary</span> = <span class="re0">$salary</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">isChief</span> = <span class="re0">$isChief</span>;&nbsp; &nbsp; <br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> calcTotalSalary<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">salary</span> + TAX_RATE/<span class="nu0">100</span> * <span class="re0">$this</span>-&gt;<span class="me1">salary</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<h2>Conclusion</h2>
+<p>As you see when you refactor you make little changes to code that is working already, but that can be improved to quite some extent. Hopefully you noticed how we switched hats often in order to<br />
+reach to some very cool and working code. It often takes only fundamental sense of architecture to get to clean code that works. Please keep in mind that you do not add a feature and refactor at the same time, as that will lead you to the road to hell.</p>
+<p>Happy refactoring. :)<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-c26c-4b1b-8649-4b5ccbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frefactoring-a-first-example%3A480f4dfe-c26c-4b1b-8649-4b5ccbdd56cb &amp;title=Refactoring+-+A+first+example';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Frefactoring-a-first-example%3A480f4dfe-c26c-4b1b-8649-4b5ccbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frefactoring-a-first-example%3A480f4dfe-c26c-4b1b-8649-4b5ccbdd56cb&amp;title=Refactoring+-+A+first+example&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frefactoring-a-first-example%3A480f4dfe-c26c-4b1b-8649-4b5ccbdd56cb&amp;title=Refactoring+-+A+first+example';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/refactoring-a-first-example:480f4dfe-c26c-4b1b-8649-4b5ccbdd56cb">6 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/refactoring-a-first-example:480f4dfe-c26c-4b1b-8649-4b5ccbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/the-various-kinds-of-design-patterns:480f4dfe-eab0-49ad-b2b0-4575cbdd56cb">The various kinds of Design Patterns</a></h2>	<div class="posted-on">
+		<p>Posted on 29/4/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<h2>A way to classify design patterns</h2>
+<p>Design Patterns differ in their level of abstraction and their intent to improve the design. Since there are quite many design patterns that have been discovered already, there must be a way to classify them. Again, there are many approaches to organize design patterns and I personally prefer the approach of the number one book about the subject - the <a href="http://www.amazon.com/Design-Patterns-Object-Oriented-Addison-Wesley-Professional/dp/0201633612/sr=8-1/qid=1161692409/ref=pd_bbs_sr_1/002-4060714-2495267?ie=UTF8&s=books" title="Gang of Four Book">Gang of Four Book</a>, which structures design patterns into the following categories:</p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<ul>
+<li>Behavioral Patterns</li>
+<li>Creational Patterns</li>
+<li>Structural Patterns</li>
+</ul>
+<h2>More categories</h2>
+<p>The GoF book focuses on design patterns from a desktop application point of view though. Since we want to delve more into the topic of design patterns in php webdevelopment, there are two more categories that we need to take into account:</p>
+<ul>
+<li>Domain-Logic Patterns</li>
+<li>Presentation-related Patterns</li>
+</ul>
+<p>Let's look at them at a greater detail.</p>
+<h2>Behavioral Patterns</h2>
+<p>Behavioral Patterns are concerned with algorithmns and  the dispatching of responsibilities between objects. They describe the patterns of communication between these objects. They shift your focus away from flow of control to concentrate on the way your objects are interconnected.</p>
+<p>Typical patterns for this category are:</p>
+<ul>
+<li>Chain of Responsibility</li>
+<li>The Observer Pattern</li>
+<li>The Command Pattern</li>
+<li>The Iterator Pattern</li>
+</ul>
+<h2>Creational Patterns</h2>
+<p>Creational Design Patterns help you with creating objects. They abstract the instantiation process of objects and thereby help make a system independent of how its objects are created and composed.<br />
+There are two reoccurring things in these patterns. Firstly, they hide which concrete classes the system uses to create objects. Secondly, They hide how instances of these classes are created and put together.</p>
+<p>Typical creational design patterns are:</p>
+<ul>
+<li>The Factory Method</li>
+<li>The Singleton Pattern</li>
+<li>The Prototype Pattern</li>
+</ul>
+<h2>Structural Patterns</h2>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>Structural Design Patterns deal with how objects can be combined into larger structures and composite objects. The design patterns in this category use either object composition or class inheritance to form these larger structures.<br />
+The motivation behind this composing of objects could either be grouping related objects together, forming compositions as they are present in real life, adapting a class' interface or extending a class' interface and capabilities at runtime.</p>
+<p>Typical Patterns in this category are:</p>
+<ul>
+<li>Adapter Pattern</li>
+<li>Composite Pattern</li>
+<li>Decorator Pattern</li>
+</ul>
+<h2>Domain-Logic Patterns</h2>
+<p>In desktop applications domain-logic patterns have a really large scope. They can help with structuring the workflow and assign responsibilities to the proper objects. Since we are mainly concerned with web applications, the patterns in this category are closely related to databases. They help you represent a database-row or even a table as an object and perform all changes you would make to the database via the object.</p>
+<p>Typical Patterns in this category are:</p>
+<ul>
+<li>Active Record Pattern</li>
+<li>Data Mapper Pattern</li>
+<li>Table Data Gateway Pattern</li>
+</ul>
+<h2>Presentation-related Patterns</h2>
+<p>Presentation-related patterns are a must-use for web applications. We want to show something on our websites, after all! Only in intranets or backend scripts will we have an architecture that needs no real presentation. Think of database backup scripts. However, even those may print "Okay, backup successful" - a form of presentation. Structure your application into layers and stick to the presentation-patterns presented in this category.</p>
+<p>Typical Patterns are:</p>
+<ul>
+<li>Template-View</li>
+<li>Transform-View</li>
+</ul>
+<h2>Conclusion</h2>
+<p>That's it for our brief overview over the various kinds of design patterns. I have presented one way to structure them and there are many others. In the coming few weeks we will study design patterns in detail.</p>
+<p>Have a good one all!<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-eab0-49ad-b2b0-4575cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-various-kinds-of-design-patterns%3A480f4dfe-eab0-49ad-b2b0-4575cbdd56cb &amp;title=The+various+kinds+of+Design+Patterns';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-various-kinds-of-design-patterns%3A480f4dfe-eab0-49ad-b2b0-4575cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-various-kinds-of-design-patterns%3A480f4dfe-eab0-49ad-b2b0-4575cbdd56cb&amp;title=The+various+kinds+of+Design+Patterns&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-various-kinds-of-design-patterns%3A480f4dfe-eab0-49ad-b2b0-4575cbdd56cb&amp;title=The+various+kinds+of+Design+Patterns';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/the-various-kinds-of-design-patterns:480f4dfe-eab0-49ad-b2b0-4575cbdd56cb">2 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/the-various-kinds-of-design-patterns:480f4dfe-eab0-49ad-b2b0-4575cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/how-design-patterns-solve-problems:480f4dfd-ca2c-4ba6-bdd1-4814cbdd56cb">How Design Patterns solve Problems</a></h2>	<div class="posted-on">
+		<p>Posted on 28/4/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Now that is a really important question. Generally you can go by this definition:</p>
+<blockquote><p>A design pattern names, abstracts and identifies the key aspects of a software design by identifying the participating classes, objects and instances, their roles, collaborations, interrelationships and the distribution of responsibilities.</p></blockquote>
+<p>However, the choice of the programming language is important. For example, PHP5 treats instances of objects as references, which might change the implementation of a certain design pattern drastically. Or, what if the language you are using does only support object composition, but no class inheritance?</p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>There are many language-specific problems occuring when you wonder how design patterns solve design problems. That's one reason why I have created this website - to only care about PHP.</p>
+<p>In the following, the definition above is explained further.</p>
+<h2>Finding Appropriate Objects</h2>
+<p>Object-Oriented design methodologies favor many different approaches. You could single out the nouns of a problem statement and define the corresponding objects. The verbs in the statement would become the objects' operations. Or you could concentrate on the responsibilties in your system. Or you could model the real world and translate all subjects and their actions into your design as objects. There is always disagreement on which approach works best and sometimes one approach is better suited to a problem, than the others.</p>
+<p>The last approach, modeling the real world often works. However, when you are faced with a problem where your object-oriented design ends up with no classes as counterparts for the world entities, one might be in trouble if there is no <em>guide</em>.</p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>Such a guide is a design pattern. When modeling objects becomes difficult, a design patterns helps you to identify the needed objects - even if they are low level objects like Sessions, Cookies or even simple Collections. If you strictly model the real world, your design might not be flexible enough. For example, an object that represents an algorithmn, a state or a process is not found during the analysis phase. It's found later when one wants to make the design more flexible and reusable.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfd-ca2c-4ba6-bdd1-4814cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-design-patterns-solve-problems%3A480f4dfd-ca2c-4ba6-bdd1-4814cbdd56cb &amp;title=How+Design+Patterns+solve+Problems';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-design-patterns-solve-problems%3A480f4dfd-ca2c-4ba6-bdd1-4814cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-design-patterns-solve-problems%3A480f4dfd-ca2c-4ba6-bdd1-4814cbdd56cb&amp;title=How+Design+Patterns+solve+Problems&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-design-patterns-solve-problems%3A480f4dfd-ca2c-4ba6-bdd1-4814cbdd56cb&amp;title=How+Design+Patterns+solve+Problems';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/how-design-patterns-solve-problems:480f4dfd-ca2c-4ba6-bdd1-4814cbdd56cb">9 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/how-design-patterns-solve-problems:480f4dfd-ca2c-4ba6-bdd1-4814cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="paging">
+	<a href="/posts/index/page:47" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:44">44</a></span> | <span><a href="/posts/index/page:45">45</a></span> | <span><a href="/posts/index/page:46">46</a></span> | <span><a href="/posts/index/page:47">47</a></span> | <span class="current">48</span> | <span><a href="/posts/index/page:49">49</a></span> | <span><a href="/posts/index/page:50">50</a></span> | <span><a href="/posts/index/page:51">51</a></span> | <span><a href="/posts/index/page:52">52</a></span> <a href="/posts/index/page:49" class="next">Next &raquo;</a></div>	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

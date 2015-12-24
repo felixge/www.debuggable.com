@@ -1,0 +1,607 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>CakePHP and Acl - Why is it so difficult? &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/cakephp-and-acl-why-is-it-so-difficult:480f4dd5-ae90-4ac6-a29a-4caccbdd56cb">CakePHP and Acl - Why is it so difficult?</a></h2>	<div class="posted-on">
+		<p>Posted on 31/5/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p><style type="text/css">.article h3{color: orange !important;}</style></p>
+<div class="article">CakePHP is great, no question about it. And so is Acl. The first time you start to understand the basic concepts of Acl you feel like "Wow, that is really the way to go for right management". But as soon as you start to dig deeper you'll find out that it's not as easy as most of the documentation that is available try to make you believe. There are many reasons for this, and I'll try to point them out to you, so your Acl experience won't become a nightmare like it has been for many before.</p>
+<h3>Reason #1 - Lag of documentation</h3>
+<p>For something as important and often needed as Acl there is really a huge gap when it comes to documentation. The two main sources for me have been the <a href="http://wiki.cakephp.org/docs:acl:introduction">Wiki</a> and the <a href="http://manual.cakephp.org/chapter/12">Manual chapter about Acl</a> but besides the fact that the information on those pages are rare there is another issue with them, which brings me to the next point:</p>
+<h3>Reason #2 - Wrong, Confusing & Outdated Information</h3>
+<p>If you try to figure out something as complex as Acl, it can really cost you hours to figure out why something doesn't work, if the examples you are trying to do are simply wrong or incomplete. Let me show you a couple of examples:</p>
+<h4>Example 1 - Accessing Aro/Aco Object</h4>
+<p>No matter where I've looked so far, I've always seen the Aro or Aco object used like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$aro</span> = <span class="kw2">new</span> Aro<span class="br0">&#40;</span><span class="br0">&#41;</span>; <br />
+<span class="re0">$aro</span>-&gt;<span class="me1">create</span><span class="br0">&#40;</span> <span class="re0">$user_id</span>, <span class="re0">$parent_id</span>, <span class="re0">$alias</span> <span class="br0">&#41;</span>;</div>
+<p>But (almost) nobody tells you what those objects actually are - Models! And how do we use Models in CakePHP? We put them to our $uses array!</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> AppController <span class="kw2">extends</span> AppModel<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$components</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Acl'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$uses</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Aro'</span>, <span class="st0">'Aco'</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw2">function</span> beforeFilter<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Aro</span>-&gt;<span class="me1">create</span><span class="br0">&#40;</span> <span class="re0">$user_id</span>, <span class="re0">$parent_id</span>, <span class="re0">$alias</span> <span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Makes more sense doesn't it? I think following the CakePHP conventions on this one should be a good idea, because that way people will instantly see that we deal with custom Models here and not with some totally unknown objects.</p>
+<h4>Example 2 - The user_id field / Accessing Aros / Acos</h4>
+<p>One of the first problems you'll run into when working with Acl is that you need to be able to have a unique id for all the Items in your trees. Well If you just have users as Aros and they are only one level in depth, things are easy - usernames are unique and therefor good enough for identifying each element/aro. But what if you want to setup more complex systems that include users, groups, and possibly other Aros? Then each of them needs to have a unique alias. One idea is to use a prefix for different types like "User.John" or "Group.Admins", but I would much rather have a tree that is clean of such things and identify my items via unique id's so there won't ever be any problems with duplicated aliases. Well the wiki has one solution for that but you should easily see why it's just <strong>wrong</strong>:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$aro</span> = <span class="kw2">new</span> Aro<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$aro</span>-&gt;<span class="me1">create</span><span class="br0">&#40;</span><span class="re0">$aro</span>-&gt;<span class="me1">findCount</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="nu0">+1</span>, <span class="kw2">null</span>, <span class="st0">'User.'</span> . <span class="re0">$this</span>-&gt;<span class="me1">User</span>-&gt;<span class="me1">getLastInsertID</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>The thing that can't work is the <em>$aro->findCount()+1</em> statement to create the user_id for the aro. Because if you have 7 aro's and you delete number 3 this function will create a new aro with the id 7 which makes you loose your unique id's. So the only way to create unique user_id's is this one (using Aro as a Controller Model this time, as shown above):</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">Aro</span>-&gt;<span class="me1">create</span><span class="br0">&#40;</span><span class="nu0">0</span>, <span class="kw2">null</span>, <span class="st0">'User.'</span> . <span class="re0">$this</span>-&gt;<span class="me1">User</span>-&gt;<span class="me1">getLastInsertID</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$this</span>-&gt;<span class="me1">Aro</span>-&gt;<span class="me1">save</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'id'</span> =&gt; <span class="re0">$this</span>-&gt;<span class="me1">Aro</span>-&gt;<span class="me1">id</span>, <span class="st0">'user_id'</span> =&gt; <span class="re0">$this</span>-&gt;<span class="me1">Aro</span>-&gt;<span class="me1">id</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>This approach allows you to always keep the id and user_id field in your aro table in sync, making it easy to identify *any* element just by saving the aco_id ($this->Aco->id) to a field in the table of item's you want to be aro's (like users). And then you don't even need to use an ugly prefix like "User.23" as an alias in your tree, but can directly set it to "Jim", "Jack", or "Johnny".</p>
+<h4>Example 3 - Outdated stuff & Confusion</h4>
+<p>There are information spread out everywhere that are not up to date any more. Let me show you an Example from the <a href="http://wiki.cakephp.org/docs:acl:introduction">Wiki</a>:</p>
+<blockquote><p>Question (Olle): What do the fields lft and rght mean in the ARO table? /cake/controller/components/dbacl/models/aclnode.php refers to rght a lot. And the controller uses an “order by lft ASC”. Answer (ChrisPart): The lft and rght fields are for MPTT (Modified Pre-Order Tree Traversal), a method used to hold the tree structure of the permissions.</p>
+<p>Question (Olle): Is the database field aros.user_id for integrating dbAcl with my other database tables holding user information? Answer (Chris Partridge): That field is used to identify the record in the DB, however there is no support for specifying the model which the id belongs to, so it’s best to set an alias (3rd parameter passed to create()) for each. I am using the following alias format, to easily identify records: $ModelName.$id. For example: User.27 </p></blockquote>
+<p>Olle mentions the missing feature of specifying a model certain data belongs to by saying: <em>"however there is no support for specifying the model which the id belongs to"</em>, but if you take the db_acl.sql from the latest nightly you'll see there actually *is* a model field in the table. Well nice, but how do I make use of that? As mentioned before Aro/Aco objects are Models, so you propably have to manually execute save() and find() statements in order to identify Aro/Aco elements by using the Model field. Which again, puts you in the need of having either a unique user_id or alias in your table (because all the Acl functions only take those to identify items). And since I already explained why I think it's a bad idea to force aliases to be unique, you need to have unique user_id's. Which brings me to my next Reason for Acl to be difficult:</p>
+<h3>Reason #3 - Why, oh why do we need the user_id field?</h3>
+<p>I think the user_id field is the worst part when working with acl. It's a numeric field that's ment to be unique across multiple Aro types like Users, Groups, etc., but it *does not* auto-increment (same goes for Acos with 'object_id')! So we have to figure out our own way to make it unique, which leads to more confusion. Why can't we just simple use the id field of the aro/aco table to identify elements? Would'nt the sun shine much brighter for all of use if the Aro::create() function would return the id of the Aro that was created so we could simply store it in our other models as the aro_id? Just look how much easier things would be:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// $parent_id = Id of the Aro &quot;Users&quot;</span><br />
+<br />
+<span class="re0">$user</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'name'</span> =&gt; <span class="st0">'John'</span>, <span class="st0">'pw'</span> =&gt; <span class="st0">'secret-hash'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$user</span><span class="br0">&#91;</span><span class="st0">'aro_id'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">Aro</span>-&gt;<span class="me1">create</span><span class="br0">&#40;</span><span class="re0">$parent_id</span>, <span class="re0">$user</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$this</span>-&gt;<span class="me1">User</span>-&gt;<span class="me1">save</span><span class="br0">&#40;</span><span class="re0">$user</span><span class="br0">&#41;</span>;</div>
+<p>This is how I feel Acl should be implemented, since it's just *way* easier for people to work out, and doesn't limit you in any ways. Using auto_incrementing id fields you could also use a combination of alias & model to identify users / groups without knowing their aco_id. I'll leave this idea for discussion since it's quite possible that I might be wrong on this since I'm no experienced Acl user, but in case people agree I'll open a RFC / Enhancment ticket on Trac for this. Meanwhile you can use the workaround I posted above if you want to go with this approach.</p>
+<h3>Reason #4 - MPTT What!??</h3>
+<p>One of the things that makes Acl very inaccesible to many of us is the fact that the AclTree's are stored with a method known as Modified Preorder Tree Traversal (short MPTT).  While I don't want to go into great detail about how MPTT works I just want to point out why it's used. The advantage of trees stored in MPTT format is that you can retrieve (and build) the tree a lot faster then you can with the other method of using a parent_id. The only disadvantage is, that it takes longer to modify the tree (to delete or add nodes), but that's no issue for right management. The best resource about MPTT that I know of is over at sitepoint in their article called: <a href="http://www.sitepoint.com/article/hierarchical-data-database">Storing Hierarchical Data in a Database</a>. If you look at the article you'll quickly be like "rght, lft, WHAT!?!?" and your enthusiasm about Acl will be gone before you've even started to get really into it. And as of right now, you'll not be able to work with Acl without having a certain understanding about the MPTT way of storing tree data.</p>
+<h3>Reason #5 - The incompletness of scripts/acl.php</h4>
+<p>Imagine you are new to this entire Acl thing, you have a project to finish, and all the stuff mentioned above is already making your life hard enough. All you want is a simple tool to play around & debug your Acl trees. Well, there is such a tool for the command line inside the cake/scripts/acl.php and for certain things it works like a charm. For others, it simply doesn't. Just 2 examples that'll ruin it for you right away:</p>
+<h4>Example #1 - View your Aco/Aro tree</h4>
+<p>You just added your first 4-5 elements to your Aro tree and now you want to see if the tree is stored in the db as you hope it would be. Well easy: Fire up the command line, switch to your /cake/scripts/ directory and type in <em>"php.exe acl.php view aro"</em> (windows). Voila, you see the Aco tree like you've created it. Hmm, but what are those numbers for? Ah right! We specified an $user_id for the Aro's we created, that's what it must be! Well ... Wrong! It's not the id you specified when you called <em>$aro->create($user_id, $parent_id, $alias);</em>, but it is the auto-incrementing primary key of your aros table. It's so easy to get this thing wrong in the beginning (especially if both numbers are the same for user 1,2,3) and it can cost you hours to figure out. I can't say the acl.php is incomplete on this one, but the documentation for it is. It's also questionable why the primary key id get's displayed when it *can not* (directly) be used to identify the elements when working with the Acl component. Another reason why I think user_id and object_id need to go.</p>
+<h4>Example #2 - Delete doesn't work</h4>
+<p>Well let's expect you've not figured out that the id's displayed by the <em>"aro view"</em> can not be used for identifying elements and you want to try to delete an item from your tree using one of those id's (which is what I went through). You type in <em>"php.exe acl.php delete aro 2"</em> and hit enter. An HTTP header get's returned and no error message shows up, hmm, did it work? Back to <em>"aro view"</em> - the item is still there. Must have been the wrong id, try it again, back to <em>"aro view"</em> - item is still there! What!? Alright you don't expect the delete function to be undone yet, because it would throw an error in that case (right?), so you try to figure out what *you* did wrong. Well it will take you a while to figure out that both is the case. delete() is undone, and you are wrong about the id's display by <em>"aro view"</em> ... What a mess : /.</div>
+<h3 style="color: red;">Summing everything up</h3>
+<p>Why did I write this article? I wrote this article to point out a couple things that I struggled with when I started working with Acl a couple of days ago (including some earlier experiments with it as well), so people who still got their first Acl experience ahead of them don't have to go through the same problems. However, I'm sure there are still more then those I mentioned. I already see a dev asking <strong>why I've not opened tickets for all of this stuff so far</strong> and the answer is: "I will open them, but when you get into Acl for the first time, things are just so confusing that you really start to question yourself and get to the point where you think you don't know anything about programming. So give me some more days until I'm sure the stuff I've found is really worth a couple of tickets and you'll see them on Trac".</p>
+<p>As said, I will use the next couple of days to figure out what tickets need to be opened, and to see if my idea of removing user_id and object_id is a product of my ignorance torwards the concept of Acl or worth an enhancement ticket. After that I'll do a proof of concept of my idea on how to integrate Acl into my <a href="http://cakeforge.org/projects/spliceit">SpliceIt! project</a>, and if this works out I'll start a series of 2-3 articles where I'll explain everything I've learned about Acl together with a (small) real world example. I'll also release some source code that will help people to work with MPTT trees, allowing them to convert them into nested arrays and such. Meanwhile I would appriciate every comment on the stuff I've talked about above so I don't go off running into the wrong direction ; ).</p>
+<p>--Felix</p>
+<p><strong>PS:</strong> I know I've been sarcastic more then once in the article above, but it's not ment to offend anybody in the community or from the core dev's. I simply tried to express how I felt when working with Acl for the first time.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-ae90-4ac6-a29a-4caccbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakephp-and-acl-why-is-it-so-difficult%3A480f4dd5-ae90-4ac6-a29a-4caccbdd56cb &amp;title=CakePHP+and+Acl+-+Why+is+it+so+difficult%3F';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakephp-and-acl-why-is-it-so-difficult%3A480f4dd5-ae90-4ac6-a29a-4caccbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakephp-and-acl-why-is-it-so-difficult%3A480f4dd5-ae90-4ac6-a29a-4caccbdd56cb&amp;title=CakePHP+and+Acl+-+Why+is+it+so+difficult%3F&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakephp-and-acl-why-is-it-so-difficult%3A480f4dd5-ae90-4ac6-a29a-4caccbdd56cb&amp;title=CakePHP+and+Acl+-+Why+is+it+so+difficult%3F';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/buch-tip-webentwicklung-mit-cakephp:4912dccb-f594-4fa1-af20-6c564834cda3">Buchtipp: Webentwicklung mit CakePHP</a></li>
+							<li><a href="/posts/how-to-organize-your-cakephp-app%e2%80%99s-javascript-ii:480f4dd6-a780-45dc-bd65-4284cbdd56cb">How to organize your CakePHP App’s Javascript II</a></li>
+							<li><a href="/posts/remember-the-days-before-spam-a-cakephp-model-for-akismet:480f4dd5-d358-4f51-ac83-45f1cbdd56cb">Remember the days before spam? A CakePHP Model for Akismet  </a></li>
+							<li><a href="/posts/normalizing-cakephp-model-records:48b7ed7f-9498-4b9c-8734-6f014834cda3">Normalizing CakePHP model records</a></li>
+							<li><a href="/posts/cakephp-authsome-debuggable-s-xmas-gift:4b34b4e6-9ca4-4673-bea6-4776cbdd56cb">CakePHP Authsome - Debuggable&#039;s Xmas Gift</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/making-error-handling-for-modelsave-more-beautiful-in-cakephp:480f4dd6-7110-4706-8230-4a97cbdd56cb">Making error handling for Model::save more beautiful in CakePHP</a></li>
+							<li><a href="/posts/cakephp-argentina:4937042e-4864-48e1-98f0-6d3d4834cda3">CakePHP Argentina</a></li>
+							<li><a href="/posts/cakephp-1.2-stable-come-and-help:4829b3ac-903c-4f56-94dc-27af4834cda3">CakePHP 1.2 Stable! Come and help</a></li>
+							<li><a href="/posts/the-ultimate-cakephp-bootstrap-technique:480f4dd5-2bcc-40cb-b45f-4b1dcbdd56cb">The ultimate CakePHP bootstrap technique</a></li>
+							<li><a href="/posts/extra-hot-cakephp-1.2-stable-is-finally-released!:4954151c-f87c-434b-abbd-4e404834cda3">Extra Hot: CakePHP 1.2 Stable is finally released!</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/cakephp-and-acl-why-is-it-so-difficult:480f4dd5-ae90-4ac6-a29a-4caccbdd56cb">22 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/cakephp-and-acl-why-is-it-so-difficult:480f4dd5-ae90-4ac6-a29a-4caccbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dd8-c978-4d90-a22e-409acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b42b7ed13e242cd4aa51b5dd9faf8383&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Gustavo Carreno&nbsp;						</strong>
+						<strong>said 
+						on May 31, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey mate!!</p>
+<p>Heck, this article really puts ACL in perspective.<br />
+I, too, have a project that is in it's first stage and I was gonna attack the ACL stuff, so YOU saved me tones of problems with this little article!!</br></p>
+<p>Many THANKS mate !!</p>
+<p>Gustavo Carreno</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-6cc4-4c94-b866-4869cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8d07c93cb4fc80a7c62e50cbac7da9c6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://pigeontech.com" rel="nofollow">automag</a>						</strong>
+						<strong>said 
+						on May 31, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice article.  I have yet to figure out ACL, then again, I havn't really tried.  I like the idea of your Spliceit! project, it'll be really helpful to the rest of us who like building sites, but aren't that good at all the little details that keep popping up that we have to learn.  Some premade plugins would put the Rapid back into RAD!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-4448-4e08-ba6a-4de3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7902bf72f919cbb30fe0956f4699236e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.postal-code.com/mrhappy/blog/" rel="nofollow">Chris</a>						</strong>
+						<strong>said 
+						on Jun 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for this article! Acl support has been one of the last features I've been intending to add to my app, mainly because cursory looks at it have been daunting, to say the least. These pointers are great and much appreciated.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-e948-4da5-a766-4dc9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fff0d05378ec238b0ccc6f5bedbf0adb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://richardathome.wordpress.com" rel="nofollow">Richard@Home</a>						</strong>
+						<strong>said 
+						on Jun 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great article. You should speak to the cake documentation project about getting it included :-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-0e04-488b-aa23-46b6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=40588c000288726274fab3ef56b71245&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							DingoNV&nbsp;						</strong>
+						<strong>said 
+						on Jun 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>thanks for the article!<br />
+it helps with a little clarification.</br></p>
+<p>here is what i found when i wanted to properly delete an ARO from the tree.<br />
+you have to promote the item first.</br><br />
+use setParent to set it's parent to null, that moves it to the top AND end of the tree and sets the rgt and lft values correctly. You can then del() the id (primarykey) safely. without too much worry.</br></p>
+<p>I spent a lot of time researching MPTT, and i understand what lft and rgt mean and how they work, but once you get on node out of place, things can go weird quickly.</p>
+<p>what really needs to happen though, is that a better delete() method needs to be created, one that ensures the tree doesn't get broken and that removes relevant permissions from aros_acos as well.</p>
+<p>oh, and i really don't get the action='*' example in the manual.<br />
+What is that supposed to mean? I thought it was a wildcard tye of thing, so i had a user_id that had read status but nothing else, based on the example in the manual, and i didn't get a true back. not quite what i was expecting, but what the hell, now i know.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-2724-4190-bb9c-4393cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=40588c000288726274fab3ef56b71245&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							DingoNV&nbsp;						</strong>
+						<strong>said 
+						on Jun 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>oh, and i should add, that i haven't figured out how ACM works either. the documentation (and lack thereof) is confusing. People have mentioned it as a plugin that just fires up. Boy, is that wrong.</p>
+<p>We need a plugin for managing ACLs that really is a drop in, good to go solution. One that asks you what table holds your authentication information and sets up the configuration.</p>
+<p>I don't even understand how to write a plugin yet, so... that won't be me.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-7cd0-43a0-9d47-49eacbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks to all who have commented on this, I appreciate the fact that you read this big junk of text ; ). </p>
+<p>*DingonV*:<br />
+I did not work with the delete function too much so far, but when I used it, it seemed to work (but I might have not checked the lft/rght values afterwards). I thought there is a function inside of AclNode called _syncTable (or sth. with sync in it) that takes care of that, but I could be wrong. If it's an issue I'll try to make a convenient solution for it.</br></p>
+<p>Regarding MPTT in general, I've figured out who it works as well, but boy, writing a function that would create an nested array with the tree wasn't easy for me. If you got other functions for MPTT in CakePHP I'd be glad to include them in the articles I'm going to write, contact me at FelixGe@web.de / #cakephp about it if you are interested.</p>
+<p>As far as a plugin goes, I'm in the process of writing one for SpliceIt! and SpliceIt! plugins are ment to work without changes in other projects as well. I'll keep you up to date on this one.</p>
+<p>Meanwhile there is more Acl homework and research for me to do before I'll start to write the article. Next thing I'll do is post a list of tickets that I will open, so you can track the progress on them. Stay tuned ; )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-f38c-4ed3-9d5c-4fe2cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://richardathome.wordpress.com/2006/06/02/links-for-2006-06-02/" rel="nofollow">Richard@Home &raquo; Blog Archive &raquo; links for 2006-06-02</a>						</strong>
+						<strong>said 
+						on Jun 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] ThinkingPHP » CakePHP and Acl - Why is it so difficult? A great tutorial on CakePHP authentication system ACL (Access Control Lists) (tags: cakephp acl) [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd8-43fc-4dd3-9385-4203cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b4f4cc99ef2108a7aa3573249800a3c1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.chillu.com" rel="nofollow">chillu</a>						</strong>
+						<strong>said 
+						on Jun 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hey, great post - guess we all run into the same problems sooner or later, and it's good to see some of them documented.</p>
+<p>after a lot of <a href="http://groups.google.com/group/cake-php/browse_thread/thread/039aa846b903fc67/e82f852a8ba0258b" rel="nofollow">wiki-bashing</a>, especially in the context of acl-documentation, i'd really like to get some feedback on my wiki-entry about <a href="http://wiki.cakephp.org/tutorials:acl-access-checking" rel="nofollow">acl-access-checking</a>. am i totally wrong with this concept? is the code bad or not up-to-date?<br />
+i'd love to see some kind of "official component" for acl-access-checking - felix: is the "rights management" in spliceIt! based on acl?</br></p>
+<p>some comments on your examples:</p>
+<p>example 1: although accessing the models this way would be more clean, it poses other problems on the user: he has to merge his $uses-settings in any subsequent controller with the already existent array from app_controller - and because this behaviour isn't really documented, i guess it leads to much more confusion than simply instanciating models in a slightly different way.</p>
+<p>example 2: yeah, haven't really thought of this - changed it in the acl-access-checking methods :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-04b0-433f-884b-43d1cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f5032f1f9cef6eece81bb9cbfc6853b4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nd&nbsp;						</strong>
+						<strong>said 
+						on Jun 27, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Useful article - I've just started looking into ACL for my first project with CakePHP (it's a kind of learn-as-you-go project :p)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-af38-46d0-9af4-4c1bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=15d0f76bd3b9b61732db56abc14354ce&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Kristian&nbsp;						</strong>
+						<strong>said 
+						on Sep 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for the article, it has helped me clear up a few points! I have been trying to get ACL to work, but has had many of problems as the ones you list above. The theory behind ACL is easy to undertstand, and the entry on ACL in the manual is great for explaning the basic concept. The problem has been to get from the textbook examples described in the manual, to the real world of CakePHP.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddd-f3c0-4ff7-987c-4588cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8f5c82c5eb917c1e1c6eab4534d1cbe4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dieter@be&nbsp;						</strong>
+						<strong>said 
+						on Sep 23, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Here is a tip for when your directory layout is not the default (eg you re-arranged the cake, app and webroot folders a bit to suit your environment more)<br />
+Even if you configured the ROOT, APP_DIR etc in index.php in the webroot folder well so that your application works perfectly, the acl.php script can't 'know' these settings, but the good news is, you can pass these as arguments.</br></p>
+<p>For example i had to do this to make it work:<br />
+php acl.php initdb -app  -core </br></p>
+<p>if i didn't do this, the script would choke on line 86 where it can't find the config/core.php</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddd-c298-40bf-9d15-4c57cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8f5c82c5eb917c1e1c6eab4534d1cbe4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dieter@be&nbsp;						</strong>
+						<strong>said 
+						on Sep 23, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>son of  a...  your comment system stripped away my "tags"</p>
+<p>anyway the right command is this:<br />
+php acl.php initdb -app [path to your app folder] -core [path to your cake folder]</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-bf74-4920-87fe-4fb3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2006/10/03/a-lightweight-approach-to-acl-the-33-lines-of-magic/" rel="nofollow">ThinkingPHP and beyond &raquo; A lightweight approach to ACL - T</a>						</strong>
+						<strong>said 
+						on Oct 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Anyway, that's not really what I want to talk about today. One of the topics I have been very silent about for month is ACL. At the end of May I was somewhat unhappy with some of the things regarding the CakePHP DB ACL implementation. And it wasn't until last week that I finally decided to implement some basic rights management in one of my applications again. So since I didn't want to bother to frustrate myself with Cake's ACL again, I started to roll my own solution. While I was happily hacking away at some code, I suddenly realized that there were a lot of familarities between the code I was writing and the way ACL was working. A couple minutes later and I was already convinced that I basically had created 33 lines of code giving me pretty much all the flexibility CakePHP's well over 500 lines would ever give me. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-31e0-418e-bc01-4e1ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=50561ceec1328945a0581c24a58deae0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.yesperiod.com" rel="nofollow">rpeterson</a>						</strong>
+						<strong>said 
+						on Jan 15, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great comments and information for ACL newcomers! I promise to get a new, enhanced version of ACM out in the near future to help people who need a ACL plugin for their apps which will also include full documention. How is SliceIt! coming along BTW?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-39fc-49ed-9bc8-44abcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hey rpeterson: This post is pretty old so some information might be outdated. I'm not working on SpliceIt! any more because my priorities have shifted, but I regularly get mails from people who are interested in it. Maybe a new development team will arise at some point?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-bf58-4d69-ab72-48e8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f943a48420724f0e110727e06506cc04&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Eric Winchell&nbsp;						</strong>
+						<strong>said 
+						on Mar 26, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Forget Cake's Acl and check out <a href="http://phpgacl.sourceforge.net/demo/phpgacl/docs/manual.html" rel="nofollow">phpGACL</a>. The manual is 1,000 times better and it has a web-based system for setting access controls.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de8-9b3c-429d-8bc0-4d61cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5af3e5b853628dda69afa96e593c4fc9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Ben&nbsp;						</strong>
+						<strong>said 
+						on Apr 10, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>^--- check out what Eric said.  that's pretty sweet.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df2-defc-460f-b40a-4d81cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ec0958d5348b7ff610c9f108460b4841&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.helfenberg.ch" rel="nofollow">AndyB</a>						</strong>
+						<strong>said 
+						on Nov 06, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>One big limitation to me is the fact, that a "user" cannot be member of multiple "groups". Or am I wrong?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48bd850d-d1f4-4ec9-8196-74304834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fa426c058a4cf09824279ad2363dc85d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Kelvin&nbsp;						</strong>
+						<strong>said 
+						on Sep 02, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>boa dica cara!!!<br />
+mas gostaria que vc colocasse algum projeto,como exemplo!!!</br><br />
+Estou precisando usar ACL no cake,mas não estou conseguindo implementar!!</br><br />
+vlw, se poder me responder agradeço!!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-491b60cc-0c08-4224-a9b3-0d7a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ec0958d5348b7ff610c9f108460b4841&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.helfenberg.ch" rel="nofollow">Pfadi Frauenfeld, Abteilung Helfenberg</a>						</strong>
+						<strong>said 
+						on Nov 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It's WAY faster to manually build a query which returns all allowed results than relying on acl for access controll. especially because acl is url-based and not record-based.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49cf91ff-468c-4783-8f68-16644834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e17720df4dd03f6d39bd994cbd8ac0da&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://raynux.com" rel="nofollow">Rayhan Chowdhury</a>						</strong>
+						<strong>said 
+						on Mar 29, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks, You wrote this article in 2006 on CakePHP version 1.xx may be. In 2009 I still don't understand why is it so complicated even in cake version 1.2. Whenever I try to solve a problem using CakePHP ACL, I get bored...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

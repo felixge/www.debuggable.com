@@ -1,0 +1,956 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Bringing the cold war to CakePHP 1.2 - The Containable Behavior &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/bringing-the-cold-war-to-cakephp-12-the-containable-behavior:480f4dd6-2b50-4d7b-ab05-418dcbdd56cb">Bringing the cold war to CakePHP 1.2 - The Containable Behavior</a></h2>	<div class="posted-on">
+		<p>Posted on 13/5/07 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p><strong>Update:</strong> JCSiegrist just noticed a problem in the code as I've released it. Somehow I must have deleted an important line of code right before uploading, sry about this. Please get the <a href="http://www.thinkingphp.org/code/behaviors/containable.phps">new version of the code</a>.</p>
+<p>Hi folks,</p>
+<p>for those of you who feel like it's becoming a regular thing that I'm starting my posts with excuses for not having posted stuff in a while there is good news: I'm one final Math / History  exam away from being a free man and done with school. That means I'll start heavy-duty blogging again, publishing all the good and great stuff I've been working on and learning in the past months.</p>
+<p>For those of you who can't await this, here comes a little teaser in form of a behavior for Cake 1.2 called 'Containable'. Essentially it is <a href="http://bakery.cakephp.org/articles/view/keeping-bindmodel-and-unbindmodel-out-of-your-controllers">yet</a> <a href="http://othy.wordpress.com/2006/06/03/unbind-all-associations-except-some/">another way</a> <a href="http://bakery.cakephp.org/articles/view/keeping-bindmodel-and-unbindmodel-out-of-your-controllers">to unbind associations</a> from a model recursively on the fly. However, I think it's more powerful then all the ones released so far for several reasons:</p>
+<ul>
+<li><strong>It's a behavior!</strong> No manual AppModel hacking here ; ).</li>
+<li><strong>It is smart:</strong> It will recognize when you pass in conflicting associations and automatically correct that.</li>
+<li><strong>It's for the lazy:</strong> Always wondering what $recursive parameter to use? No More! Containable sets it for you.</li>
+<li><strong>It's convenient:</strong> Like to use dot-seperated Model strings as parameters? Arrays of Models? Or both at the same time? No problem!</li>
+</ul>
+<p>Alright, enough marketing. Here is <strong><a href="http://www.thinkingphp.org/code/behaviors/containable.phps">the code</a></strong> and how to install it:</p>
+<ol>
+<li>Put <a href="http://www.thinkingphp.org/code/behaviors/containable.phps">the code</a> in /app/models/behaviors/containable.php</li>
+<li>Create an /app/app_model.php file like this:</li>
+</ol>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> AppModel <span class="kw2">extends</span> Model <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$actsAs</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Containable'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p><strong>Done!</strong> Now that was easy. But how to use this new behavior? Well, how would you like to use it? See if one of those alternatives cuts it for you:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">User</span>-&gt;<span class="me1">contain</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; <span class="st0">'UserType'</span>,<br />
+&nbsp; &nbsp; <span class="st0">'Group'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'GroupPermission'</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; <span class="st0">'Post'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'Category'</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="st0">'Comment'</span> =&gt; <span class="st0">'User'</span>,&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#41;</span><br />
+<span class="br0">&#41;</span>;</div>
+<p>Uhm, that was verbose, how about:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">User</span>-&gt;<span class="me1">contain</span><span class="br0">&#40;</span><span class="st0">'UserType'</span>, <span class="st0">'Group.GroupPermission'</span>, <span class="st0">'Post.Category'</span>, <span class="st0">'Post.RelatedPost'</span>, <span class="st0">'Post.Comment.User'</span><span class="br0">&#41;</span>;</div>
+<p>Or a slightly longer, but more DRY alternative:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">User</span>-&gt;<span class="me1">contain</span><span class="br0">&#40;</span><span class="st0">'UserType'</span>, <span class="st0">'Group.GroupPermission'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; <span class="st0">'Post'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Category'</span>, <span class="st0">'RelatedPost'</span>, <span class="st0">'Comment.User'</span><span class="br0">&#41;</span><br />
+<span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>All of the snippets above will cause the exactly the same associations to be present in your next Model::find* query. They are just expressed in a different notation. The function does not care if you use several parameters, strings with dot notation or nested arrays. Define your own containment policies in whatever syntax you like the best! Or mix them : )!</p>
+<p>I hope this will become a powerful weapon in your very own war on terrorizing associations you don't want in your resultsets and will make your present <a href="http://en.wikipedia.org/wiki/Doomsday_device">doomsday devices</a> obsolete soon ; ).</p>
+<p>Oh and before I forget, it might also be worth to read through <a href="http://www.thinkingphp.org/code/behaviors/containable.phps">the code</a> a little. I've experimented with two cool things in there: Namely using static variables as a 'memory' in recursive functions as well as recognizing the root level of the recursive calls by checking if a certain parameter is a boolean : ).</p>
+<p>-- Felix Geisendörfer aka the_undefined</p>
+<p>PS: Let me know if you find any bugs so I can fix them ASAP.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-2b50-4d7b-ab05-418dcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbringing-the-cold-war-to-cakephp-12-the-containable-behavior%3A480f4dd6-2b50-4d7b-ab05-418dcbdd56cb &amp;title=Bringing+the+cold+war+to+CakePHP+1.2+-+The+Containable+Behavior';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbringing-the-cold-war-to-cakephp-12-the-containable-behavior%3A480f4dd6-2b50-4d7b-ab05-418dcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbringing-the-cold-war-to-cakephp-12-the-containable-behavior%3A480f4dd6-2b50-4d7b-ab05-418dcbdd56cb&amp;title=Bringing+the+cold+war+to+CakePHP+1.2+-+The+Containable+Behavior&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbringing-the-cold-war-to-cakephp-12-the-containable-behavior%3A480f4dd6-2b50-4d7b-ab05-418dcbdd56cb&amp;title=Bringing+the+cold+war+to+CakePHP+1.2+-+The+Containable+Behavior';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/how-to-organize-your-cakephp-app%e2%80%99s-javascript-ii:480f4dd6-a780-45dc-bd65-4284cbdd56cb">How to organize your CakePHP App’s Javascript II</a></li>
+							<li><a href="/posts/cakephp-bleeding-edge-google-group:480f4dd6-73e4-487a-9c7d-4b86cbdd56cb">CakePHP Bleeding Edge - Google Group</a></li>
+							<li><a href="/posts/macgyver-menu-for-cakephp-whats-the-active-menu-item:480f4dd6-c044-436e-bbde-4ed8cbdd56cb">MacGyver menu for CakePHP - What&#039;s the active menu item?</a></li>
+							<li><a href="/posts/google-analytics-php-api-cakephp-model:480f4dd5-b2a4-452a-b4ed-4f3fcbdd56cb">Google Analytics PHP Api (CakePHP Model)</a></li>
+							<li><a href="/posts/cakephp-argentina:4937042e-4864-48e1-98f0-6d3d4834cda3">CakePHP Argentina</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/url-aliases-for-cakephp:480f4dd5-cb20-4251-a742-48f2cbdd56cb">URL Aliases for CakePHP</a></li>
+							<li><a href="/posts/drake-drupal-cakephp-is-making-progress:480f4dd5-7218-454c-92a0-4f44cbdd56cb">Drake (Drupal + CakePHP) is making progress</a></li>
+							<li><a href="/posts/toogleing-associations-in-cakephp-models:480f4dd5-58b0-4ecf-bf4d-4637cbdd56cb">Toggling Associations in CakePHP Models</a></li>
+							<li><a href="/posts/cakephp-12-manual:480f4dfe-2080-491a-a22c-43e6cbdd56cb">CakePHP 1.2 Manual</a></li>
+							<li><a href="/posts/remember-the-days-before-spam-a-cakephp-model-for-akismet:480f4dd5-d358-4f51-ac83-45f1cbdd56cb">Remember the days before spam? A CakePHP Model for Akismet  </a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/bringing-the-cold-war-to-cakephp-12-the-containable-behavior:480f4dd6-2b50-4d7b-ab05-418dcbdd56cb">42 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/bringing-the-cold-war-to-cakephp-12-the-containable-behavior:480f4dd6-2b50-4d7b-ab05-418dcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4de9-dfc8-4421-9efa-470ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f32734828a0bc23bb5b3848270c68921&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.devmoz.com/blog" rel="nofollow">CraZyLeGs</a>						</strong>
+						<strong>said 
+						on May 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>http://othy.wordpress.com/2006/06/03/unbind-all-associations-except-some/ as the url says is from June 3rd, 2006 ;) nearly a year old, there were no behaviors at that time.</p>
+<p>Anyway your stuff is interesting, can be extended to add fields and conditions.<br />
+that is, I want association x to stay but I only want fieldx1 andfieldx2 under xconditions.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-cdac-4471-8fc7-4fe8cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>CraZyLeGs: Hey I was in no way trying to be critical against the existing implementations. If it wasn't for them and me studying them this post wouldn't have been made. And behaviors also do not exist in Cake 1.1 so the alternatives deserve their place. That "doomsday device" reference was just thrown in for the sake of the "cold war" theme on this post and hopefully will not be taken serious : ).</p>
+<p>I'm not sure about limiting fields / adding conditions that would go beyond what the current implementation is designed for. But if you'd share what you mean with that I'll see what I can do : ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-ff64-4288-9329-47e6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6cacda6f9cdac54d60f51d6190631fd8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							nao&nbsp;						</strong>
+						<strong>said 
+						on May 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I maked something very similar but I allow to not unbind child of one association with suffix '*'. It allow repeat association unbinding for self jointed association with suffix '@'. Finally, it'allow too select fields with syntax : "assoc:field1,field2".</p>
+<p>     $this-&gt;User-&gt;unbindAll(array(<br />
+                      'UserType:name,password',</br><br />
+                      'Group:name' =&gt; array(</br><br />
+                              'GroupPermission:foo*'</br><br />
+                      ),</br><br />
+                      'Post' =&gt; array(</br><br />
+                              'Category',</br><br />
+                              'Comment' =&gt; 'User',</br><br />
+                      ),</br><br />
+                      'Category:name,password' =&gt; array(</br><br />
+                              'Category:name,password@',</br><br />
+                      )</br><br />
+              )</br><br />
+      );</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-2aac-4841-b590-4584cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Oh ok I think I know what both of you are talking about now. Yeah I might add that, but probably with a different syntax then the above.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-a2ec-4fc6-8db7-40a5cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6cacda6f9cdac54d60f51d6190631fd8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							nao&nbsp;						</strong>
+						<strong>said 
+						on May 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I forget, I added "modifier" too. "Category:name,password|objectify|foo" : it look for "objectify" and "foo" method in each behaviour.</p>
+<p>My code is dirty, it should be better to use your behaviour and implement my ideas to it. What to you thing about?</p>
+<p>My code his here : http://bin.cakephp.org/view/271561981</p>
+<p>Add this functions to your app model.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-ea94-4852-a04b-450ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f32734828a0bc23bb5b3848270c68921&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.devmoz.com/blog" rel="nofollow">CraZyLeGs</a>						</strong>
+						<strong>said 
+						on May 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>felix: oh didn't mean you criticize or anything, I actually wrote ubindAll and yea a lot of work I see is based on it which is cool. I'm just thinking of getting the real weapon that will get the baker's doomsday kitchen device obsolete ;)</p>
+<p>nao: Very interesting. perhaps a merge with felix's syntax.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-25a8-4af7-b5bc-48f1cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nao: Interesting stuff indeed. However there is definitely too much going on there I think and I'm not sure if it should maybe split up in several behaviors. Anyway, I'll take a look at it again in the next days and see what I can come up with : ). Great to see your approach anyway!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-f0f4-46d8-a5c4-47edcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=68c529c3442953c3beb00a7ccca7e6bb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Lucian Lature&nbsp;						</strong>
+						<strong>said 
+						on May 14, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It's good to have you back...Waiting forward for more cake posts.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-9a30-458a-aac1-4369cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7aa99b54c8a5cb8b86c231d2587f2e51&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://heartstringz.net" rel="nofollow">Felix</a>						</strong>
+						<strong>said 
+						on May 14, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>That's awesome!<br />
+I'm looking for a jQuery helper for Cake, are you or some guys out there working on it?</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-a61c-4bc6-96bd-42f1cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 14, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>No. I don't think a helper could ever meet my requirements, I prefer writing all my JS code by hand.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-1124-4fda-8d0c-4104cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c28cbc5ff5f63a4fa191af3bb49a36a7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://nateklaiber.com" rel="nofollow">Nate Klaiber</a>						</strong>
+						<strong>said 
+						on May 14, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>That is a very handy piece of code! Nice to see you didn't fall off of the face of the earth, and I look forward to some more posts.</p>
+<p>Hope you finish up strong with school.....</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-7194-4f5b-b0f7-4715cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 14, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey nate: Most posts will come. My long overdue web app will launch. Good stuff for the cake core will be released and some other fun things with this site and in general are planned as well : ).</p>
+<p>About school: Just took my Math final today and boy was it hard. My problem is that I'm a platonic idealist when it comes to most things, so I cannot accept difficult solutions (involving lots of writing for things that ought to be simple). However this really gets into my way when taking a difficult test because  sometimes you simply don't have the time to find the abstract solution to the problem and in reality they want you to go through pages of derivations, semi-thought-through conclusions and whatever else falls into the realm of cargo-cult science : /. So let's see what comes out of this one.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-8ce0-4036-b111-41f3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.developercast.com/2007/05/14/felix-geisendorfers-blog-bringing-the-cold-war-to-cakephp-12-the-containable-behavior/" rel="nofollow">developercast.com &raquo; Felix Geisendorfer&#8217;s Blog: Bring</a>						</strong>
+						<strong>said 
+						on May 14, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Felix Geisendorfer is sharing a bit of his CakePHP knowledge with us today with this new post to his blog. It shines a spotlight on a feature of the framework - a behavior called &#8220;Containable&#8221;.   For those of you who can&#8217;t await this, here comes a little teaser in form of a behavior for Cake 1.2 called &#8216;Containable&#8217;. Essentially it is yet another way to unbind associations from a model recursively on the fly. However, I think it&#8217;s more powerful then all the ones released so far. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-3120-4c78-b85e-45d7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e7ec2e6e9a72b31c5115a11658525c10&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Brandon&nbsp;						</strong>
+						<strong>said 
+						on May 15, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Bravo!<br />
+You finally come out of hiding :) and deliver something that is worth the month we all waited!!  IMO, this is a great behavior!! I have always toiled with this issue and found it unbearable at times to have to manually set the recursion of associative models (or forget to and wonder why my pages take so long to load:)).</br></p>
+<p>Thanks for this great code!!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-1c50-40e1-a22b-42bbcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6773510c8bafa00e4e9705f6169d7155&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							JCSiegrist&nbsp;						</strong>
+						<strong>said 
+						on May 15, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This looks fantastic! But I can't get it to work. For me it seems to always do an unbindAll. Going through the code it seems that $containments[$model-&gt;name] never gets set. But I'm probably overlooking something obvious. Currently using Cake 1.2r4925 on php5. </p>
+<p>:jcs</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-9494-46df-9026-4259cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 15, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>JCSiegrist: Good call! I must have messed up the version I uploaded right before I did so as it is indeed lacking this critical line of code. Please get the new version, it's fixed : ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-d9dc-4d96-a54c-467acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6773510c8bafa00e4e9705f6169d7155&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							JCSiegrist&nbsp;						</strong>
+						<strong>said 
+						on May 15, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great, works wonderfully now! Thank You.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-2c04-415d-90b1-4cf9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6773510c8bafa00e4e9705f6169d7155&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							JCSiegrist&nbsp;						</strong>
+						<strong>said 
+						on May 15, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Oh,oh. I found another issue at least with my app. As soon as I have another behavior on a model and call contain I get an sql error. Somewhere a db query gets executed with the string 'contain'. As soon as I remove the other behavior it works. I've tried various other behaviors, so I don't think it is any specific behavior. </p>
+<p>I'll look into the containable code to see if I can find anything. Have you tested with other model specific behaviors?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-845c-4f1e-90ed-4d1ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6773510c8bafa00e4e9705f6169d7155&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							JCSiegrist&nbsp;						</strong>
+						<strong>said 
+						on May 15, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ok, sorry. I found the problem. Of course I overwrote $actsAs in my Model, so that the ContainableBehavior was not available from the AppModel. So CakePHP ran the call to the contain method of my model as an overloadable callback. CakePHP just send it right to the db. </p>
+<p>The solution is to also add the 'Containable' to the actsAs array in the specific Model, if other behaviors are used.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-1ccc-4963-850e-4de9cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 15, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'm working on another (top secret) behavior right now which will make usage of Containable and had no problems with it so far. However I have not tested with any other behaviors yet and would appreciate your input on what may be causing your particular problem.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-8250-4751-9f7f-4d10cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6773510c8bafa00e4e9705f6169d7155&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							JCSiegrist&nbsp;						</strong>
+						<strong>said 
+						on May 15, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Setting $actAs in MyModel overwrote $actsAs in AppModel, where the ContainableBehavior was set. </p>
+<p>Solution for me was to just also include 'Containable' in the $actsAs array of MyModel.</p>
+<p>CakePHP doesn't seem to merge the arrays like it seems to be doing with $uses, $helpers etc. </p>
+<p>Have to check how that works in CakePHP and maybe file an enhancement ticket.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-a9b0-4530-ae63-41dccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99cf87231f06f534edc360b735af926c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://slun.ic.cz/" rel="nofollow">poLK</a>						</strong>
+						<strong>said 
+						on May 21, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well done, Felix :)<br />
+Just little note for PHP compatibility: http://bin.cakephp.org/view/725024741</br><br />
+Thank you for sharing this code!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-8d7c-4c2b-b78b-4165cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 21, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>poLK: "PHP compatibility"? What do you mean by that?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-d280-4e0b-b95d-41e8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6773510c8bafa00e4e9705f6169d7155&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							JCSiegrist&nbsp;						</strong>
+						<strong>said 
+						on May 21, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>PHP4 does not support references in the foreach iterator(?). </p>
+<p>I have also found that for some reason the newest cake console bake script doesn't like foreach loops using references, a php error is thrown in the console on each script that uses them. </p>
+<p>Thank You Felix for writing this great Behavior and sharing it!</p>
+<p>:jc</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-8a98-4476-853e-4dffcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2007/05/27/152/" rel="nofollow">ThinkingPHP and beyond &raquo;</a>						</strong>
+						<strong>said 
+						on May 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] I&#8217;m currently working hard on refactoring my Containable behavior to provide you with lot&#8217;s of fun stuff like fields, conditions etc. limitations for associations on the fly. I also do everything using test driven development which turns out to be *very* hard in this case and is the reason why the new version isn&#8217;t released even so I probably already spent ~10 hours on it. Please excuse the delay and stay tuned. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-d9a8-44d0-8015-4443cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6cacda6f9cdac54d60f51d6190631fd8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							nao&nbsp;						</strong>
+						<strong>said 
+						on May 29, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>That good!</p>
+<p>I wonder that it syntax you will use to implement all this new functionnality.</p>
+<p>I am impatient to see your new version, I hope soon!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-f8c8-4505-8c0d-458fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a0cb5390683f9eac1e3405dee008383e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							headbiznatch&nbsp;						</strong>
+						<strong>said 
+						on May 30, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>contain is wonderful. very intuitive and especially great for Flash remoting... thank you for your contributions, and all the best regarding your exams. rock on.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-13cc-4b60-8a76-45f6cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 31, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>poLK / JCSiegrist: Arg, just realized I did my testing on PHP5 only so yeah you are right, this is a problem. Any way the new version is a complete rewrite and won't use this code : ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-a830-4541-8d46-4659cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e6e4c134f312cd0a0a6fc650af29dc0b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Abbas Ali&nbsp;						</strong>
+						<strong>said 
+						on Jun 09, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>A temporary solution for php4 incompatibility might be this...</p>
+<p>Replace</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&amp;<span class="co2">#gt;runtime[$model-&amp;#gt;name] as $key =&amp;#gt; &amp;amp;$containedModel) {</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$containedModel</span>-&amp;<span class="co2">#gt;__backAssociation)) {</span></br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$containedModel</span>-&amp;<span class="co2">#gt;__resetAssociations();</span></br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span></br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span></br></div>
+<p>with</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&amp;<span class="co2">#gt;runtime[$model-&amp;#gt;name] as $key =&amp;#gt; $containedModel) {</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&amp;<span class="co2">#gt;runtime[$model-&amp;#gt;name][$key]-&amp;#gt;__backAssociation)) {</span></br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&amp;<span class="co2">#gt;runtime[$model-&amp;#gt;name][$key]-&amp;#gt;__resetAssociations();</span></br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span></br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span></br></div>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-86a8-4401-b313-4493cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cab48b6143e1246d56bd3d4385b2c8da&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://bennerweb.com" rel="nofollow">Joshua Benner</a>						</strong>
+						<strong>said 
+						on Jun 12, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I've been testing containable to see if it will work with my project. It's really a great tool. I'm getting an unexpected (to me) result, however:</p>
+<p>If I did a normal recursive=3 find* on model Placement, the result would be like this:</p>
+<p>Placement<br />
+PlacementType</br><br />
+School</br><br />
+Student</br><br />
+--Person</br><br />
+--Placement</br><br />
+----PlacementType</br><br />
+----School</br><br />
+----Student</br></p>
+<p>This is what I want:</p>
+<p>Placement<br />
+PlacementType</br><br />
+Student</br><br />
+--Person</br><br />
+--Placement</br><br />
+----PlacementType</br></p>
+<p>This is the contain call I've tried:</p>
+<p>$this-&gt;Placement-&gt;contain(array('PlacementType', 'Student.Person','Student.Placement.PlacementType'));</p>
+<p>and I've tried:</p>
+<p>$this-&gt;Placement-&gt;contain(array('PlacementType', 'Student' =&gt; array('Person', 'Placement' =&gt; array('PlacementType'))));</p>
+<p>But each time, I get this:</p>
+<p>Placement<br />
+PlacementType</br><br />
+Student</br><br />
+--Person</br><br />
+--Placement</br><br />
+----PlacementType</br><br />
+----Student</br></p>
+<p>Does it fetch the Student association from Placement again since I wanted it once? Is this expected behavior, bug, or limitation (of code, or of my understanding! :)</p>
+<p>Thanks!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-b814-48d5-b45e-4d8bcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 12, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Joshua: This is expected behavior. If you do a findAll that retrieves a certain association two or more times then you'll not be able to fine-grain it's sub-associations other then having them all the same. My behavior helps you as good as it can with this by making sure it doesn't accidentally remove Student from Placement when you specify "Student.Placement.PlacementType" but it won't be able to more then this.</p>
+<p>This is a limitation that arises from the current Model architecture that defines associations on a per model and not a per situation/query basis. As it's usually not a major problem I hope that'll be good enough for you are trying to accomplish, otherwise you'll have to either do 2 finds or manual querying.</p>
+<p>-- Felix</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-bc30-42f8-9be0-4d2ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6cacda6f9cdac54d60f51d6190631fd8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							nao&nbsp;						</strong>
+						<strong>said 
+						on Jun 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Some news for your new version ? I am impatient to see how you implement my ideas of mine.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-ceb0-4cf4-a2a7-4b56cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2007/06/14/containable-20-beta/" rel="nofollow">ThinkingPHP and beyond &raquo; Containable 2.0 BETA</a>						</strong>
+						<strong>said 
+						on Jun 14, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] sorry I've taken so long to get a new version of Containable Behavior released, but believe me I've not been slacking this time. Rather I noticed that my initial plan of refactoring, adding a couple features and unit testing the behavior (especially the later) turned out to be much more ambitious than I thought it would be. In fact I'm releasing the new version as a BETA right now since I'm still not 100% satisfied with the result and not all features have made it in yet, but I felt the need for iterating. However, the new version should be a big step up from this initial one and I hopefully bug free. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dee-10ac-462e-93ce-4cc9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=91a658c2941ac7680f5fb9bcde7217b0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							sourtouch&nbsp;						</strong>
+						<strong>said 
+						on Aug 16, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix thanks for the very useful behavior. I am finding that I get a lot of memory errors when using this behavior though and I can't tell whats causing it. All I know is that when it sometimes happens that if I 'contain' a model to only include certain other models I get a memory exhausted error. The only way to make the error go away is to comment out the containing. Any ideas what might be causing this?</p>
+<p>Thanks,<br />
+S</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dee-1a5c-47aa-804a-46b9cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 16, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>sourtouch: Are you using the 2.0 version? I use this behavior on a huge project with 300db tables and virtually several hundred calls to it. See if you can investigate further on this as I have no idea what could be causing it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dee-7bc8-409e-886c-4a4fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=91a658c2941ac7680f5fb9bcde7217b0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							sourtouch&nbsp;						</strong>
+						<strong>said 
+						on Aug 17, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix, sorry I posted this in the wrong thread as it is version 2.0 Betathat I'm using.</p>
+<p>I think the problem lies with the $containments variable that is returned from the contain method. It seems to contain a really huge about amount of unnecessary data. </p>
+<p>Try adding debug($containments);exit; at line 72 right before the contain method returns the $containments variable. </p>
+<p>If you like I can email you a copy of what I get when I do that.</p>
+<p>Best,<br />
+S :)</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dee-5698-4eec-a6ae-4d42cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 17, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>sourtouch: Are you using PHP4? The $containments should merely be made up of references to models, none of that should take up any significant memory.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dee-0eec-4be2-8cf3-490acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=91a658c2941ac7680f5fb9bcde7217b0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							sourtouch&nbsp;						</strong>
+						<strong>said 
+						on Aug 17, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>No I'm using PHP5. $containments does seem to be made of information on models and tables but when i dump it into the browser it spits out over 40,000 lines of debug information which is as far as it gets before the memory error occurred.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dee-77cc-448a-bba4-4abdcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 17, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>sourtouch: Yes, that is normal because the Models reference each other recursively indefinitely. Do you get the memory errors only from doing the debug() or during normal usage of the behavior? Please go ahead and paste me some code here so I get an idea about what you are doing: http://bin.cakephp.org/add/sourtouch</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4def-7d24-4ee6-a3e8-47cccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c4c09945f5f310fcf65c3b43da9bcb7f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							ian&nbsp;						</strong>
+						<strong>said 
+						on Sep 17, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>This is a good behavior but as with sourtouch, I get memory errors during normal usage, but only when trying to restrict models in a way equivalent to calling recursive = 2 and using the built-in pagination component. If I do a findAll instead of a paginate call, the behavior works perfectly.</p>
+<p>For what its worth, if you comment out line 1411 in model.php (__resetAssociations) - $this-&gt;{$type} = $this-&gt;__backAssociation[$type]; then the paginate call also works ok.</p>
+<p>More here: http://bin.cakephp.org/add/ian</p>
+<p>Cheers, ian</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df9-652c-4437-a067-407ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://developingwithstyle.com/2007/06/25/contain-my-excitement/" rel="nofollow">Developing With Style &raquo; Archive &raquo; Contain my excitem</a>						</strong>
+						<strong>said 
+						on Apr 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Last month I read - more like scanned - over a post on Felix Geisendörfer&#8217;s (the_undefined) blog all about a new behaviour he had just written for CakePHP. At the time I didn&#8217;t really get it and so didn&#8217;t see its value. But today while progressing with my Cake rewrite of Switchboard, I had a need to limit the associations that Cake was returning. The most obvious way was to play with the $recursive variable in my models, but that just isn&#8217;t fine grained enough. So I hopped on over to the Cake IRC channel and asked how others were doing it. Luckily for me, Felix had also hopped on over and suggested I take a look at his containable behaviour. He had just released version 2.0, so I grabbed the code and started playing. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-494c379b-dae8-4ad8-ad4f-06924834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=71b51d7006a8bdcca2c072f2c39a2a25&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							SwarnePepwale&nbsp;						</strong>
+						<strong>said 
+						on Dec 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thak you for the news</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

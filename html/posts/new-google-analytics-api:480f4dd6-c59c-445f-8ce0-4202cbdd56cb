@@ -1,0 +1,2315 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>New Google Analytics API / DataSource! &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/new-google-analytics-api:480f4dd6-c59c-445f-8ce0-4202cbdd56cb">New Google Analytics API / DataSource!</a></h2>	<div class="posted-on">
+		<p>Posted on 18/12/07 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>sorry it took me forever, but after <a href="http://www.thinkingphp.org/2006/06/19/google-analytics-php-api-cakephp-model/">my old Google Analytics API</a> fell apart due to the fact that Google published a new interface that also came with new reports / exporting formats I didn't have the time to come up with a new one.</p>
+<p>Anyway, in a very productive CakePHP session with nate a couple weeks ago in Atlanta I finally implemented some new HttpSocket stuff that was needed (minimal support for cookies / ssl) for creating the new API as a datasource. Now that its done I'm fairly happy with the outcome of the new API : ).</p>
+<p>Without further words: <a href="http://thinkingphp.org/code/datasources/google_analytics_source.phps">Download the 1.0 version here</a> (A <a href="https://svn.cakephp.org/repo/branches/1.2.x.x/">SVN:HEAD version of Cake 1.2</a> is highly recommended).</p>
+<p>It doesn't have pretty API comments yet, so I'm gonna make up for it with a little tutorial:</p>
+<h2>Step 1: Set up your connection credentials</h2>
+<p>After you downloaded the API and placed it in app/models/datasources/google_analytics_source.php, open up your app/config.database.php and add the following lines:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> <span class="re0">$analytics</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; <span class="st0">'datasource'</span> =&gt; <span class="st0">'google_analytics'</span>,<br />
+&nbsp; <span class="st0">'user'</span> =&gt; <span class="st0">'my-account@gmail.com'</span>,<br />
+&nbsp; <span class="st0">'password'</span> =&gt; <span class="st0">'my-password'</span>,<br />
+<span class="br0">&#41;</span>;</div>
+<p>Naming your connection $analytics is a choice, anything else will do as well.</p>
+<h2>Step 2: Set up a little test controller:</h2>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<br />
+<span class="kw2">class</span> AnalyticsController <span class="kw2">extends</span> AppController<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$uses</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$Analytics</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw2">function</span> beforeFilter<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; App::<span class="me2">import</span><span class="br0">&#40;</span><span class="st0">'ConnectionManager'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Analytics</span> =&amp; ConnectionManager::<span class="me2">getDataSource</span><span class="br0">&#40;</span><span class="st0">'analytics'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="kw2">function</span> list_profiles<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// List all profiles associated with your account</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$profiles</span> = <span class="re0">$this</span>-&gt;<span class="me1">Analytics</span>-&gt;<span class="me1">listSources</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; debug<span class="br0">&#40;</span><span class="re0">$profiles</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/exit"><span class="kw3">exit</span></a>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw2">function</span> show_reports<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+<span class="co1">// The quickest way to test if the API is working for you.</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$report</span> = <span class="re0">$this</span>-&gt;<span class="me1">Analytics</span>-&gt;<span class="me1">report</span><span class="br0">&#40;</span><span class="st0">'Dashboard'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; debug<span class="br0">&#40;</span><span class="re0">$report</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+<span class="co1">// Use a specific profile id (see list_profiles action above), do:</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$report</span> = <span class="re0">$this</span>-&gt;<span class="me1">Analytics</span>-&gt;<span class="me1">report</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'profile'</span> =&gt; <span class="st0">'290723'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'report'</span> =&gt; <span class="st0">'Dashboard'</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; debug<span class="br0">&#40;</span><span class="re0">$report</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// You can also reference your profile by name instead</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$report</span> = <span class="re0">$this</span>-&gt;<span class="me1">Analytics</span>-&gt;<span class="me1">report</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'profile'</span> =&gt; <span class="st0">'www.thinkingphp.org'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'report'</span> =&gt; <span class="st0">'Dashboard'</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; debug<span class="br0">&#40;</span><span class="re0">$report</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Retrieve the raw XML instead of an array to parse it yourself (lets say using SimpleXml in PHP5):</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$report</span> = <span class="re0">$this</span>-&gt;<span class="me1">Analytics</span>-&gt;<span class="me1">report</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'profile'</span> =&gt; <span class="st0">'www.thinkingphp.org'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'report'</span> =&gt; <span class="st0">'Dashboard'</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span>, <span class="kw2">true</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; debug<span class="br0">&#40;</span><span class="re0">$report</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+<span class="co1">// Retrieve a PDF report (make sure you set the right header before displaying):</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$report</span> = <span class="re0">$this</span>-&gt;<span class="me1">Analytics</span>-&gt;<span class="me1">report</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'profile'</span> =&gt; <span class="st0">'www.thinkingphp.org'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'report'</span> =&gt; <span class="st0">'Dashboard'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'format'</span> =&gt; <span class="st0">'pdf'</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span>, <span class="kw2">true</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; debug<span class="br0">&#40;</span><span class="re0">$report</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Set some criteria on the report:</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$report</span> = <span class="re0">$this</span>-&gt;<span class="me1">Analytics</span>-&gt;<span class="me1">report</span><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'profile'</span> =&gt; <span class="st0">'www.thinkingphp.org'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'report'</span> =&gt; <span class="st0">'Dashboard'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'from'</span> =&gt; <span class="st0">'2007-12-17'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'to'</span> =&gt; <span class="st0">'2007-12-18'</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; debug<span class="br0">&#40;</span><span class="re0">$report</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+<span class="coMULTI">/**<br />
+&nbsp;* Small Reference of options:<br />
+&nbsp;* <br />
+&nbsp;* profile: The id or name of the profile (optional, default = first profile)<br />
+&nbsp;* report: A report string like 'Dashboard', 'TrafficSources', 'Keywords' (optional, default = 'Dashboard')<br />
+&nbsp;* from: A yyyy-mm-dd formated date (optional, default = 1 month ago)<br />
+&nbsp;* to: A yyyy-mm-dd formated date (optional, default = today)<br />
+&nbsp;* tab: 0-4 (optional, default = 0)<br />
+&nbsp;* view: 0-9+ (optional, default = 0)<br />
+&nbsp;* format: 0-3 or 'pdf', 'xml', 'csv', 'tsv' (optional, default = 'xml')<br />
+&nbsp;* compute: 'average', other options unknown? (optional, default = 'average')<br />
+&nbsp;* query: Here you can manually pass (and overwrite) any part of the raw HTTP GET query made to Google Analytics. (optional, default = array())<br />
+&nbsp;*/</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span>
+</div>
+<p>Now you might wonder how get the list of reports that are available. Well usually that is pretty simple, just check the name of the menu entry you have open when browsing through the google analytics web interface and try using it in CamelCase. For example the 'Search Engines' view under traffic sources is the same as the 'SearchEngines' report. If this does not work, then use Firebug or something else to find the destination of one of the export links on the screen you are looking at. For example on the 'Direct Traffic' screen (under traffic sources as well), the xml export link points to 'export?fmt=1&id=5879334&pdr=20071116-20071216&cmp=average&&rpt=DirectSourcesReport' which means that the name of the report you need for this API is 'DirectSources'. If I get around I might create some listReports() function, but for now this should do the trick.</p>
+<p>Another tip: If you are overwhelmed by the information returned by the default xml reports, try using the CSV / TSV ones, they should usually contain less unneeded information, but you'll have to parse them yourself.</p>
+<p>Ok, I hope you guys enjoy and let me know if you have any questions / suggestions / problems.</p>
+<p>-- Felix Geisendörfer aka the_undefined</p>
+<p><strong>Note:</strong> This data source uses <a href="http://en.wikipedia.org/wiki/Web_scraping">web scraping</a>. This means that Google could easily break it by making changes to the infrastructure of Google Analytics again. I also haven't heard back from google about their legal views on this technique since <a href="http://www.thinkingphp.org/2006/05/30/update-on-cakephp-google-analytics-apimodel/">Late May 2006</a>, but so far I haven't heard about Google approaching any vendors providing similar access to their service using web scraping either, which is a good sign.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-c59c-445f-8ce0-4202cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnew-google-analytics-api%3A480f4dd6-c59c-445f-8ce0-4202cbdd56cb &amp;title=New+Google+Analytics+API+%2F+DataSource%21';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnew-google-analytics-api%3A480f4dd6-c59c-445f-8ce0-4202cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnew-google-analytics-api%3A480f4dd6-c59c-445f-8ce0-4202cbdd56cb&amp;title=New+Google+Analytics+API+%2F+DataSource%21&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnew-google-analytics-api%3A480f4dd6-c59c-445f-8ce0-4202cbdd56cb&amp;title=New+Google+Analytics+API+%2F+DataSource%21';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/Google_Chrome_for_Mac:4aaa8f79-859c-4792-aa13-4c6ccbdd56cb">Google Chrome for Mac</a></li>
+							<li><a href="/posts/cakephp-bleeding-edge-google-group:480f4dd6-73e4-487a-9c7d-4b86cbdd56cb">CakePHP Bleeding Edge - Google Group</a></li>
+							<li><a href="/posts/crawl-google-they-do-the-same-to-you:484ebdeb-bbe8-45fa-ad0f-26b14834cda3">Crawl Google, they do the same to you ; )</a></li>
+							<li><a href="/posts/update-on-cakephp-google-analytics-apimodel:480f4dd5-7044-47bc-945a-4d90cbdd56cb">Update on CakePHP Google Analytics API/Model</a></li>
+							<li><a href="/posts/google-analytics-php-api-cakephp-model:480f4dd5-b2a4-452a-b4ed-4f3fcbdd56cb">Google Analytics PHP Api (CakePHP Model)</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/using-rest-api%e2%80%99s-as-models-in-cakephp-a-google-calendar-example:480f4dd5-02c0-464e-941c-4774cbdd56cb">Using REST Api’s as Models in CakePHP / A Google Calendar example</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/new-google-analytics-api:480f4dd6-c59c-445f-8ce0-4202cbdd56cb">106 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/new-google-analytics-api:480f4dd6-c59c-445f-8ce0-4202cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4df3-9234-4600-aa06-4cc9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2006/06/19/google-analytics-php-api-cakephp-model/" rel="nofollow">ThinkingPHP and beyond &raquo; Google Analytics PHP Api (CakePHP</a>						</strong>
+						<strong>said 
+						on Dec 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] IMPORTANT: The stuff found in this article is outdated and not working anymore. Please see: New Google Analytics API / DataSource! for a newer version! [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-94b8-48bf-a817-476bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=68c529c3442953c3beb00a7ccca7e6bb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Lucian Lature&nbsp;						</strong>
+						<strong>said 
+						on Dec 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice job!...:)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-bbd0-4391-8a0c-47ffcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e6c4bdab1b1754154a9b509defc19426&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Pacifists&nbsp;						</strong>
+						<strong>said 
+						on Dec 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Heh the last week I was working on your old API ir remaking it to fit the changes that google introduced, just didn't have time to finish it. I was going to ask you to look at it when I'm finished, but you beat me to it, so I guess all I have to do now - is to use the new one :)</p>
+<p>Thanks for the great job. I like the clarity of your code.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-ec08-42f4-b9d3-43adcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=50cbd19c3d591d794a5f74cb7a47f881&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://streetfiles.org" rel="nofollow">oli</a>						</strong>
+						<strong>said 
+						on Dec 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>coole sache.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-5c5c-42d3-a786-4642cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f2cfbe5688fcd0e04de380e3bcf8e75f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://juan.basso.eng.br" rel="nofollow">Juan Basso</a>						</strong>
+						<strong>said 
+						on Dec 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Very nice!</p>
+<p>Someone to change in your datasource: You are using "uses('Xml');", replace it by "App::import('Core', 'Xml');". :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-5a6c-427e-a69c-427ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e6c4bdab1b1754154a9b509defc19426&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Pacifists&nbsp;						</strong>
+						<strong>said 
+						on Dec 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Juan: I've tried changing that and then 'AppHelper' not found and some other errors poped out. Using SVN cake 1.2, so maybe it's not the best thing to do :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-1d6c-404e-a1a4-4b6bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=21cdf913d6c78fd43356e37cf71f886a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.gignus.com/" rel="nofollow">Matt</a>						</strong>
+						<strong>said 
+						on Dec 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great stuff Felix! </p>
+<p>Glad you're back.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-e238-4a51-b8f4-4711cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f2cfbe5688fcd0e04de380e3bcf8e75f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://juan.basso.eng.br" rel="nofollow">Juan Basso</a>						</strong>
+						<strong>said 
+						on Dec 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sorry. I write wrong.</p>
+<p>The correct is: App::import('Xml', 'Core');</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-9950-4848-a37a-43a3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c5b13d672f9d1071ba5ea01955fe6a19&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://snowcore.blogspot.com/" rel="nofollow">Snowcore</a>						</strong>
+						<strong>said 
+						on Dec 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for Datasource!<br />
+It's really powerful!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-78ec-4805-95fd-41afcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.phpdeveloper.org/news/9275" rel="nofollow">PHPDeveloper.org</a>						</strong>
+						<strong>said 
+						on Dec 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p><strong>Felix Geisendorfer's Blog: New Google Analytics API / DataSource!...</strong></p>
+<p>Due to the new advancements Google has made in their Analytics ......</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-e698-4f51-a433-4b8ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.developercast.com/2007/12/19/felix-geisendorfers-blog-new-google-analytics-api-datasource/" rel="nofollow">developercast.com &raquo; Felix Geisendorfer&#8217;s Blog: New G</a>						</strong>
+						<strong>said 
+						on Dec 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Due to the new advancements Google has made in their Analytics API (Datasource) functionality, the API changed slightly and the code that Felix Geisendorfer had created to work with a CakePHP install wasn&#8217;t working anymore. He&#8217;s corrected the problem with this new post with the new code and an example of its use.   In a very productive CakePHP session with nate a couple weeks ago in Atlanta I finally implemented some new HttpSocket stuff that was needed (minimal support for cookies / ssl) for creating the new API as a datasource. Now that its done I&#8217;m fairly happy with the outcome of the new API. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-dde8-4953-9ecd-4e7acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://lamp.techbirbal.com/2007/12/19/felix-geisendorfers-blog-new-google-analytics-api-datasource/" rel="nofollow">Felix Geisendorfer&#8217;s Blog: New Google Analytics API / Data</a>						</strong>
+						<strong>said 
+						on Dec 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Due to the new advancements Google has made in their Analytics API (Datasource) functionality, the API changed slightly and the code that Felix Geisendorfer had created to work with a CakePHP install wasn&#8217;t working anymore. He&#8217;s corrected the problem with this new post with the new code and an example of its use.   In a very productive CakePHP session with nate a couple weeks ago in Atlanta I finally implemented some new HttpSocket stuff that was needed (minimal support for cookies / ssl) for creating the new API as a datasource. Now that its done I&#8217;m fairly happy with the outcome of the new API. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-0ec4-4aff-8052-4b0fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://lamp.techbirbal.com/2007/12/19/felix-geisendorfers-blog-new-google-analytics-api-datasource/" rel="nofollow">Felix Geisendorfer&#8217;s Blog: New Google Analytics API / Data</a>						</strong>
+						<strong>said 
+						on Dec 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Due to the new advancements Google has made in their Analytics API (Datasource) functionality, the API changed slightly and the code that Felix Geisendorfer had created to work with a CakePHP install wasn&#8217;t working anymore. He&#8217;s corrected the problem with this new post with the new code and an example of its use.   In a very productive CakePHP session with nate a couple weeks ago in Atlanta I finally implemented some new HttpSocket stuff that was needed (minimal support for cookies / ssl) for creating the new API as a datasource. Now that its done I&#8217;m fairly happy with the outcome of the new API. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-11c0-45c7-a4ce-491fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cc4d233c0a35243c8dcb6844f93700d1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://jeanviet.info" rel="nofollow">Jeanviet</a>						</strong>
+						<strong>said 
+						on Dec 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for the update... still so hard for me to know exactly what i have to do with cake php. can you give us more details (or someone who comments as well)... can you explain all the steps we have to deal with cake php... or maybe just what have changed with the old method (do we need to install cake php 1.2 ? your code works with the old version ?)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-a2c4-47ba-8767-45f4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://davidwalsh.name/good-web-design-css-working-group-body-id-ie8-acid2-domassistant-25-google-analytics-wii-opera-sdk/" rel="nofollow">Weekend Links - Good Web Design, CSS Working Group, Body ID, IE8</a>						</strong>
+						<strong>said 
+						on Dec 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] http://www.thinkingphp.org/2007/12/18/new-google-analytics-api/ addthis_url = 'http%3A%2F%2Fdavidwalsh.name%2Fgood-web-design-css-working-group-body-id-ie8-acid2-domassistant-25-google-analytics-wii-opera-sdk%2F'; addthis_title = 'Weekend+Links+-+Good+Web+Design%2C+CSS+Working+Group%2C+Body+ID%2C+IE8+Acid2%2C+DOMAssistant+2.5%2C+Google+Analytics%2C+Wii+Opera+SDK'; addthis_pub = ''; [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-48ec-46ee-9190-485dcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Dec 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Jeanviet: You will need to check out CakePHP 1.2 from SVN and then follow the steps I provided above. Any older cake version will not work. If you have problems with this try to check out the CakePHP mailing list at google groups or hop on freenode IRC #cakephp - there are plenty people who will help you if you ask nice and politely.</p>
+<p>But as always, see how much some google research may already help you.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-9f6c-4490-b09e-4854cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://bigbluehat.com/blog/2007/12/27/review-5-infrastructure-tips-for-startups/" rel="nofollow">BigBlueHat &raquo; Blog Archive &raquo; Review: 5 Infrastructure</a>						</strong>
+						<strong>said 
+						on Dec 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] The dashboard is customizable, but the only way to integrate your stats into another product or a centralized dashboard for all your sites is via a web-scrapping API (for CakePHP no less). [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df4-c7c0-45b7-bd2b-4546cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cc4d233c0a35243c8dcb6844f93700d1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://jeanviet.info" rel="nofollow">jeanviet</a>						</strong>
+						<strong>said 
+						on Dec 29, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix: everything is OK now, i put the new version 1.2...</p>
+<p>Here you can see my beautiful stats:<br />
+http://jeanviet.info/stats/analytics/janusiens</br></p>
+<p>Thanks once again Felix...</p>
+<p>Maybe a little question that i was enable to solve.. i'm not an expert in php...</p>
+<p>In google analytics datas, you have variables with numbers which are string (7) and not integer...<br />
+Example: $pageviews = "154 789"</br></p>
+<p>I would like to change this to integer...</p>
+<p>if i do this (int)$pageviews... i've got this: 154</p>
+<p>how can i have this: 154789 with a integer variable<br />
+i try this (before int function): str_replace (' ', '', $pageviews)</br></p>
+<p>But it doesn't work. the space doesn't disappear.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df4-2f34-4a01-813c-4be1cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://david.scatigna.it/2008/01/03/links-for-2008-01-03/" rel="nofollow">Skylog &raquo; Blog Archive &raquo; links for 2008-01-03</a>						</strong>
+						<strong>said 
+						on Jan 03, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] New Google Analytics API / DataSource! (tags: php) [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df4-d600-4953-a8ce-455ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cc4d233c0a35243c8dcb6844f93700d1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://jeanviet.info" rel="nofollow">Jeanviet</a>						</strong>
+						<strong>said 
+						on Jan 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Happy new year for those who read the comments... maybe 1 day, i'll have the chance to have an answer to my "spaces" problems in numbers.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df4-951c-4372-83db-4bedcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Jeanviet:</p>
+<p>I didn't see any problem with your code, however, I assume this is what happened. Your code looked like this:</p>
+<p>str_replace ('', '', $pageviews)<br />
+$pageviews = (int)$pageviews;</br></p>
+<p>This does not work b/c str_replace does not work on a reference to the variable you pass in, but on a copy of the value. This means you got to write something like this:</p>
+<p>$pageviews = str_replace ('', '', $pageviews);<br />
+$pageviews = (int)$pageviews;</br></p>
+<p>or shorter:<br />
+$pageviews = (int)str_replace ('', '', $pageviews);</br></p>
+<p>Anyway, its a little inappropriate to ask general PHP questions on here, there are more then enough mailing lists and irc channels full of people to help you with those out there.  But no worries, I hope this helps and you're using this API for something fun ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df4-7e44-40d1-8903-4ab6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0a360ff80d5f8a26d77bf3f39f6eef6e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							David Lynes&nbsp;						</strong>
+						<strong>said 
+						on Jan 09, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I am trying to run the same above and have installed as per the instruction but I am getting the following error messages. </p>
+<p>Warning (2): preg_split() [function.preg-split]: Compilation failed: lookbehind assertion is not fixed length at offset 9 [CORE/cake/libs/http_socket.php, line 832]</p>
+<p>I am using PHP5 with the CakePHP 1.2.0.6311 beta. </p>
+<p>Please could anyone help or point me in the right direction please.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df4-cc2c-4526-8427-429dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=34126258d6eea961cccd152ff74da0da&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://chinooktc.com" rel="nofollow">Timmy</a>						</strong>
+						<strong>said 
+						on Jan 09, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice work.  I'm going to test this out today.  I was curious though about what/if anything doesn't work if not running off the HEAD 1.2.</p>
+<p>Thanks again.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df4-91cc-405d-ab4b-4190cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.ginside.com/2006/393/google-analytics-api/" rel="nofollow">Google Analytics API</a>						</strong>
+						<strong>said 
+						on Jan 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Update! A great update to a version that works! Check out the most recent Google Analytics API!    Tags:Analytics, API [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df4-5224-45b1-8296-43afcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=614ef2a7bd25e5456953cae5f0deefd4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.aleron.com.au" rel="nofollow">aleron</a>						</strong>
+						<strong>said 
+						on Jan 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>great work</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-fca8-4c9c-ada5-4a2bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b2a1f4916363050aae02e867d33e5b92&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.solumovil.com" rel="nofollow">santi</a>						</strong>
+						<strong>said 
+						on Jan 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hi all could some one show me please  some code for the viewer, or some steps to test it, thanks. i think i have it working but havent been able to see any data :S</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-7260-4a5f-8862-427ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4b8ac10de9798276c02a56fd26671cbc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Suchi&nbsp;						</strong>
+						<strong>said 
+						on Jan 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hello - I was trying this API out - but am facing with some problems. It seems that the lgin is not working fine for me.<br />
+I tried to echo the response we get in the login function - but that forwards me to another login box - with the correct user filled in, no password filled in and a Captcha to be filled in.</br><br />
+When i tried to get the same respone echoed (but now wrapped in htmlentities function) i get the following</br><br />
+<code><br />
+   <!-- function doRedirect(url) { open(url, "_top"); } -->   </><!-- function doRedirect(url) { try { open(url, "_top"); } catch (xcp) { insertContinueLink(); } } -->   </><!-- function doRedirect(url) { try { open(url, "_top"); } catch (xcp) { insertContinueLink(); } } -->   </><!-- var firsttime = "firsttime"; var goback = "goback"; var gofwd = "gofwd"; function redirect() { var url = 'https:\x2F\x2Fwww.google.com\x2Faccounts\x2FLoginBox?continue=http%3A%2F%2Fwww.google.com%2Fanalytics%2Fhome%2F%3Fet%3Dreset%26hl%3Den-US\x26service=analytics\x26hl=en-US\x26reqemail=gargsuchi%40gmail.com\x26roec=Captcha\x26pofce=gargsuchi%40gmail.com'; var state = document.dummyform.dummyfield.value; var lastUrl = document.dummyform.dummyfield2.value; if ((state == firsttime) || (url != lastUrl)) { // First time visit or passive login document.dummyform.dummyfield.value = goback; document.dummyform.dummyfield.defaultvalue = goback; document.dummyform.dummyfield2.value = url; document.dummyform.dummyfield2.defaultvalue = url; doRedirect(url); } else if (state == goback) { // Remember that we should go forward next time and go backward. document.dummyform.dummyfield.value = gofwd; document.dummyform.dummyfield.defaultvalue = gofwd; history.back(); } else if (state == gofwd) { // Remember that we should go backward next time and go forward. document.dummyform.dummyfield.value = goback; document.dummyform.dummyfield.defaultvalue = goback; history.forward(); } } // Tells the user we are waiting for the page to redirect function insertLoadingMessage() { document.getElementById("loadingDiv").style.visibility = "visible"; } function insertContinueLink() { document.getElementById("loadingDiv").style.visibility = "hidden"; document.getElementById("clickToContinue").style.visibility = "visible"; } -->     Loading...   <a href="https://www.google.com/accounts/LoginBox?continue=http%3A%2F%2Fwww.google.com%2Fanalytics%2Fhome%2F%3Fet%3Dreset%26hl%3Den-US&amp;service=analytics&amp;hl=en-US&amp;reqemail=gargsuchi%40gmail.com&amp;roec=Captcha&amp;pofce=gargsuchi%40gmail.com" rel="nofollow">Click here to continue</a>       Please <a href="https://www.google.com/accounts/LoginBox?continue=http%3A%2F%2Fwww.google.com%2Fanalytics%2Fhome%2F%3Fet%3Dreset%26hl%3Den-US&amp;service=analytics&amp;hl=en-US&amp;reqemail=gargsuchi%40gmail.com&amp;roec=Captcha&amp;pofce=gargsuchi%40gmail.com" rel="nofollow">click here to continue</a>.<br />
+</br></></br></code></br></p>
+<p>Can you pleae help me out with this.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-1748-49e3-8bcb-4f63cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4b8ac10de9798276c02a56fd26671cbc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Suchi&nbsp;						</strong>
+						<strong>said 
+						on Jan 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>well - now it seems that the login is working - but still i am not able to get what i want.<br />
+When i go to</br><br />
+http://path-to-my-cake/analytics/list_profiles/</br><br />
+I get a lot of warnings etc. and then nothing.</br><br />
+I turned up the debug level and also put in some echos in the listSources function.</br><br />
+When i echoed $response there - i get the login screen of google (naturally the code after that doesnt work ans it is not able to get the matching string)</br><br />
+For more troubleshooting - i echoed $this-&gt;connected() &amp; $this-&gt;login() and both of them are 1. So why s this asking me to login??</br></p>
+<p>Any idea what can be wrong?</p>
+<p>Thank for any help<br />
+Suchi</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-9050-4260-9677-454ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4b8ac10de9798276c02a56fd26671cbc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Suchi&nbsp;						</strong>
+						<strong>said 
+						on Jan 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>PS: sorry i cant give u the URL of my app - as it is behind htaccess authentication.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-c4c4-4d3f-8c60-4830cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 31, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Suchi: My guess is you are using an old cake version before I added simple cookie support to the HttpSocket.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-3688-4aa8-8f7d-4a51cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4b8ac10de9798276c02a56fd26671cbc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Suchi Garg&nbsp;						</strong>
+						<strong>said 
+						on Jan 31, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>i downloaded cake_1.2.0.6311-beta.tar.gz and installed that afresh - so it shouldnt be that.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-b818-47ef-ac17-437ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=83e2802a4e2a0fd4e2c4f69f258b419e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://gegeetteprterehajhiky.com" rel="nofollow">Illundalp</a>						</strong>
+						<strong>said 
+						on Feb 05, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hi! some infoo...<br />
+<a href="http://gegtyhttyhiky.com" rel="nofollow"> http://gegetyththghtryty.com </a></br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-e054-45d4-a20a-4d75cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=78e834d483355c40d2769942fa4458c9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://elitefreehost.com/bag/cake-in-a-bag.html" rel="nofollow">CepOrelpunege</a>						</strong>
+						<strong>said 
+						on Feb 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>If your different and a bit of a trend setter, not a trend follower, either go with the Licence Plate handbags or design and make your own.  <a href="http://elitefreehost.com/bag/ford-f-150-air-bag-light-stays-on.html" rel="nofollow">ford f 150 air bag light stays on</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df6-f578-4c65-bf72-4922cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f903fd1f1425751fca611e1ef055a6d0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Shyama Kant&nbsp;						</strong>
+						<strong>said 
+						on Feb 09, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>sir,<br />
+For Google Analytics api i have followed the steps written in http://www.thinkingphp.org/2006/06/19/google-analytics-php-api-cakephp-model/ as well as visited this url also http://www.thinkingphp.org/2007/12/18/new-google-analytics-api/</br></p>
+<p>Please let me know which to follow and the required steps to implement the google analytics. Its important.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df6-8210-4658-b251-40c8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://wiz.su/2008/02/14/otobrazhenie-dannykh-google-analytics-na-sajjte/" rel="nofollow">Отображение данных Google Analytics на сайте | Записки маленьког</a>						</strong>
+						<strong>said 
+						on Feb 13, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] К сожалению, для Google Analytics нет документированного API, поэтому информацию можно получить только экспериментальным путем или рассматривая соответствующие разработки. Я остановился на втором, за основу были взяты API Джо Тана2 для плагина WordPress Reports3, и Google Analytics API для CakePHP4. Второе не подходит в качестве базового решения, поскольку требует CakePHP знакомиться с которым пока желания нет, да и ставить фреймворк из-за простенького скрипта захочется не всем. В API от Джо я значительно упростил часть работающую непосредственно с GA, убрал лишние запросы и парсинг, которому в элементе отвечающем за загрузку делать нечего. Обратите внимание, что для авторизации требуются логин и пароль Google аккаунта, хранить на хостинге данные основного аккаунта не всегда целесообразно и безопасно, возможно стоит создать аккаунт специально для таких целей и открыть на нем доступ к отчетам сайта. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df6-b7f8-40d5-bec6-48e6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=32d39ac27f2cc6df6f31e93df9fc5c2c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.connectcase.nl" rel="nofollow">Cees</a>						</strong>
+						<strong>said 
+						on Feb 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>How do I download the whole stuff? The downloads on cakeforge.org all seem to point to some "download.php", while in the blog there is spoken of folders like "app/"/</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-dcbc-4229-91f4-4624cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Cees: You will need to download CakePHP 1.2 from cakephp.org first before you're going to be able to make any use of this. At this point there is no standalone version of this script.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df6-f5e4-420f-a8c1-48d9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a5e89252af5b649f5ce7802453303c13&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://wyrihaximus.net/blog/" rel="nofollow">WyriHaximus</a>						</strong>
+						<strong>said 
+						on Feb 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I keep getting this when I try to use this DS "	We cannot log you into your account at this time. Please try again later.". Anyone knows how to fix/solve it?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-55ac-4b26-85c0-4fb6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=dabd8c7b9b0c40737d720d5f3e086b32&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							avm&nbsp;						</strong>
+						<strong>said 
+						on Mar 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'm getting this error</p>
+<p>Class 'App' not found in C:\wamp\www\cake\app\controllers\analytics_controller.php on line 22</p>
+<p>The line involved is</p>
+<p>App::import('ConnectionManager');</p>
+<p>What is causing this? Help is appreciated</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-e4ec-4b62-9ab8-479ccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>avm: You need to use the latest version of CakePHP 1.2 for this data source to work. You are probably using 1.1.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-3cf0-47d5-8237-4658cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=93bea07e713080ed0d5be6865d6e7cf4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://peltiertech.com/WordPress/" rel="nofollow">Jon Peltier</a>						</strong>
+						<strong>said 
+						on Apr 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I can't seem to avoid this error.</p>
+<p>Fatal error: Class 'GoogleAnalyticsSource' not found in /www/eh7701/public_html/cake_1_2/cake/libs/model/connection_manager.php on line 110</p>
+<p>Unfortunately I know little of PHP, though I'm picking it up fast.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-cf04-48aa-970e-4949cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b2d5ededf9e96daa2db4e2505540a921&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.interklub.com.pl" rel="nofollow">Daniel.Interklub</a>						</strong>
+						<strong>said 
+						on Apr 15, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi!</p>
+<p>Is there new version of method that allows to grab all Top Content section reports?<br />
+I need to get about 8000 positions and max passed via query is 500.</br></p>
+<p>Theres no paginationations, so I dont know how to switch to next results.<br />
+I'll be very greatful for any suggestions.</br></p>
+<p>DNA</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4828eb86-8b9c-4bba-b2b7-5d984834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fabd80fa1764b6e8bb33e21f6bab3d9e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Narendra&nbsp;						</strong>
+						<strong>said 
+						on May 13, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Help!</p>
+<p>My post looks like this (omitted email and pass) and I keep getting just another login page as the response. :-(</p>
+<p>HttpSocket Object<br />
+(</br><br />
+    [description] => HTTP-based DataSource Interface</br><br />
+    [quirksMode] =></br><br />
+    [request] => Array</br><br />
+        (</br><br />
+            [method] => POST</br><br />
+            [uri] => Array</br><br />
+                (</br><br />
+                    [scheme] => https</br><br />
+                    [host] => www.google.com</br><br />
+                    [port] => 443</br><br />
+                    [user] =></br><br />
+                    [pass] =></br><br />
+                    [path] => /accounts/ServiceLoginBoxAuth</br><br />
+                    [query] => Array</br><br />
+                        (</br><br />
+                        )</br></p>
+<p>                    [fragment] =><br />
+                )</br></p>
+<p>            [auth] => Array<br />
+                (</br><br />
+                    [method] => basic</br><br />
+                    [user] =></br><br />
+                    [pass] =></br><br />
+                )</br></p>
+<p>            [version] => 1.1<br />
+            [body] => continue=http%3A%2F%2Fwww.google.com%2Fanalytics%2Fhome%2F%3Fet%3Dreset%26hl%3Den-US&amp;service=analytics&amp;nui=hidden&amp;hl=en-US&amp;GA3T=ouVrvynQwUs&amp;Email=EEEEEE%40gmail.com&amp;PersistentCookie=yes&amp;Passwd=PPPPPPP</br><br />
+            [line] => POST /accounts/ServiceLoginBoxAuth HTTP/1.1</br></p>
+<p>            [header] => Host: www.google.com<br />
+Connection: close</br><br />
+User-Agent: CakePHP</br><br />
+Content-Type: application/x-www-form-urlencoded</br><br />
+Content-Length: 232</br></p>
+<p>            [raw] => POST /accounts/ServiceLoginBoxAuth HTTP/1.1<br />
+Host: www.google.com</br><br />
+Connection: close</br><br />
+User-Agent: CakePHP</br><br />
+Content-Type: application/x-www-form-urlencoded</br><br />
+Content-Length: 232</br></p>
+<p>continue=http%3A%2F%2Fwww.google.com%2Fanalytics%2Fhome%2F%3Fet%3Dreset%26hl%3Den-US&amp;service=analytics&amp;nui=hidden&amp;hl=en-US&amp;GA3T=ouVrvynQwUs&amp;Email=EEEEE%40gmail.com&amp;PersistentCookie=yes&amp;Passwd=PPPPPP<br />
+            [cookies] => Array</br><br />
+                (</br><br />
+                )</br></p>
+<p>        )</p>
+<p>    [response] => Array<br />
+        (</br><br />
+            [raw] => Array</br><br />
+                (</br><br />
+                    [status-line] =></br><br />
+                    [header] =></br><br />
+                    [body] =></br><br />
+                    [response] =></br><br />
+                )</br></p>
+<p>            [status] => Array<br />
+                (</br><br />
+                    [http-version] =></br><br />
+                    [code] =></br><br />
+                    [reason-phrase] =></br><br />
+                )</br></p>
+<p>            [header] => Array<br />
+                (</br><br />
+                )</br></p>
+<p>            [body] =><br />
+            [cookies] => Array</br><br />
+                (</br><br />
+                )</br></p>
+<p>        )</p>
+<p>    [config] => Array<br />
+        (</br><br />
+            [persistent] =></br><br />
+            [host] => www.google.com</br><br />
+            [protocol] => 6</br><br />
+            [port] => 443</br><br />
+            [timeout] => 30</br><br />
+            [request] => Array</br><br />
+                (</br><br />
+                    [uri] => Array</br><br />
+                        (</br><br />
+                            [scheme] => https</br><br />
+                            [host] => www.google.com</br><br />
+                            [port] => 443</br><br />
+                        )</br></p>
+<p>                    [auth] => Array<br />
+                        (</br><br />
+                            [method] => basic</br><br />
+                            [user] =></br><br />
+                            [pass] =></br><br />
+                        )</br></p>
+<p>                    [cookies] => Array<br />
+                        (</br><br />
+                        )</br></p>
+<p>                )</p>
+<p>        )</p>
+<p>    [lineBreak] => </p>
+<p>    [_baseConfig] => Array<br />
+        (</br><br />
+            [persistent] =></br><br />
+            [host] => localhost</br><br />
+            [protocol] => tcp</br><br />
+            [port] => 80</br><br />
+            [timeout] => 30</br><br />
+        )</br></p>
+<p>    [connection] =><br />
+    [connected] =></br><br />
+    [error] => Array</br><br />
+        (</br><br />
+        )</br></p>
+<p>    [_log] =><br />
+)</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48298dc4-4efc-4db6-9624-4d1f4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 13, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Narendra: Make sure you are using the latest version of CakePHP!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-482c493a-f3c4-41cd-b3eb-3def4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bdf24ec4f08de8ce1afc5422bdff6329&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.michaelmafort.com" rel="nofollow">Michael</a>						</strong>
+						<strong>said 
+						on May 15, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Good job! Congratulations.<br />
+Thanks for share this app.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-482e60c2-a9ec-49c3-8562-2c464834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8b20ce4a6894f4b15eeb5a4733d2b2d6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							TimC&nbsp;						</strong>
+						<strong>said 
+						on May 17, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix - thanks for sharing...  One question from a Cake newbie.  The API seems to work for me, but instead of a report or something, I get the following messages:</p>
+<p>app/controllers/analytics_controller.php (line 29)<br />
+Error: The view for AnalyticsController::show_reports() was not found.</br><br />
+Error: Confirm you have created the file: app/views/analytics/show_reports.ctp</br></p>
+<p>I understand what it is looking for, but have no idea what goes into the file!!</p>
+<p>Any help appreciated.</p>
+<p>Thanks in advance...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48319582-11f0-4b1e-8075-468c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bdb9fe447497e0b09d265c4a7cbe00b7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Kiyong&nbsp;						</strong>
+						<strong>said 
+						on May 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks~ Felix... :)<br />
+I'm Koeran.</br><br />
+You are lucky guy!</br><br />
+I'm happy for you.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4831a0f5-4b1c-4b6a-b6df-77b54834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>TimC: Just create the file and put some text in it. You can also add PHP code to it and output any variables set from your controller using the Controller::set function.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-483af750-eae4-4185-8baf-6f8b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8b20ce4a6894f4b15eeb5a4733d2b2d6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							TimC&nbsp;						</strong>
+						<strong>said 
+						on May 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix - one more question.  I have the ctp file created now, but noticed the debug($report) line in the control file was commented out.  When I uncomment the debug($report) line, I get the following:</p>
+<p>app/controllers/analytics_controller.php (line 29)</p>
+<p>Line 29 is: debug($report);</p>
+<p>here is the code in show_reports():</p>
+<p>$report = $this->Analytics->report(array(<br />
+            'profile' => '6723610',</br><br />
+            'report' => 'Dashboard'</br><br />
+        ));</br><br />
+        debug($report);</br></p>
+<p>Similar error output occurs for the list_profiles and show_reports.  The analytics page in Google has multiple accounts, but the specific id should take care of this (I believe).  Just noted the multiple accts as an FYI.  Also, running this on a Mac Book Pro w/ Safari and Firefox browsers.</p>
+<p>Thanks again in advance...</p>
+<p>Tim</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-483b065e-3c60-459b-9b40-46274834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8b20ce4a6894f4b15eeb5a4733d2b2d6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							TimC&nbsp;						</strong>
+						<strong>said 
+						on May 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix - forget my previous request.  I just reviewed my database.php file (for like the 10th time) and noticed a typo in my user name that I hadn't noticed before.  Arrrghhh, but the good news is, it's working!!</p>
+<p>Thanks again!!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48403f30-d100-4a1a-a831-26bc4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b0f4a7aa41955638d74d3f63b04704fb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://seanneilan.com" rel="nofollow">Sean Neilan</a>						</strong>
+						<strong>said 
+						on May 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'm getting some kind of SSL error. It says,<br />
+Warning (2): fread()function.fread]: SSL: fatal protocol error [CORE/cake/libs/socket.php, line 233</br></p>
+<p>Running PHP 5.2.3 with Zend engine v2.2.0, Zend extension manager v1.2.0 and Zend optimizer v3.2.8</p>
+<p>Any ideas?</p>
+<p>Thank you very much for your time.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4840456d-ee64-48f5-b005-1e8e4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sean: OS? I know osx can be a tiny bit quirky at times but you should not get this on linux.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4840610c-0784-4de1-a943-4d764834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b0f4a7aa41955638d74d3f63b04704fb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://seanneilan.com" rel="nofollow">Sean Neilan</a>						</strong>
+						<strong>said 
+						on May 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Felix</p>
+<p>Thank you for your response!</p>
+<p>The PHP script is running server side on a redhat linux box @ hostforweb.com. Although, I'm running OSX here. Normally, I wouldn't think the client side would have much to do with an error like this.</p>
+<p>Actually, for some reason, I didn't get this error before and when I showed it to my boss, it came up. Kind of like Michigan J. Frog.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4842ae6e-b35c-480a-9726-7c704834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 01, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sean: Maybe you need to update your PHP version or SSL bindings. The HttpSocket itself relies on PHPs built-in magic for SSL so I wouldn't really know what could be causing this other then a buggy implementation somewhere down the stack.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4858e765-c8f4-44a1-a849-3d764834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=60d4096cfc9aa7e6f4958d4bd6a46c4f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://test.com" rel="nofollow">narendra</a>						</strong>
+						<strong>said 
+						on Jun 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>I tried a lot with your script, but still i am not getting any output.</p>
+<p>its show me below errors</p>
+<p>app\controllers\analytics_controller.php (line 21)</p>
+<p>app\controllers\analytics_controller.php (line 28)</p>
+<p>app\controllers\analytics_controller.php (line 35)</p>
+<p>app\controllers\analytics_controller.php (line 42)</p>
+<p>app\controllers\analytics_controller.php (line 50)</p>
+<p>app\controllers\analytics_controller.php (line 59)</p>
+<p>Notice (8): Undefined property:  View::$Analytics [APP\controllers\analytics_controller.php, line 20]</p>
+<p>Code</p>
+<p>    function show_reports() {</p>
+<p>// The quickest way to test if the API is working for you.</p>
+<p>        $report = $this->Analytics->report('Dashboard');</p>
+<p>AnalyticsController::show_reports() - APP\controllers\analytics_controller.php, line 20<br />
+include - APP\views\analytics\show_reports.ctp, line 2</br><br />
+View::_render() - CORE\cake\libs\view\view.php, line 646</br><br />
+View::render() - CORE\cake\libs\view\view.php, line 368</br><br />
+Controller::render() - CORE\cake\libs\controller\controller.php, line 732</br><br />
+Dispatcher::_invoke() - CORE\cake\dispatcher.php, line 260</br><br />
+Dispatcher::dispatch() - CORE\cake\dispatcher.php, line 230</br><br />
+[main] - APP\webroot\index.php, line 84</br></p>
+<p>Fatal error: Call to a member function report() on a non-object in C:\xampp\htdocs\cakephp\app\controllers\analytics_controller.php on line 20</p>
+<p>Please help me ,</p>
+<p>Thanks</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4863bc1d-45e0-4323-9a50-55ef4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3591eb8f458b086858991cd620848307&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.m3v.us" rel="nofollow">Alex</a>						</strong>
+						<strong>said 
+						on Jun 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great script! Thanks Felix!</p>
+<p>Has someone solved the problem of getting the larger datasets(more then 500 records)?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4863ed03-6d74-40a5-89cf-2df04834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Alex: I'll look into it now.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48763696-cd6c-4ec7-af8b-2f534834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7b3521b6118efc2d8b5b107b5e58c586&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Deepti&nbsp;						</strong>
+						<strong>said 
+						on Jul 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix!</p>
+<p>You have done a great job with the API. I am facing problems with cakePHP though. I am a new to cakePHP and though I think I have the everything at the right place I do not know how to test it. The only thing I see with show_reports.ctp in place are these lines :</p>
+<p>app\controllers\analytics_controller.php (line 21)</p>
+<p>app\controllers\analytics_controller.php (line 28)</p>
+<p>app\controllers\analytics_controller.php (line 35)</p>
+<p>app\controllers\analytics_controller.php (line 42)</p>
+<p>app\controllers\analytics_controller.php (line 50)</p>
+<p>app\controllers\analytics_controller.php (line 59)</p>
+<p>Can you please tell me what and how should I proceed?</p>
+<p>Really appreciate your help.</p>
+<p>Thanks,<br />
+Deepti</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48769fe4-bd50-4e3c-ab4a-7fed4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7b3521b6118efc2d8b5b107b5e58c586&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Deepti&nbsp;						</strong>
+						<strong>said 
+						on Jul 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey it works :) For people facing similar problem please make sure that you have configures your php with ssl. That was my problem.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48771326-b434-45db-b355-151c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9f5b52660ba6ab2011f8b5fc105b0315&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							michaelchan&nbsp;						</strong>
+						<strong>said 
+						on Jul 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I put the API, controller in the location as instructed and have the database and its configuration file up. However, the database is empty.</p>
+<p>The CakePHP is up, but how do I proceed from here? How can I show the Analytics result and customize it? Have no any clue at all.</p>
+<p>Is there any further sample code or more detail instruction to get it work?</p>
+<p>Thanks,<br />
+Michael</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-487e68cf-a070-41e2-96cb-1d2c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4bc67e0211fc515733ab8cb49b174ddf&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Patrick&nbsp;						</strong>
+						<strong>said 
+						on Jul 16, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Has anyone else had any problems with the 'to' 'from' parameters? No matter what, I'm getting exactly one month of data. Even if I do not include those paramaters.</p>
+<p>For example:</p>
+<p>	        $report = $this->Analytics->report(array(<br />
+	            'profile' => $id,</br><br />
+	            'report' => 'PageViews',</br><br />
+				'from' => '2008-06-01',</br><br />
+				'to' => '2008-06-06',</br><br />
+	        ));</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-488929ec-a068-4742-8aef-1f7d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c35b71991703e62a8dfdb6eb404539c7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Sam S&nbsp;						</strong>
+						<strong>said 
+						on Jul 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I am getting an error witht the sources var on google_analytics_source.php, line 187</p>
+<p>foreach ($sources as $source) { </p>
+<p>I can't see why I am getting this, it does not seem to cause adverse effects - I still get data any idea why I get this?</p>
+<p>Also things seem to work better with numerical id rather than name passed as profile to the Analytics->report, I guess that not a problem.</p>
+<p>Perhaps google is altering the ay analytics work?</p>
+<p>its great and would be really positive if google endorsed this (hoping :))</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-488c02e9-7ecc-4219-ad59-3c8b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e1908e299f9f9fa4938e7e11e2c96f1e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.concept47.com" rel="nofollow">austin_web_developer</a>						</strong>
+						<strong>said 
+						on Jul 27, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I have this all setup but calling<br />
+<a rel="nofollow" href="http://mytestapp/analytics/list_profiles">http://mytestapp/analytics/list_profiles</a></br></p>
+<p>just gives me this<br />
+app\controllers\analytics_controller.php (line 14) </br></p>
+<p>I've checked and double checked my login information. I don't have any views included, but I cannot get it to work.<br />
+anyone else having the same problem?</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-488c0624-7ea8-4bc4-a0bb-066f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e1908e299f9f9fa4938e7e11e2c96f1e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.concept47.com" rel="nofollow">austin_web_developer</a>						</strong>
+						<strong>said 
+						on Jul 27, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I just read Deepti's response up above.<br />
+I am on a windows box, so I think I might be out of luck.</br><br />
+bummer.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4890e0d6-1fac-4858-9a2c-074c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=be88e097267370cc6199916104842113&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Edmundo&nbsp;						</strong>
+						<strong>said 
+						on Jul 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hello Felix,</p>
+<p>Thank you for your code, it works great!<br />
+Do you know if is there a way to get all the links listed on the top content report? I have a site that has 150000+ links on that report and I would like to get that info outside of GA.</br></p>
+<p>Thank you!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489880b8-b5d4-46cd-a356-5fc34834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0baa241af2172195bbbc88b563d16433&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.rakesh.ms" rel="nofollow">Rakesh Muraharishetty</a>						</strong>
+						<strong>said 
+						on Aug 05, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>There are a lot of constraints that you need to dig in order to find. I ll better write a small code snippet for you,</p>
+<p><a rel="nofollow" href="http://www.rakesh.ms/blog/2008/08/05/extract-urls-from-google-analytics/">http://www.rakesh.ms/blog/2008/08/05/extract-urls-from-google-analytics/</a></p>
+<p>You need to change the profile name(PROFILE_NAME) and number of urls (trows). It is going to take a lot of time for larger websites like yours. Better</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4898812f-cad0-4062-8a20-57b84834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0baa241af2172195bbbc88b563d16433&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.rakesh.ms" rel="nofollow">Rakesh Muraharishetty</a>						</strong>
+						<strong>said 
+						on Aug 05, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sorry that my last post was incomplete. I mean better split number of urls into 500 in each go. Google analytics also shows a max of 500 urls per page.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489e254b-45b8-4cf0-b366-2da44834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e81afd63c241ca2fda0f535131846f2e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dirvan&nbsp;						</strong>
+						<strong>said 
+						on Aug 09, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>I do not seem to see anything when I run   <a rel="nofollow" href="http://localhost:8888/analytics/list_profiles">http://localhost:8888/analytics/list_profiles</a> I do not see anything but get this: app/controllers/analytics_controller.php (line 14)</p>
+<p>When I use <a rel="nofollow" href="http://localhost:8888/analytics/show_reports">http://localhost:8888/analytics/show_reports</a> I see a chunk of data (with arrays and data) on a yellow background.<br />
+Is this is what I should have seen?</br></p>
+<p>I am using the latest Cake version since I have downloaded it today. Its installed under MAMP.</p>
+<p>Cheers</p>
+<p>Dirvan</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a01b31-4928-41c3-abbf-2ec94834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>If you only have one profile you might not get a list, but show reports is expected to dump a bunch of data, yes.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a955de-e028-4bd7-9aba-4f7e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=55ff61f119ad3335705a71074384c164&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Justin&nbsp;						</strong>
+						<strong>said 
+						on Aug 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I havenever used php cake before, so the instructions above leave me head scratching, how do I run this? When does the code from step 2 go?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b25819-6024-46b4-9234-56fc4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d2dae3febb9c2369bef3af9063bd50cc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							satinder&nbsp;						</strong>
+						<strong>said 
+						on Aug 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>i have installed everything and ran your analytics api. but got this error mess<br />
+Error:  Database table googleanalytics for model Googleanalytic was not found.</br></p>
+<p>So i wanted to know what's the structure for that table?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d0b8f0-58f0-4197-889f-175f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f512b6084ec3e57edf5380398640666d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Pattakkaarar&nbsp;						</strong>
+						<strong>said 
+						on Sep 17, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Deepti,<br />
+Im getting the same problem like getting the</br><br />
+app\controllers\analytics_controller.php (line 21)</br></p>
+<p>app\controllers\analytics_controller.php (line 28)</p>
+<p>app\controllers\analytics_controller.php (line 35)</p>
+<p>app\controllers\analytics_controller.php (line 42)</p>
+<p>app\controllers\analytics_controller.php (line 50)</p>
+<p>app\controllers\analytics_controller.php (line 59)<br />
+in my home page</br><br />
+Could you be more specific about changing 'configures your php with ssl'.</br><br />
+I didnt get that point.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d0ef12-fc48-4b59-abf9-572b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=74f94f3d280c03dea39e21df2bdb00a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://mandysingh.blogspot.com" rel="nofollow">Mandy</a>						</strong>
+						<strong>said 
+						on Sep 17, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix,</p>
+<p>seems like your code has stopped working for anything other than the default profile. Urls such as https:www.google.comanalyticshomeadminscid have now changed and are returning 302 to settings. Also seems like select box names have also changed.</p>
+<p>I am going to take a stab at working with this, but if you get some time or have some insights on this issue, could you please share?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d2cc35-bb6c-4bfc-8efe-07154834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ba620303949299f62b634040a8fe1942&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nick&nbsp;						</strong>
+						<strong>said 
+						on Sep 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Felix,</p>
+<p>This was an amazing find, but I too ran into the "302 Moved Temporarily" problem that Mandy has explained above. I will also try to debug this issue and any update would be appreciated.</p>
+<p>Thanks!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d389a1-11f0-4e0b-8066-3f354834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=74f94f3d280c03dea39e21df2bdb00a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://mandysingh.blogspot.com" rel="nofollow">Mandy</a>						</strong>
+						<strong>said 
+						on Sep 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Okay, I have this fixed in my playpen setup. I don't have a public url to post to. Felix, I can email them to you if you want.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48e2921d-d110-4b46-98f2-5d594834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=906816739b64b3c19730384cbfc9ff46&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Przemek Jazlo&nbsp;						</strong>
+						<strong>said 
+						on Sep 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>If you want to retrieve more than standard max. 500 of rows per page, then you need to append extra parameter called 'limit' to your query:</p>
+<p>$query = array(<br />
+   'limit' => 10000, // some big number</br><br />
+);</br></p>
+<p>$report = $this->Analytics->report(array(<br />
+   'profile' => [your_profile_id],</br><br />
+   'report' => [name_of_report],</br><br />
+   ...</br><br />
+   'query' => $query,</br><br />
+));</br></p>
+<p>You can also do more interesting stuff, for example change the default dimension of the report which you want to capture via API. You need to use extra parameter called 'segkey' to specify the dimension:</p>
+<p>$query = array(<br />
+   'segkey' => 'request_uri_1', // changes dimension to 'landing page'</br><br />
+);</br><br />
+// rest is same as above</br></p>
+<p>Please note that GA uses Ajax when changing the dimension. I used Firebug in order to discover parameters in the actual request, since they normally do not appear in the URL of the export link.</p>
+<p>I hope the information will be useful to some of you.</p>
+<p>-Przemek</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48eb548a-9434-480c-85cb-2ce34834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0bb514ec6d3dda74cf1e6269ce60087b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.knafland.com" rel="nofollow">knafland</a>						</strong>
+						<strong>said 
+						on Oct 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hello, another CakePHP newcomer. Using /analytics/show_reports/ controller, i get next response:<br />
+Array</br><br />
+(</br></p>
+<div class="clear"></div>
+<div class="code debuggable_sh_html" style="white-space: wrap;white-space: nowrap;">=&gt; Array<br />
+&nbsp; &nbsp; &nbsp; &nbsp; (</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [HEAD] =&gt; Array</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [TITLE] =&gt; Array</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [#text] =&gt; Moved Temporarily</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; )</br><br />
+</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; )</br><br />
+</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [BODY] =&gt; Array</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [H1] =&gt; Array</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [#text] =&gt; Moved Temporarily</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; )</br><br />
+</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [#text] =&gt; Array</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [0] =&gt; The document has moved </br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [1] =&gt; .</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; )</br><br />
+</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [A] =&gt; Array</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [#text] =&gt; here</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; )</br><br />
+</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; )</br><br />
+</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; )</br><br />
+</br><br />
+)</br><br />
+Anny help appreciated!</br></div>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48eb9e24-5020-470b-95e4-3c684834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8f9195ae5f661cb64b2895a8516e0be3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							newbie&nbsp;						</strong>
+						<strong>said 
+						on Oct 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi,</p>
+<p>I followed all the above steps and when I strat running the script using the below two lines its giving error:<br />
+ $GA = new AnalyticsController;</br><br />
+ $GA->list_profiles();</br></p>
+<p>Error its giving is<br />
+[Tue Oct 07 15:20:54 2008] [error] [client 127.0.0.1] PHP Fatal error:  Class 'AppController' not found in C:\\Program Files\\Apache Software Foundation\\Apache2.2\\htdocs\\analytics_controller.php on line 2</br></p>
+<p>Can any body please help me in understanding how to run the test script in Apache...<br />
+I have installed CAKE 1.2 version only.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ecc391-01c8-4f80-b5ac-3fae4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8f9195ae5f661cb64b2895a8516e0be3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							newbie&nbsp;						</strong>
+						<strong>said 
+						on Oct 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi,</p>
+<p>I am able to configure cake php and other stuff but giving other errors.<br />
+Can any body please help me in solving my problem:</br><br />
+app\controllers\analytics_controller.php (line 14) </br></p>
+<p>which was reported by people earlier... but could not see any solution for this.... any help on configuring php with ssl would help me...</p>
+<p>Thanks...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48f72242-012c-4221-b500-7e404834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0a33e7fc312a84f321a118b01f5b808a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://christoph.no" rel="nofollow">Christ0ph</a>						</strong>
+						<strong>said 
+						on Oct 16, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>is there any way to get for example data from analytics/reporting/content_detail_navigation?</p>
+<p>Ive tried to use the "Reports" parametre, but that doesnt work. Im also abit unsure how i could use the query parametre for this. Anyone?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4914a69d-4990-4153-be58-07524834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fda4431cc3a34e3e28d869b679dae0fa&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.autoquoter.com" rel="nofollow">Mike</a>						</strong>
+						<strong>said 
+						on Nov 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Can this be incorporated into Wordpress?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49199d87-06d4-406d-a32c-1e2e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1f001387e3679b04374247e33fec05bc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							ss_convert&nbsp;						</strong>
+						<strong>said 
+						on Nov 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for taking time to write this code Felix. I had to make the following changes to my google_analytics_source.php to get everything working:</p>
+<p>1) Changed "<a rel="nofollow" href="https://www.google.com/analytics/home/..."">https://www.google.com/analytics/home/..."</a> to "<a rel="nofollow" href="https://www.google.com/analytics/settings/..."">https://www.google.com/analytics/settings/..."</a> everywhere</p>
+<p>2) Line 105: Changed "account_list" to "scid"</p>
+<p>3) Line 123: Changed "profile_list" to "id"</p>
+<p>To everyone getting started, it really helps if you change your debug level to 3 on Line 43 of core.php. This allows you to see the Controller Dump. If you read down through it you can usually see where things are failing.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4940a7b8-df10-488a-96bf-27a04834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=49c220c10fe1dd3b1f67f41d2dd64bc9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Jo &nbsp;						</strong>
+						<strong>said 
+						on Dec 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hi,<br />
+while running analytics/show_reports , i have received the following error</br><br />
+Array</br><br />
+(</br></p>
+<div class="clear"></div>
+<div class="code debuggable_sh_html" style="white-space: wrap;white-space: nowrap;">=&gt; Array<br />
+&nbsp; &nbsp; &nbsp; &nbsp; (</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [HEAD] =&gt; Array</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [TITLE] =&gt; Array</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [#text] =&gt; Moved Temporarily</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; )</br><br />
+</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; )</br><br />
+</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [BODY] =&gt; Array</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [H1] =&gt; Array</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [#text] =&gt; Moved Temporarily</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; )</br><br />
+</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [#text] =&gt; Array</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [0] =&gt; </br><br />
+The document has moved </br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [1] =&gt; .</br><br />
+</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; )</br><br />
+</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [A] =&gt; Array</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [#text] =&gt; here</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; )</br><br />
+</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; )</br><br />
+</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; )</br><br />
+</br><br />
+)</br><br />
+</br><br />
+</br><br />
+appreciated your help</br></div>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4952a42b-42d8-4f2b-b35f-4f914834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=06bf01b2b0e42349654b73a1dd20fb5e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							JP&nbsp;						</strong>
+						<strong>said 
+						on Dec 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I managed to get some things working by using the comment of ss_convert, and replacing /cake/libs/http_socket.php @ line 848 with: $parts = preg_split('/(< ![^;]")?;[ \t]*/', $cookie);</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4952a44b-ce78-49f5-bbbf-4ea84834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=06bf01b2b0e42349654b73a1dd20fb5e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							JP&nbsp;						</strong>
+						<strong>said 
+						on Dec 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>$parts = preg_split('/(&gt;![^;]")?;[ \t]*/', $cookie);</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4952a462-27ec-4c17-9b78-4ea84834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=06bf01b2b0e42349654b73a1dd20fb5e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							JP&nbsp;						</strong>
+						<strong>said 
+						on Dec 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>finally, this is the correct one:<br />
+$parts = preg_split('/(&lt;![^;]")?;[ \t]*/', $cookie);</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4952ac99-7014-45a4-beb7-55624834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=06bf01b2b0e42349654b73a1dd20fb5e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							JP&nbsp;						</strong>
+						<strong>said 
+						on Dec 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>You also wanna replace the url around line 121 in the google_analytics_source.php with:</p>
+<p>/settings/?scid=</p>
+<p>(instead of some thing with /admin)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4992e5b1-7288-475f-930c-0d5f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2e4fe91a6471927e757fca1990de0168&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Arnout&nbsp;						</strong>
+						<strong>said 
+						on Feb 11, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Do you also have a standalone version of this? :-)<br />
+I think lots of people can use this as a standalone app as well.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-499bd96c-a0e0-46e6-9f43-0d694834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e1908e299f9f9fa4938e7e11e2c96f1e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.concept47.com" rel="nofollow">austin_web_developer</a>						</strong>
+						<strong>said 
+						on Feb 18, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I've made the edits suggested above and posted the updated file here<br />
+<a rel="nofollow" href="http://github.com/concept47/cake-php-google-analytics/tree/master">http://github.com/concept47/cake-php-google-analytics/tree/master</a></br></p>
+<p>I hope you don't mind Felix, I haven't figured out how to send patches yet. Once I do, I'll send the patch over. If you integrate the changes, let me know, so I can take the repo down.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-499bdab0-f9b4-40e5-a393-6d424834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e1908e299f9f9fa4938e7e11e2c96f1e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.concept47.com/austin_web_developer_blog/" rel="nofollow">austin_web_developer</a>						</strong>
+						<strong>said 
+						on Feb 18, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>If you're on a windows box and are getting the errors above where nothing is outputting at the debug calls, Your problem is that you don't have open ssl support installed.</p>
+<p>The HttpSocket Component that Felix uses, eventually makes a call using fsockopen or pfsockopen. If the connection is a secure one, it tries to do this over ssl:// instead of <a rel="nofollow" href="https://.">https://.</a></p>
+<p>To install openssl, just go here<br />
+<a rel="nofollow" href="http://us3.php.net/manual/en/openssl.installation.php">http://us3.php.net/manual/en/openssl.installation.php</a></br><br />
+But basically, all you need to do is uncomment this line in your php ini</br><br />
+;extension=php_openssl.dll</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b017ff-63b8-46e4-a3e7-3f6b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b5ea64aaccc7b29d5ef3670bac45ba6c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.digitael.nl" rel="nofollow">Martijn Duizendstra</a>						</strong>
+						<strong>said 
+						on Mar 05, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'm sorry, i just can't get this thing to work. I've updated the google_analytics_source.php file according to Austin_web_developer's changes but i still keep getting the damn errors on every line where a debug is occuring. I've tested CURL, OpenSSL, fsockopen, pfsockopen and everything is working, phpinfo() is also showing me that OpenSSL is installed and enabled. I hope someone can help me with this problem, or else i just have to pray that Google will release their API soon... Thanks in advance</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b01bad-b818-4620-b9e3-7e854834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e1908e299f9f9fa4938e7e11e2c96f1e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.concept47.com" rel="nofollow">austin_web_developer</a>						</strong>
+						<strong>said 
+						on Mar 05, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Post your errors, and your php version plus os.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b024b3-873c-464c-897f-1e5c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b5ea64aaccc7b29d5ef3670bac45ba6c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.digitael.nl" rel="nofollow">Martijn Duizendstra</a>						</strong>
+						<strong>said 
+						on Mar 05, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey thanks for replying so fast man.<br />
+I'm running Windows 2003 Server Web Edition, PHP Version 4.4.3</br></p>
+<p>When i go to: index.php?url=/analytics/list_profiles</p>
+<p>It shows me this error:<br />
+app\controllers\analytics_controller.php (line 18)</br></p>
+<p>If i go to: index.php?url=/analytics/show_reports it will show:<br />
+app\controllers\analytics_controller.php (line 24)</br></p>
+<p>app\controllers\analytics_controller.php (line 31)</p>
+<p>app\controllers\analytics_controller.php (line 38)</p>
+<p>app\controllers\analytics_controller.php (line 45)</p>
+<p>app\controllers\analytics_controller.php (line 53)</p>
+<p>app\controllers\analytics_controller.php (line 62) </p>
+<p>and:<br />
+Error:  The view for analyticsController::show_reports() was not found.</br></p>
+<p>But the view shouldn't be the problem of the error right?<br />
+Thanks in advance</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b6bd58-1898-46e1-b519-55a54834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b5ea64aaccc7b29d5ef3670bac45ba6c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.digitael.nl" rel="nofollow">Martijn Duizendstra</a>						</strong>
+						<strong>said 
+						on Mar 10, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Anyone?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b6f9e1-bb6c-4bb0-9b15-17a94834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e1908e299f9f9fa4938e7e11e2c96f1e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.concept47.com" rel="nofollow">austin_web_developer</a>						</strong>
+						<strong>said 
+						on Mar 10, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>To be specific ... your problem would be in the file<br />
+cake/libs/socket.php</br></p>
+<p>problem is that the connect function is connecting over ssl:// in line 109<br />
+using fsockopen in line 114</br></p>
+<p>do some good old debugging (echo 'hello'; exit;)<br />
+So see where the script is dying ... if it is dying after that fsockopen call, then you haven't fixed your ssl problem (which is what I think your problem might be).</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b75fe1-2cfc-433b-b26b-6dbe4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b5ea64aaccc7b29d5ef3670bac45ba6c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.digitael.nl" rel="nofollow">Martijn Duizendstra</a>						</strong>
+						<strong>said 
+						on Mar 11, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey thanks for you reply. The thing i don't understand is where the "debug()" command is coming from. Is it a default cake function, or do i need to install something into the framework for this?</p>
+<p>In the meanwhile I will check the things you've said. Let me know, thanks in advance.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b76b21-75f0-4429-94ac-3d684834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e1908e299f9f9fa4938e7e11e2c96f1e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.concept47.com" rel="nofollow">austin_web_developer</a>						</strong>
+						<strong>said 
+						on Mar 11, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>yes. It is a cakephp function.<br />
+It is what is outputting thing like</br><br />
+app\controllers\analytics_controller.php (line 24)</br><br />
+It should be followed by some data, but in your case the data is blank.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b80e5e-6ad0-48ec-80de-66a04834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b5ea64aaccc7b29d5ef3670bac45ba6c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.digitael.nl" rel="nofollow">Martijn Duizendstra</a>						</strong>
+						<strong>said 
+						on Mar 11, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Cake is showing the same type of notice/error when i run this function as well... maybe it's another issue?</p>
+<p>function index() {<br />
+     debug("Test");</br><br />
+}</br></p>
+<p>if i run the url /index.php?url=/analytics/index it executes the index() function, and shows "Test" as output, but the notice/error is also showing</p>
+<p>app\controllers\analytics_controller.php (line 11)</p>
+<p>What am i doing wrong here...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b8148c-aab8-4187-ad1c-4f234834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e1908e299f9f9fa4938e7e11e2c96f1e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.concept47.com" rel="nofollow">austin_web_developer</a>						</strong>
+						<strong>said 
+						on Mar 11, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>You don't seem familiar with cakephp ...<br />
+that is what it is supposed to do.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49e6ec0b-4a44-4997-98d0-6f5c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6f92c9ae502c7af6bcac0420e02693ee&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							carlos&nbsp;						</strong>
+						<strong>said 
+						on Apr 16, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I am a newbie. I have uploaded cakePHP to my server into a folder called cake. I have uploaded the api into  cake/app/models/datasources directory. Now where do I put the test code shown above??? I tried to put it in a file cake/analytics.php but i get a red and yellow error screen which says...</p>
+<p> Error:  Analytics.phpController could not be found.</p>
+<p>Error: Create the class Analytics.phpController below in file: app/controllers/analytics.php_controller.php</p>
+<p>< ?php<br />
+class Analytics.phpController extends AppController {</></p>
+<p>	var $name = 'Analytics.php';<br />
+}</br><br />
+?></br></p>
+<p>I tried creating app/controllers/analytics.php_controller.php as suggested and it didn't change anything.</p>
+<p>Please a little step by step guide would be so useful for noobs like me.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49ef7c10-8578-408a-ae6f-646b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=29e2d6431d4a86cdc18df0dd4c699a38&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://zeroasterisk.com/" rel="nofollow">Alan Blount</a>						</strong>
+						<strong>said 
+						on Apr 22, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>There's a new official google API to get data:</p>
+<p><a rel="nofollow" href="http://code.google.com/apis/analytics/docs/gdata/1.0/gdataProtocol.html#ClientLogin">http://code.google.com/apis/analytics/docs/gdata/1.0/gdataProtocol.html#ClientLogin</a></p>
+<p>Anyone want to volunteer to create a new data source? (yes, I know I should step up to this challenge, but my one year old disagrees)</p>
+<p>thanks,<br />
+-alan-</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a245d80-d67c-4f7d-a1de-57f34834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f158ef807222abcc01e3ceb26a3bedc5&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nathan Dunlap&nbsp;						</strong>
+						<strong>said 
+						on Jun 01, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great to see this. Having an issue though...</p>
+<p>When I enable the Auth component in the app_contorller, I recieve the following error...</p>
+<p>Cannot modify header information - headers already sent by (output started at /Applications/MAMP/htdocs/pow3/app/models/datasources/google_analytics_source.php:254) [CORE/cake/libs/controller/controller.php, line 640]</p>
+<p>Ideas???</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a36874d-ef90-44b6-bad1-750c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8c1eca56d2fe6776644e1c6cafcd2a7f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Benson&nbsp;						</strong>
+						<strong>said 
+						on Jun 15, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Am  new to cakephp. Please give a sample view that i can use to display the reports on my website.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a368920-fb60-4854-8ba2-0d954834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b5ea64aaccc7b29d5ef3670bac45ba6c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.digitael.nl" rel="nofollow">Martijn Duizendstra</a>						</strong>
+						<strong>said 
+						on Jun 15, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Benson,</p>
+<p>The datasource described above can be considered obsolete because the official Google Analytics Data Export API is now available to all developers outside the private beta program.</p>
+<p>You can read more here: <a rel="nofollow" href="http://code.google.com/intl/nl/apis/analytics/docs/gdata/gdataDeveloperGuide.html">http://code.google.com/intl/nl/apis/analytics/docs/gdata/gdataDeveloperGuide.html</a></p>
+<p>Good Luck!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a36a301-0224-43e5-8f5c-4ef04834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8c1eca56d2fe6776644e1c6cafcd2a7f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Benson&nbsp;						</strong>
+						<strong>said 
+						on Jun 15, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Martijn Duizendstra</p>
+<p>Thanks for the quick response. I will have a look at the API and I hope It will be helpful.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ae61760-1e0c-4a78-9f3c-3b16cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e629c817788f550e1fb86db13416655&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Fred Ballard&nbsp;						</strong>
+						<strong>said 
+						on Oct 26, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sadly, in light of the new Google Analytics API and ga:pi(), and this no longer working, isn't it time to retire this?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

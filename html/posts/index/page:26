@@ -1,0 +1,534 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Blog &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="paging">
+	<a href="/posts/index/page:25" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:22">22</a></span> | <span><a href="/posts/index/page:23">23</a></span> | <span><a href="/posts/index/page:24">24</a></span> | <span><a href="/posts/index/page:25">25</a></span> | <span class="current">26</span> | <span><a href="/posts/index/page:27">27</a></span> | <span><a href="/posts/index/page:28">28</a></span> | <span><a href="/posts/index/page:29">29</a></span> | <span><a href="/posts/index/page:30">30</a></span> <a href="/posts/index/page:27" class="next">Next &raquo;</a></div>
+	<div class="post">
+	<h2><a href="/posts/lookupable-behavior:48b93b4a-eaf8-4fc8-85ad-6d454834cda3">Lookupable Behavior</a></h2>	<div class="posted-on">
+		<p>Posted on 30/8/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>this is post #11 of my <a href="http://debuggable.com/posts/time-to-grow-again-or-loose-money:48ab3665-2054-4e55-b13f-0c104834cda3">30 day challenge</a>.</p>
+<p>If you ever had to work with a fairly normalized database where for example the statuses of some tables have their own table then you probably know how annoying it can be do keep those status tables in sync with everybody during development. Whenever you create a new status record you need to tell everybody about it. Then you need a good approach to refer to this status in your application and keep your code readable.</p>
+<p>So here is what I came up with:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> LookupableBehavior <span class="kw2">extends</span> ModelBehavior <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">function</span> lookup<span class="br0">&#40;</span>&amp;<span class="re0">$model</span>, <span class="re0">$conditions</span>, <span class="re0">$field</span> = <span class="st0">'id'</span>, <span class="re0">$create</span> = <span class="kw2">true</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/is_array"><span class="kw3">is_array</span></a><span class="br0">&#40;</span><span class="re0">$conditions</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$conditions</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a> <span class="br0">&#40;</span><span class="re0">$model</span>-&gt;<span class="me1">displayField</span> =&gt; <span class="re0">$conditions</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$field</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$fieldValue</span> = <span class="re0">$model</span>-&gt;<span class="me1">field</span><span class="br0">&#40;</span><span class="re0">$field</span>, <span class="re0">$conditions</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$fieldValue</span> = <span class="re0">$model</span>-&gt;<span class="me1">find</span><span class="br0">&#40;</span><span class="re0">$conditions</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$fieldValue</span> !== <span class="kw2">false</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$fieldValue</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$create</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="re0">$model</span>-&gt;<span class="me1">create</span><span class="br0">&#40;</span><span class="re0">$conditions</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$model</span>-&gt;<span class="me1">save</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="re0">$conditions</span><span class="br0">&#91;</span><span class="re0">$model</span>-&gt;<span class="me1">primaryKey</span><span class="br0">&#93;</span> = <span class="re0">$model</span>-&gt;<span class="me1">id</span>;<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$field</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$model</span>-&gt;<span class="me1">read</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$model</span>-&gt;<span class="me1">field</span><span class="br0">&#40;</span><span class="re0">$field</span>, <span class="re0">$conditions</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>The basic idea is to use this behavior with primitive tables that only have an id and a name / title / whatever column. So lets say you have a post_statuses table and you want to assign your current post the status 'Published', things would be as easy as:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'post_status_id'</span>, <span class="re0">$this</span>-&gt;<span class="me1">Post</span>-&gt;<span class="me1">PostStatus</span>-&gt;<span class="me1">lookup</span><span class="br0">&#40;</span><span class="st0">'Published'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>This causes the behavior to search your post_statuses table for a record named 'Published'. If it is found then the records id is returned. If it is not found, then the record is created and the new id is returned. This way you never have to worry about keeping your status tables in sync as everything is created on the fly and it is dead simple to expand available status options this way. Of course this method is not going to protect you from typos or people going nuts with adding new statuses, but with a little internal policy on how to use this behavior you should be able to save yourself some time and regain some of that hair you lost because of internet explorer : ).</p>
+<p>The latest version of this code along with installation instructions is published in the <a href="http://github.com/felixge/debuggable-scraps/tree/master/cakephp/behaviors/lookupable">debuggable scraps repository</a> as always.</p>
+<p>Feedback is most welcome! Please leave a comment.</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/48b93b4a-eaf8-4fc8-85ad-6d454834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Flookupable-behavior%3A48b93b4a-eaf8-4fc8-85ad-6d454834cda3 &amp;title=Lookupable+Behavior';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Flookupable-behavior%3A48b93b4a-eaf8-4fc8-85ad-6d454834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Flookupable-behavior%3A48b93b4a-eaf8-4fc8-85ad-6d454834cda3&amp;title=Lookupable+Behavior&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Flookupable-behavior%3A48b93b4a-eaf8-4fc8-85ad-6d454834cda3&amp;title=Lookupable+Behavior';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/lookupable-behavior:48b93b4a-eaf8-4fc8-85ad-6d454834cda3">11 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/lookupable-behavior:48b93b4a-eaf8-4fc8-85ad-6d454834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/normalizing-cakephp-model-records:48b7ed7f-9498-4b9c-8734-6f014834cda3">Normalizing CakePHP model records</a></h2>	<div class="posted-on">
+		<p>Posted on 29/8/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>here we go with post #10 of my <a href="http://debuggable.com/posts/time-to-grow-again-or-loose-money:48ab3665-2054-4e55-b13f-0c104834cda3">30 day challenge</a> from sunny Atlanta.</p>
+<p>one problem I often face when writing model functions is that I got to handle different ways of passing a model record. Imagine a simple Post hasMany Comment association that you are looping through and calling a function on.</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$out</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$posts</span> <span class="kw1">as</span> <span class="re0">$post</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$out</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <a href="http://www.php.net/sprintf"><span class="kw3">sprintf</span></a><span class="br0">&#40;</span><span class="st0">'&lt;h1&gt;%s&lt;/h1&gt;'</span>, <span class="re0">$post</span><span class="br0">&#91;</span><span class="st0">'Post'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'title'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$post</span><span class="br0">&#91;</span><span class="st0">'Comment'</span><span class="br0">&#93;</span> <span class="kw1">as</span> <span class="re0">$comment</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$out</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <a href="http://www.php.net/sprintf"><span class="kw3">sprintf</span></a><span class="br0">&#40;</span><span class="st0">'&lt;img src=&quot;%s&quot;&gt;'</span>, Comment::<span class="me2">gravatarUrl</span><span class="br0">&#40;</span><span class="re0">$comment</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <a href="http://www.php.net/join"><span class="kw3">join</span></a><span class="br0">&#40;</span><span class="st0">&quot;<span class="es0">\n</span>&quot;</span>, <span class="re0">$out</span><span class="br0">&#41;</span>;</div>
+<p>If you were now to code the Comment::gravatarUrl function and you wanted it to be fairly flexible as to what the $comment parameter is (an array, either with or without the 'Comment' key included or the $id of the record), you'd have to always code something like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> Comment <span class="kw2">extends</span> AppModel<span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/static"><span class="kw3">static</span></a> <span class="kw2">function</span> gravatarUrl<span class="br0">&#40;</span><span class="re0">$comment</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/is_array"><span class="kw3">is_array</span></a><span class="br0">&#40;</span><span class="re0">$comment</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$comment</span> = ClassRegistry::<span class="me2">init</span><span class="br0">&#40;</span><span class="st0">'Comment'</span><span class="br0">&#41;</span>-&gt;<span class="me1">findById</span><span class="br0">&#40;</span><span class="re0">$comment</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$comment</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$comment</span><span class="br0">&#91;</span><span class="st0">'Comment'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$comment</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Comment'</span> =&gt; <span class="re0">$comment</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/sprintf"><span class="kw3">sprintf</span></a><span class="br0">&#40;</span><span class="st0">'http://www.gravatar.com/avatar/%s.jpg'</span>, <a href="http://www.php.net/md5"><span class="kw3">md5</span></a><span class="br0">&#40;</span><span class="re0">$comment</span><span class="br0">&#91;</span><span class="st0">'Comment'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'author_email'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>So in order to avoid duplicating this kind of logic throughout my apps, I decided to abstract it into a generic AppModel::normalize function that looks like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> AppModel <span class="kw2">extends</span> Model<span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/static"><span class="kw3">static</span></a> <span class="kw2">function</span> normalize<span class="br0">&#40;</span><span class="re0">$model</span>, <span class="re0">$id</span>, <span class="re0">$query</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$id</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/is_array"><span class="kw3">is_array</span></a><span class="br0">&#40;</span><span class="re0">$id</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$record</span> = <span class="re0">$id</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$record</span><span class="br0">&#91;</span><span class="re0">$model</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$record</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="re0">$model</span> =&gt; <span class="re0">$record</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$record</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$Model</span> = ClassRegistry::<span class="me2">init</span><span class="br0">&#40;</span><span class="re0">$model</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$record</span> = <span class="re0">$Model</span>-&gt;<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'first'</span>, am<span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'conditions'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="re0">$model</span>.<span class="st0">'.'</span>.<span class="re0">$model</span>-&gt;<span class="me1">primaryKey</span> =&gt; <span class="re0">$id</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'contain'</span> =&gt; <span class="kw2">false</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span>, <span class="re0">$query</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$record</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$record</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Usage is fairly simple. Applying the function to the behavior above will make the function look like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> Comment <span class="kw2">extends</span> AppModel<span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/static"><span class="kw3">static</span></a> <span class="kw2">function</span> gravatarUrl<span class="br0">&#40;</span><span class="re0">$comment</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$comment</span> = AppModel::<span class="me2">normalize</span><span class="br0">&#40;</span><span class="st0">'Comment'</span>, <span class="re0">$comment</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="br0">&#40;</span><span class="re0">$comment</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp;&nbsp;? <a href="http://www.php.net/sprintf"><span class="kw3">sprintf</span></a><span class="br0">&#40;</span><span class="st0">'http://www.gravatar.com/avatar/%s.jpg'</span>, <a href="http://www.php.net/md5"><span class="kw3">md5</span></a><span class="br0">&#40;</span><span class="re0">$comment</span><span class="br0">&#91;</span><span class="st0">'Comment'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'author_email'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; : <span class="kw2">false</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>And as you can see there is also a 3rd parameter called $query that you can use to create more complex normalization rules if an $id is passed in instead of an array. Now of course this isn't perfect yet. It doesn't verify complex association structures and I spend a lot of thought on how to possibly do that. But at some point I kind of concluded that the performance implications probably wouldn't be worth it. Another thing I'd really love is if I was able to detect the name of the class the static function was called upon inside the normalize function, but so far I think PHP simply can't do it. What I mean is that I'd like to use Comment::normalize / Post::normalize etc. without having to re-define the function in each model, so if anybody has an idea I'd love to hear it!</p>
+<p>Feedback as always is very welcome! Please comment!</p>
+<p>HTH,<br />
+-- Felix Geisendörfer<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/48b7ed7f-9498-4b9c-8734-6f014834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnormalizing-cakephp-model-records%3A48b7ed7f-9498-4b9c-8734-6f014834cda3 &amp;title=Normalizing+CakePHP+model+records';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnormalizing-cakephp-model-records%3A48b7ed7f-9498-4b9c-8734-6f014834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnormalizing-cakephp-model-records%3A48b7ed7f-9498-4b9c-8734-6f014834cda3&amp;title=Normalizing+CakePHP+model+records&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fnormalizing-cakephp-model-records%3A48b7ed7f-9498-4b9c-8734-6f014834cda3&amp;title=Normalizing+CakePHP+model+records';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/normalizing-cakephp-model-records:48b7ed7f-9498-4b9c-8734-6f014834cda3">13 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/normalizing-cakephp-model-records:48b7ed7f-9498-4b9c-8734-6f014834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/hdd-surgery-for-my-macbook-pro:48b71c63-7cf4-4046-805b-15434834cda3">HDD surgery for my MacBook Pro</a></h2>	<div class="posted-on">
+		<p>Posted on 28/8/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>here we go with post #9 of my <a href="http://debuggable.com/posts/time-to-grow-again-or-loose-money:48ab3665-2054-4e55-b13f-0c104834cda3">30 day challenge</a>.</p>
+<p>This isn't exactly a CakePHP / JS tip, but I feel like blogging about it ; ). For several weeks my MacBook Pro's HDD was maxed out. I had a 7200 RPM 160 GB HDD and since I have a ton (!) of music, pictures and a bootcamp partition this is close to nothing. When I finally had to spend 5-10 minutes every day just to keep the system running (OSX hates < 2GB of free HDD) I had to do something.</p>
+<p>Since I didn't want to delete any of my data, I checked out additional hard drives. However, I was a little bit unhappy that there didn't seem to be any fast (7200 RPM) 2.5" harddrives with 300 GB or more. So eventually I decided that I had to sacrifice the fast speed if I wanted to go for big. And big I got:</p>
+<p>What you see below is the <a href="http://www.amazon.com/Samsung-SpinPoint-M60S-HM500LI-internal/dp/B001BSIXT0/ref=sr_1_1?ie=UTF8&s=electronics&qid=1219960104&sr=8-1">Samsung SpinPoint M60S HM500LI</a>, a 500 GB HDD with 5400 RPM and a 8mb buffer.</p>
+<p><img src="http://static.thinkingphp.org/img/mac-surgery/1.jpg"></p>
+<p>Here is a size comparison to the MacBook Pro:</p>
+<p><img src="http://static.thinkingphp.org/img/mac-surgery/2.jpg"></p>
+<p>So far so good. However, after I ordered the HDD it was laying around for quite a bit. Why? I was scared. Looking at the <a href="http://www.ifixit.com/Guide/Mac/MacBook-Pro-17-Inch-Core-Duo/Hard-Drive-Replacement/87/8/">ifixit guide</a> I knew the replacement would be quite involved. I mean now that I done it I know its nothing but taking out a couple of screws and cables and putting them back together. But boy did my hands shake while working on the internals of my little work buddy : ).</p>
+<p>The beginning was easy. You take your Mac and take a before picture just in case you'll never see it again:</p>
+<p><img src="http://static.thinkingphp.org/img/mac-surgery/3.jpg"></p>
+<p>Then you turn it off and start by removing the battery:</p>
+<p><img src="http://static.thinkingphp.org/img/mac-surgery/4.jpg"></p>
+<p>Next you take off the little cover where the memory is located (I had already done that once before when putting 4GB Ram in):</p>
+<p><img src="http://static.thinkingphp.org/img/mac-surgery/5.jpg"></p>
+<p>Then you basically take out screws. Lots of them. It really helps to have the right tools as indicated in the <a href="http://www.ifixit.com/Guide/Mac/MacBook-Pro-17-Inch-Core-Duo/Hard-Drive-Replacement/87/8/">ifixit guide</a>. Especially the torx screw driver and spudger are things you don't want to miss.</p>
+<p><img src="http://static.thinkingphp.org/img/mac-surgery/6.jpg"></p>
+<p>Once you got all the screws out, you crack the case open. This is when it gets scary and your every move feels like you could destroy the little machine that is at the mercy of your hands:</p>
+<p><img src="http://static.thinkingphp.org/img/mac-surgery/7.jpg"></p>
+<p>In order to take the keyboard and top part of the case of you have to disconnect its wire. The trick is to carefully loose the yellow tape used to fixate the cable without knocking of any capacitors or shit. Once that is accomplished you are rewarded with this stunning picture:</p>
+<p><img src="http://static.thinkingphp.org/img/mac-surgery/8.jpg"></p>
+<p>The hard drive itself is located at the bottom left, and you need to lift up two yellow tapes again as well as disconnect the HDD:</p>
+<p><img src="http://static.thinkingphp.org/img/mac-surgery/10.jpg"></p>
+<p>Here is a close-up shot of the old drive that was in my MacBook:</p>
+<p><img src="http://static.thinkingphp.org/img/mac-surgery/9.jpg"></p>
+<p>And this is the HDD connector including the yellow tape fixating it:</p>
+<p><img src="http://static.thinkingphp.org/img/mac-surgery/11.jpg"></p>
+<p>Once you got all the cables and stuff off, you can take off the hdd. It has 4 bumpers and placeholders screwed to it which you need to transfer to the new drive. After that you basically just put all the stuff back in in reverse order and pray for the best. While I put my new drive in I suddenly had a little component hanging from one of the cables which I accidently pulled out. It turned out this simply was just placed in a little compartment left to the drive and I didn't rip anything. But boy was I scared ; ). </p>
+<p><img src="http://static.thinkingphp.org/img/mac-surgery/12.jpg"></p>
+<p>Anyway, after putting everything back together and booting up with the Leopard Install DVD, I was very happy to discover the surgery was a success! I formatted the new disk and recovered my data from a time machine Backup and things couldn't have been much smoother. The only thing I noticed is that I lost my mysql my.cnf file. It was located in /etc/private/my.cnf which unfortunately is excluded from the backup. Oh well, no biggie - after all I was just glad to not have killed my machine before leaving for the US today ; ).</p>
+<p><img src="http://static.thinkingphp.org/img/mac-surgery/13.jpg"></p>
+<p>Alright, hope some of you guys enjoyed the pictures. As far as I can tell there isn't much of a performance hit because of the slower RPM speed yet, but that's just my initial impression.</p>
+<p>Oh and before I forget. From tomorrow on my time zone is EST since I'm in Atlanta. So my posts will be published by 9am EST not CET anymore.</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/48b71c63-7cf4-4046-805b-15434834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhdd-surgery-for-my-macbook-pro%3A48b71c63-7cf4-4046-805b-15434834cda3 &amp;title=HDD+surgery+for+my+MacBook+Pro';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhdd-surgery-for-my-macbook-pro%3A48b71c63-7cf4-4046-805b-15434834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhdd-surgery-for-my-macbook-pro%3A48b71c63-7cf4-4046-805b-15434834cda3&amp;title=HDD+surgery+for+my+MacBook+Pro&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhdd-surgery-for-my-macbook-pro%3A48b71c63-7cf4-4046-805b-15434834cda3&amp;title=HDD+surgery+for+my+MacBook+Pro';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/hdd-surgery-for-my-macbook-pro:48b71c63-7cf4-4046-805b-15434834cda3">10 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/hdd-surgery-for-my-macbook-pro:48b71c63-7cf4-4046-805b-15434834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/recent-surgery:48b64a3b-7534-4952-aad9-16a84834cda3">Recent surgery</a></h2>	<div class="posted-on">
+		<p>Posted on 28/8/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>this is a little heads up that my post for today will be delayed as I'm traveling to Atlanta today and there simply wasn't any time so far this morning to finish my post. However, I wil finish it at the airport (after <a href="http://debuggable.com/posts/hacking-the-wires:48ae63ea-9888-482f-9a28-44684834cda3">hacking the wifi</a> ; p).</p>
+<p>Meanwhile here is a little teaser for the upcoming post, enjoy:</p>
+<p><img src="http://static.thinkingphp.org/img/mac-surgery/teaser.jpg"></p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/48b64a3b-7534-4952-aad9-16a84834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frecent-surgery%3A48b64a3b-7534-4952-aad9-16a84834cda3 &amp;title=Recent+surgery';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Frecent-surgery%3A48b64a3b-7534-4952-aad9-16a84834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frecent-surgery%3A48b64a3b-7534-4952-aad9-16a84834cda3&amp;title=Recent+surgery&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frecent-surgery%3A48b64a3b-7534-4952-aad9-16a84834cda3&amp;title=Recent+surgery';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/recent-surgery:48b64a3b-7534-4952-aad9-16a84834cda3">5 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/recent-surgery:48b64a3b-7534-4952-aad9-16a84834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/passing-controller-variables-to-your-javascript:48b4f0c6-c718-47b2-bca1-05794834cda3">Passing controller variables to your JavaScript</a></h2>	<div class="posted-on">
+		<p>Posted on 27/8/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>this is post #8 of my <a href="http://debuggable.com/posts/time-to-grow-again-or-loose-money:48ab3665-2054-4e55-b13f-0c104834cda3">30 day challenge</a>. One week done, yeah!</p>
+<p>If your application requires JavaScript in order to work than you have probably been looking for an efficient way to pass CakePHP controller variables to your scripts. I already mentioned this technique in <a href="http://debuggable.com/posts/with-jquery-cakephp-to-world-domination-slides:480f4dd6-7cb8-4e84-af4f-4dc6cbdd56cb">my talk at CakeFest this year</a>, but here is the full explanation.</p>
+<p>Essentially we started by adding a new function to the AppController which we call 'setJson':</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> AppController <span class="kw2">extends</span> Controller<span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">function</span> setJson<span class="br0">&#40;</span><span class="re0">$one</span>, <span class="re0">$two</span> = <span class="kw2">null</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/is_array"><span class="kw3">is_array</span></a><span class="br0">&#40;</span><span class="re0">$one</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">viewVars</span><span class="br0">&#91;</span><span class="st0">'jsonVars'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$one</span><span class="br0">&#93;</span> = <span class="re0">$two</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$one</span> <span class="kw1">as</span> <span class="re0">$key</span> =&gt; <span class="re0">$val</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">viewVars</span><span class="br0">&#91;</span><span class="st0">'jsonVars'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$key</span><span class="br0">&#93;</span> = <span class="re0">$val</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>After you added this to your AppController, you will also need this in the &lt;head&gt; section of your app/views/layouts/default.ctp file:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$jsonVars</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$javascript</span>-&gt;<span class="me1">codeBlock</span><span class="br0">&#40;</span><span class="st0">'window.jsonVars = '</span>.<span class="re0">$javascript</span>-&gt;<span class="me1">object</span><span class="br0">&#40;</span><span class="re0">$jsonVars</span><span class="br0">&#41;</span>.<span class="st0">';'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>So lets say your application is all ajax / js and you want to render a couple of widgets fetched from the db, this is what you would do:</p>
+<p>app/controllers/widgets_controller.php</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> WidgetsController <span class="kw2">extends</span> AppController<span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">function</span> index<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$widgets</span> = <span class="re0">$this</span>-&gt;<span class="me1">Widget</span>-&gt;<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'all'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">setJson</span><span class="br0">&#40;</span><a href="http://www.php.net/compact"><span class="kw3">compact</span></a><span class="br0">&#40;</span><span class="st0">'widgets'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>app/views/webroot/js/my_include.js</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$<span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; $.<span class="me1">each</span><span class="br0">&#40;</span>window.<span class="me1">jsonVars</span><span class="br0">&#91;</span><span class="st0">'widgets'</span><span class="br0">&#93;</span>, <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; $.<span class="me1">renderWidget</span><span class="br0">&#40;</span><span class="kw1">this</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span></div>
+<p>So essentially this provides you with a quick and dirty way to make your PHP arrays directly accessible in JavaScript. Often times you may want to avoid such techniques for accessibility reasons, but in other cases this is just exactly what makes sense.</p>
+<p>Feel free to drop a comment if you like this approach or have your own solution to the problem.</p>
+<p>HTH,<br />
+-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/48b4f0c6-c718-47b2-bca1-05794834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fpassing-controller-variables-to-your-javascript%3A48b4f0c6-c718-47b2-bca1-05794834cda3 &amp;title=Passing+controller+variables+to+your+JavaScript';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fpassing-controller-variables-to-your-javascript%3A48b4f0c6-c718-47b2-bca1-05794834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fpassing-controller-variables-to-your-javascript%3A48b4f0c6-c718-47b2-bca1-05794834cda3&amp;title=Passing+controller+variables+to+your+JavaScript&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fpassing-controller-variables-to-your-javascript%3A48b4f0c6-c718-47b2-bca1-05794834cda3&amp;title=Passing+controller+variables+to+your+JavaScript';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/passing-controller-variables-to-your-javascript:48b4f0c6-c718-47b2-bca1-05794834cda3">6 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/passing-controller-variables-to-your-javascript:48b4f0c6-c718-47b2-bca1-05794834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="paging">
+	<a href="/posts/index/page:25" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:22">22</a></span> | <span><a href="/posts/index/page:23">23</a></span> | <span><a href="/posts/index/page:24">24</a></span> | <span><a href="/posts/index/page:25">25</a></span> | <span class="current">26</span> | <span><a href="/posts/index/page:27">27</a></span> | <span><a href="/posts/index/page:28">28</a></span> | <span><a href="/posts/index/page:29">29</a></span> | <span><a href="/posts/index/page:30">30</a></span> <a href="/posts/index/page:27" class="next">Next &raquo;</a></div>	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

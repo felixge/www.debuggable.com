@@ -1,0 +1,1282 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Parsing XML using SimpleXML &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/parsing-xml-using-simplexml:480f4dfe-6a58-4a17-a133-455acbdd56cb">Parsing XML using SimpleXML</a></h2>	<div class="posted-on">
+		<p>Posted on 3/5/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Parsing XML Data with PHP's SimpleXML</p>
+<h1>Introduction</h1>
+<p>Extensible Markup Language (XML) has become the number one format for disparate systems to communicate. Its most common applications are probably the Really Simple Syndication (RSS) Feeds embraced by the blogging community - including http://php-coding-practices.com. :)</p>
+<p>One of the most significant changes made to PHP5 is the way it handles XML data. A few seamless set of XML parsing tools have been integrated directly into the language itself. The old days where us poor programmers had to use external tools and libraries are finally over! The purpose of this article is to give a closer look on one the cool new xml libraries - SimpleXML.</p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<h1>Short XML-Roundup</h1>
+<p>If you have ever worked with XHTML (Extensible Hypertext Markup Language), then you'are familiar with an application of XML, since XHTML is a reformulation of HTML4 as XML. I assume you are familiar with XML already. If not, head over to the <a href="http://w3schools.com">W3 Schools Site</a> and learn about it.</p>
+<h2>Important things in an XML Document</h2>
+<p>The most important things in an XML document are the following:</p>
+<ul>
+<li><strong>Entity:</strong> An entity is a named unit of storage. Entities can work as "variables" in an XML document. They can also be used to embed angular brackets or other characters that can normally not be part of an XML document. Entities can be included directly into the script or from en external source.</li>
+<li><strong>Element:</strong> A data object that can contain other elements or raw textual data. Elements can also feature one or more attributes.</li>
+<li><strong>Document Type Declaration</strong> A set of instructions that describes the accepted structure of the XML file. They can be embedded or externally defined.</li>
+</ul>
+<p>XML documents should be valid. That means they are well-formed (all tags are nested recursively and correctly) and they contain a Document Type Declaration (DTD). The DTD is not a requirement and in fact, you will see many documents without a DTD. You should stick to it, though. This is not a php coding best practice, but an XML one. Think about it. ;)</p>
+<h2>An Example of valid XML Documents</h2>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot;?&gt;</span></div>
+<p>The above document is only well-formed, but it is not valid. This is because it contains no DTD. Let's fix that:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot;?&gt;</span><br />
+<span class="sc3"><span class="re1">&lt;</span> !DOCTYPE message SYSTEM <span class="st0">&quot;message.dtd&quot;</span><span class="re2">&gt;</span></span></div>
+<p>Now that is a valid XML document! It is well-formed, all tags are nested correctly and it contains a DTD.</p>
+<h1>Introduction to SimpleXML</h1>
+<p>Over are the difficult days of PHP4 when external libraries had to be used to parse and change XML files. With PHP5 came a number of integrated XML libraries - one of which is SimpleXML.<br />
+True to its namestake, it provides an easy way to work with xml documents. SimpleXML, however, is geared through parsing and reading xml files and is rather inferior when it comes to alternating documents. Yes, you can alter xml documents with SimpleXML, but the dom library, among others, is far superior in this field. The good news is that you can juggle parsed xml file objects back and forth between the new built-in libraries, which makes the overall task pretty easy.</p>
+<h1>Creating an XML Document</h1>
+<p>In order to learn how to parse XML files with PHP SimpleXML, we will need a document first. For that, we simply use the current sitemap.xml file for http://php-coding-practices.com. You can view or download it from http://php-coding-practices.com/sitemap.xml.</p>
+<p>Here is an excerpt:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- generator=&quot;wordpress/2.1.1&quot; --&gt;</span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- sitemap-generator-url=&quot;http://www.arnebrachhold.de&quot; sitemap-generator-version=&quot;2.7.1&quot; &nbsp;--&gt;</span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- Debug: Total comment count: 8 --&gt;</span></span><br />
+<span class="sc3"><span class="re1">&lt;urlset</span> <span class="re0">xmlns</span>=<span class="st0">&quot;http://www.google.com/schemas/sitemap/0.84&quot;</span><span class="re2">&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T21:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>daily<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>1<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- Debug: Start Postings --&gt;</span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- Debug: Priority report of postID 55: Comments: 0 of 8 = 0 points --&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/beautifying-your-code/php-code-beautifier-tool/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T22:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>weekly<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>0.1<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- Debug: Priority report of postID 54: Comments: 2 of 8 = 0.3 points --&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/refactoring/refactoring-a-first-example/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T16:16:22+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>weekly<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>0.3<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span></div>
+<p>The document should be pretty straightforward if you are familiar with XML. It provides a number of urls that each have a location, a last modification date, a change frequency and a priority. It is used with the Google Webmaster Tools to make it easier for google to index all pages on http://php-coding-practices.com.</p>
+<h1>Loading an XML File</h1>
+<p>Let's get a head start with SimpleXML on our sitemap.xml. Create a new simplexml.php file within the same directory where you placed the sitemap.xml file. Make sure both files are in your htdocs directory somewhere so you can access the php file on your local php-enabled system. Put the following source code into the simplexml.php file:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$source</span> = <span class="st0">'sitemap.xml'</span>;<br />
+<br />
+<span class="co1">// load as string</span><br />
+<span class="re0">$xmlstr</span> = <a href="http://www.php.net/file_get_contents"><span class="kw3">file_get_contents</span></a><span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$sitemap1</span> = simplexml_load_string<span class="br0">&#40;</span><span class="re0">$xmlstr</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// load as file</span><br />
+<span class="re0">$sitemap2</span> = simplexml_load_file<span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span>;</div>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>The code is pretty straightforward. First of we use SimpleXML's simplexml_load_string function to load a previously read xml file (which got stored in a string) as a string. Secondly, we parse the xml directly from the file using simplexml_load_file(), which is faster and makes more sense.<br />
+The file could also be a path to a remote xml file, depending on your allow_url_fopen php.ini setting. Note, that both $sitemap1 and $sitemap2 are instances of the SimpleXMLElement class.</p>
+<p>SimpleXML also has an OOP-centric approach, where you can create those SimpleXMLElement objects on the fly:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$source</span> = <span class="st0">'sitemap.xml'</span>;<br />
+<br />
+<span class="co1">// load as string</span><br />
+<span class="re0">$xmlstr</span> = <a href="http://www.php.net/file_get_contents"><span class="kw3">file_get_contents</span></a><span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$sitemap</span> = <span class="kw2">new</span> SimpleXMLElement<span class="br0">&#40;</span><span class="re0">$xmlstr</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// load as file</span><br />
+<span class="re0">$sitemap</span> = <span class="kw2">new</span> SimpleXMLElement<span class="br0">&#40;</span><span class="re0">$source</span>,<span class="kw2">null</span>,<span class="kw2">true</span><span class="br0">&#41;</span>;</div>
+<p>Not much need of explanation here, except that, as you see, the constructor of the SimpleXMLElement class can receive two optional parameters. The first parameter can hold additional information on how the file should be parsed, whereas the second one informs the class that the first parameter is a path to a file instead of a string.<br />
+We left the second parameter to null at this point, because we do not need it for journey. If you are eager to learn what you can do with it, check out the <a href="http://www.php.net/manual/en/ref.libxml.php#libxml.constants">optional constants</a> you can provide as an array for the second parameter.</p>
+<h1>Accessing Children</h1>
+<p>SimpleXML is so cool and easy, because when you parse a document as we have done now, all children are stored as nodes of the SimpleXMLElement object - allowing us to access them easily. Let's look at this now:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// load as file</span><br />
+<span class="re0">$sitemap</span> = <span class="kw2">new</span> SimpleXMLElement<span class="br0">&#40;</span><span class="re0">$source</span>,<span class="kw2">null</span>,<span class="kw2">true</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$sitemap</span> <span class="kw1">as</span> <span class="re0">$url</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;{$url-&gt;loc} - {$url-&gt;lastmod} - {$url-&gt;changefreq} - {$url-&gt;priority}<span class="es0">\r</span><span class="es0">\n</span>&quot;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>The result is a great list of all urls and their sub-nodes. The drawback is here that we need to know about all the names of the nodes. If the xml document changes, we would need to change our client code, too. Let's take care of that:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$sitemap</span>-&gt;<span class="me1">children</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="kw1">as</span> <span class="re0">$child</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$child</span>-&gt;<span class="me1">getName</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="st0">&quot;:<br />
+&quot;</span>;<br />
+&nbsp; <br />
+&nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$child</span>-&gt;<span class="me1">children</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="kw1">as</span> <span class="re0">$subchild</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;---&gt;&quot;</span>.<span class="re0">$subchild</span>-&gt;<span class="me1">getName</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="st0">&quot;: &quot;</span>.<span class="re0">$subchild</span>.<span class="st0">&quot;<br />
+&quot;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Coolness! What we have done here is simply using the children() method of the SimpleXMLElement class that provides an iteration interface to iterate over all children of a node. Your output should be something like this:</p>
+<blockquote><p>
+url:<br />
+--->loc: http://php-coding-practices.com/<br />
+--->lastmod: 2007-05-02T21:51:04+00:00<br />
+--->changefreq: daily<br />
+--->priority: 1<br />
+url:<br />
+--->loc: http://php-coding-practices.com/beautifying-your-code/php-code-beautifier-tool/<br />
+--->lastmod: 2007-05-02T22:51:04+00:00<br />
+--->changefreq: weekly<br />
+--->priority: 0.1
+</p></blockquote>
+<p>Now what if you simply want to dump all xml data recursively with all children? You would not want to create 20 foreach-loops right? SimpleXML itself does not provide an easy recursive function that does that. However, we can easily do it on our own:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+displayChildrenRecursive<span class="br0">&#40;</span><span class="re0">$sitemap</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw2">function</span> displayChildrenRecursive<span class="br0">&#40;</span><span class="re0">$xmlObj</span>,<span class="re0">$depth</span>=<span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$xmlObj</span>-&gt;<span class="me1">children</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="kw1">as</span> <span class="re0">$child</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <a href="http://www.php.net/str_repeat"><span class="kw3">str_repeat</span></a><span class="br0">&#40;</span><span class="st0">'-'</span>,<span class="re0">$depth</span><span class="br0">&#41;</span>.<span class="st0">&quot;&gt;&quot;</span>.<span class="re0">$child</span>-&gt;<span class="me1">getName</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="st0">&quot;: &quot;</span>.<span class="re0">$subchild</span>.<span class="st0">&quot;<br />
+&quot;</span>;<br />
+&nbsp; &nbsp; displayChildrenRecursive<span class="br0">&#40;</span><span class="re0">$child</span>,<span class="re0">$depth</span><span class="nu0">+1</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>The recursive function is provided with a SimpleXMLElement object and a recursion depth. Then it dumps all of the object's children one by one and calls itself on the fly to process all subchilds of the current child.</p>
+<h1>Accessing Attributes</h1>
+<p>If our xml document contained attributes - for example if the urls had an id or number - we could access them as well. XML Example:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- generator=&quot;wordpress/2.1.1&quot; --&gt;</span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- sitemap-generator-url=&quot;http://www.arnebrachhold.de&quot; sitemap-generator-version=&quot;2.7.1&quot; &nbsp;--&gt;</span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- Debug: Total comment count: 8 --&gt;</span></span><br />
+<span class="sc3"><span class="re1">&lt;urlset</span> <span class="re0">xmlns</span>=<span class="st0">&quot;http://www.google.com/schemas/sitemap/0.84&quot;</span><span class="re2">&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url</span> <span class="re0">num</span>=<span class="st0">&quot;1&quot;</span><span class="re2">&gt;</span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T21:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>daily<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>1<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- Debug: Start Postings --&gt;</span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- Debug: Priority report of postID 55: Comments: 0 of 8 = 0 points --&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url</span> <span class="re0">num</span>=<span class="st0">&quot;2&quot;</span><span class="re2">&gt;</span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/beautifying-your-code/php-code-beautifier-tool/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T22:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>weekly<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>0.1<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span><br />
+<span class="sc3"><span class="coMULTI">&lt;!-- Debug: Priority report of postID 54: Comments: 2 of 8 = 0.3 points --&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url</span> <span class="re0">num</span>=<span class="st0">&quot;3&quot;</span><span class="re2">&gt;</span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/refactoring/refactoring-a-first-example/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T16:16:22+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>weekly<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>0.3<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span></div>
+<p>Here is how we would parse them with the first method:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// load as file</span><br />
+<span class="re0">$sitemap</span> = <span class="kw2">new</span> SimpleXMLElement<span class="br0">&#40;</span><span class="re0">$source</span>,<span class="kw2">null</span>,<span class="kw2">true</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$sitemap</span> <span class="kw1">as</span> <span class="re0">$url</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;Number: {$url['num']}: {$url-&gt;loc} - {$url-&gt;lastmod} - {$url-&gt;changefreq} - {$url-&gt;priority}<span class="es0">\r</span><span class="es0">\n</span>&quot;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Look at that array-like approach for attributes. Isn't that cool? Here is the implementation using the attributes() method of the SimpleXMLElement object:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$sitemap</span>-&gt;<span class="me1">children</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="kw1">as</span> <span class="re0">$child</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$child</span>-&gt;<span class="me1">getName</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="st0">&quot;:<br />
+&quot;</span>;<br />
+&nbsp; <br />
+&nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$child</span>-&gt;<span class="me1">attributes</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="kw1">as</span> <span class="re0">$attr</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;-&gt;&quot;</span>.<span class="re0">$attr</span>-&gt;<span class="me1">getName</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="st0">&quot;: &quot;</span>.<span class="re0">$attr</span>.<span class="st0">&quot;<br />
+&quot;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$child</span>-&gt;<span class="me1">children</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="kw1">as</span> <span class="re0">$subchild</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;---&gt;&quot;</span>.<span class="re0">$subchild</span>-&gt;<span class="me1">getName</span><span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="st0">&quot;: &quot;</span>.<span class="re0">$subchild</span>.<span class="st0">&quot;<br />
+&quot;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Simple, isn't it?</p>
+<h1>XPath Queries</h1>
+<p>The XML Path Language (XPath) is a W3C standardized language that is used to access and search XML documents. It is used extensively in Extensible Stylesheet Language Transformation (XSLT) and forms the basis for XML Query (XQuery) and XML Pointer (XPointer). It is a query language to access specific nodes deep in the XML tree in a comfortable way.</p>
+<p>SimpleXMLElement comes with its <a href="http://www.php.net/manual/de/function.simplexml-element-xpath.php">xpath()</a> method, that does all the bulk work for us. Keep in mind that xpath() searches only within the node from which it is accessed.<br />
+If you use xpath() on the root SimpleXMLElement it searches the entire document - if you use it with a child, it searches only within the child and so on. It returns an array of SimpleXMLElement objects - even if only a single element is returned.</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$xml</span> = &lt; &lt;&lt;XML<br />
+&lt;?xml version=<span class="st0">&quot;1.0&quot;</span> encoding=<span class="st0">&quot;UTF-8&quot;</span><span class="kw2">?&gt;</span><br />
+&lt;urlset&gt;<br />
+&nbsp; &lt;url&gt;<br />
+&nbsp; &nbsp; &lt;loc&gt;http://php-coding-practices.com/&lt;/loc&gt;<br />
+&nbsp; &nbsp; &lt;lastmod&gt;2007-05-02T21:51:04+00:00&lt;/lastmod&gt;<br />
+&nbsp; &nbsp; &lt;changefreq&gt;daily&lt;/changefreq&gt;<br />
+&nbsp; &nbsp; &lt;priority&gt;1&lt;/priority&gt;<br />
+<br />
+&nbsp; &lt;/url&gt;<br />
+&nbsp; &lt;url&gt;<br />
+&nbsp; &nbsp; &lt;loc&gt;http://php-coding-practices.com/beautifying-your-code/php-code-beautifier-tool/&lt;/loc&gt;<br />
+&nbsp; &nbsp; &lt;lastmod&gt;2007-05-02T22:51:04+00:00&lt;/lastmod&gt;<br />
+&nbsp; &nbsp; &lt;changefreq&gt;weekly&lt;/changefreq&gt;<br />
+&nbsp; &nbsp; &lt;priority&gt;0.1&lt;/priority&gt;<br />
+<br />
+&nbsp; &lt;/url&gt;<br />
+&lt;/urlset&gt;<br />
+XML;<br />
+<br />
+$sitemap = new SimpleXMLElement($xml);<br />
+$results = $sitemap-&gt;xpath('url/loc');<br />
+print_r($results);<br />
+foreach($results as $location) {<br />
+&nbsp; echo $location.'<br />
+';<br />
+}</div>
+<p><strong>Important Note:</strong> The sitemap.xml file that we use doesn't seem to be liked by xpath, because it contains comments and contained a namespace on the urlset-node:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt;urlset xmlns=&quot;http://www.google.com/schemas/sitemap/0.84&quot;&gt;</span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T21:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>daily<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>1<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span><br />
+...<br />
+[/urlset]</div>
+<p>If we do not register the namespace with xpath, it will not work. For now, let's remove the namespace (xmlns="http://www.google.com/schemas/sitemap/0.84"). A way we can make XPath work alongside namespaces will be discussed later.</p>
+<h1>Modifying XML Documents with SimpleXML</h1>
+<h2>Adding elements and attributes</h2>
+<p>Prior to PHP 5.1.3, SimpleXML had no means to change an xml document, meaning it could not add or remove elements or attributes. Yes it could change their values, but the only way to add or remove elements or attributes was to export the SimpleXMLElement object to the DOM library. However, with PHP 5.1.3 the method addChild() and addAttribute() were introduced to the SimpleXMLElement object.</p>
+<p>Let's look at the addChild() method first:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$url</span> = <span class="re0">$sitemap</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'url'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'loc'</span>,<span class="st0">'http://php-design-patterns.com'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'lastmod'</span>,<span class="st0">'2007-05-02T21:51:04+00:00'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'changefreq'</span>,<span class="st0">'daily'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'priority'</span>,<span class="st0">'0.5'</span><span class="br0">&#41;</span>;<br />
+<br />
+<a href="http://www.php.net/header"><span class="kw3">header</span></a><span class="br0">&#40;</span><span class="st0">'Content-type: text/xml'</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$sitemap</span>-&gt;<span class="me1">asXML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>The addChild() method returns a SimpleXMLElement itself, to which you can add childs again. It accepts three parameters - the node's name, an optional value and an optional namespace. We will come to namespaces in a minute. </p>
+<p>Via the asXML() method of the SimpleXMLElement you can also output the entire document again, which comes in handy with the header() function to tell the browser that your script's output has to be treated as XML content. The asXML() method also accepts a file path parameter to which it can save the document. In this case it returns a boolean value indicating whether the safe operation was successful or not.</p>
+<p>The addAttribute() method is quite similar:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$url</span> = <span class="re0">$sitemap</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'url'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addAttribute</span><span class="br0">&#40;</span><span class="st0">'featured'</span>,<span class="st0">'true'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'loc'</span>,<span class="st0">'http://php-design-patterns.com'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'lastmod'</span>,<span class="st0">'2007-05-02T21:51:04+00:00'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'changefreq'</span>,<span class="st0">'daily'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">addChild</span><span class="br0">&#40;</span><span class="st0">'priority'</span>,<span class="st0">'0.5'</span><span class="br0">&#41;</span>;<br />
+<br />
+<a href="http://www.php.net/header"><span class="kw3">header</span></a><span class="br0">&#40;</span><span class="st0">'Content-type: text/xml'</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$sitemap</span>-&gt;<span class="me1">asXML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>.</p>
+<p>We have now added an attribute "featured" with the value "true" to our url node, as we can see in the script's output:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">....</span><br />
+<span class="sc0">&lt;url featured=&quot;true&quot;&gt;</span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-design-patterns.com<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T21:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>daily<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>0.5<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span></div>
+<p>The addAttribute() method can also receive an optional namespace.</p>
+<h2>Removing elements and attributes</h2>
+<p>While SimpleXML provides the functionality for adding childs and attributes, it does not provide a means to remove them - at least not directly via its API. However, you can remove an element with:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<a href="http://www.php.net/unset"><span class="kw3">unset</span></a><span class="br0">&#40;</span><span class="re0">$sitemap</span>-&gt;<span class="me1">url</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;</div>
+<p>This will not remove attributes from the element at the url level. You could set the attribute value to null as well, but that would not actually remove it. The attribute will only become empty. To really remove attributes and elements, you have to export your SimpleXMLElement objects to the DOM library (explained in a later article).</p>
+<h1>Working with Namespaces</h1>
+<p>The use of namespaces allows you to associate certain element and attribute names with namespaces identified by URIs. This has the benefit of avoiding naming conflicts when two elements of the same name exist, but contain different data.</p>
+<p>Our sitemap contains a namespace already - check for the string xmlns="http://www.google.com/schemas/sitemap/0.84" in the urlset node. Let's add a few more:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br />
+<span class="sc3"><span class="re1">&lt;urlset</span> <span class="re0">xmlns</span>=<span class="st0">&quot;http://www.google.com/schemas/sitemap/0.84&quot;</span><br />
+&nbsp; <span class="re0">xmlns:meta</span>=<span class="st0">&quot;http://example.com/meta/&quot;</span><br />
+&nbsp; <span class="re0">xmlns:foo</span>=<span class="st0">&quot;http://example.com/foo/&quot;</span><span class="re2">&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T21:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>daily<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>1<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/beautifying-your-code/php-code-beautifier-tool/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T22:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>weekly<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>0.1<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span><br />
+...</div>
+<p>Since PHP 5.1.3, SimpleXML has had the ability to return all namespaces declared in a document (getDocNamespaces()), return all namespaces used in a document (getNamespaces()) and register a namespace prefix used in making an XPath query (registerXPathNamespace()). Here is an example for getDocNamespaces() :</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$namespaces</span> = <span class="re0">$sitemap</span>-&gt;<span class="me1">getDocNamespaces</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$namespaces</span> <span class="kw1">as</span> <span class="re0">$key</span> =&gt; <span class="re0">$value</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;{$key} =&gt; {$value}<br />
+&quot;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>This will output</p>
+<blockquote><p>
+=> http://www.google.com/schemas/sitemap/0.84<br />
+meta => http://example.com/meta/<br />
+foo => http://example.com/foo/
+</p></blockquote>
+<p>Fair enough, our initial namespace didn't have a name, so that first line looks a bit weird. </p>
+<p>A call to getNamespaces() will return nothing, since we do not use any yet. if we used namespaces within our document, by typing something like</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt;url&gt;</span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/beautifying-your-code/php-code-beautifier-tool/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-05-02T22:51:04+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>weekly<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;meta</span> :priority<span class="re2">&gt;</span></span>0.1
+</div>
+<p>getNamespaces() would return an array of used namespaces.</p>
+<p>The tricky thing is to use namespaces and XPath with registerXPathNamespace(). The function creates a prefix/ns context for the next XPath query. In particular, this is helpful if the provider of the given XML document alters the namespace prefixes. registerXPathNamespace() will create a prefix for the associated namespace, allowing one to access nodes in that namespace without the need to change code to allow for the new prefixes dictated by the provider.</p>
+<p>Example:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$sitemap</span>-&gt;<span class="me1">registerXPathNamespace</span><span class="br0">&#40;</span><span class="st0">'c'</span>, <span class="st0">'http://www.google.com/schemas/sitemap/0.84'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$result</span> = <span class="re0">$sitemap</span>-&gt;<span class="me1">xpath</span><span class="br0">&#40;</span><span class="st0">'//c:loc'</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/print_r"><span class="kw3">print_r</span></a><span class="br0">&#40;</span><span class="re0">$result</span><span class="br0">&#41;</span>;<br />
+<span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$result</span> <span class="kw1">as</span> <span class="re0">$value</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$value</span>.<span class="st0">'<br />
+'</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Voila, our XPath query works now and lists all url locations. :]</p>
+<h1>Conclusion</h1>
+<p>We have come to the end of our little SimpleXML journey. As you see, SimpleXML is a very lightweight and easy-to-use xml parser that provides simple yet effective solutions to the most common xml needs.</p>
+<p>If you need to change an xml document, then SimpleXML is not the way to go. We will have a look at an according library for this, namely the DOM library, in a later article.</p>
+<p>Thanks for reading! Have a good one. :)<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-6a58-4a17-a133-455acbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fparsing-xml-using-simplexml%3A480f4dfe-6a58-4a17-a133-455acbdd56cb &amp;title=Parsing+XML+using+SimpleXML';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fparsing-xml-using-simplexml%3A480f4dfe-6a58-4a17-a133-455acbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fparsing-xml-using-simplexml%3A480f4dfe-6a58-4a17-a133-455acbdd56cb&amp;title=Parsing+XML+using+SimpleXML&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fparsing-xml-using-simplexml%3A480f4dfe-6a58-4a17-a133-455acbdd56cb&amp;title=Parsing+XML+using+SimpleXML';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/parsing-a-form-in-node-js-1:4b0bff13-4244-4ebc-8455-4975cbdd56cb">Parsing form data with node.js</a></li>
+							<li><a href="/posts/parsing-file-uploads-at-500-mb-s-with-node-js:4c03862e-351c-4faa-bb67-4365cbdd56cb">Parsing file uploads at 500 mb/s with node.js</a></li>
+							<li><a href="/posts/parsing-xml-with-the-dom-library:480f4dfe-03e4-47f1-bf8c-47dacbdd56cb">Parsing XML With The DOM Library</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/parsing-xml-using-simplexml:480f4dfe-6a58-4a17-a133-455acbdd56cb">43 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/parsing-xml-using-simplexml:480f4dfe-6a58-4a17-a133-455acbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dff-0c48-4b46-b572-4181cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=03476a469576b87ccc7d0fa495a5cc07&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.sleeplessboy.com" rel="nofollow">sleeplessboy</a>						</strong>
+						<strong>said 
+						on May 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Very good tutorial, good intro to parse xml file in PHP.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-2868-4cb1-a38a-429ccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on May 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thank you! I will write an article for the DOM library as well. Just do not know, when. :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-bd54-4a75-ad46-4096cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=39d23d7011abb704b34464956dd19439&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							NeeK_Muntang&nbsp;						</strong>
+						<strong>said 
+						on May 30, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ohhhh... I just looked at the date and realized you probably haven't written the DOM Library article. DOH!</p>
+<p>Is it me or does is seem a bit odd that there is no real way to remove the url node with SimpleXML???</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-1f1c-49d3-b737-4c78cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on May 30, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Neek,</p>
+<p>in fact I haven't written it yet, but as it seems I will do it this weekend. And yes it is odd one cannot remove the url node with SImpleXML. IMO, SimpleXML is a cool platform it would be really cool if it supported removing nodes. </p>
+<p>Maybe there is a way to extend the library... looks like another article. :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-f46c-4efc-ad24-400ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2e04ece735b5bbd4e39fba6faaa67315&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.bidfreelancers.com" rel="nofollow">Bidfreelancers</a>						</strong>
+						<strong>said 
+						on May 31, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Which is better simpleXML or DOM/Xpath way?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-678c-4556-9733-441dcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on May 31, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It really depends on what you want to achieve and what your personal preferences are.</p>
+<p>If you ask me, SimpleXML with its xpath() method is the way to go for easy tasks. If you want to alter an xml document, DOM is the way to go. However, I will elaborate on which to choose over the other more when I write the article on parsing xml files with the DOM library.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-0268-4301-8c1e-42bccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9ce8a7c428c4d90d04a04f326f949a6b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.1lifestory.com" rel="nofollow">Nikos</a>						</strong>
+						<strong>said 
+						on Jun 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great tutorial. I just scanned through the code and after just a few minutes it all made sense to me.....great credit to you for writing it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-f984-4630-b182-4257cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Jun 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thank you very much!</p>
+<p>Today I started the article about the DOM extension. Will hopefully be finished tomorrow or the day after. :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e00-0458-4731-9c82-425ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9ce8a7c428c4d90d04a04f326f949a6b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.1lifestory.com" rel="nofollow">Nikos</a>						</strong>
+						<strong>said 
+						on Jun 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Excellent news. I'm looking forward to it because I've got to the point of trying to remove elements. Hopefully there'll soon create a function to do it. Thanks for doing this, you've already saved me a few hours of having to figure out xml and php. I'm using xml in my Drupal cms module.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e00-fba4-41d7-a522-4220cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Jun 05, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey cool. :) Well removing elements in DOM is very easy compared to SimpleXML, but more on that later in the article. I am currently struggling a bit with xpath in DOM. It's giving me some headaches. :S Edit: Cool, got it working now. :)</p>
+<p>What kind of cms are you working on?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e00-521c-4594-80d3-46b1cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9ce8a7c428c4d90d04a04f326f949a6b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.1lifestory.com" rel="nofollow">Nikos</a>						</strong>
+						<strong>said 
+						on Jun 05, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>xpath is a bit wierd to use, it did lead me to believe xpath isn't ideal for querying for a specific data record, but hey, I've only just started looking into this stuff so I'm a bit of noob to this. But the concept is good. I've decided I'm going to use a database table instead of xml purely on the fact that the module I'm creating is going to be posted back to the Drupal community, and I don't want to have to make people install certain php libraries to get the module working, or make them have to upgrade their php to version &gt; 5.</p>
+<p>The cms I use is Drupal http://drupal.org. I'm an in house developer for a company in London. Another cms i'm interested in having a look at is CodeIgniter http://codeigniter.com/. It's got an OO framework and I think OO is a great concept so I will be looking into it in the near future. </p>
+<p>btw I liked the article Ten Simple Tricks That Will Make You A Valuable Colleague, it was an intersting read.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e00-c9c8-458d-8402-408ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://php-coding-practices.com/language-specific/parsing-xml-with-the-dom-library/" rel="nofollow">Parsing XML With The DOM Library | PHP Coding Practices - Become</a>						</strong>
+						<strong>said 
+						on Jun 05, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Articles Control Your CSS Via PHP - Good Stuff!Parsing XML using SimpleXMLKeystroke Counter ToolPHP Code-Beautifier ToolPrinciples in RefactoringThis Has To Be The Worst Code [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e00-aa48-4e69-9da4-4d57cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Jun 05, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Nikos: Thanks for your interest in my articles. :) The Ten Simple Tricks article will receive a follow-up soon, too (within the next three days I hope).</p>
+<p>I have worked with CodeIgniter myself - it's probably one of the best cms / frameworks out there! I am loving it, too. For my PHp needs, however, I current prefer CakePHP, hence the article category on the site. ;)</p>
+<p>About Xpath: Yeah I have to agree, it can be cumbersome sometimes. I especially noticed that when writing the <a href="http://php-coding-practices.com/language-specific/parsing-xml-with-the-dom-library/">DOM XML article</a>. It gave me some headaches. :/</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-3c38-4827-92d2-4a18cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a25f4f32c12976038f970c0f74968b43&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Matilde Stein&nbsp;						</strong>
+						<strong>said 
+						on Jul 30, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi,<br />
+Thanks for this tutorial. Have you written the later article mentioned above... " to really remove attributes and elements, you have to export your SimpleXMLElement objects to the DOM library (explained in a later article)."</br><br />
+If so, can you point me to it?</br><br />
+merci!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-d668-4ddd-8b21-4d3acbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Jul 31, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Matilde,</p>
+<p>thanks for your comment. Admittedly, I haven't written it yet. *blushes*</p>
+<p>But I will try to do it this week.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-a488-4a99-a152-47d2cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1f44e1e8eec09ccc12686dd845fa7fe9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Szymon Wygnański&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>To remove a node from xml try this:<br />
+for($i=0;$inode[$i]-&gt;someTag == 'somethink') {</br><br />
+    unset($xml-&gt;node[$i];</br><br />
+  }</br><br />
+}</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-8bac-4957-957a-4b6fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1f44e1e8eec09ccc12686dd845fa7fe9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Szymon Wygnański&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>To remove a node from xml try this:<br />
+for($i=0;$inode[$i]-&gt;someTag == 'somethink') {</br><br />
+unset($xml-&gt;node[$i];</br><br />
+}</br><br />
+}</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e03-c6cc-40da-b905-4236cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1f44e1e8eec09ccc12686dd845fa7fe9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Szymon Wygnański&nbsp;						</strong>
+						<strong>said 
+						on Aug 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>grrr... there is some error on this web site!<br />
+Half of my code has been deleted after submiting!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e03-7f80-4e18-bb29-46efcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Aug 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Try to wrap [ php ] around it..(without the spaces).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e04-7734-445d-9738-4438cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c125b9604f66aec96c4e20feb5c7c016&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							zervell&nbsp;						</strong>
+						<strong>said 
+						on Dec 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>How can I add empty tags like . I get  with addchild(). thanks.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e04-abc4-4e8b-a4e1-4621cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8b82c415b718227451f8c1b3f702f5de&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Carole&nbsp;						</strong>
+						<strong>said 
+						on Jan 15, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>There's a problem with addChild() when namespaces are involved, namely the auto-generation of an unnecessary xmlns: attribute:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$item</span>-&amp;<span class="co2">#gt;addChild('itunes:subtitle', $this-&amp;#gt;podcastSubtitle,&quot;itunes&quot;);</span></div>
+<p>This results in the following:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+Musical Mockery</div>
+<p>When really all we want is:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+Musical Mockery</div>
+<p>Any ideas on solutions (other than a regexp, which does work but is a bit hacky as it isn't an XML solution)?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e04-9bc0-4548-b0d2-4baacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8b82c415b718227451f8c1b3f702f5de&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Carole&nbsp;						</strong>
+						<strong>said 
+						on Jan 15, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>There's a problem with addChild() when namespaces are involved, namely the auto-generation of an unnecessary xmlns: attribute:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$item</span>-&amp;<span class="co2">#gt;addChild('itunes:subtitle', $this-&amp;#gt;podcastSubtitle,&quot;itunes&quot;);</span></div>
+<p>This results in the following:</p>
+<p>Musical Mockery</p>
+<p>When really all we want is:</p>
+<p>Musical Mockery</p>
+<p>Any ideas on solutions (other than a regexp, which does work but is a bit hacky as it isn't an XML solution)?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e04-bf0c-4a65-98ed-4f95cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8b82c415b718227451f8c1b3f702f5de&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Carole&nbsp;						</strong>
+						<strong>said 
+						on Jan 15, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I give up, your comment interface makes no sense.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e04-93d4-4e83-a828-4a57cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Jan 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Carole,</p>
+<p>what issue did you encounter with the comment system? Is it because of the double post, or the html tags that get escaped?</p>
+<p>Best,<br />
+Tim</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e04-8608-4fb4-97e6-490dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.webdev-academy.com/idioms/wordpress/2008/02/16/general-cms-development-links/" rel="nofollow">IDIOMS development &raquo; Blog Archive &raquo; General CMS deve</a>						</strong>
+						<strong>said 
+						on Feb 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] XML (2): http://php-coding-practices.com/language-specific/parsing-xml-using-simplexml/ [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e05-a394-4465-87e6-4821cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://phpugffm.de/index.php/very-simplexml,2008-03,283.html" rel="nofollow">Very SimpleXML - PHPUGFFM - PHP User Group Frankfurt am Main</a>						</strong>
+						<strong>said 
+						on Mar 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Parsing XML using SimpleXML (Tim Koschuetzki, 2007-05) [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48233710-d58c-414a-824f-76704834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=77a0de2a3e3d29159840b1e0e810180d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://alweb.homeip.net/dw0rm/dblog/" rel="nofollow">Lukas</a>						</strong>
+						<strong>said 
+						on May 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great article guys.</p>
+<p>I see you have some problems with how your example code and xml files are displayed in the blog posts. I had a similar issue but have adapted WP-Syntax plugin for my blog. It's for Wordpress plug-in but you should be able to easily adapt it to your needs. </p>
+<p>Keep up the good work!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48233804-2694-414d-9c03-352e4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on May 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for the heads up Lukas. We will use some xml syntax hiliting soonish!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489ab35b-1114-473f-af71-1f914834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ff371b81f97202bbdc18bda07d0e2080&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Derick&nbsp;						</strong>
+						<strong>said 
+						on Aug 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Very good tutorial and I have learn a lot.</p>
+<p>But I have a problem in addChild. Following is my code. It is working on PHP Version 5.2.5 but not working on PHP Version 5.0.4 server. Error is coming after $urltag = $xml1->addChild('url','');. So the page show as blank.</p>
+<p>function updateSitemapXML($link,$location=""){<br />
+	if($location != "") $file = $location."/Sitemap.xml"; else $file = "Sitemap.xml";</br></p>
+<p>	//if (file_exists($file)) print "Exists";</p>
+<p>	$xml1 = simplexml_load_file($file);</p>
+<p>	if(!checkXMLURLExists($xml1,$link))<br />
+	{</br><br />
+		$urltag = $xml1->addChild('url','');</br><br />
+		$nexttag  = $urltag->addChild('loc', $link);</br><br />
+		$nexttag  = $urltag->addChild('changefreq', 'weekly');</br></p>
+<p>		file_put_contents($file,$xml1->asXML()); </p>
+<p>	}<br />
+}</br></p>
+<p>Please help!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489ac461-cfac-4e11-b434-67e74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=aff88dd6a4b5cc06db848ef0e81069c9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Jordie&nbsp;						</strong>
+						<strong>said 
+						on Aug 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Actually, you can remove an attribute:</p>
+<p>(Your blog software won't let me use normal tags so I've replaced tehm with square brackets)</p>
+<p>$xml = '[?xml version="1.0" encoding="UTF-8"?]<br />
+[blahset]</br><br />
+ [blah foo="bar"]Something[/blah]</br><br />
+[/blahset]';</br></p>
+<p>$xml = new SimpleXMlElement($xml);<br />
+unset($xml->blah['foo']);</br><br />
+$xml->asXml();</br></p>
+<p>Returns: </p>
+<p>[?xml version="1.0" encoding="UTF-8"?]<br />
+[blahset]</br><br />
+ [blah]Something[/blah]</br><br />
+[blahset]</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49190c19-5b14-4466-b739-7d224834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=eac748104c4632f27c73812c8be3ed70&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.wcities.com" rel="nofollow">Pushpesh</a>						</strong>
+						<strong>said 
+						on Nov 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>To delete a node from an xml file using SimpleXML, try using unset().<br />
+unset($sitemap->url1[0]);</br><br />
+It removes the node from the xml tree.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-495f6e3c-37dc-4507-8d65-6ea94834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=760224df6d6e3ca5571330742da2b7af&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							swamyvnvs&nbsp;						</strong>
+						<strong>said 
+						on Jan 03, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi, I want provide a validation for given xml, validation are datatype, required tags, how to acheive this validations using the simplexml methods, is there any predefind methods in simple xml for validations</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-495fb873-519c-44cc-a747-073d4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Jan 03, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>swamyvnvs: You can take a look at CakePHP's assertTags() function.</p>
+<p>Download CakePHP from cakephp.org.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a1f9d64-f864-400f-ad39-6c984834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=367869f234525b915bac1b1ccfe09a1a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.ellidokuz.com" rel="nofollow">Tekirdağ</a>						</strong>
+						<strong>said 
+						on May 29, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>excellent xml code :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a2e12de-997c-4a48-bde5-07b34834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3ad210b3c18c881db3c302e4a400bacb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Rafael Pascual&nbsp;						</strong>
+						<strong>said 
+						on Jun 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Tim, </p>
+<p>Thanks for the tutorial...<br />
+Is there a way to edit a specific node in an xml file and then save only the portion that I edited? I need that to make sure that if something bad happened in my internet connections, my site won't be corrupted. I am just a noob and base on my understanding in one of examples above, we load the xml file and then save everything to that file again. Isn't that just overwriting? I am thinking of some ways to get the specific node, edit it, then save the node without affecting the other nodes. Is that possible?</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a2e38b2-89e4-48e2-85aa-2de84834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Jun 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well it's not easily possible, but it's definitely possible.</p>
+<p>How do you intend to find out which node to edit?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a34575c-1fc0-488a-8381-54804834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=aba454bbe82271456d987a72900292f4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Rafael Pacual&nbsp;						</strong>
+						<strong>said 
+						on Jun 14, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>In case I have sent my reply somewhere I don't know, I will repost it here. </p>
+<p>Thanks Tim, I would like to locate my node in the simplest way possible, but I guess this wouldn't be easy so can we use DOM or would you like to suggest something else? Even though it gets harder than I am expecting I would not care for as long as the code is flawless. Thank you so much.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a34b414-c870-4417-9984-3f324834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Jun 14, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well, the question is Rafael, based on which fields/content you want to locate your node.</p>
+<p>Like how is it different from all the others? Can you provide an example? Then we can go from there to write some generic code. :]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a35a6dc-102c-4d50-9f82-76864834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=aba454bbe82271456d987a72900292f4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Rafael A. Pascual&nbsp;						</strong>
+						<strong>said 
+						on Jun 15, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[?xml version="1.0" encoding="utf-8"?]<br />
+[category]</br><br />
+  [id] ... [/id]</br><br />
+  [artist] ... [/artist]</br><br />
+  [desc] ... [/desc]</br><br />
+  [video]</br><br />
+    [list]</br><br />
+      [file] ... [/file]</br><br />
+      [mp4] ... [/mp4]</br><br />
+      [preview] ... [/preview]</br><br />
+      [cover] ... [/cover]</br><br />
+      [amount] ... [/amount]</br><br />
+      [value] ... [/value]</br><br />
+    [/list]</br><br />
+    [list]</br><br />
+      ...</br><br />
+    [/list]</br><br />
+[/category]</br><br />
+[category]</br><br />
+    [list]</br><br />
+    ...</br><br />
+    [/list]</br><br />
+[/category]</br><br />
+...</br></p>
+<p>Sorry for that Tim, the above code is my actual xml(I have 11,368 lines). What I need to do is to edit everything that's inside the [list]...[/list] tags or just add/delete lists. So far, I can only edit lists on my first category tag but I cannot edit lists on my second category up to the last.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a39a372-5c14-4a64-bdf8-35294834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3ad210b3c18c881db3c302e4a400bacb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Rafael A. Pascual&nbsp;						</strong>
+						<strong>said 
+						on Jun 18, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Just an addition to my last post. I can edit my nodes but I am overwriting the whole xml file so I need a work around. Please help me with this Tim.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ad18783-6820-4664-bd1b-2711cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=45afaf839f69103c4d5cb61cae361fd2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.spyble.com" rel="nofollow">Marco</a>						</strong>
+						<strong>said 
+						on Oct 11, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>thanks for your post. I've edited your recurser function a little to work with namespaces. I've got a file here that basically has a namespace for each row, quite nasty :)</p>
+<p>function displayChildrenRecursive($xmlObj,$depth=0) {<br />
+		$namespaces = $xmlObj->getNamespaces(true);</br><br />
+		foreach($namespaces as $ns){</br><br />
+	   	foreach($xmlObj->children($ns) as $child) {</br><br />
+	    		echo str_repeat('-',$depth).">".$child->getName().": ".$child."\r\n";</br><br />
+	    		$this->displayChildrenRecursive($child,$depth+1);</br><br />
+	 		}</br><br />
+ 		}</br><br />
+	}</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ad1925e-ccf8-458b-86c4-26eccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Oct 11, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for contribution, Marco. :]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4afd1da5-f068-4d50-8fc2-3480cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0b892f399411a909721e28c20b99abd4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.gibbydevelopments.com" rel="nofollow">Anthony</a>						</strong>
+						<strong>said 
+						on Nov 13, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Came across this post from a chain of sites I'm reading to learn how to access and develop applications using Twitter API. I'm going to have to read this a little later, but I'll definitely be back.  </p>
+<p>Anthony V. Gibby<br />
+Get paid just for using Twitter - <a rel="nofollow" href="http://bit.ly/1dJmxw">http://bit.ly/1dJmxw</a></br><br />
+<a rel="nofollow" href="http://www.gibbydevelopments.com">http://www.gibbydevelopments.com</a></br><br />
+<a rel="nofollow" href="http://www.twitter.com/AVGibby">http://www.twitter.com/AVGibby</a></br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

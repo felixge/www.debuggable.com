@@ -1,0 +1,762 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>7 + 8 === 7 in JavaScript &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/7+8===7-in-javascript:4acba016-d204-489b-b5a0-1fd0cbdd56cb">7 + 8 === 7 in JavaScript</a></h2>	<div class="posted-on">
+		<p>Posted on 6/10/09 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>I kid you not, this is an issue I actually ran into a long time ago and have been terribly careful of avoiding ever since.</p>
+<p>It must have been a fantastic day in the "Bad Parts" JavaScript department. While one team was busy screwing up the + operator to be responsible for both string concatenation and addition, another team set out to build a nasty trap inside the parseInt() function.</p>
+<p>This together results in probably my favourite JavaScript bug of all times. It goes like this: You have two strings that contain zero padded numbers (like hours or minutes) and you want to perform some math on them:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> a = <span class="st0">'07'</span>;<br />
+<span class="kw2">var</span> b = <span class="st0">'08'</span><br />
+<br />
+<span class="kw3">alert</span><span class="br0">&#40;</span>a + b<span class="br0">&#41;</span>;</div>
+<p>Of course you would not write such code, but maybe you have a friend who has done it. This friend probably quickly realized that '0708' was not the result he was hoping for, so he got clever and updated his code to:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> a = <span class="st0">'07'</span>;<br />
+<span class="kw2">var</span> b = <span class="st0">'08'</span><br />
+<br />
+<span class="kw3">alert</span><span class="br0">&#40;</span>parseInt<span class="br0">&#40;</span>a<span class="br0">&#41;</span> + parseInt<span class="br0">&#40;</span>b<span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>However, it turns out that the result of this operation is actually 7. SEVEN you ask? Yes: it's not a bug, it's a feature.</p>
+<p>JavaScript assumes that any 0-prefixed string ought to be referring to an octal number. This will not become apparent until your string represents an invalid octal such as '08'. So in order to outsmart this "feature" you have to explicitly provide the base for your integer:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">var</span> a = <span class="st0">'07'</span>;<br />
+<span class="kw2">var</span> b = <span class="st0">'08'</span><br />
+<br />
+<span class="kw3">alert</span><span class="br0">&#40;</span>parseInt<span class="br0">&#40;</span>a, <span class="nu0">10</span><span class="br0">&#41;</span> + parseInt<span class="br0">&#40;</span>b, <span class="nu0">10</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>I hope this will one day safe somebody the hour of my life that went into this : ).</p>
+<p>-- Felix Geisendörfer aka the_undefined</p>
+<p>PS: Got a great JavaScript bug like this as well? I'd be happy to hear about it in the comments.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4acba016-d204-489b-b5a0-1fd0cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2F7%2B8%3D%3D%3D7-in-javascript%3A4acba016-d204-489b-b5a0-1fd0cbdd56cb &amp;title=7+%2B+8+%3D%3D%3D+7+in+JavaScript';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2F7%2B8%3D%3D%3D7-in-javascript%3A4acba016-d204-489b-b5a0-1fd0cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2F7%2B8%3D%3D%3D7-in-javascript%3A4acba016-d204-489b-b5a0-1fd0cbdd56cb&amp;title=7+%2B+8+%3D%3D%3D+7+in+JavaScript&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2F7%2B8%3D%3D%3D7-in-javascript%3A4acba016-d204-489b-b5a0-1fd0cbdd56cb&amp;title=7+%2B+8+%3D%3D%3D+7+in+JavaScript';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/javascript-meetup-berlin-slides:4b4d98bc-034c-451d-b8f1-5377cbdd56cb">JavaScript Meetup Berlin + Slides</a></li>
+							<li><a href="/posts/relative-urls-in-javascript:48cd078b-46e4-4995-903a-0ed74834cda3">Relative urls in JavaScript</a></li>
+							<li><a href="/posts/a-php-developers-guide-to-javascript-part-i:480f4dd6-8a0c-4f43-b2ba-474dcbdd56cb">A PHP developers guide to JavaScript - Part I</a></li>
+							<li><a href="/posts/javascript-meetup-hamburg-slides:4b8f9986-4e64-4755-b420-074dcbdd56cb">JavaScript Meetup Hamburg + Slides</a></li>
+							<li><a href="/posts/passing-controller-variables-to-your-javascript:48b4f0c6-c718-47b2-bca1-05794834cda3">Passing controller variables to your JavaScript</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/7+8===7-in-javascript:4acba016-d204-489b-b5a0-1fd0cbdd56cb">34 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/7+8===7-in-javascript:4acba016-d204-489b-b5a0-1fd0cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4acbc009-4050-4f7e-a991-211ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=782ed167b5c2c2563480ad62727f6b08&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakeapp.com" rel="nofollow">Simon Brüchner</a>						</strong>
+						<strong>said 
+						on Oct 06, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Too late, just ran into this problem/feature last week. Took me 1/2 hour.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acbc1d1-5e6c-4999-96bc-211ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1672b36a5f56243c14cc04e3e13f49d9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							robust solution&nbsp;						</strong>
+						<strong>said 
+						on Oct 06, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>nice tip.<br />
+thank you</br><br />
+for the moment I do not remember any tip, although I found many in my professional career.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acbc4e0-78fc-4119-9f3c-2174cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=337aee5e8a9f23a4a1a84fc6aed7a625&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.vanyli.net" rel="nofollow">yed_</a>						</strong>
+						<strong>said 
+						on Oct 06, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi,</p>
+<p>for last half year I was developing some economic software. There were lot of number operations in JS and I went nuts. Final solution for working with numbers in JS was multiply every variable with 1. For example:</p>
+<p>var a = '07';<br />
+var b = '08';</br><br />
+alert( a*1 + b*1); //15</br></p>
+<p>It's not nice solution, but it solved all my problems.</p>
+<p>I found also some bugs in JS calculation, for example in firefox 100 * 1.15 = 114.999999999</p>
+<p>(sorry my english)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acbc8be-3400-4f13-a3e0-211ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fb5741bda7c127c419b130022a42ead3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.electricprism.com/aeron" rel="nofollow">Aeron</a>						</strong>
+						<strong>said 
+						on Oct 06, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Definintely recommend using a Javascript framework. Mootools has great helpers.</p>
+<p>For example you have parseInt(), parseFloat() but then toFixed(). MT does a great job of normalizing this:<br />
+toInt() with toFloat() - which of course also sets a base 10 radix and allows for better chaining all-in-one!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acbd32a-6f3c-41d4-b47a-22bccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=97fe25cb37475368e417754904e88733&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Gordon&nbsp;						</strong>
+						<strong>said 
+						on Oct 06, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I frequently encounter calculation errors where X multiplied by ten will result in 10X-0.000000001 or similar, so 10*5 = 49.999999999 or 5^2 will return 24.9999999.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acc160b-f81c-44ab-a413-23e8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c47ff39c2f48ea9f444d4d16921e1dba&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Gabriel&nbsp;						</strong>
+						<strong>said 
+						on Oct 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>About the decimal glitch, I remember seen a script wich split the numbers in decimal and integer parts and perform the multiplicaction separately and join the numbers after that.</p>
+<p>PS1: I just discover the rickrollbug! :D<br />
+PS2: Sorry by my english</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acc2510-ae44-4c1f-a824-2423cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c229780bae3a2e831fb628e75fd78375&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							xtrementl&nbsp;						</strong>
+						<strong>said 
+						on Oct 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>You could instead use Number() instead of parseInt().</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acc2f7f-8c84-4866-99b8-247ccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Oct 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Posted for David Thalmann:</p>
+<p>@yed: This is not a "bug" of JavaScript, it's just the IEEE-Standard for floating-point operations (correctly applied by JavaScript), check this:</p>
+<p>var i = 0.1;<br />
+var j = 0.2;</br><br />
+alert(i+j);</br></p>
+<p>To "see" what actually happens, see here: <a rel="nofollow" href="http://bit.ly/2r9Be">http://bit.ly/2r9Be</a></p>
+<p>@topic: Good post, but I think on every programming language you have to keep attention when dealing with numbers (often combined with casting and other "features").</p>
+<p>Java: System.out.println((int) 2.5 * 2.0 + (int) (2.5 * 2.0));<br />
+PHP: if (1 == "2") echo "woot";</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acc3b99-a10c-4343-8249-2491cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=57a0286d1735363f18d4942c48138cc6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Javi&nbsp;						</strong>
+						<strong>said 
+						on Oct 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yep, same happened to me two months ago. We had a calendar applet, based on jQuery UI datepicker.</p>
+<p>It worked fine for nine months. But when august came, clients started to call saying the applet was not displaying the right date anymore. After a couple of hours, I found this "bug" and realized that august is the eighth month!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acc8663-9e70-42bd-adcb-2709cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f6681e53f53098ce1c09ae30811ac535&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://coffeesounds.com" rel="nofollow">Łukasz</a>						</strong>
+						<strong>said 
+						on Oct 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Recently I found one really annoying thing in JS (it's not related to Math/parseInt/etc) but I lost few hours wondering 'why?'<br />
+var d = new Date(2009, 08, 02);</br><br />
+You'd expect that 'd' will store the info about 2nd of August of 2009.</br><br />
+No.</br><br />
+It's 2nd of JULY</br></p>
+<p>Here's why:  <a rel="nofollow" href="https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Global_Objects/Date">https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Global_Objects/Date</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acc89d5-b584-42af-989e-273ccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Łukasz: Haha, so month is 0-11 but date is 1-31. Pure genius : ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acc9053-2864-4fd8-876d-27a3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=57a0286d1735363f18d4942c48138cc6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Javi&nbsp;						</strong>
+						<strong>said 
+						on Oct 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Łukasz: Exactly! Now I remember why I had to do "parseInt(month) - 1", but didn't have to do the same thing with the day. So that's why it worked on february the 8th but didn't on august the 2nd.</p>
+<p>And all this work just to display a date!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acca270-1330-47ca-9512-2850cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e06a373526d8308b18eae59e472f1df0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Chris&nbsp;						</strong>
+						<strong>said 
+						on Oct 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>>>> typeof NaN<br />
+"number"</br></p>
+<p>this is also a bit odd :-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4accb314-9710-48b8-bbe6-2d72cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=97fe25cb37475368e417754904e88733&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Gordon&nbsp;						</strong>
+						<strong>said 
+						on Oct 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>var d = new Date(2009, 08, 02);<br />
+You'd expect that 'd' will store the info about 2nd of August of 2009.</br><br />
+No.</br><br />
+It's 2nd of JULY</br></p>
+<p>Try September :)<br />
+0 Jan 1 Feb 2 Mar 3 Apr 4 May 5 Jun 6 Jul 7 Aug  8 Sep 9 Oct 10 Nov 11 Dec</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4accbebb-18ac-4df5-9480-2e06cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f6681e53f53098ce1c09ae30811ac535&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://coffeesounds.com" rel="nofollow">Łukasz</a>						</strong>
+						<strong>said 
+						on Oct 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Gordon - well, I fixed it with (month+1) just to keep my sanity safe :-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acccfe0-52d8-4405-9fc0-2f06cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=612ad7c3adee43c41ee3e88affe94472&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							NOSLOW&nbsp;						</strong>
+						<strong>said 
+						on Oct 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>JSlint.com has saved me from this bug. Otherwise, it would have bitten me (eventually).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4accf5c3-955c-47f5-b1b2-2ffacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=782ed167b5c2c2563480ad62727f6b08&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakeapp.com" rel="nofollow">Simon Brüchner</a>						</strong>
+						<strong>said 
+						on Oct 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@NOSLOW: How did jslint saved you? Did you cecked your script with it or did you used it as a framework?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acd0e05-fda8-4d0e-b673-34c3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f6681e53f53098ce1c09ae30811ac535&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Lukasz&nbsp;						</strong>
+						<strong>said 
+						on Oct 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Simon - jslint is a great validation/optimizer tool created by Doug Crockford. If you develop in JS *you have to use it*. by deafult it warns you about such 'gotchas' as parseInt without decimal base, ++ and -- operators.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acdb8c3-5978-48b4-a726-3864cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=612ad7c3adee43c41ee3e88affe94472&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							NOSLOW&nbsp;						</strong>
+						<strong>said 
+						on Oct 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Simon: Lukasz summed it up. JSlint warns you whenever you use javascript's "bad parts". After using it a while, you'll see that it does a good job at catching things that need to be corrected.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acdd880-7420-4869-a0d9-39d5cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=758967b84fdd8cbfc900df4a5ac76265&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Tom&nbsp;						</strong>
+						<strong>said 
+						on Oct 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yes, nice post, thanks.<br />
+I've found an interestning problem too:</br></p>
+<p>Never name your function parameter 'class'.<br />
+I've spent 1 hour to find out what the problem is. At the end I commented out everything except the problematic method header, and then I found it. </br></p>
+<p>In firefox, it is ok. but in ie6 no error is displayed, but your script not working anymore (found it with putting alert('') calls after the problematic declaration).</p>
+<p>Br,<br />
+Tom</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acdd94f-c020-408c-bf96-39d2cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=782ed167b5c2c2563480ad62727f6b08&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakeapp.com" rel="nofollow">Simon Brüchner</a>						</strong>
+						<strong>said 
+						on Oct 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Another great time waster that keeps me from my work is a comma "," in an array/object AFTER the last entry. FF eats it, IE not.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acddae9-aff4-4cfc-b835-3a18cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tom: You need be even more careful with reserved keywords in Safari, it will even refuse to take those that are not being used by JS yet.</p>
+<p>Simon Brüchner: Yeah, that's usually the first thing I have to fix when making my sites IE compatible : )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acde1a9-8a64-43c7-b453-3ae1cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=758967b84fdd8cbfc900df4a5ac76265&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Tom&nbsp;						</strong>
+						<strong>said 
+						on Oct 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for the information, I skipped the test on safari this time.</p>
+<p>Hard times today because of ie6... :S<br />
+Maybe you are all familiar with this bug (or feature, I don't know), but it's new for me and it's really annoying.</br></p>
+<p>I have a radio button group, and a js onchange handler.<br />
+Simple, isn't it?</br><br />
+It works ok in ff, but in ie, the action of onchange event fired just after focus lost on that element.</br><br />
+I don't know the working in other browsers, but I bet they have no problem with onchange handling.</br><br />
+As a solution I use the onclick event from now.</br></p>
+<p>Tom</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acde57b-7ca0-4913-9d00-3915cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f6681e53f53098ce1c09ae30811ac535&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://coffeesounds.com" rel="nofollow">Łukasz</a>						</strong>
+						<strong>said 
+						on Oct 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Simon and Felix - JSlint warns about the trailing comma after last element of an array/object as well :-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ace3335-9c3c-4eb3-88fc-3e6ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bb8fdec5b5671bd7bc1001a9e4ad9b26&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://andrewkolesnikov.com" rel="nofollow">Andrew Kolesnikov</a>						</strong>
+						<strong>said 
+						on Oct 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Using Javascript with JSlint has saved me countless hours. Is there a bundle for TextMate to validate JS with JSlint?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ace5015-f094-42a5-9adc-3f81cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f6681e53f53098ce1c09ae30811ac535&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Łukasz&nbsp;						</strong>
+						<strong>said 
+						on Oct 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Andrew - yup, there's a bundle for Textmate (and E) and since JSlint is a command line tool it can be used with any decent editor/ide</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ace56bb-4c2c-4068-945d-3f42cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=575afc361a648cc0234ffcef805e1578&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://brunocassol.com/" rel="nofollow">Bruno Cassol</a>						</strong>
+						<strong>said 
+						on Oct 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Just one thing: RTFM!</p>
+<p>Even my 14 yr sister knows that in computers numbers starting with 0 are on octal notation. ECMAScript specification says so too.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ace5a8b-2298-4a0d-8b35-4071cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Bruno Cassol: Yeah, I have read it and it says you are encouraged to not be a smart ass and leave octals alone. Have you read it?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ace7c5f-a6b8-4889-8e36-4200cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6d7fdb747d1679ca828394c55a4ff418&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://sitecrafting.com" rel="nofollow">Paul Sayre</a>						</strong>
+						<strong>said 
+						on Oct 08, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>My favorite is that you can overwrite undefined and null.<br />
+var a;</br><br />
+alert(a == undefined); // true</br><br />
+undefined = 3;</br><br />
+alert(a == undefined); // false</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4acfb0e2-4720-49c8-852d-15a8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f0b4bff1c49276c72c2578d54306a724&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.guerra-creativa.com/" rel="nofollow">Enrique Jacobs</a>						</strong>
+						<strong>said 
+						on Oct 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I read this blog post two days ago and now I ran into exactly the same problem when parsing a date time value (actually I develop with JS since a long time and I can't remember running into the octet pitfall up to now).<br />
+Saved me some time, thanks!</br><br />
+BTW: Have a look at our quiet new CakePHP-driven community app: <a rel="nofollow" href="http://www.guerra-creativa.com">http://www.guerra-creativa.com</a></br><br />
+Guaranteed to be bug-pestered ;-)</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ad05bc3-ca10-4e1a-97e3-1ae4cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Oct 10, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Enrique Jacobs: Very cool design!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ad08524-c74c-445e-8f8b-1ca1cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=484aafba8f2b2455dff1d7ca6f45eb4a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.basshero.org" rel="nofollow">jaywink</a>						</strong>
+						<strong>said 
+						on Oct 10, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Javascript is  odd at times :) just recently learned that foo['bar'] is not an associative array but actually just a property (ie foo.bar) :P</p>
+<p><a rel="nofollow" href="http://www.basshero.org/61/javascript-arraylength-fails-if-key-has-line-breaks/">http://www.basshero.org/61/javascript-arraylength-fails-if-key-has-line-breaks/</a></p>
+<p>(which isn't true but after writing that post I was told javascript has no associative arrays)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ad2609a-eed4-4b91-ba7d-3056cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=602221e0c40c93cfe5c1925a89f2d291&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Bret Kuhns&nbsp;						</strong>
+						<strong>said 
+						on Oct 11, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yeah, this Octal notation is nothing new, though I can see why it's not intuitively obvious when you first hit this "error". PHP uses the same convention <a rel="nofollow" href="http://us3.php.net/manual/en/language.types.integer.php">http://us3.php.net/manual/en/language.types.integer.php</a></p>
+<p>$a = 0123; // octal number (equivalent to 83 decimal)</p>
+<p>Despite this, though I haven't tried, I have a feeling doing $var = (int)"08"; in PHP will probably give you a decimal 8 int.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ada183a-fcc8-43f7-99a9-2368cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b58d5953d70feca4aa20f67a1a4b8963&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.kkovacs.hu" rel="nofollow">KKovacs</a>						</strong>
+						<strong>said 
+						on Oct 17, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix,</p>
+<p>It's not just in JavaScript. Starting a number with a zero means octal in several languages, including C, Python, PHP and TCL (those I know of, maybe others, too). :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

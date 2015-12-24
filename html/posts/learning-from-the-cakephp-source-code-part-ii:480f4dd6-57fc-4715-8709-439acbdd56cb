@@ -1,0 +1,448 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Learning from the CakePHP source code - Part II &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/learning-from-the-cakephp-source-code-part-ii:480f4dd6-57fc-4715-8709-439acbdd56cb">Learning from the CakePHP source code - Part II</a></h2>	<div class="posted-on">
+		<p>Posted on 29/9/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Sorry this post took me a while. The last couple days have been sort of busy and a lot of things on my lists didn't get done. Anyway, I'll continue right where I stopped, with the Dispatcher:</p>
+<h2>The heart of CakePHP - The Dispatcher</h2>
+<p>In the <a href="http://www.thinkingphp.org/2006/09/25/learning-from-the-cakephp-source-code-part-i/">previous post</a> I was showing how to use the Dispatcher::dispatch() function. Now what's more interesting, is what it actually does and in what order.</p>
+<ol style="list-style-position: inside;">
+<li><strong>Build the $params array.</strong> The first thing the Dispatcher::dispatch() function does is to perform an array_merge between $this->parseParams($url) and $additionalParams. Dispatcher::parseParams() is quite interesting as well. The first thing it does is to create a new Instance of the Router and call Router::parse($from_url). This returns an array with fields like 'controller', 'action', etc.. After that all variables from $_GET, $_POST and $_FILE are being merged into the $params array as well and finally returned to the Dispatcher function.</li>
+<li><strong>Find the base url: </strong> The next thing Dispatcher::dispatch() does, is to find the base url, that all controller actions, routes, etc. happen within. This url is then assigned to $this->base. All the base url retrieving logic is implemented in Dispatcher::baseUrl().</li>
+<li><strong>Load/Include the requested Controller:</strong> From now on I'll focus on the most important things going on because it would be insane to go into every little detail. The next block of code basically sees if $params['controller'] is emtpy, and if yes object::cakeError() is invoked to show the 'missingController' page all of us know. If the controller field is not empty, the first thing CakePHP tries to do is to load this controller (via loadController) from within /app/controllers. If that fails, CakePHP looks if there is a plugin with the name of $params['controller'] (via loadPluginController), and if not, missingController is invoked as well.</li>
+<li><strong>Possible Plugin Logic:</strong> In case there was a plugin found, the next thing that happens is some plugin logic that does not get executed for normal Controller requests. It's basically some $params shifting magic (Dispatcher::_restructureParams()), and most notably the point where loadPluginModels() get's executed.</li>
+<li><strong>Executing the Admin Route:</strong> If you have CAKE_ADMIN defined in your /app/config/core.php, then this is the point where the 'admin_' prefix (or whatever CAKE_ADMIN is set to) is added to the $params['action'] parameter. And here you also have a check that protects CAKE_ADMIN routes as private actions. This basically means if somebody would call /posts/admin_index instead of /admin/posts/index he wouldn't get very far.</li>
+<li><strong>Render a possible missingController error:</strong> If at some point in the code above $missingController was set to true, this is the point where $this->cakeError('missingController', ...) is invoked. If not, $controller is being assigned a new instance of our $ctrlClass.</li>
+<li><strong>Action exists? Action private?: </strong> The next couple of lines are dedicated to perform some checks on the $params['action'] parameter. The following things happen in the order I mention them: If $params['action'] is empty, it is set to 'index' instead. If the Controller has an action with the name $params['action'] but it starts with '_', $privateAction is set to true. If the Controller does not have an action $params['action'], or it happens to be named: 'beforeFilter', 'beforeRender' or 'afterFilter', $missingAction is set true.</li>
+<li><strong>Set Controller variables:</strong> Now it's time for all of the Controller variables to be set with interesting information. This includes the 'autoRender', 'base', 'here', 'webroot', 'params', 'action', 'data', 'passedArgs', 'autoLayout', 'webservices' and 'plugin'.</li>
+<li><strong>Load Components & Models:</strong> The Dispatcher now calls $controller->_initComponents() which attaches all components as references to the Controller object, but does not yet call their startup() function. After that, the same thing happens with Models when calling $controller->constructClasses().</li>
+<li><strong>Render possible missingAction/privateActione errors:</strong> If there had been a missingAction or privateAction error before, this is the point where $this->cakeError() get's called to render those.</li>
+<li><strong>Invoke the controller:</strong> The last call in Dispatcher::dispatch() goes to Dispatcher::_invoke(), but since it's still the same operation we are doing, I'll continue writing about things like before. The _invoke function directly executes Dispatcher::start(), which does the following things: If Controller::beforeFilter is a string/array, call the/all function(s) in this string/array (Warning: This is depracted!). Afterwards Controller::beforeFilter() get's executed without further checking. And the last thing happening in Dispatcher::start() is that all component's startup() functions get called. So back in Dispatcher::_invoke() there comes a check whether we are scaffolding or not, and if no, our Controller action get's called via call_user_func_array. Then, if $controller->autoRender is set to true, $controller->render() is called, and finally the afterFilter get's executed. Depending on whether there was some rendering going on or not either the raw output or the action's return value are getting returned to Dispatcher::dispatch() which directly returns this value back to the point where the initial call came from.</li>
+</ol>
+<p>That's it, you've just witnessed the miracle of birth ... er dispatching. I've skipped some minor things here and there, but in general this together with <a href="http://www.thinkingphp.org/2006/09/25/learning-from-the-cakephp-source-code-part-i/">Part I</a> should be a good guide to the things happening before all your wonderful application code kicks in. Of course, there is a lot more like all the Model and View stuff. But talking about all of this would take for ever, bore you to death and would only be useful to very few of us. However, <strong>if you guys would be interested in it</strong>, I would post a <strong>Part III</strong> where I would just do some pointing at classes and code snippets a CakePHP user should have read to get a better understanding of the things going on in the background.</p>
+<p>Oh, and today is probably also going to be the day I'll <a href="http://www.thinkingphp.org/2006/09/23/alright-i-lost/">buy myself some yummy Cake</a> ... : /. I'm not sure if I'll be able to take the picture and everything today, but I'll try my best. Hmm ... after that I should probably close this blog since nobody is going to hire me in the field of web development any more and I'll have to look for a new area to work in : /.</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-57fc-4715-8709-439acbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Flearning-from-the-cakephp-source-code-part-ii%3A480f4dd6-57fc-4715-8709-439acbdd56cb &amp;title=Learning+from+the+CakePHP+source+code+-+Part+II';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Flearning-from-the-cakephp-source-code-part-ii%3A480f4dd6-57fc-4715-8709-439acbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Flearning-from-the-cakephp-source-code-part-ii%3A480f4dd6-57fc-4715-8709-439acbdd56cb&amp;title=Learning+from+the+CakePHP+source+code+-+Part+II&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Flearning-from-the-cakephp-source-code-part-ii%3A480f4dd6-57fc-4715-8709-439acbdd56cb&amp;title=Learning+from+the+CakePHP+source+code+-+Part+II';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/testing-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes:4890ed55-be28-4d4a-ba4c-7fd64834cda3">Testing Models in CakePHP - Now let&#039;s get rid of the unnecessary ModelTest classes !</a></li>
+							<li><a href="/posts/job-senior-cakephp-position-with-english360com:4a3bcdf2-7b28-405f-bbe1-7fb54834cda3">[JOB] Senior CakePHP position with english360.com</a></li>
+							<li><a href="/posts/code-coverage-analysis-soon-in-cakephp---test-how-well-you-test:4814f6a0-fe60-4f50-be0b-07194834cda3">Code Coverage Analysis soon in CakePHP - Test How Well You Test</a></li>
+							<li><a href="/posts/extra-hot-cakephp-1.2-stable-is-finally-released!:4954151c-f87c-434b-abbd-4e404834cda3">Extra Hot: CakePHP 1.2 Stable is finally released!</a></li>
+							<li><a href="/posts/how-to-have-multiple-paginated-widgets-on-the-same-page-with-cakephp:48ad241e-b018-4532-a748-0ec74834cda3">How to have multiple paginated widgets on the same page with CakePHP</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/migrating-from-wordpress-to-cakephp:480f4dd6-ef28-4881-b74f-4185cbdd56cb">Migrating from WordPress to CakePHP</a></li>
+							<li><a href="/posts/slides-for-my-cakephp-unit-testing-talk:480f4dfe-4880-4b82-9a52-4bd8cbdd56cb">Slides for my CakePHP Unit Testing Talk</a></li>
+							<li><a href="/posts/problems-with-repeatitive-source-code-or-better-dont-repeat-yourself:480f4dfd-ac70-4f1b-907b-4eb4cbdd56cb">Problems with repetitive source code or better: Don&#039;t repeat yourself</a></li>
+							<li><a href="/posts/update-on-cakephp-google-analytics-apimodel:480f4dd5-7044-47bc-945a-4d90cbdd56cb">Update on CakePHP Google Analytics API/Model</a></li>
+							<li><a href="/posts/cakephp-all-others:480f4dfe-0bb0-46bc-b668-415ccbdd56cb">CakePHP &gt; All Others</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/learning-from-the-cakephp-source-code-part-ii:480f4dd6-57fc-4715-8709-439acbdd56cb">16 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/learning-from-the-cakephp-source-code-part-ii:480f4dd6-57fc-4715-8709-439acbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dde-1bac-4c4b-9b1e-4a49cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a92e5d86be5f8a3408d46acc2943f99c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Lucian Lature&nbsp;						</strong>
+						<strong>said 
+						on Sep 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I would be interested in Part III, and especially if it will discuss a little on Model class and the way it handles the associations between models.<br />
+Don't give up, man!...have a Cake and keep going...I think you'll be hired, someday...</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dde-2fc4-441a-96bd-44f9cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Lucian: The associations are not my special expertise I have to admit ^^, but I'll see what I can do.</p>
+<p>And as far as giving up goes: It's all fun, I don't think anybody will really care about it, and if so that would act as a nice filter for the kind of people I wouldn't want to work for anyway ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dde-da98-4aeb-9f83-48e1cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f2b8a45c5431b462a8a038c975397e35&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.tommmy.de" rel="nofollow">Tom</a>						</strong>
+						<strong>said 
+						on Sep 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Heyo Felix,</p>
+<p>Sorry for beeing slightly off-topic, but i have to jump on your line, fearing you never get a job again cause of putting yourself into a cake :D</p>
+<p>Yesterday I saw a guy on TV who wears womens clothing and mentioned that in his CV when he was applying for his new job.....and got it! I don't think at all, that putting your face into a cake from time to time is as bad as wearing womens clothes ;)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-86f8-4c6c-a9bd-4ffacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.phpdeveloper.org/news/6390" rel="nofollow">PHPDeveloper.org</a>						</strong>
+						<strong>said 
+						on Sep 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p><strong>Felix Geisend&ouml;rfer's Blog: Learning from the CakePHP source code - Part 2...</strong></p>
+<p>...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dde-fc50-40bd-9665-40f9cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tom: Are you trying to encourage me to do even more stupid stuff in future? Ok, I'll see what I can do ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-2edc-4fb4-90dc-4b77cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=55e3dd5b4f00e50fc1a1d7ac409fd859&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Matt&nbsp;						</strong>
+						<strong>said 
+						on Sep 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great post!</p>
+<p>I also anticipate a Part III.  Thanks for taking the time to post.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-1b90-4561-ac0f-4bc0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9d2291bb80081de3101be0a4d2739eaf&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Christoph&nbsp;						</strong>
+						<strong>said 
+						on Sep 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Felix!</p>
+<p>As you wrote in Part I most of Cake's core code is "delightful and should help you to become a better programmer" and that's what makes it so easy to read. I think what you did in this post was mainly "translating sourcecode into prose"... Well, what I want to say: I just think that any programmer who is really willing to learn more about the core is also able to directly read through some lines of code and understand them without additional explanation.</p>
+<p>All I want to suggest is just don't waste your time with discribing sections of code but tell us more about all that powerful, hidden stuff, e.g. how to use the class registry and stuff like that! I know you're - compared to most of us - damn familiar with the core so I'm really curious to learn more about the might &amp; magic of Cake's core!</p>
+<p>Hey, but maybe that's exactly what you wanted to do in Part III, so I'm already looking forward to it!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-6930-49a7-89db-44c8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4a1e7ccf9ec98a3d31548bc415e138a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://omnibuscreative.com" rel="nofollow">ben hirsch</a>						</strong>
+						<strong>said 
+						on Sep 30, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is a really helpful article. Thanks!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-a84c-41e3-b775-4dafcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e4bd4b90b2fe2d26df78b167e4781b07&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://jonbaer.com" rel="nofollow">Jon Baer</a>						</strong>
+						<strong>said 
+						on Oct 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix, great post, should be included in the manual to begin with ...</p>
+<p>There is one small drawback to the Cake setup, maybe you can cover, but Ive noticed that its pretty "hackish" @ the moment to use the ORM portion of Cake by itself ... granted not what it was meant for but in legacy areas where you can do a full blown relaunch using Cake, its nice to just end up w/ the Model structures you can use and then port them over when you use the entire framework.  (ie, people who cant use the controllers yet, dont have support for using the views yet, but would like to use the model setups - in CLI environment for example) ... no normal way to do this it seems?</p>
+<p>- Jon</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddc-454c-4608-8c5f-4ce7cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Jon,</p>
+<p>with hackish you are referring to my "favicon.ico" bootstraping technic I guess? If so, yes it is a little hackish, but it works very nicely, and probably will continue to do so in future ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-4514-4a3a-8bd3-4de7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9d68f9934637508ef9a58359bebdcece&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Fabio&nbsp;						</strong>
+						<strong>said 
+						on Oct 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Very interesting article. I hope you will write part III. :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de1-f624-43f4-91f1-4d2ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2ab31489a58f527712d75f36c446a465&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Marcelo de Moraes Serpa&nbsp;						</strong>
+						<strong>said 
+						on Oct 20, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Felix,</p>
+<p>Great post as usual! This serie of article is being really helpful as there isn't much (if there is any) documentation about the inner-working of CakePHP. </p>
+<p>I'm also waiting for the Part III :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-35bc-468d-8bb7-4590cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=08ef850ef0f3df0f879ff5a6cb7f9ba3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Mark&nbsp;						</strong>
+						<strong>said 
+						on Nov 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Excellent couple of articles. Please don't stop! Would be interesting to see more than just part III, maybe describing more in terms of the Model, View and Controller and how they sit in with each other (who extends what, etc)<br />
+Ok, that's asking too much :)</br></p>
+<p>There really isn't enough articles like this around that actually 'disect' the source code properly - what alot of coders don't realise is that (whilst its initially harder and mindblowing), the source code of an app like this, couple with google and a little patience, is worth a THOUSAND hello world/blog tutorials.</p>
+<p>Good job, lookin forward to more...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de3-9e0c-487b-ba57-4830cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f27c329ded33e2e9898d3bdc8851b380&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://brianvoss.com" rel="nofollow">Brian</a>						</strong>
+						<strong>said 
+						on Dec 01, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great post Felix!  I also vote for part III. :)</p>
+<p>Been looking for insight like this into what's happening when since I started baking.  Having this laid out in a Sequence Diagram somewhere in the manual would be an incredible learning tool.</p>
+<p>I didn't see this in your post - where does Controller::beforeRender fit in the invocation order?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-c3d8-496d-a83c-4755cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://amazing-development.com/archives/2007/01/05/difficult-start-with-cakephp/" rel="nofollow">&raquo; Difficult start with cakephp &laquo; amazing development</a>						</strong>
+						<strong>said 
+						on Jan 05, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] So far I found only two pages with &#8220;Rails-quality&#8221; documentation: Learning from the CakePHP source code - Part I and Part II. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4950facc-d958-4708-84b3-159a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d968ad85681efd85a1593fcece5578c1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							lia&nbsp;						</strong>
+						<strong>said 
+						on Dec 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>mmh can someone show me an example program using cakePHP??<br />
+because i want to learn how to make a website using cakephp</br><br />
+and i can't make it because i never see the programs like before</br><br />
+thank you so much!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

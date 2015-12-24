@@ -1,0 +1,874 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Making error handling for Model::save more beautiful in CakePHP &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/making-error-handling-for-modelsave-more-beautiful-in-cakephp:480f4dd6-7110-4706-8230-4a97cbdd56cb">Making error handling for Model::save more beautiful in CakePHP</a></h2>	<div class="posted-on">
+		<p>Posted on 3/2/07 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p>Hi folks,</p>
+<p>when looking through other peoples code, I often see actions like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> add<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Task</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">data</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">Task</span>-&gt;<span class="me1">validates</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Task</span>-&gt;<span class="me1">save</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Display a success message</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">else</span> <br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Display an error message that validation failed</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Looks good, wouldn't you say? Well it is good code for most cases. However, it doesn't handle an important aspect of saving something to the database: checking if the actual DB operation succeeded. Now I've written actions like the one above in the past as well. It's just that I've not had many MySql errors since I've switched to CakePHP. The Model class usually handles all the DB operations flawlessly and it's probably been over a year that I've written a custom MySql statement in my code somewhere. However, even CakePHP or, what's more likely, the database can fail or deny operations.</p>
+<p>So in order to not get unpleasant / surprising results, one should always use a structure like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> add<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Task</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">data</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">Task</span>-&gt;<span class="me1">validates</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">Task</span>-&gt;<span class="me1">save</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Display a success message</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span> <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Display an error message that there was a save error</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">else</span> <br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Display an error message that validation failed</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>I don't know about you, but to me there is beauty missing. The code above is readable and understandable, no question about it. However, I think it can be replaced with something better. Now, if you look at the following code and your reaction goes along the line "same difference, who cares, etc." then I can understand that. In this case you might still find an interesting sequence of code so you didn't waste your time reading this. But I hope some of you can confirm my inner feeling regarding the beauty of the code.</p>
+<p>Alright, here comes a code that does exactly what the code above does, just with what I'd call the beauty-factor ; ).</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> add<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$result</span> = <span class="re0">$this</span>-&gt;<span class="me1">saveData</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">switch</span> <span class="br0">&#40;</span><span class="re0">$result</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">case</span> <span class="st0">'success'</span>:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Display a success message</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">case</span> <span class="st0">'validation_failed'</span>:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Display an error message that validation failed</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">case</span> <span class="st0">'save_failed'</span>:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Display an error message that validation failed</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>So before I'll ask if anybody can confirm that I've not turned crazy, here comes the code that is required to make the one above work. First of all, you need an AppController function like the one below:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="co1">// Make sure the Common (fake) namespace is available throughout the entire project</span><br />
+loadComponent<span class="br0">&#40;</span><span class="st0">'Common'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw2">class</span> AppController <span class="kw2">extends</span> Controller<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; &nbsp;* AppController::saveData is a generic save function that performs validations and saving for any given $data<br />
+&nbsp; &nbsp; &nbsp;* on a given $model. It returns a string which indicates the result of the operation. Possible result values<br />
+&nbsp; &nbsp; &nbsp;* are:<br />
+&nbsp; &nbsp; &nbsp;* <br />
+&nbsp; &nbsp; &nbsp;* 'missing_model', 'save_failed', 'validation_failed', 'success'<br />
+&nbsp; &nbsp; &nbsp;*<br />
+&nbsp; &nbsp; &nbsp;* @param mixed $data If skipped, Controller::data will be used<br />
+&nbsp; &nbsp; &nbsp;* @param mixed $model If skipped, Controller::modelClass will be used<br />
+&nbsp; &nbsp; &nbsp;* @return string<br />
+&nbsp; &nbsp; &nbsp;*/</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> saveData<span class="br0">&#40;</span><span class="re0">$data</span> = <span class="kw2">null</span>, <span class="re0">$model</span> = <span class="kw2">null</span>, <span class="re0">$cleanUpFields</span> = <span class="kw2">false</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// If $this-&gt;action has the name of this function, it was requested by the Dispatcher</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">action</span>==<span class="st0">'saveData'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Make sure this does not work</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// The $data parameter defaults to $this-&gt;data if none was provided</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; Common::<span class="me2">defaultTo</span><span class="br0">&#40;</span><span class="re0">$data</span>, <span class="re0">$this</span>-&gt;<span class="me1">data</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// The $model parameter defaults to $this-&gt;modelClass if none was provided</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; Common::<span class="me2">defaultTo</span><span class="br0">&#40;</span><span class="re0">$model</span>, <span class="re0">$this</span>-&gt;<span class="me1">modelClass</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// If our $cleanUpFields variable is set to true</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$cleanUpFields</span>===<span class="kw2">true</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Clean up this controllers fields</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">cleanUpFields</span><span class="br0">&#40;</span><span class="re0">$model</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// If no $model parameter was given, but Controller::modelClass is available</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="br0">&#123;</span><span class="re0">$model</span><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Try to use the Model instance from our Controller</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$Model</span> =&amp; <span class="re0">$this</span>-&gt;<span class="br0">&#123;</span><span class="re0">$model</span><span class="br0">&#125;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Try to load this Model using Common::getModel</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$Model</span> =&amp; Common::<span class="me2">getModel</span><span class="br0">&#40;</span><span class="re0">$model</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// If our $Model variable is no object</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/is_object"><span class="kw3">is_object</span></a><span class="br0">&#40;</span><span class="re0">$Model</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Return the 'missing_model' result value</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'missing_model'</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Set our $Model::data</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$Model</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="re0">$data</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// See if our $Model validates</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$Model</span>-&gt;<span class="me1">validates</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// If we couldn't save our $Model $data</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$Model</span>-&gt;<span class="me1">save</span><span class="br0">&#40;</span><span class="re0">$data</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Return the 'save_failed' result value</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'save_failed'</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span> <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// If it didn't validate, return the 'validation_failed' result value</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'validation_failed'</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// If everything worked out, return the 'success' result value</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'success'</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Ok, you might have noticed the usage of a class called Common in here. I was thinking to write about this in another post, but it fits in really well with this one, so here is what I use it for. One thing I often feel I don't know the right place for in CakePHP are generic functions that modify dates, restructure arrays or do similar things. In the past they usually ended up as "private" functions (the ones starting with '__' in CakePHP) in some controller. What I didn't like about this however, was that I couldn't share those across the application easily and that they just didn't seem to belong there in first place. So my recent solution to this problem was to create a class called 'Common' and place it in /app/components. Now technically it's not a real CakePHP component as it mainly serves as a name space and it's also not named 'CommonComponent'. However, I still think it's a good place to put this class, at least I couldn't think of a better one.</p>
+<p>Alright, before I start to bore you, here comes the code for it. (You might remember <a href="http://www.thinkingphp.org/2007/01/22/how-to-properly-create-a-model-instance-manually/">my old friend the getModel function</a>)</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="coMULTI">/**<br />
+&nbsp;* This class serves as a namespace for functions that need to be globally available within this application.<br />
+&nbsp;* All of it's functions can be called statically, i.e. Common::defaultTo(...), etc.<br />
+&nbsp;*<br />
+&nbsp;* Warning: It's name violates against the CakePHP naming conventions which demand it to be named CommonComponent.<br />
+&nbsp;* For the sake of convenience I decided against the conventions in this case (also because it's not a component in<br />
+&nbsp;* the classic / CakePHP sense of things)<br />
+&nbsp;*/</span><br />
+<span class="kw2">class</span> Common <span class="kw2">extends</span> Object <br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; &nbsp;* Tries a couple of approaches to return an instance of a given $model. If none of them succeed,<br />
+&nbsp; &nbsp; &nbsp;* 'false' is returned instead.<br />
+&nbsp; &nbsp; &nbsp;*<br />
+&nbsp; &nbsp; &nbsp;* @param string $model<br />
+&nbsp; &nbsp; &nbsp;* @return mixed<br />
+&nbsp; &nbsp; &nbsp;*/</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> &amp;getModel<span class="br0">&#40;</span><span class="re0">$model</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Make sure our $modelClass name is camelized</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$modelClass</span> = Inflector::<span class="me2">camelize</span><span class="br0">&#40;</span><span class="re0">$model</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// If the Model class does not exist and we cannot load it</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/class_exists"><span class="kw3">class_exists</span></a><span class="br0">&#40;</span><span class="re0">$modelClass</span><span class="br0">&#41;</span> &amp;&amp; !loadModel<span class="br0">&#40;</span><span class="re0">$modelClass</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Can't pass false directly because only variables can be passed via reference</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$tmp</span> = <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Return false</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$tmp</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// The $modelKey is the underscored $modelClass name for the ClassRegistry</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$modelKey</span> = Inflector::<span class="me2">underscore</span><span class="br0">&#40;</span><span class="re0">$modelClass</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// If the ClassRegistry holds a reference to our Model</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>ClassRegistry::<span class="me2">isKeySet</span><span class="br0">&#40;</span><span class="re0">$modelKey</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Then make this our $ModelObj</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$ModelObj</span> =&amp; ClassRegistry::<span class="me2">getObject</span><span class="br0">&#40;</span><span class="re0">$modelKey</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// If no reference to our Model was found in trhe ClassRegistry, create our own one</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$ModelObj</span> =&amp; <span class="kw2">new</span> <span class="re0">$modelClass</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// And add it to the class registry for the next time</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ClassRegistry::<span class="me2">addObject</span><span class="br0">&#40;</span><span class="re0">$modelKey</span>, <span class="re0">$ModelObj</span><span class="br0">&#41;</span>; &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Return the reference to our Model object</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$ModelObj</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="coMULTI">/**<br />
+&nbsp; &nbsp; &nbsp;* Simple, yet very convenient function to set a given $variable to it's $defaultValue if it is empty<br />
+&nbsp; &nbsp; &nbsp;*<br />
+&nbsp; &nbsp; &nbsp;* @param mixed $variable<br />
+&nbsp; &nbsp; &nbsp;* @param mixed $defaultValue<br />
+&nbsp; &nbsp; &nbsp;*/</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> defaultTo<span class="br0">&#40;</span>&amp;<span class="re0">$variable</span>, <span class="re0">$defaultValue</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// If our $variable is empty</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$variable</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Overwrite it with it's $defaultValue</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$variable</span> = <span class="re0">$defaultValue</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Alright, now you got all the code to get my initial sample from above running and the opportunity to question the state of my sanity ; ). For those of you who'd like to send me to a mental institute I got some rational arguments left that might be able to save me:</p>
+<p>AppController::saveData ...</p>
+<ul>
+<li>... makes it possible to save data for any given Model (even those not included in the current Controller) easily.</li>
+<li>... always makes sure Model::save was successful</li>
+<li>... makes the code even more readable (imho)</li>
+</ul>
+<p>And last but not least it also provides you with an easier way to only save ModelB if saving ModelA (really) succeeded:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> add<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$success</span> = <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$user_saved</span> = <span class="re0">$this</span>-&gt;<span class="me1">saveData</span><span class="br0">&#40;</span><span class="kw2">null</span>, <span class="st0">'User'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$user_saved</span>==<span class="st0">'success'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$profile_saved</span> = <span class="re0">$this</span>-&gt;<span class="me1">saveData</span><span class="br0">&#40;</span><span class="kw2">null</span>, <span class="st0">'Profile'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$profile_saved</span>==<span class="st0">'success'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$success</span> == <span class="kw2">true</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Roll back our first DB operation</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">User</span>-&gt;<span class="me1">delete</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$success</span>==<span class="kw2">true</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Display success message</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">else</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Use the contents of $user_saved and $profile_saved to display the appropiate error</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Therefor I'd like to end this post by pleading innocent regarding eventual accusations regarding my sanity ; ).</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-7110-4706-8230-4a97cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmaking-error-handling-for-modelsave-more-beautiful-in-cakephp%3A480f4dd6-7110-4706-8230-4a97cbdd56cb &amp;title=Making+error+handling+for+Model%3A%3Asave+more+beautiful+in+CakePHP';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmaking-error-handling-for-modelsave-more-beautiful-in-cakephp%3A480f4dd6-7110-4706-8230-4a97cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmaking-error-handling-for-modelsave-more-beautiful-in-cakephp%3A480f4dd6-7110-4706-8230-4a97cbdd56cb&amp;title=Making+error+handling+for+Model%3A%3Asave+more+beautiful+in+CakePHP&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmaking-error-handling-for-modelsave-more-beautiful-in-cakephp%3A480f4dd6-7110-4706-8230-4a97cbdd56cb&amp;title=Making+error+handling+for+Model%3A%3Asave+more+beautiful+in+CakePHP';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/handling-database-connection-errors-in-cakephp:480f4dd5-9570-421a-a04d-43cdcbdd56cb">Handling database connection errors in CakePHP</a></li>
+							<li><a href="/posts/unlimited-model-fields-expandable-behavior:48428c2e-9a88-47ec-ae8e-77a64834cda3">Unlimited Model fields - Expandable Behavior</a></li>
+							<li><a href="/posts/how-to-organize-your-cakephp-app%e2%80%99s-javascript-ii:480f4dd6-a780-45dc-bd65-4284cbdd56cb">How to organize your CakePHP App’s Javascript II</a></li>
+							<li><a href="/posts/amazon-associates-api-data-source-for-cakephp:4891ecd6-0330-47c7-b338-0dd34834cda3">Amazon Associates API (data source) for CakePHP</a></li>
+							<li><a href="/posts/learning-from-the-cakephp-source-code-part-i:480f4dd6-28d0-445e-a1dc-4ceacbdd56cb">Learning from the CakePHP source code - Part I</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/command-line-fun-in-cakephp-12:480f4dd6-7ecc-41d1-83bb-43d2cbdd56cb">Command line fun in CakePHP 1.2</a></li>
+							<li><a href="/posts/How_to_Fetch_the_ENUM_Options_of_a_Field_The_CakePHP_Enumerable_Behavior:4a977c9b-1bdc-44b4-b027-1a54cbdd56cb">How to Fetch the ENUM Options of a Field - The CakePHP Enumerable Behavior</a></li>
+							<li><a href="/posts/cakephp-argentina:4937042e-4864-48e1-98f0-6d3d4834cda3">CakePHP Argentina</a></li>
+							<li><a href="/posts/remember-the-days-before-spam-a-cakephp-model-for-akismet:480f4dd5-d358-4f51-ac83-45f1cbdd56cb">Remember the days before spam? A CakePHP Model for Akismet  </a></li>
+							<li><a href="/posts/cakephp-12-manual:480f4dfe-2080-491a-a22c-43e6cbdd56cb">CakePHP 1.2 Manual</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/making-error-handling-for-modelsave-more-beautiful-in-cakephp:480f4dd6-7110-4706-8230-4a97cbdd56cb">20 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/making-error-handling-for-modelsave-more-beautiful-in-cakephp:480f4dd6-7110-4706-8230-4a97cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4de5-942c-48cb-b72d-43f8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f4112f3023c643bf2f7b32c9c5dcfcba&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakebaker.42dh.com" rel="nofollow">Daniel Hofstetter</a>						</strong>
+						<strong>said 
+						on Feb 03, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hm, to me it looks like you are trying to solve a problem where no problem is ;-)  What I usually do is the following:</p>
+<p>if ($this-&gt;User-&gt;save($this-&gt;data)) {<br />
+    // success</br><br />
+} else {</br><br />
+    // failure</br><br />
+}</br></p>
+<p>And that works fine for me. But maybe I don't understand what you try to accomplish...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-5eb8-4dd9-b267-425ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=52d6d1f510025c43edb1b9d19f40b055&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dieter.plaetinck.be" rel="nofollow">Dieter@be</a>						</strong>
+						<strong>said 
+						on Feb 03, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Daniel, i think the key element of felix' approach is that he wants one variable which contains information about the success of the save operation.  There are 3 situations: complete success, validation failed, or validiation succeeded but a problem at database level arose (making the save action fail)</p>
+<p>Personally i use code like in block #2 to do such things, which is fine, but felix wants it more beautifully. That's why he introduces all this code so he can store all the needed information about success or the multiple kinds of failure in 1 variable.<br />
+I think it's overkill, especially for an application.  But i might be a nice addition for core functionality in the framework.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-b2a0-47e2-a901-4fe0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6cacda6f9cdac54d60f51d6190631fd8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nao&nbsp;						</strong>
+						<strong>said 
+						on Feb 03, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I like it but instead of 'success', 'validation_failed' and 'save_failed', it should be great to return int :</p>
+<p>1 for success<br />
+-1 for validation_failed</br><br />
+-2 for save_failed</br></p>
+<p>define('SAVE_DATA_SUCCESS', 1);<br />
+define('SAVE_DATA_VALIDATION_FAILED', -1);</br><br />
+define('SAVE_DATA_SAVE_FAILED', -2);</br></p>
+<p>      function add()<br />
+      {</br><br />
+          $result = $this-&gt;saveData();</br><br />
+          switch ($result)</br><br />
+          {</br><br />
+              case SAVE_DATA_SUCCESS:</br><br />
+                  // Display a success message</br><br />
+                  break;</br><br />
+              case SAVE_DATA_VALIDATION_FAILED:</br><br />
+                  // Display an error message that validation failed</br><br />
+                  break;</br><br />
+              case 'SAVE_DATA_SAVE_FAILED:</br><br />
+                  // Display an error message that save failed</br><br />
+                  break;</br><br />
+          }</br><br />
+      }</br></p>
+<p>So, it allow too :</p>
+<p>      function add()<br />
+      {</br><br />
+          $result = $this-&gt;saveData();</br><br />
+          if($result)</br><br />
+          {</br><br />
+                  // Display a success message</br><br />
+          }else{</br><br />
+                  // Display an error message</br><br />
+          }</br><br />
+      }</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-6a48-4738-97fc-48f4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6cacda6f9cdac54d60f51d6190631fd8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nao&nbsp;						</strong>
+						<strong>said 
+						on Feb 03, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>define('SAVE_DATA_MISSING_MODEL', -3);</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-1b0c-4788-8f82-49b0cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 03, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nao: I'm not a huge fan of defining magic numbers / error codes as constants these days. Because if I use debug($result), I want to get something that a human-being can actually read and not a number ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-5004-4482-b04c-4591cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6cacda6f9cdac54d60f51d6190631fd8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nao&nbsp;						</strong>
+						<strong>said 
+						on Feb 03, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yes, but error codes alow to make a simple if-else on it.</p>
+<p>To make error "human friendly" with debug mode on, just add trigger error in your function :</p>
+<p>            // If we couldn't save our $Model $data<br />
+            if (!$Model-&gt;save($data))</br><br />
+            {</br><br />
+                trigger_error(sprintf('Internal error on %s::%s(): Save failed, __class__, __FUNCTION__), E_USER_WARNING);</br><br />
+                // Return the 'save_failed' result value</br><br />
+                return SAVE_DATA_SAVE_FAILED;</br><br />
+            }</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-07bc-4ddc-9726-4804cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=829bf90593d4ee8766c31340dc7c6e36&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.bluetwanger.de/blog/" rel="nofollow">Markus Bertheau</a>						</strong>
+						<strong>said 
+						on Feb 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I agree with Felix in that the second example is not very "beautiful" for the following reasons:<br />
+ 1. unneccessary indentation</br><br />
+ 2. Point of failure and corresponding error message aren't next to each other.</br></p>
+<p>For this reason I write such code like this:</p>
+<p>      function add()<br />
+      {</br><br />
+          $this-&gt;Task-&gt;set($this-&gt;data);</br></p>
+<p>          if (!$this-&gt;Task-&gt;validates())<br />
+          {</br><br />
+              // Display an error message that validation failed</br><br />
+              return;</br><br />
+          }</br></p>
+<p>          if (!$this-&gt;Task-&gt;save())<br />
+          {</br><br />
+              // Display an error message that there was a save error</br><br />
+              return;</br><br />
+          }</br></p>
+<p>          // Display a success message<br />
+      }</br></p>
+<p>This has some advantages in comparison to variant 2:<br />
+ 1. It's less code, thus simpler, easier to read an maintain.</br><br />
+ 2. It is made clear that validation and save errors are exceptional conditions that usually don't occur; the main action of the method (in this case displaying a success message) is on the first indent level and not hidden inside a two-level if.</br><br />
+ 3. The disadvantages from above are eliminated.</br></p>
+<p>Such a code layout of course assumes that you can do the return after every failure condition. I have found this to be true in practice.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-1064-4ecb-a9ad-4fb0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=42c5bbf957f3ac0385fb5694d40992ef&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.wizardworx.co.za" rel="nofollow">Mladen Mihajlovic</a>						</strong>
+						<strong>said 
+						on Feb 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Shouldn't this be in AppModel rather?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-1590-45fb-8e8f-42d9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6cacda6f9cdac54d60f51d6190631fd8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nao&nbsp;						</strong>
+						<strong>said 
+						on Feb 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The advantage to put it in controller, is you need to ask question i model is loaded or not. Pass nothing for default model of controller or just pass it at string form, Felix's function automatically load it for you if necessary.</p>
+<p>Now, it's possible to split it in two part, one for controller which clean up field and load model, and other part for model which valid and save.</p>
+<p>So in your controller, you could do :</p>
+<p>$this-&gt;saveData($data = null, $model = null, $fieldList = array(), $cleanUpFields = false);</p>
+<p>or</p>
+<p>$this-&gt;Model-&gt;save2($data = null, $validate = true, $fieldList = array());</p>
+<p>Difference between Model::save and Model::save2 is save2 return nature of failed ('missing_model', 'save_failed', 'validation_failed', 'success').</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-f878-48f9-addc-4136cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6cacda6f9cdac54d60f51d6190631fd8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nao&nbsp;						</strong>
+						<strong>said 
+						on Feb 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sorry : The advantage to put it in controller, is you DONT'T need to ask if model is loaded or not</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-b274-4acd-b21e-4315cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2a7beefdd99589c42333579124967fc2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.noswad.me.uk" rel="nofollow">AD7six</a>						</strong>
+						<strong>said 
+						on Feb 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Interesting idea, but it seems like blurring the lines between the controller and the model. Its also a bit restrictive as written: there are 3 parameters for save. At the very least (!$Model-&gt;save($data)) should be (!$Model-&gt;save($data,false)) to apply DRY to the executed code.</p>
+<p>What situations are you considering whereby data would be valid but cause a db error..? Typically that only happens in development in my experience (as in, in an unexpected or uncontrolled manner). As it doesn't matter to the user (or quite often in the code, such as the last code example) why a submission didn't work, why not make use of the model onError method (admittedly introduced in 1.2 iirc) to log the problem and/or add to the model validation errors. Maybe cake will do that anyway before the next release.</p>
+<p>Incidentally regarding the last example: Using transactions makes handling multiple updates much easier, and I never understood why $Model-&gt;query("START TRANSACTION;"); etc. wasn't the first thing thought of when the need for a transaction arises. Unless it's an app to be distributed, "problem solved".</p>
+<p>PS. why not follow the cake style of having less new lines (i.e. "} else {" on a single line)?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-3114-4aa7-9da3-4fcecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for all the feedback. From all the suggestions above I really like Markus Bertheau's approach of using return to avoid too much nested if blocks. In fact I changed the code in my current application to this pattern right away.</p>
+<p>Mladen Mihajlovic: I don't think it would belong in AppModel as it's Controller logic that is being dealt with here.</p>
+<p>AD7Six: Yes, the other parameters for Model::save are not accessible with this method, that's a problem, I agree. About the question what could cause a db error? Well if you use a DB that has it's own validation rules built in it's very easy for a save command to fail. In those cases you certainly don't want to display a "Your item was added"-page to the user. Even if that is never the case in your it would still be sloppy programming to not check if the Model::save call actually worked. About transactions: I haven't really worked with them much in the past and just thought the saveData method would make for a good example of how to build "fake" transaction support. This was not ment as a transaction how-to. About your question regarding the braces style: I actually really hate the style that the cake core was switched to a while back. When I write code for the foundation or client projects that require it, I can life with it. But I would never ever use it for my own stuff ... it's a strong personal preference I have.</p>
+<p>Again, thanks for every bodies feedback. Even so I'll probably go with Markus Bertheau's approach from now on, you might still find some of the posting interesting, even if it's just the little Common::defaultTo function ... ; ).</p>
+<p>-- Felix</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-a55c-432e-b2eb-4cbacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6cacda6f9cdac54d60f51d6190631fd8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nao&nbsp;						</strong>
+						<strong>said 
+						on Feb 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Felix : I like too Markus Bertheau’s approach. You can do something very similar with your function, like this :</p>
+<p>function add()<br />
+{</br><br />
+		$result = $this-&gt;saveData();</br><br />
+		switch ($result)</br><br />
+		{</br><br />
+			case VALIDATION_FAILED:</br><br />
+				 // Display an error message that validation failed</br><br />
+				return;</br><br />
+			case SAVE_FAILED:</br><br />
+				// Display an error message that there was a save error</br><br />
+				return;</br><br />
+		}</br></p>
+<p>// Display a success message<br />
+}</br></p>
+<p>@AD7six :Too glue to Model::save, add $fieldList parameter to Controller::saveData</p>
+<p>    function saveData($data = null, $model = null, $fieldList = array(), $cleanUpFields = false)<br />
+    {</br><br />
+...</br><br />
+if (!$Model-&gt;save($data, false, $fieldList))</br><br />
+...</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-5a90-4074-ab4c-4f03cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=52d6d1f510025c43edb1b9d19f40b055&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dieter.plaetinck.be" rel="nofollow">Dieter@be</a>						</strong>
+						<strong>said 
+						on Feb 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Numeric return values?<br />
+That's soo 1972 (birth of C language) :-)</br></p>
+<p>Here are the code conventions btw:<br />
+https://trac.cakephp.org/wiki/Developement/CodingStandards</br><br />
+Like felix, I like the previous ones better, but hey: convention over.. taste, right :-)</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-100c-4090-b79e-4f84cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2a7beefdd99589c42333579124967fc2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.noswad.me.uk" rel="nofollow">AD7six</a>						</strong>
+						<strong>said 
+						on Feb 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<blockquote><p>"it would still be sloppy programming to not check if the Model::save call actually worked"</p></blockquote>
+<p>I don't recall saying or suggesting that :)</p>
+<p>In any event thanks for sharing ideas Felix, discussions are a great way to prompt innovation.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-1880-4ae1-b2df-49fdcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 05, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Dieter@be: Nobody forces you to use the CakePHP coding standards for your CakePHP projects. I think they are really good and people should use them, but the braces style is something I'll put my taste above them. So for my personal projects / things I publish on here I'll use the old style. For things I write for the foundation I'll play by the official rules ; ).</p>
+<p>AD7six: Yeah, I think that discussions like this are always interesting and good stuff comes from them ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-21f8-49f6-ad5d-452dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e7351a8775e514d68407f92eef5039a3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Pete&nbsp;						</strong>
+						<strong>said 
+						on Feb 05, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Whilst using numeric constants such as:</p>
+<p>define("SAVE_DATA_SUCCESS", 1);</p>
+<p>isn't great for debugging purposes (what the hell does 1 mean again!), you've just replaced 'magic numbers' with 'magic strings', neither of which are great, they're both hard to remember and prone to errors.</p>
+<p>Also you don't get any help from IDEs with code-completion.<br />
+Recently I've started to prefer:</br></p>
+<p>define("SAVE_DATA_SUCCESS", "succeeded");</p>
+<p>You get all the benefits of constants (code-completion, documentation of possible results in a single place) without the drawbacks of random numbers (harder debugging).</p>
+<p>It's not a big deal, but since PHP supports strings in switch statements, it's always nice to do things you can't do in c/c++</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-97ac-4739-9d17-4c79cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=52d6d1f510025c43edb1b9d19f40b055&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dieter.plaetinck.be" rel="nofollow">Dieter@be</a>						</strong>
+						<strong>said 
+						on Feb 06, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>c/c++ doesn't support strings in switch statements? i knew java didn't but c/c++ is new for me.<br />
+good to know that :-)</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de6-f7d0-4fb9-9c81-4d71cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.phpdeveloper.org/news/7229" rel="nofollow">PHPDeveloper.org</a>						</strong>
+						<strong>said 
+						on Feb 06, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p><strong>Felix Geisendorfer's Blog: Making error handling for Model::save more beautiful in CakePHP...</strong></p>
+<p>...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dee-b1a0-44eb-bf9a-4731cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1054bf81d870e91288ae9c7a8eecb5c1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://weblog.axent.pl" rel="nofollow">prond</a>						</strong>
+						<strong>said 
+						on Aug 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I think that using exceptions would be far more beautyfull.<br />
+Example:</br><br />
+try {</br><br />
+  $this-&gt;User-&gt;set($this-&gt;data);</br><br />
+  $this-&gt;User-&gt;save();</br><br />
+  //handle successfull operation</br><br />
+} catch (CakeValidationException $e) {</br><br />
+  // handle validation exception</br><br />
+} catch (CakeModelSaveException $e) {</br><br />
+  // handle savemodel exception</br><br />
+} catch (Exception $e) {</br><br />
+  // hadnle other exceptions</br><br />
+}</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

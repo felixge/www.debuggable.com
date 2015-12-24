@@ -1,0 +1,464 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Why UUIDs? &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/why-uuids:48c906cc-7a6c-4f22-9e20-6ffd4834cda3">Why UUIDs?</a></h2>	<div class="posted-on">
+		<p>Posted on 11/9/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Why UUIDs?</p>
+<p>what are UUIDs? Well according to the Wikipedia:</p>
+<blockquote><p>A Universally Unique Identifier (UUID) is an identifier standard used in software construction, standardized by the Open Software Foundation (OSF) as part of the Distributed Computing Environment (DCE).</p></blockquote>
+<p>In English that would roughly translate to really long random strings. So random in fact that Wikipedia thinks:</p>
+<blockquote><p>After generating 1 billion UUIDs every second for the next 100 years, the probability of creating just one duplicate would be about 50%</p></blockquote>
+<p>So why should you care and maybe even use those UUIDs? I mean there are certainly reasons against using them. Ever tried to memorize a bunch of UUIDs? Give it a shot:</p>
+<pre class="terminal">48c907b0-b8ac-4161-84c9-4fbf1030b5da
+48c907b0-dc38-475c-a9c4-4a2e1030b5da
+48c907b0-f088-44ae-8be5-4e811030b5da
+</pre>
+<p>When it comes to primary keys you might miss the ease with which one can remember auto incrementing values. But hang on, with a bit of copy &amp; paste one can get over this inconvenience and carry those values around.</p>
+<p>But why should you go through that trouble? The answer can largely be found in their uniqueness. With UUIDs, you can give an identifier to any object in the real world. This id you give it is guaranteed to not have been used for labeling any other object in the universe so far. Guaranteed in this context means you are more likely to win the lottery without buying lottery tickets than generating a duplicate UUID.</p>
+<p>This is an amazing property for several reasons. Imagine a fairly real world task of having to join the blog posts of two previously separate sites into a single new one. Back when Tim and I did that for this blog we had to re-index all our blog post ids as well as all foreign keys pointing to them. Why? Because we both had given out the same auto incrementing ids to different blog posts. If we (wordpress) had used UUIDs, merging our two blogs (or any other sets of data) would have been magnitudes easier.</p>
+<p>And there is more. If you want to create polymorphic associates than UUIDs are going to make that a lot easier for you in CakePHP. Just create a table called 'comments' and give it a belongsTo of [Photo, Post, User]. But instead of creating a foreign key field for each model, you get away with just creating a single foreign_id field and setting that up as the foreign key for all the belongsTo associations. Since the UUID the foreign_id points to is unique across tables, you don't even have to track what model / table it actually belongs to. This avoids a more complex query and leads to improved performance for the setup. (You might still want to populate Comment.model just so you know where the link goes to without doing the actual lookup).</p>
+<p>Last but not least there is another advantage hidden in the randomness of those ids. By not having your ids follow any pattern, an attacker won't be able to iterate through your databases records without you giving him a map of primary ids for it. This in itself doesn't automatically make your application secure, but it lessens the damage that is likely to be done if a permission bug is exploited.</p>
+<p>Anyway, I'm sure I forgot a bunch of reasons and I am also looking forward to people sharing their concerns on performance and the concept itself. In the meantime just know that CakePHP will automatically generate UUID keys if your primary key is a char(36) field.</p>
+<p>HTH,<br />
+-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/48c906cc-7a6c-4f22-9e20-6ffd4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwhy-uuids%3A48c906cc-7a6c-4f22-9e20-6ffd4834cda3 &amp;title=Why+UUIDs%3F';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwhy-uuids%3A48c906cc-7a6c-4f22-9e20-6ffd4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwhy-uuids%3A48c906cc-7a6c-4f22-9e20-6ffd4834cda3&amp;title=Why+UUIDs%3F&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwhy-uuids%3A48c906cc-7a6c-4f22-9e20-6ffd4834cda3&amp;title=Why+UUIDs%3F';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/string-substitution-using-uuids:48ad0e84-7c80-4bfd-b6be-4e8d4834cda3">String substitution using UUIDs</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/why-uuids:48c906cc-7a6c-4f22-9e20-6ffd4834cda3">17 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/why-uuids:48c906cc-7a6c-4f22-9e20-6ffd4834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-48c91718-f8d8-4a0f-a26b-17bf4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fb222af1d07ca695061df966b1286164&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://codeacious.wordpress.com" rel="nofollow">Corey Daley</a>						</strong>
+						<strong>said 
+						on Sep 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great post.  We had been 'discussing' whether or not to use UUID's on the way home from the workshop.  I think this really cleared up the pro's of using them.  </p>
+<p>If you need material for a new post I have a suggestion:<br />
+When using cakePHP in a High Availability & Failover environment (specifically using Heartbeat & ldirector), and using an NFS as the backend where the content is housed for all the head units, should the tmp directory within cake be stored by the NFS server also and allow the cache to be accessed by all servers? Or should each head unit have it's own tmp directory and hence it's own cache?</br></p>
+<p>Thanks,<br />
+Corey</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48c928c6-6e80-460a-a81d-5f904834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f0e51b26b8683f7040348037db33fd71&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.iteisa.com" rel="nofollow">Jaime Gómez Obregón</a>						</strong>
+						<strong>said 
+						on Sep 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Very interesting post. I agree that UUIDs uniqueness may be useful in some situations. But for non-massive tasks like blogging and most of webapps y still prefer other indexing methods.</p>
+<p>Why? Mainly because URL beautyness. I prefer clean URL like "/posts/why-uuids" than "/posts/why-uuids:48c906cc-7a6c-4f22-9e20-6ffd4834cda3". This is not only a mere esthetic reason. Sending URL over 80 characters long over many mail user agents break links even nowadays.</p>
+<p>Also, I also care about search engine optimization. First, "/posts/why-uuids:48c906cc-7a6c-4f22-9e20-6ffd4834cda3" and "/posts/hello-world:48c906cc-7a6c-4f22-9e20-6ffd4834cda3" is duplicated content for a search engine (unless you add new logic to handle redirects). On the other hand, the hash may look like a parameter (id, has) to search engines, which may affect ranking.</p>
+<p>I have seen and used so many times the /posts/view/123 pattern, but to me it offers no advantage over the /post/view/my-post-title-here approach. I just use the sluggable behaviour and set Model.slug as a key index in my DB schema. Then I use $model->findBySlug($this->params['slug']).</p>
+<p>That's my opinion. Great to learn about UUIDs, but currently they offer to me more cons than pros.</p>
+<p>PS: I love your blog! (and this is my first comment on it)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48c93946-2674-4efd-9142-4e974834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=29e2d6431d4a86cdc18df0dd4c699a38&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://zeroasterisk.com/" rel="nofollow">Alan Blount</a>						</strong>
+						<strong>said 
+						on Sep 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I agree with Jaime: for many clients, SEO is a significant concern and the URL is one of the more important parts of a page... It must be unique, but also contain key terms specific to the content/focus of that page.  Also - some times I like to say "hey, take a look at post # 1234" and with UUIDs I wouldn't be able to do that; I'd have to reference by name or UUID.</p>
+<p>So - for public facing URLs, slugs it is... for existing projects, ID remains...  </p>
+<p>I may still use UUIDs in a future project, for situations where no human ever has to read the ID number.  </p>
+<p>Great explanation though - thanks much!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48c939e0-16a8-4207-a7d9-5dfd4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c28cbc5ff5f63a4fa191af3bb49a36a7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.nateklaiber.com" rel="nofollow">Nate Klaiber</a>						</strong>
+						<strong>said 
+						on Sep 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I am with Jaime on this one. While I can see the need for them in the backend (however you choose to implement), I just don't see the point in having them in the URL's. It's much easier and cleaner to use a permalink/slug (incrementing with duplicates), than it is to have URLs with the UUID appended to the end. I would focus more on the SEO + clean URL aspect before I would put that in the URL.</p>
+<p>So, not disagreeing with you - I see the value, I just don't see the need for URL's like these.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48c948b1-6d80-4520-9447-7c5a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fb3a3dcfb9e30579cd34020ef35bc979&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://robwilkerson.org" rel="nofollow">Rob Wilkerson</a>						</strong>
+						<strong>said 
+						on Sep 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'm in the UUID camp, myself, and have been for a few years.  Felix offered the polymorphic justification, but extrapolate that to portability in general.  Integers (the traditional unique identifier) are simply too predictable.  Good for counting change, but really, really crappy when you need to move data around.  </p>
+<p>I can't tell you how many times I've had to tell a client that I can't partially migrate their data into another database because either ID conflicts will occur or ambiguous data will result.  It's not an uncommon business case in large operations.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48c993e9-8f3c-4109-a6d1-24ad4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Jaime Gómez Obregón: Our urls will redirect if you supply a wrong slug - so no duplicate content issue here.</p>
+<p>As far as SEO goes: The UUIDs in our urls should not have any effect on that whatsoever. I can't verify that for sure, but afaik as long as your actual slug content is before the UUID stuff google will be plenty happy.</p>
+<p>Depending on your SEO / email marketing / whatever needs you may choose to not use UUIDs or hide their internal usage. But from a data architecture point of view I think they are amazingly helpful concept and if you can use them the rewards will be great ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48c9b6e1-84c0-4291-aacb-3e164834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f0fb29e22821d1f81a1f0d3515195ae3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://hi.baidu.com/thinkinginlamp/" rel="nofollow">laowang</a>						</strong>
+						<strong>said 
+						on Sep 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>uuid is bad for mysql.</p>
+<p><a rel="nofollow" href="http://www.mysqlperformanceblog.com/2007/03/13/to-uuid-or-not-to-uuid/">http://www.mysqlperformanceblog.com/2007/03/13/to-uuid-or-not-to-uuid/</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ca0c31-31e0-476d-ae8c-5d8b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f0b8fa14cbee5edfdeeac6b8f9ad062d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://sanisoft.com/blog/" rel="nofollow">Tarique Sani</a>						</strong>
+						<strong>said 
+						on Sep 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@laowang You beat me to it :) </p>
+<p>If any one depending solely on the randomness of uuid for security you are on a downhill road to hell anyways - In other words security by obscurity is just *not* </p>
+<p>But the real strength of uuid is indeed revealed when you have to move data around</p>
+<p>@Corey - try a cluster of memcache servers and remember NFS sux big time on reliability</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ca2768-3e6c-4450-aca0-4ddc4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=dc51f58249aa6abec7e79abff23d294e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							GreyCells&nbsp;						</strong>
+						<strong>said 
+						on Sep 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@laowang - in defence of UUIDs the performance issue is primarily with the maintenance of indexes during bulk inserts, and to a lesser extent with compound keys. There might be a negligable impact on index read, but not so as you'd notice. If your datasets are large enough to be affected, you probably have the experience in the team (and the hardware) to work around the issues.</p>
+<p>This would apply to virtually any RDBMS, not just MySQL. Most indexes 'chunk' the data (btree for example: <a rel="nofollow" href="http://en.wikipedia.org/wiki/Btree">http://en.wikipedia.org/wiki/Btree</a> ), so when a new key is added, the tree must be re-computed. For integer based indexes, the key value is normally just incremented, so the tree does not have to be completely restructured for each insert. UUIDs on the other hand, frequently force significant changes to the index structure (which is already larger anyway) - hence the performance impact.</p>
+<p>There is an easy workaround (the oldest trick in the book) for bulk inserts: disable the index and re-enable afterwards, thereby recreating the index only once. With UUIDs of course, you don't have to worry about enforcing a unique constraint during the insert. Massive numbers of individual inserts might be a trickier problem but probably not as tricky as managing the bandwidth required to feed those inserts :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ca5fcf-cac0-4663-9132-55b84834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tarique Sani: Using unpredictable ids is not security by obscurity but security by design. I think that because if someone would have the complete source code of an app using UUIDs along with the db schema he'd still be unable to guess record ids.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ca6307-ca84-463f-b062-459a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a25453dbad62cb74848879b543edac31&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Bernhard J. M. Grün&nbsp;						</strong>
+						<strong>said 
+						on Sep 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>UUID are also quite nice if you have to set up a "multi-master" database setup. That way you don't have to do complicated things with an auto_increment ID field. But there are cases where it is not reasonable to use UUIDs. That is the case for key-value tables were the values are always shorter than the UUID (and are also more or less static). (common examples: producer names, role names, ...)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ca8e32-8928-4d1c-89f5-75fd4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=72b7bdc2ea7ade2d95f3396ded0a40ec&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							leo&nbsp;						</strong>
+						<strong>said 
+						on Sep 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I think UUID keys are especially interesting for (large) web-applications and integer auto_increment keys simply suit the needs of a "traditional" web-site.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48cae752-5870-42e8-b2c5-5c254834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=950e2f69f9b22dcdb4bc1f8a7ce2371a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Lane&nbsp;						</strong>
+						<strong>said 
+						on Sep 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Felix, you've sold me on using UUID's for the upcoming project I'm working on.  Does cakePHP have something to manage or automatically generate UUID's?  Also, what type of field do you use in MySQL to store these beasts?  VARCHAR(36)?  or binary? </p>
+<p>Thanks,<br />
+Lane</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48caf151-536c-4d20-9a12-77634834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c9611b164f7a348979f5c6e8061659c6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Martz&nbsp;						</strong>
+						<strong>said 
+						on Sep 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I've just recently fallen in love with UUIDs, and I'm not completelt sure why. This article goes some way towards justification for using them. I do like the complete randomness, and for a larger project I have coming up UUIDs do provide a level of protection (not security) against people traversing all of the records with predictable integer primary keys. </p>
+<p>I intend on using UUIDs for users||profiles primary keys because I do not want it to be easy to trawl through a list of users and scrape profile or  contact information, to give away the total number of site members, or allow members to rank themselves on being the newest and having the lowest UID (ala slashdot). It's a great leveller.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ccf3e3-0e1c-49ca-aae1-2c7f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fb3a3dcfb9e30579cd34020ef35bc979&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://robwilkerson.org" rel="nofollow">Rob Wilkerson</a>						</strong>
+						<strong>said 
+						on Sep 14, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Lane - </p>
+<p>Yes, Cake can handle that.  Just name your field "id" and type it as a char(36).  varchar(36) may also work, but it will always be 36 chars so there's not need to eat up that extra byte on every record.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d10ef5-7738-474b-a7ae-4db34834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cd1e77d8747d867acb068d76edd2a822&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Andras&nbsp;						</strong>
+						<strong>said 
+						on Sep 17, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>Can you explain this in detail:</p>
+<p>"But instead of creating all the foreign keys for that, you get away with just creating a single foreign_id field and setting that up as the foreign key for all the belongsTo associations."</p>
+<p>So far I used UUID in association same way as I would with INT keys..</p>
+<p>Thanks,</p>
+<p>Andras</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48d17a34-c268-445b-8120-75204834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 17, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Andras: Oh that was little blurry indeed. Changed it to:</p>
+<p>"But instead of creating a foreign key field for each model, you get away with just creating a single foreign_id field and setting that up as the foreign key for all the belongsTo associations."</p>
+<p>Thanks.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

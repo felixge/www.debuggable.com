@@ -1,0 +1,742 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>RightJS 1.5: 6-8 times faster than jQuery &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/rightjs-1-5-6-8-times-faster-than-jquery:4b1fc009-1940-4d26-bdc6-0af2cbdd56cb">RightJS 1.5: 6-8 times faster than jQuery</a></h2>	<div class="posted-on">
+		<p>Posted on 9/12/09 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>My journey of <a href="http://www.structuredprocrastination.com/">mastering procrastination</a> has led me to an interesting article on Hacker News today:</p>
+
+<p><a href="http://news.ycombinator.com/item?id=985723">RightJS 1.5: 6-8 times faster than jQuery</a></p>
+
+<p>(The title has been updated to "RightJS Version 1.5.0 Is Out" since I started writing this.)</p>
+
+<p>Wow, I thought! This sounds like an excellent example of cargo cult science, one of my favourite subjects.</p>
+
+<p>I mean I love innovation in this field just like everybody else. But seriously, jQuery is not exactly know for being slow &amp; heavy. So anybody claiming a 6-8x speed improvement must have achieved an unbelievable breakthrough. Either that, or he must be using using the cargo cult method.</p>
+
+<p>Applying the cargo cult method to performance testing is rather simple, which probably explains its popularity. You pick a random series of tests that can be run against the various implementations you want to compete with. Then you spend a few hours hacking away at your implementation until it is the clear winner. Don't give up if it becomes too hard, just tweak the test cases to slightly favor your implementation. It's really as easy as that.</p>
+
+<p>I can totally understand why people are doing that. The opposite would mean that you have to apply the scientific method, which is really cumbersome. First you have to collect data, lots of it. In our case that means performing very detailed analysis and profiling of a large enough set of real world JavaScript applications. Using this data set, you should be able to answer questions like: What are the most common selectors people use? What DOM operations are popular? Which of those are actually relevant to the performance of the analyzed applications? With those answers you can attempt to come up with a series of tests that will rank the various implementations according to their performance. But actually writing those tests will be very hard. Should you use the most distinct and sexy way in each implementation? Or should you use the most effective techniques people have come up with?</p>
+
+<p>Luckily there is a third option. It is called specialized benchmarking. You start by admitting that the things you are going to test are purely based on your curiosity about them, possibly because they are related to the particular problem YOU care about. Make it very clear that the outcome of those tests should in no way be seen as an indicator for overall performance and try to hide them from people who don't know what that means.</p>
+
+<p>Specialized benchmarking will possibly not answer anybodies questions other than your own, but it beats the hell out of the cargo cult method.</p>
+
+<p>Let's examine why the RightJS performance tests get it wrong and what they could do about it. From this point on I will only refer to material on their page, the post on Hacker News was just how I heard about them.</p>
+
+<p>First of all, they claim that their performance benchmarks are there "To give you some ideas about the project quality and abilities". I think that should be changed to: "We are especially fast for the following operations (...), those however are not proofen to be good indicators for general performance in JS projects.". It's kind of like weight loss advertisement. You can show pictures of people who lost 50 pound, but you gotta put that "* Results are not typical" note there. This way people can pause for a second, and remember that there are no magic bullets to weight loss and consider their purchase with that in mind.</p>
+
+<p>After that, they could start to decide whether some of their tests are worth keeping, and if so, make sure that they are as scientific as possible. I'll just use their test #1 as an example, but check the <a href="http://github.com/MadRabbit/taskspeed/tree/master/tests/">test suite</a> for yourself, to see that this pattern is repeated throughout the entire thing.</p>
+
+<p><strong>Testing jQuery DOM building (343ms*):</strong></p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="st0">&quot;make&quot;</span>: <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">for</span><span class="br0">&#40;</span><span class="kw2">var</span> i = <span class="nu0">0</span>; i&lt;<span class="nu0">250</span>; i++<span class="br0">&#41;</span><span class="br0">&#123;</span><br />
+&nbsp; &nbsp; $<span class="br0">&#40;</span><span class="st0">&quot;&lt;ul id='setid&quot;</span> + i + <span class="st0">&quot;' class='fromcode'&gt;&lt;/ul&gt;&quot;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; .<span class="me1">append</span><span class="br0">&#40;</span><span class="st0">&quot;&lt;li&gt;one&lt;/li&gt;&quot;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; .<span class="me1">append</span><span class="br0">&#40;</span><span class="st0">&quot;&lt;li&gt;two&lt;/li&gt;&quot;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; .<span class="me1">append</span><span class="br0">&#40;</span><span class="st0">&quot;&lt;li&gt;three&lt;/li&gt;&quot;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; .<span class="me1">appendTo</span><span class="br0">&#40;</span><span class="st0">&quot;body&quot;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="kw1">return</span> $<span class="br0">&#40;</span><span class="st0">&quot;ul.fromcode&quot;</span><span class="br0">&#41;</span>.<span class="me1">length</span>;<br />
+<span class="br0">&#125;</span></div></p>
+
+<p><strong>Testing RightJS DOM building (80ms*):</strong></p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="st0">&quot;make&quot;</span> : <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">for</span> <span class="br0">&#40;</span><span class="kw2">var</span> i = <span class="nu0">0</span>; i &lt; <span class="nu0">250</span>; i++<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; document.<span class="me1">body</span>.<span class="me1">appendChild</span><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw2">new</span> Element<span class="br0">&#40;</span><span class="st0">'ul'</span>, <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'class'</span>: <span class="st0">'fromcode'</span>, id: <span class="st0">'setid'</span>+i<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>.<span class="me1">insert</span><span class="br0">&#40;</span><span class="br0">&#91;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw2">new</span> Element<span class="br0">&#40;</span><span class="st0">'li'</span>, <span class="br0">&#123;</span>html: <span class="st0">'one'</span><span class="br0">&#125;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw2">new</span> Element<span class="br0">&#40;</span><span class="st0">'li'</span>, <span class="br0">&#123;</span>html: <span class="st0">'two'</span><span class="br0">&#125;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw2">new</span> Element<span class="br0">&#40;</span><span class="st0">'li'</span>, <span class="br0">&#123;</span>html: <span class="st0">'three'</span><span class="br0">&#125;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#93;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="kw1">return</span> $$<span class="br0">&#40;</span><span class="st0">'ul.fromcode'</span><span class="br0">&#41;</span>.<span class="me1">length</span>;<br />
+<span class="br0">&#125;</span></div></p>
+
+<p>I smell cargo! First of all, why is RightJS using a native DOM method, document.body.appendChild, and jQuery has to use .appendTo('body')? Those are two radically different operations, and just to see how radical lets make the following change:</p>
+
+<p><strong>Optimized jQuery DOM building I (194ms*):</strong></p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="st0">&quot;make&quot;</span>: <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">for</span><span class="br0">&#40;</span><span class="kw2">var</span> i = <span class="nu0">0</span>; i&lt;<span class="nu0">250</span>; i++<span class="br0">&#41;</span><span class="br0">&#123;</span><br />
+&nbsp; &nbsp; document.<span class="me1">body</span>.<span class="me1">appendChild</span><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; $<span class="br0">&#40;</span><span class="st0">&quot;&lt;ul id='setid&quot;</span> + i + <span class="st0">&quot;' class='fromcode'&gt;&lt;/ul&gt;&quot;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; .<span class="me1">append</span><span class="br0">&#40;</span><span class="st0">&quot;&lt;li&gt;one&lt;/li&gt;&quot;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; .<span class="me1">append</span><span class="br0">&#40;</span><span class="st0">&quot;&lt;li&gt;two&lt;/li&gt;&quot;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; .<span class="me1">append</span><span class="br0">&#40;</span><span class="st0">&quot;&lt;li&gt;three&lt;/li&gt;&quot;</span><span class="br0">&#41;</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="kw1">return</span> $<span class="br0">&#40;</span><span class="st0">&quot;ul.fromcode&quot;</span><span class="br0">&#41;</span>.<span class="me1">length</span>;<br />
+<span class="br0">&#125;</span></div></p>
+
+<p>Ouch, an error rate of 43% against jQuery. Let's try harder:</p>
+
+<p><strong>Optimized jQuery DOM building II (72ms*):</strong></p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="st0">&quot;make&quot;</span>: <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">for</span><span class="br0">&#40;</span><span class="kw2">var</span> i = <span class="nu0">0</span>; i&lt;<span class="nu0">250</span>; i++<span class="br0">&#41;</span><span class="br0">&#123;</span><br />
+&nbsp; &nbsp; document.<span class="me1">body</span>.<span class="me1">appendChild</span><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; $<span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">&quot;&lt;ul id='setid&quot;</span> + i + <span class="st0">&quot;' class='fromcode'&gt;&quot;</span>+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">&quot;&lt;li&gt;one&lt;/li&gt;&quot;</span>+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">&quot;&lt;li&gt;two&lt;/li&gt;&quot;</span>+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">&quot;&lt;li&gt;three&lt;/li&gt;&quot;</span>+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">&quot;&lt;/ul&gt;&quot;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="kw1">return</span> $<span class="br0">&#40;</span><span class="st0">&quot;ul.fromcode&quot;</span><span class="br0">&#41;</span>.<span class="me1">length</span>;<br />
+<span class="br0">&#125;</span></div></p>
+
+<p>If this was a presentation I would have an LOLCat saying "jQuery rulez" right now. But luckily this isn't and I'll try to reason scientifically about this.</p>
+
+<p>jQuery is NOT faster in this example. Don't believe the numbers you see. They have been meaningless all along. The reason for that is simple: While initially it looked like we were performing the same test with jQuery as we were with RightJS, we never actually did! The jQuery example, from the beginning, was creating DOM elements from HTML strings, while RightJS was wrapping the document.createElement API. This is not the same thing and you cannot learn anything from comparing apples to oranges.</p>
+
+<p>The truth as far as this test case is concerned? Well, jQuery simply does not have a document.createElement wrapper. Thus you cannot compare it to implementations that do. And why should you? DOM building like this is largely useless, given excellent alternatives such as <a href="http://ejohn.org/blog/javascript-micro-templating/">John' Micro -Templating</a> engine.</p>
+
+<p>Just to show how useless this test was from the beginning, here is my not so paradox implementation that outperforms the pure DOM test:</p>
+
+<p><strong>Testing Pure DOM building (37ms*):</strong></p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="st0">&quot;make&quot;</span>: <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">for</span><span class="br0">&#40;</span><span class="kw2">var</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; body = document.<span class="me1">body</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; ul = document.<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">&quot;ul&quot;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; li = document.<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">&quot;li&quot;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; i = <span class="nu0">0</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; fromcode;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; i &lt; <span class="nu0">250</span>; ++i<br />
+&nbsp; &nbsp; <span class="br0">&#41;</span><span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; fromcode &nbsp; &nbsp;= ul.<span class="me1">cloneNode</span><span class="br0">&#40;</span><span class="kw2">true</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; fromcode.<span class="me1">id</span> = <span class="st0">&quot;setid&quot;</span> + i;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; fromcode.<span class="me1">className</span> = <span class="st0">&quot;fromcode&quot;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; fromcode.<span class="me1">appendChild</span><span class="br0">&#40;</span>li.<span class="me1">cloneNode</span><span class="br0">&#40;</span><span class="kw2">true</span><span class="br0">&#41;</span><span class="br0">&#41;</span>.<span class="me1">appendChild</span><span class="br0">&#40;</span>document.<span class="me1">createTextNode</span><span class="br0">&#40;</span><span class="st0">&quot;one&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; fromcode.<span class="me1">appendChild</span><span class="br0">&#40;</span>li.<span class="me1">cloneNode</span><span class="br0">&#40;</span><span class="kw2">true</span><span class="br0">&#41;</span><span class="br0">&#41;</span>.<span class="me1">appendChild</span><span class="br0">&#40;</span>document.<span class="me1">createTextNode</span><span class="br0">&#40;</span><span class="st0">&quot;two&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; fromcode.<span class="me1">appendChild</span><span class="br0">&#40;</span>li.<span class="me1">cloneNode</span><span class="br0">&#40;</span><span class="kw2">true</span><span class="br0">&#41;</span><span class="br0">&#41;</span>.<span class="me1">appendChild</span><span class="br0">&#40;</span>document.<span class="me1">createTextNode</span><span class="br0">&#40;</span><span class="st0">&quot;three&quot;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; body.<span class="me1">appendChild</span><span class="br0">&#40;</span>fromcode<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> &nbsp;utility.<span class="me1">getSimple</span>.<span class="me1">call</span><span class="br0">&#40;</span>body, <span class="st0">&quot;ul.fromcode&quot;</span><span class="br0">&#41;</span>.<span class="me1">length</span>;<br />
+<span class="br0">&#125;</span></div></p>
+
+<p><strong>Optimized jQuery DOM building III (36ms*):</strong></p>
+
+<p><div class="clear"></div><div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="st0">&quot;make&quot;</span>: <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> elements = <span class="st0">'&lt;div&gt;'</span>;<br />
+&nbsp; <span class="kw1">for</span><span class="br0">&#40;</span><span class="kw2">var</span> i = <span class="nu0">0</span>; i&lt;<span class="nu0">250</span>; i++<span class="br0">&#41;</span><span class="br0">&#123;</span><br />
+&nbsp; &nbsp; elements = elements+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">&quot;&lt;ul id='setid&quot;</span> + i + <span class="st0">&quot;' class='fromcode'&gt;&quot;</span>+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">&quot;&lt;li&gt;one&lt;/li&gt;&quot;</span>+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">&quot;&lt;li&gt;two&lt;/li&gt;&quot;</span>+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">&quot;&lt;li&gt;three&lt;/li&gt;&quot;</span>+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">&quot;&lt;/ul&gt;&quot;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; $<span class="br0">&#40;</span>elements+<span class="st0">'&lt;/div&gt;'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">children</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; .<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; document.<span class="me1">body</span>.<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="kw1">this</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; <span class="kw1">return</span> $<span class="br0">&#40;</span><span class="st0">&quot;ul.fromcode&quot;</span><span class="br0">&#41;</span>.<span class="me1">length</span>;<br />
+<span class="br0">&#125;</span></div></p>
+
+<p>As you can see, the cargo cult method is quite powerful : ).</p>
+
+<p>Anyway, I don't want to discourage the development of RightJS in any way. I think it's awesome that there are libraries that are trying to compete with jQuery.</p>
+
+<p>It is really hard to do meaningful performance testing and infinitely easy for some random punk like me to come along and point out all the flaws. To me, even trying to do a general purpose performance test against 6 (!) implementations, that is pure bravery. So in case you decide to do something similar, just admit the odds you are up against and people will be very forgiving and engaged.</p>
+
+<p>Comments, hate mail &amp; suggestions are welcome!</p>
+
+<p>-- Felix Geisendörfer aka the_undefined</p>
+
+<p>&#42; Results not typical - Some recent version of Firefox on my Laptop, picking random samples from runs that looked good!
+<img style="display: none;" src="http://debuggable.com/posts/tick/4b1fc009-1940-4d26-bdc6-0af2cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frightjs-1-5-6-8-times-faster-than-jquery%3A4b1fc009-1940-4d26-bdc6-0af2cbdd56cb &amp;title=RightJS+1.5%3A+6-8+times+faster+than+jQuery';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Frightjs-1-5-6-8-times-faster-than-jquery%3A4b1fc009-1940-4d26-bdc6-0af2cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frightjs-1-5-6-8-times-faster-than-jquery%3A4b1fc009-1940-4d26-bdc6-0af2cbdd56cb&amp;title=RightJS+1.5%3A+6-8+times+faster+than+jQuery&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frightjs-1-5-6-8-times-faster-than-jquery%3A4b1fc009-1940-4d26-bdc6-0af2cbdd56cb&amp;title=RightJS+1.5%3A+6-8+times+faster+than+jQuery';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/encode-html-entities-with-jquery:480f4dd6-13cc-4ce9-8071-4710cbdd56cb">Encode HTML entities with jQuery</a></li>
+							<li><a href="/posts/jquery-madness-at-the-workshop-in-raleigh,-nc,-sepetember-6th---7th:48a9b405-7574-495b-b75e-2d284834cda3">jQuery Goodness at the Workshop in Raleigh, NC, September 6th - 7th</a></li>
+							<li><a href="/posts/getting-serious-with-jquery-adding-custom-css-selectors:480f4dd6-e834-4cf6-a5cc-478ccbdd56cb">Getting serious with jQuery - Adding custom CSS selectors</a></li>
+							<li><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li>
+							<li><a href="/posts/uhhhwat-introduction-to-the-jquery-community:480f4dd6-c598-474e-a57a-44e7cbdd56cb">&quot;uhhh.......WAT?&quot; - Introduction to the jQuery community</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/jquery-is-a-true-prototype-killer:480f4dd5-6634-48f4-99c2-4a2dcbdd56cb">jQuery is a true prototype killer</a></li>
+							<li><a href="/posts/with-jquery-cakephp-to-world-domination-slides:480f4dd6-7cb8-4e84-af4f-4dc6cbdd56cb">With jQuery &amp; CakePHP to World Domination (Slides)</a></li>
+							<li><a href="/posts/jac-comment-box-auto-completer-jquery-plugin:48ce581c-a2ac-48ed-9a27-2c4c4834cda3">Jac: Comment box name auto completer (jQuery plugin)</a></li>
+							<li><a href="/posts/simple-global-ajax-activity-indicator-with-jquery:480f4dd6-7508-4aea-9850-4139cbdd56cb">Simple global Ajax activity indicator with jQuery</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/rightjs-1-5-6-8-times-faster-than-jquery:4b1fc009-1940-4d26-bdc6-0af2cbdd56cb">24 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/rightjs-1-5-6-8-times-faster-than-jquery:4b1fc009-1940-4d26-bdc6-0af2cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4b1fe2d1-0b44-47d0-99ab-0caecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3749d9033f9c4275523b61e738328a28&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nik&nbsp;						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>You don't do it the same way as others in your examples. First of all you don't construct the elements with framework, you feed the innerHTML property with strings and make your browser construct the elements. It's different.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b1fe392-d9d4-436f-a523-1057cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3749d9033f9c4275523b61e738328a28&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nik&nbsp;						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>secondly you do your construction off-dom.</p>
+<p>basically what you test in your code is the body.appendChild method performance. it has nothing to do with jQuery performance at all.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b1fe411-8490-4e4c-83f2-0e02cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nik: Thanks for playing : )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b1fe50f-7d84-4836-b13f-1267cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3749d9033f9c4275523b61e738328a28&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nik&nbsp;						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>you're welcome. write again.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b1fe69c-0ad0-4787-b183-1057cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nik: I thought you were kidding. Nevermind ...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b1fe99b-05e8-4bd8-8776-1057cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3749d9033f9c4275523b61e738328a28&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nik&nbsp;						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix: sorry didn't really read the article, though you're serious with the jQuery's test tweaking and was quick on my reaction 8)</p>
+<p>Then I've read it and I agreed, the tests technique of taskspeed is quite a bool. Especially I love the part where RightJS rips of the pure-DOM test 8). Dojo and YUI in the tests had done most of the things in pure dom too, that's why they look fast too. Then it's really affected by the css-selectors performance.</p>
+<p>And it's complete off-ballance. But well. It not all shitty, at some points like add/remove class you might have some sort of comparison.</p>
+<p>But anyway you should agree that RightJS in those tests was more or less honest in the way the things implemented.</p>
+<p>BTW: This is me the author of RightJS</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b1fec0c-70c4-4320-a481-13b6cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nik: Yeah, I don't think RightJS is cheating. I just saw a totally flawed comparison and you know how it is when you think somebody is wrong on the internet : ).</p>
+<p>Keep up the great work and don't let people like me discourage you! I absolutely love new interesting libraries, and RightJS looks great!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b1fed44-5df0-4c5d-964f-13b6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3749d9033f9c4275523b61e738328a28&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nik&nbsp;						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thans Felix, but it's too late to give up anyway 8)</p>
+<p>Will read you now, you're funny boy!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b1fee2a-6378-4404-915c-13b6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=45cd87741cbb92dd9e84228528afd910&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Errant&nbsp;						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>As I said on HN; lets not blame the RightJS developer - he/she never seems to have explicitly made a 6x better claim! Or even any kind of "faster than X claim".</p>
+<p>It was an editorial mishap by whoever posted it to HN :(</p>
+<p>On the other hand I agree with the rest of your post :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b1fefc8-4df0-4767-b891-14dfcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Errant: Yeah, the RightJS site itself doesn't make that claim. But it's easy to see why somebody would look at it, and draw the same conclusion as the poster on HN did from it. Personally I'd be very happy if Nik just adds a bit more explanation and context to the way the results are presented.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b1ff154-e438-4554-838d-1276cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8c43ed7f065406bf171c0f3eb32cf615&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://zedshaw.com/" rel="nofollow">Zed Shaw</a>						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well, I think you've kind of blown this out of proportion.  That HN heading was not posted by Nikolay, it was by some guy who was hyping.  The reality is, Nikolay has some performance tests he uses to make sure Right.JS is fast.  It's probably more of a regression test suite than anything.  Of course, you probably wouldn't know what a test suite was so it's understandable you wouldn't realize that.</p>
+<p>If you actually went to rightjs.org and read it, he says it's fast, not the fastest.  The fact that he has some tests to make sure it's fast is a bonus.  The fact he gave you the code is double bonus, and more than you've done here.</p>
+<p>You have no verifiable data available, no full runnable test suite, and no indication of the browsers it runs in.  </p>
+<p>I'm beginning to think you work at the CRU.  :-)</p>
+<p>Whether you think his tests have problems or not doesn't matter.  He's testing something, and he's giving you the full skinny, entire data, and the code he runs.  That's mountains more disclosure than you've got in your blog post right here.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b1ff2e7-8f7c-4b2a-a275-14bbcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3749d9033f9c4275523b61e738328a28&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nik&nbsp;						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix: most of the pages on the site actually were done just off hands when the project was rolling out, and the site by itself is more like a technological demo.</p>
+<p>I'm working with a designer now and going to rework/rewrite most of its parts, so I'll write something more or less meaningful over there soon.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b1ff600-a6e8-419c-8c43-15e3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0ac20f1159c0ffced0ffeb0ffee6a310&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://miketaylr.com" rel="nofollow">Mike Taylor</a>						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Just wanted to point out that as soon as jQuery 1.4 is released, the statement "Well, jQuery simply does not have a document.createElement wrapper" will no longer be true. However, you're absolutely correct for the current (1.3.2) release.</p>
+<p><a rel="nofollow" href="http://github.com/jquery/jquery/blob/master/src/core.js#L77-91">http://github.com/jquery/jquery/blob/master/src/core.js#L77-91</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b2000b1-ba18-4a1c-862d-1655cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Zed Shaw: Of course I've blown it out of proportions, I'll be the first to admit it. By taking an argument to the extreme you learn all of its weaknesses and flaws, and you get much more passionate and interesting responses, such as yours. I really think RightJS is doing some awesome stuff. I agree with you on everything except your assumption about my knowledge on test suites : )</p>
+<p>Nik: Cool, is the source of it up somewhere? I'd certainly volunteer to provide a patch for putting the benchmark page into perspective to make up for my rant : ).</p>
+<p>Mike: Cool, I didn't know that! Thanks for pointing it out.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b20037e-a96c-4a7b-97f7-1a2dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3749d9033f9c4275523b61e738328a28&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nik&nbsp;						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix: yup. it's on github next to all other rightjs related stuff</p>
+<p><a rel="nofollow" href="http://github.com/rightjs/rightjs-home">http://github.com/rightjs/rightjs-home</a></p>
+<p>but don't make it too smart though, I still want people to put a healthy amount of thoughts on the matter, question it and came to their own conclusions ;)</p>
+<p>I really use the benchmarks as regression tests mostly to watch RightJS own progress from version to version, find weak spots, etc. And then, there are actually tests for Prototype and Mootools and they are more or less valid and can be correlated with RightJS, case all three frameworks have similar api and do things in similar way.</p>
+<p>So try to not make a show out of it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b2003d6-8f30-4726-a3a0-1a15cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nik: No worries, I would probably just add a note saying that it's a regression suite and shouldn't be seen as as a way of comparing the general speed of those frameworks. Would that be ok?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b2009f5-9b54-41a0-be66-19b8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3749d9033f9c4275523b61e738328a28&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nik&nbsp;						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix: Well I think you actually can, but as a blunt direct comparison on a bunch of weird stuff.</p>
+<p>The thing as I see it, the test by itself is not a threat and it has a good amount of truth in it. The problem is the interpretation and here I rather agreed with Zed you kinda blow it out of the proportions. I see your point and irony, but the thing is that if you're a smarty pants and know what are you doing, performance in JavaScript will never be a problem to you with any framework, case you always can fall back to the pure dom and do some mambo-jumbo around.</p>
+<p>In reality most of developers are not hardcore programmers, and they know about JavaScript just enough to make a simple ajax call or make an animated navigation menu. Those people will do what they see on the surface of the public API or another words, do things blunt and directly. And in this light those tests do actually reflect the general speed of those frameworks.</p>
+<p>So it's kinda tricky business. At one side you can interpret the tests as general speed measures, on the other the taskspeed util by itself rather idiotic and unbalanced, without any real value in each separated test and this makes that ridiculous summary result of 8x speed up.</p>
+<p>I actually had a paragraph over there saying that dojo and yui are cheating in the test and jQuery just don't have the elements building functionality and blah blah blah, but it was boring and I nuked it.</p>
+<p>Anyway, I'm being long. Try what you have on mind. I always can correct where I don't agree. As the result we can come to some sort of compromise</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b2034e7-2b54-4037-8bed-289ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=799a8a6502aff3268519382ea2837d4b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://webreflection.blogspot.com/" rel="nofollow">Andrea Giammarchi</a>						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>WebReflection here, Pure DOM author.<br />
+Pure DOM has been explicitly created to perform tasks in the best optimized way using DOM natives, except in a single test where it is explicitly asked to use innerHTML.</br></p>
+<p>We need to do few considerations here:<br />
+ 1 - 36 ms VS 37 ms are a fool if you call it outperform</br><br />
+ 2 - Pure DOM does NOT want to use innerHTML. We all know that innerHTML is faster and your test is a cheat. If I cheat with Pure DOM bye bye baseline (innerHTML is not exactly what I define Pure DOM, HTML5 a part, but I may consider an innerHTML based version so you won't outperform *anything* with whatever library it is, is this what you want?)</br></p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="st0">&quot;make&quot;</span>: <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">for</span><span class="br0">&#40;</span><span class="kw2">var</span></br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; el = document.<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">&quot;div&quot;</span><span class="br0">&#41;</span>,</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; outperform_this = <span class="br0">&#91;</span><span class="br0">&#93;</span>,</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; i = <span class="nu0">0</span>, length = <span class="nu0">250</span>; i &lt; length; ++i</br><br />
+&nbsp; &nbsp; <span class="br0">&#41;</span></br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; outperform_this<span class="br0">&#91;</span>i<span class="br0">&#93;</span> = <span class="st0">'&lt;ul class=&quot;fromcode&quot; id=&quot;setid'</span> + i + <span class="st0">'&quot;&gt;&lt;li&gt;one&lt;/li&gt;&lt;li&gt;two&lt;/li&gt;&lt;li&gt;three&lt;/li&gt;&lt;/ul&gt;'</span></br><br />
+&nbsp; &nbsp; ;</br><br />
+&nbsp; &nbsp; el.<span class="me1">innerHTML</span> = outperform_this.<span class="me1">join</span><span class="br0">&#40;</span><span class="st0">&quot;&quot;</span><span class="br0">&#41;</span>;</br><br />
+&nbsp; &nbsp; <span class="kw1">for</span><span class="br0">&#40;</span><span class="kw2">var</span> i = <span class="nu0">0</span>, fragment = document.<span class="me1">createDocumentFragment</span><span class="br0">&#40;</span><span class="br0">&#41;</span>, childNodes = el.<span class="me1">childNodes</span>; i &lt; length; ++i<span class="br0">&#41;</span></br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; fragment.<span class="me1">appendChild</span><span class="br0">&#40;</span>childNodes<span class="br0">&#91;</span>i<span class="br0">&#93;</span>.<span class="me1">cloneNode</span><span class="br0">&#40;</span><span class="kw2">true</span><span class="br0">&#41;</span><span class="br0">&#41;</span></br><br />
+&nbsp; &nbsp; ;</br><br />
+&nbsp; &nbsp; document.<span class="me1">body</span>.<span class="me1">appendChild</span><span class="br0">&#40;</span>fragment<span class="br0">&#41;</span>;</br><br />
+&nbsp; &nbsp; <span class="kw1">for</span><span class="br0">&#40;</span><span class="kw2">var</span> childNodes = document.<span class="me1">getElementsByTagName</span><span class="br0">&#40;</span><span class="st0">&quot;ul&quot;</span><span class="br0">&#41;</span>, i = <span class="nu0">0</span>, l = <span class="nu0">0</span>, length = childNodes.<span class="me1">length</span>; i &lt; length; ++i<span class="br0">&#41;</span><span class="br0">&#123;</span></br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><span class="br0">&#40;</span>el = childNodes<span class="br0">&#91;</span>i<span class="br0">&#93;</span><span class="br0">&#41;</span>.<span class="me1">className</span> === <span class="st0">&quot;fromcode&quot;</span><span class="br0">&#41;</span></br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ++l</br><br />
+&nbsp; &nbsp; &nbsp; &nbsp; ;</br><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span>;</br><br />
+&nbsp; &nbsp; <span class="kw1">return</span> l;</br><br />
+<span class="br0">&#125;</span></br></div>
+<p> 3 - same libraries authors perfectly know which is the TaskSpeed aim: demonstrate how are performances via <strong>daily basis code</strong> ... there is not such jQuery usage and if there is, you must consider to use directly JavaScript because you are obviously looking for Pure Performances. This YUI! related post should tell you something, nobody complained about TaskSpeed so far: <a rel="nofollow" href="http://www.yuiblog.com/blog/2009/04/13/yui-270-on-taskspeed/">http://www.yuiblog.com/blog/2009/04/13/yui-270-on-taskspeed/</a><br />
+ 4 - last, but not least, you used the old TaskSpeed implementation, while the new one should be even faster</br></p>
+<p>Best Regards</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b203723-d1a8-4547-984a-2844cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=799a8a6502aff3268519382ea2837d4b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://webreflection.blogspot.com/" rel="nofollow">Andrea Giammarchi</a>						</strong>
+						<strong>said 
+						on Dec 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Moreover, I did not cheat using even querySelectorAll or getElementByClassName where available ... but still, if that is what you got about TaskSpeed, I'll be glad to provide you a proper cheat for the "make" test</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b203aea-ae00-4edf-bade-293dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=799a8a6502aff3268519382ea2837d4b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://webreflection.blogspot.com/" rel="nofollow">Andrea Giammarchi</a>						</strong>
+						<strong>said 
+						on Dec 10, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>just in case ... <a rel="nofollow" href="http://webreflection.blogspot.com/2009/12/taskspeed-real-cheat.html">http://webreflection.blogspot.com/2009/12/taskspeed-real-cheat.html</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b203edc-35b8-4ddf-aba9-28d6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0c031b9fc2e7339ee82ef9ca9fd2e899&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Max&nbsp;						</strong>
+						<strong>said 
+						on Dec 10, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Zed, thanks for adding absolutely nothing to the discussion and wasting my time.  </p>
+<p>Just like this comment.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b2b8a89-b154-42c8-a8d6-1965cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6d6eec6a276a9369e4b50e1de5859838&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://webpeeps.ru/" rel="nofollow">Dmitry Binner</a>						</strong>
+						<strong>said 
+						on Dec 18, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is awesome, but jquery is not only a DOM-manipulation tool, it's also a big number of plugins, etc. I think it is standard de-facto for now</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b2f8542-f694-4ac7-8f53-6d9bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=55172c881b22a03d57605486ee1bbe5c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.juergenriemer.com" rel="nofollow">Juergen Riemer</a>						</strong>
+						<strong>said 
+						on Dec 21, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>AFAIK jQuery is using dojos CSS selector engine thus any comparison like the above mentioned would actually be a comparison with dojo yet still everyone indicates jQuery as their "main target"</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b54eeea-faac-4b9c-ba09-4b0ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c6bdf94a1e1f76eefe788131347d0e14&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Abba Bryant&nbsp;						</strong>
+						<strong>said 
+						on Jan 18, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Actually I believe Jquery is using John Resig's Sizzle css selector engine - which was given to the Dojo Foundation to be maintained outside of the Jquery loop.</p>
+<p>They then adopted it, not the other way around. So .. just to be pedantic .. Dojo is using Jquery's selector engine.</p>
+<p>Juergen : as such, according to your logic - not mine - any comparison by dojo and their community would actually be a comparison with Jquery. The exact opposite of what you said. That being said, the two frameworks are hugely different and it would also be a bad apples to apples comparison.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

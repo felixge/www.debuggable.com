@@ -1,0 +1,980 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Programming Psychology II: Private methods  &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/programming-psychology-ii-private-methods:481ed862-b0d8-4a0e-9247-165c4834cda3">Programming Psychology II: Private methods </a></h2>	<div class="posted-on">
+		<p>Posted on 7/7/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>my previous posts about <a href="http://debuggable.com/posts/programming-psychology-return-home-early:4811de9f-ae28-49c2-a7dc-2f154834cda3">code that is easy to write vs code that is easy to read</a> and why <a href="http://debuggable.com/posts/xhtml-is-a-joke:4819bf98-4978-4027-896e-2ea44834cda3">XHTML is a joke</a> spawned a fair amount of criticism. This time I am afraid very few people are going to agree with me at all:</p>
+<blockquote><p>Private / protected methods and properties are one of the most stupid concepts of OOP.</p></blockquote>
+<p>This is a thought I first shared at <a href="http://debuggable.com/posts/cakefest-orlando-2008-summary:480f4dd6-6404-4774-a771-4e8fcbdd56cb">CakeFest Orlando</a> this year, but could not explain properly at the time.</p>
+<p>Here is the typical excuse for why any language should implement such a terrible concept:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> BankAccount<span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">private</span> <span class="re0">$balance</span> = <span class="nu0">0.00</span>;<br />
+<br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> set<span class="br0">&#40;</span><span class="re0">$newBalance</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/is_numeric"><span class="kw3">is_numeric</span></a><span class="br0">&#40;</span><span class="re0">$newBalance</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">error</span> = <span class="st0">'And I will strike down upon thee with great vengeance<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; and furious anger those who would attempt to poison and<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; destroy my bank account. [...]'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">balance</span> = <span class="re0">$newBalance</span>;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">true</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> get<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">balance</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> save<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// Great, I can now always blindly trust the value of $this-&gt;balance!</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> file_put_contents<span class="br0">&#40;</span><span class="st0">'balance'</span>, <span class="re0">$this</span>-&gt;<span class="me1">balance</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Awesome! Now nobody can mess with the balance of this account class and you don't even have to communicate the rules for using it to other programmers!<br />
+<blockquote>If you think you can manage programmers or enforce API policies with a few keywords of your programming language ... think again!</p></blockquote>
+<p>If somebody does not understand why he is not supposed to modify the balance property - he will find ways around it. And it won't be pretty, trust me. He'll directly write his values to the database and reload the object. He'll simply change your source code without warning. He'll extend the class and overwrite the set method.<br />
+<blockquote>Programmers will do just about anything to restore power you are trying to take away from them.</p></blockquote>
+<p>Now you might think: <strong>"But it really makes sense to use a private property here, nobody would ever want to work around this?"</strong>. Well maybe. And thats a big maybe. Predicting what other programmers will want to do with your code is like <a href="http://en.wikipedia.org/wiki/UUID#Random_UUID_probability_of_duplicates">playing number guessing with uuids</a>.</p>
+<p>So why not try to make the other programmers your allies? Show them what you are trying to accomplish in a semantic fashion:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> BankAccount<span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">public</span> <span class="re0">$balance</span> = <span class="nu0">0.00</span>;<br />
+<br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> validates<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/is_numeric"><span class="kw3">is_numeric</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">balance</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">error</span> = <span class="st0">'And I will strike down upon thee with great vengeance<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; and furious anger those who would attempt to poison and<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; destroy my bank account. [...]'</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">true</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="kw2">public</span> <span class="kw2">function</span> save<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// Lets just make sure that nothing has gone wrong before saving</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$this</span>-&gt;<span class="me1">validates</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> file_put_contents<span class="br0">&#40;</span><span class="st0">'balance'</span>, <span class="re0">$this</span>-&gt;<span class="me1">balance</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>This approach has many advantages:</p>
+<ul>
+<li>It gets rid of the useless overhead from setter / getter functions.</li>
+<li>It communicates that you need to validate certain things before saving a record.</li>
+<li>It embraces open architectures and others can work with it right away.</li>
+<li>It makes your class more flexible since you can temporarily feed it with invalid values.</li>
+<li>It exposes a new useful method.</li>
+</ul>
+<h3>Is that it?</h3>
+<p>Despite the fact that I think that private / protected are a stupid idea to begin with, I have an even bigger issue with them:<br />
+<blockquote>The concept of private / protected properties and methods seems to be the most popular recipe for producing crappy code.</p></blockquote>
+<p>I think it's safe to say that all of us were following at least one of the patterns listed below at one point:</p>
+<ul>
+<li>Not sure where this code goes - I'll put it in a private method for now.</li>
+<li>Oh, I will refactor this later, so I temporarely put it in a private method.</li>
+<li>This is just a helper function, no need to clutter the API with it.</li>
+<li>I am sure no other class will need to access this property ... lets make it private.</li>
+</ul>
+<p>Now ask yourself how many times those decisions have lead to code you are proud of? I cannot recall a single occasion in my work as a programmer where using private / protected has helped me to write better code. In fact, these days I even judge other peoples code by it:<br />
+<blockquote>When I see more than 2-3 private / protected methods in a class I know the code I'm looking at is in poor shape.</p></blockquote>
+<p>This may sound like a big simplification, but it holds true. I've almost never seen people use private / protected in the proper (yet stupid) way they are supposed to be used.</p>
+<p>The psychology behind this is simple. Give people a way to ignore things they don't want to deal with and they will. Private / protected were not meant for that purpose, but unfortunately they encourage the worst habits in us programmers and I therefor highly recommend against using them.</p>
+<p>-- Felix Geisendörfer aka the_undefined</p>
+<p>PS: Even if you "just" use the CakePHP convention of prefixing functions with one or two underscores to indicate scope visibility you'll end up writing messy code.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/481ed862-b0d8-4a0e-9247-165c4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprogramming-psychology-ii-private-methods%3A481ed862-b0d8-4a0e-9247-165c4834cda3 &amp;title=Programming+Psychology+II%3A+Private+methods+';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprogramming-psychology-ii-private-methods%3A481ed862-b0d8-4a0e-9247-165c4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprogramming-psychology-ii-private-methods%3A481ed862-b0d8-4a0e-9247-165c4834cda3&amp;title=Programming+Psychology+II%3A+Private+methods+&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprogramming-psychology-ii-private-methods%3A481ed862-b0d8-4a0e-9247-165c4834cda3&amp;title=Programming+Psychology+II%3A+Private+methods+';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/private-methods-follow-up:4873b289-8f70-4500-a798-76ea4834cda3">Private methods - Follow Up</a></li>
+							<li><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li>
+							<li><a href="/posts/things-to-avoid-in-a-team-programming-environment:480f4dfe-7890-4234-8979-40f4cbdd56cb">Things To Avoid In A Team-Programming Environment</a></li>
+							<li><a href="/posts/the-linguistics-of-programming:48cfa8e1-5298-47c0-bf46-363d4834cda3">The Linguistics of Programming</a></li>
+							<li><a href="/posts/programming-psychology-return-home-early:4811de9f-ae28-49c2-a7dc-2f154834cda3">Programming Psychology - Return home early</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/programming-psychology-ii-private-methods:481ed862-b0d8-4a0e-9247-165c4834cda3">35 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/programming-psychology-ii-private-methods:481ed862-b0d8-4a0e-9247-165c4834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-48722674-7d80-44cf-8ffb-16344834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=59066e62dbeff30f4af60fb899730b96&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dardo Sordi&nbsp;						</strong>
+						<strong>said 
+						on Jul 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I would like to comment but I've been marked as spam, two links are too much for a comment?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48722c08-64a4-4bd1-b8cf-14484834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jul 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Dardo Sordi: Akismet can be a little too aggressive sometimes. If you email me the comment I'll edit your previous one to use the content you want.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48723caf-78e4-4fb8-b255-14bc4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=88cc69e3d83e0136330ef163c4d98e35&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Brandon P&nbsp;						</strong>
+						<strong>said 
+						on Jul 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great Post!<br />
+I've always liked reading on how you breakdown conventions to really look at whether or not these concepts can hold their own weight!</br></p>
+<p>In college I always asked the following question about OO that never seemed to get answered to my satisfaction:</p>
+<p>If you have a private variable that is accessed through public or protected getter/setter methods... why is that variable private?</p>
+<p>Through my experience I have found the access modifiers really work in only a handful of situations. You put it perfectly that a sloppy programmer will:</p>
+<p>"[...] will do just about anything to restore power you are trying to take away from them."</p>
+<p>The only time I can see the private keyword work is if (like in your example above) the balance variable was never meant to be written directly but still needs to be publicly read (kind of a quasi-readonly).  There is no way (i think) that you can impose a "readonly" of a variable in a public context but still make it writable within the class context:</p>
+<p>public function getBalance() {<br />
+    return $this->balance;</br><br />
+}</br></p>
+<p>public function addCredit($amount) {<br />
+    $this->addTransaction($amount);</br><br />
+}</br></p>
+<p>public function addDebit($amount) {<br />
+    $this->addTransaction($amount);</br><br />
+}</br></p>
+<p>protected final function addTransation($amount){<br />
+    // do other stuff like logging or adding records</br><br />
+    $this->balance += $amount;</br><br />
+}</br></p>
+<p>Hindsight, you shouldn't really use PHP as a grounds to criticize OO concepts since PHP doesn't strictly impose OO rules or include many of the more advanced features that OO has to offer.  It would be like criticizing the quality of dry-aged beef to your grissely McDonald's hamburger :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48723d19-8858-436d-ba1b-17e14834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2a4f4f2259921a89fbb16f44034f395a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.marianoiglesias.com.ar" rel="nofollow">Mariano Iglesias</a>						</strong>
+						<strong>said 
+						on Jul 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Felix: I have to disagree with you on this one. BIG TIME. You can't discard a valuable concept that has evolved over the years just because there's crappy code out there. Damn it, if we were to do that, having seen such a big amount of useless code, no single programming concept would be left!</p>
+<p>I think Member accessibility + Interfaces + Property methods (such as those in C#) are a great concept when applied consciously, and adequately. You seem to favor 100% white boxes, that's fine. But you can't assume every bit of code in an application to expose its full API.</p>
+<p>In fact, having worked on Java applications with millions of lines of code I can tell you Abstract Classes and Interfaces, together with effective accessibility makes the code elegant, accessible and pretty straightforward. Now I can bet you that the wrong kind of programmer would mess up with those concepts and end up producing crappy code. Just as they would using only public variables.</p>
+<p>Anyway I could go into it in length, but just wanted to give you the general overview.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48724895-c50c-4ac6-ae32-45654834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f4112f3023c643bf2f7b32c9c5dcfcba&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakebaker.42dh.com" rel="nofollow">Daniel Hofstetter</a>						</strong>
+						<strong>said 
+						on Jul 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I think your examples are a good example why you should use private properties ;-)</p>
+<p>In the first example you validate the balance as soon as it is set (and hence the balance is always valid) whereas in the second example it is not possible to validate the balance when it is set and so the balance can become invalid. Do you see the problem?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48725360-b258-4e8e-a689-15e54834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=612ad7c3adee43c41ee3e88affe94472&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							NOSLOW&nbsp;						</strong>
+						<strong>said 
+						on Jul 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>That would certainly make reading/using the CakePHP API a bit overwhelming to the average programmer if they had to see all the internal functions!</p>
+<p>As a programmer, if I don't *need* to see a function, I don't *want* to see that function. I know enough to stay away from the "internals" of a black box, and if I don't, I do so at my own risk.</p>
+<p>Most of the time, I'm the consumer of my own (crappy) code. I may not get it right the first time (or 10 times), but that shouldn't discourage me from (eventually) getting it right. Seeing public vs. private at least tells me that I was *trying* to do the right thing. If anything, it reminds me to be careful, or to rethink (refactor) it. Using public/private speaks louder than code comments, or lack there of...hence why I write so much crappy code :)</p>
+<p>Having said all that, your post will make me think harder about not writing such bad code. Good post!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-487255c6-a158-4c1a-b2f2-36d34834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jul 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ok folks, here is the challenge: Show me a good piece of a CakePHP application using private / protected in a way that cannot be improved upon by a refactoring as I show as an example above.</p>
+<p>I'd be totally happy if you guys proof me wrong as it would make me like PHP (and some other languages) a bit more : ).</p>
+<p>For now I think JavaScript has the best approach to the problem by using lexic scoping.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48725cee-6c10-44d8-a4ec-5f284834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b31555e2010aedff7315ae1b341438bb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://symforc.com/" rel="nofollow">Romain Dorgueil</a>						</strong>
+						<strong>said 
+						on Jul 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I agree about private properties, which are more than often a bad idea because you're kind of forbidding to extend your code. Using private is like saying "Ok, I thought of all possible needs and goals for this data, so if you won't ever have to use it". That often prove wrong however.</p>
+<p>I would not say the same for protected properties though, using getter and setters. Your base class may only have simple setters like</p>
+<p>public function setValue($v)<br />
+{</br><br />
+  $this->value = $v;</br><br />
+}</br><br />
+public function getValue($v)</br><br />
+{</br><br />
+  return $this->value;</br><br />
+}</br></p>
+<p>But to keep your data coherent, that's often very usefull. Imagine you use $this->value = ... everywhere in your code (and $myobject->value = ... if the property is public). Now one day your needs change, and you want to set a $this->isValueModified flag to true everytime you change the value. Despite the «overhead» brought by getters and setters, it now prove more than handy.</p>
+<p>In fact it is just life saving.</p>
+<p>About the overhead. After a little test, i estimate that the setter/getter method is 0.7 seconds (to add to the 0.4 seconds of the basic = operator method) for 1 million calls. I personally find it is acceptable in exchange of clean code that is easy to maintain. As numbers thrown like this don't mean anythinghere is the simple code used to benchmark: </p>
+<p><a rel="nofollow" href="http://hashbin.com/77K">http://hashbin.com/77K</a></p>
+<p>So you can try it at home :)</p>
+<p>"When I see more than 2-3 private / protected methods in a class I know the code I'm looking at is in poor shape."</p>
+<p>My version of this would be "When I see more than 0 private methods/properties in a class I know the code I'm looking at is in poor shape."</p>
+<p>I don't use CakePHP so I won't be able to show anything, but I think this is more a development practices concern than a framework specific one. The "anybody change my values" approach is i.m.h.o archaic in term of code maintenability on medium/long term. But one should choose the patterns he use depending on his own practical cases, no rule (or about) will prove 100% right in 100% cases.</p>
+<p>Cheers, thanks for the post.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48725ec3-652c-4eb6-b846-57264834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4471a0311f54800bfb38ea0cddffe090&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Ramon&nbsp;						</strong>
+						<strong>said 
+						on Jul 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix Geisendörfer said: "Show me a good piece of a CakePHP application using private / protected in a way that cannot be improved upon by a refactoring as I show as an example above."</p>
+<p>< ?php</p>
+<p>class BankAccount {</p>
+<p>	protected $balance = 0.00;</p>
+<p>	protected $error;</p>
+<p>	public function validate() {<br />
+		if (!is_numeric($this->balance)) {</br><br />
+			$this->error = 'And I will strike down upon...';</br><br />
+			return false;</br><br />
+		}</br></p>
+<p>		return true;<br />
+	}</br></p>
+<p>	public function save() {<br />
+		if (!$this->validate()) {</br><br />
+			return false;</br><br />
+		}</br></p>
+<p>		return file_put_contents('balance.txt', $this->balance) !== false;<br />
+	}</br></p>
+<p>	public function setBalance($balance) {<br />
+		$this->balance = $balance;</br><br />
+	}</br></p>
+<p>	public function getBalance() {<br />
+		return $this->balance;</br><br />
+	}</br></p>
+<p>	public function getError() {<br />
+		return $this->error;</br><br />
+	}</br><br />
+}</br></p>
+<p>$Account = new BankAccount;<br />
+$Account->setBalance('756.68 blah');</br><br />
+if (!$Account->save()) {</br><br />
+	echo 'error: ' . $Account->getError();</br><br />
+}</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48726288-7480-48c2-9976-4f8d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c9b00d1b547282a5259ff4716d9f1b12&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://usrportage.de" rel="nofollow">Lars Strojny</a>						</strong>
+						<strong>said 
+						on Jul 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>1.) Validating properties when the object is saved, doesn't really make sense, as it hides the place where the error occured (when the value was set). Therefore it violates the paradigm of transparent errors.<br />
+2.) Not validating properties leaves the object in an inconsistent state which might lead to inconsistent reads.</br><br />
+3.) The other programmer won't change the code in a way he is not supposed to. Period. Otherwise, you know, the stick ...</br><br />
+4.) Hiding details is one of the most fundamental paradigms in software architecture, protocol design etc. pp. Protected and private members are there to hide, well, details that are private or protected to a class. Currently we don't have "real" properties in PHP as e.g. C# has it, that's why we use setters and getters.</br><br />
+5.) Nobody needs to know IP to use a browser. And that's a good thing.</br><br />
+6.) If you want to emulate properties, use __set() and __get(). ezComponents does that e.g. Not that you really should do that, but yeah, it is a possibility.</br><br />
+7.) Everybody: no, don't do it that way. Thanks.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48727935-0ba4-44fc-8c6f-475c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=da832583a79a42d2dcf2dbbb2612e758&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Kaitnieks&nbsp;						</strong>
+						<strong>said 
+						on Jul 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I guess one has to have a lot of experience to be as wrong as you are :D<br />
+Anyway, I'll give you just one trivial example to make private methods useful - when you're adding or changing functionality of certain class, you know you're free to do anything you want with the private ones, because nothing from outside will ever touch them.</br><br />
+On contrary, when you read names of public class methods, you should have a pretty solid idea about what the class does and how it should be used.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-487285ea-574c-4d43-8e19-76a84834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6955172c6fcd8ac96c606b17fd88682e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Mike&nbsp;						</strong>
+						<strong>said 
+						on Jul 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>In your second 'good' BankAccount class, you're forced to save or at elast call the validates method the balance out to the filesystem before you ever know it's valid.  </p>
+<p>That works OK in a CakePHP context where you probably POST a request to /bank_account/edit_balance to change the balance and then make another request to do anything else to the bank account. But what about a context in which your instance of the BankAccount object remains in memory between specific actions taken on it?  </p>
+<p>Someone could easily write the following code:</p>
+<p>$bankAccount->balance = 'abc';<br />
+$bankAccount->withdraw(50);</br></p>
+<p>When the code subtracted 50 from 'abc,' it would set the balance var to some nonsense value.  If you had used a setter with error checking, the class could have thrown an exception when you attempted to set the balance var with non-numeric data.</p>
+<p>To implement anything with that BankAccount class the programmer either has to persist the class or call the validates function after every action they take on the object to ensure that it has valid data.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-487285ff-8bf0-465b-af52-1f384834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=00d595d4340c4ac04edd294f8128aed8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://ioreader.com" rel="nofollow">Peter Goodman</a>						</strong>
+						<strong>said 
+						on Jul 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>On some parts of this I agree. In general, the existence of 'protected' makes 'private' somewhat useless (with PHP, at least). Thus, I agree that private should go. Otherwise you are sorely mistaken.</p>
+<p>"If you think you can manage programmers or enforce API policies with a few keywords of your programming language ... think again!"</p>
+<p>I don't see how this is a useful point at all. If someone is using code they could just as well rewrite a function or remove a class entirely and none of the keywords in said code can do anything about it. Shocking! This is argumentum ad ridiculum.</p>
+<p>"Programmers will do just about anything to restore power you are trying to take away from them."</p>
+<p>Anecdotal evidence will not suffice. Prove it.</p>
+<p>"The concept of private / protected properties and methods seems to be the most popular recipe for producing crappy code."</p>
+<p>Ibid.</p>
+<p>"When I see more than 2-3 private / protected methods in a class I know the code I'm looking at is in poor shape."</p>
+<p>Ibid.</p>
+<p>I think in general you've entirely missed the point with respect to the visibility keywords in object-oriented programming. In general, if someone wants to break the rules of your API, then obviously there is nothing you can do, but it is to their long-term detriment. There is a reason why one ought code to an interface instead of an implementation: implementations are inherently variable.</p>
+<p>By exposing all properties as public to the rest of your application it lets your code become highly coupled to the internal implementation of code. High coupling is usually positively correlated with spaghetti code.</p>
+<p>As other commenters have mentioned, your example fails insofar as the validity of an object is not guaranteed until someone calls the 'validate' function. </p>
+<p>"Ok folks, here is the challenge: Show me a good piece of a CakePHP application using private / protected in a way that cannot be improved upon by a refactoring as I show as an example above."</p>
+<p>You've created a straw man: your pattern only "works" for methods that need to have their data saved in the same way as your example does. Even then it fails to guarantee the validity of its data pre-saving.</p>
+<p>Consider this counter-example: <a rel="nofollow" href="http://codepad.org/SIqOZhJZ">http://codepad.org/SIqOZhJZ</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4872882f-b950-45d5-8a6f-577a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=00d595d4340c4ac04edd294f8128aed8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://ioreader.com" rel="nofollow">Peter Goodman</a>						</strong>
+						<strong>said 
+						on Jul 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>"Predicting what other programmers will want to do with your code is like playing number guessing with uuids."</p>
+<p>Another straw man; you shouldn't have to think about how others will use your code. If you've written nicely decoupled code with single-purpose where your classes have clearly defined roles then you *know* what other people will be doing with your code.</p>
+<p>If you find that the function of your code is open to interpretation then you're doing it wrong. Refactor your code such that the use cases of a class are clearly defined and obvious.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48728ac5-b740-4dc1-9353-54b14834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=59066e62dbeff30f4af60fb899730b96&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Dardo Sordi</a>						</strong>
+						<strong>said 
+						on Jul 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>first I want to say that, to some extent, I do agree with it you. For<br />
+me, public/protected (I think private is so evil to be used) should be</br><br />
+a gentleman's agreement (convention).</br></p>
+<p>So you can say:</p>
+<p>> > This is how I designed it to be used, but if you think you have a valid reason to use it in a different way ("I'm smarter than you" can be a valid reason), then go ahead.</p>
+<p>I suppose that I've an Enabling Attitude<br />
+<a rel="nofollow" href="http://www.martinfowler.com/bliki/SoftwareDevelopmentAttitude.html">http://www.martinfowler.com/bliki/SoftwareDevelopmentAttitude.html</a></br></p>
+<p>Anyway, this guy have a point against setters and getters that makes<br />
+sense for me: <a rel="nofollow" href="http://www.javaworld.com/javaworld/jw-09-2003/jw-0905-toolbox.html">http://www.javaworld.com/javaworld/jw-09-2003/jw-0905-toolbox.html</a></br></p>
+<p>Good Post.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4872f898-34ac-4538-b0ff-2f654834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=642716638958259c02825da648879e72&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							ganesh&nbsp;						</strong>
+						<strong>said 
+						on Jul 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hi mr.Felix<br />
+   Thank you for your great article</br><br />
+Regards&Thanks.</br><br />
+Ganesan.S.R</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48737fa1-ee00-42d6-bfd0-7c634834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c70e8d9542bf6c0e91688d58fbf4f672&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							jazzslider&nbsp;						</strong>
+						<strong>said 
+						on Jul 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Your example feels a bit contrived to me.  If I were writing a BankAccount class, I'd try to make its public API mirror a real bank account's "API:" the bank teller.  A bank teller allows a customer to perform just a handful of basic tasks on their account: </p>
+<p>interface BankAccount<br />
+{</br><br />
+    public function getBalance();</br><br />
+    public function depositFrom(Wallet $wallet, $amount);</br><br />
+    public function withdrawTo(Wallet $wallet, $amount);</br><br />
+    public function transferTo(BankAccount $otherAccount, $amount);</br><br />
+    public function transferFrom(BankAccount $otherAccount, $amount);</br><br />
+}</br></p>
+<p>Each of these transactions, if valid, will affect the account's balance; however, only the teller needs to know how to actually change the balance directly, because only the teller can be trusted to do so legitimately.  If the customer asks to make a $1000 deposit but only hands in a $10 bill, the teller's job is to throw an error (or maybe an alarm, if the customer is also wearing a ski mask).</p>
+<p>The BankAccount class needs to be able to do something similar, and to do that it needs to be aware of all the key players (i.e., customers' Wallets and other BankAccounts).  You can't let outside code modify the balance directly, because any change in the balance must necessarily affect the balance of some other money source as well.  If it doesn't, you're either creating money from nothing, or annihilating existing money.  The former is illegal, and the latter is a crying shame :)</p>
+<p>In a nutshell...leaving $balance public makes it impossible for you to do all the necessary validation, since it makes it possible for client code to modify the balance without indicating where the money came from or went to.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-487384bd-9adc-4166-a0cf-358c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e242d4107db24ffdf72beb8f128b70dd&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							khelonium&nbsp;						</strong>
+						<strong>said 
+						on Jul 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Your first example is way safer when several programmers work together. I do agree that private and protected are evil some times , but your  second example is wrong. As it was mentioned already , balance is not always valid. But besides that , when you will decide to have it always valid, you will break other code(which directly uses balance). There is a workaround in php  with magic functions like  __get and __set , but that's back to the first example. You assume other people think just like you , but that is incorrect. I consider that your second example is  closer to procedural programming than to OOP.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48738668-b3fc-4d7b-abd3-6e264834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c49f18be35506d89a172764aa257e4db&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://eclexia.net" rel="nofollow">polerin</a>						</strong>
+						<strong>said 
+						on Jul 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Private/protected methods and properties are actually a wonderful thing, but not for the reasons you use as a strawman, though they must be used in a consistent and well thought out way.  For example, if you had made your set() method private, child classes would still be unable to extend it.  This alone shows that your understanding of private methods is lacking.</p>
+<p>Even beyond that basic fact, the primary benefit of private and protected methods is not obfuscation.  It is a method to help promote better encapsulation, class focus, and reduce interdependence between classes.  All of which are good things, and MVC is a good example of this.</p>
+<p>Randomly declaring properties and methods private is a bad idea, and it will lead to messy code.  Proper use of private methods and properties will result in cleaner and more reusable code in the long run however.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48738a6d-c00c-4965-bb54-659c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=34d57f8b69c811da62b91ee792e8fcaa&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dsi.vozibrale.com/" rel="nofollow">dr. Hannibal Lecter</a>						</strong>
+						<strong>said 
+						on Jul 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>No offense, but I think this is ridiculous.</p>
+<p>Basically, it seems like you wouldn't have any problems making Model::__constructLinkedModel() or Model::__generateAssociation() public? Why would anyone want to pollute the Model object like that?</p>
+<p>And also, in ASP.NET/C#, if you want to create a singleton class, this is how you do it:</p>
+<p>public sealed class MySingleton<br />
+{</br><br />
+	private MySingleton() {}</br><br />
+	public static readonly MySingleton Instance = new MySingleton();</br><br />
+}</br></p>
+<p>All thanks to the almighty private keyword! How would you do this without the private?</p>
+<p>What about C# properties?</p>
+<p>private string _Message;</p>
+<p>public string Message<br />
+{</br><br />
+	get</br><br />
+	{</br><br />
+		if (something)</br><br />
+			doSomethingDimWittedHere();</br></p>
+<p>		return _Message;<br />
+	}</br><br />
+	set</br><br />
+	{</br><br />
+		_Message = value;</br></p>
+<p>		doSomeStuffHereToo();<br />
+		becauseICan();</br><br />
+	}</br><br />
+}</br></p>
+<p>Why not just go back to procedural programming and make everything public, changeable, accessible..that must be fun, right? :-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4873983f-c718-4504-ab6a-0f824834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d42a4a129a8bc3e5e13023a6931c1955&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://johnsmentaldetritus.blogspot.com/" rel="nofollow">John J.</a>						</strong>
+						<strong>said 
+						on Jul 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I have to completely disagree with you on this, and your own statements contradict your core argument. The main reason for using private/protected methods and properties is modularity and extensibility (the later less so for private). As others have used in examples above, if you need to change the behavior of a property, but you don't want to have to change everywhere it is read/written to, a getter/setter function consolidates all calls to that property to one place.</p>
+<p>As for your self contradiction, one of your primary arguments against private functions is that "Programmers will do just about anything to restore power you are trying to take away from them." Then, in your example of good code, you take power away from programmers, making them always call your save() function to write the balance. Your theoretical programmer who will just restore whatever power you take away will simply just do the file_write_contents() directly in the code, removing any value from writing your code this way. Public/private/protected methods very clearly document what you can mess with and what you shouldn't.</p>
+<p>I also have to ask, in what example of good code would you want to have invalid data in a variable?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4873d01f-2774-4d2c-81f2-5c324834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=890b18939e1eae1eecc193478a7c57e9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Jax&nbsp;						</strong>
+						<strong>said 
+						on Jul 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Seriously.... wtf?<br />
+Private code is all about:</br></p>
+<p>a) Noise reduction<br />
+b) Reducing the potential for mistakes</br></p>
+<p>You seem to take it as an afront that the previous developer doesn't respect your 1337 skills or something.</p>
+<p>The fact that what you are suggesting means that NO value can be read-only  is incredulous. A single human being CANNOT hold an entire architecture in their head. Consider for a second ALL of the variables in ALL of your objects at run time. Now consider the fact that you cannot (with your method) guarantee the value of ANY of them. That means that every single use of these variables MUST have some sanity checking in them to ensure that someone hasn't foobarred your previously valid value before using it. Now try mixing in some multi-threading and watch your head explode.<br />
+Cmon, hunt that bug, who set balance to: "All your base are belong to us"? Can you tell? With such a system you'll have a hard time finding out.</br></p>
+<p>Private code is about encapsulation. I make a bit, I decide on the public API and I FORGET the rest. The latter part is most important, I'm human so I can't hold the entire thing in my head. My Public API simplifies this and enables me to manage to fit more into my head because I can trust in the truth of the public API (as long as it is implemented properly and is a good API).<br />
+I know that if I call person.Birthday i'm going to get a date in the PAST.</br><br />
+I know that my configuration objects (in a dynamic UI for example) have been validated previously and they represent sane values.</br><br />
+I know that the ID of my database entity is a number as opposed to the string "Frog"</br></p>
+<p>The fact that your example uses a weak type makes this all the more ridiculous. I can't even guarantee the fact that my balance is a number!!!<br />
+Seriously, WHAT is the use case for doing:</br></p>
+<p>BankAccount->balance = "squirrel"</p>
+<p>I mean, why? why? Why do you want this? Don't talk about future proofing, the most future proofed bit of code is blank sheet. Code what you need and change it later if you NEED.</p>
+<p>Seriously dude, if you don't get this then you'd do well to give up on making big systems (with multiple devs editing the code) or you'll be stuck in code-churn as you attempt to iron out all the bugs.<br />
+Encapsulation is one of the biggest deals in OOP programming and you'd be wise to respect it.</br><br />
+I apologise for sounding so angry but this code you present makes me cry... :'(</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4874124e-8a94-4fc2-af47-57a84834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=74cc83022ea14b42b49ea487b95d5f1e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://seanja.com/blog" rel="nofollow">SeanJA</a>						</strong>
+						<strong>said 
+						on Jul 09, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well, I am also mostly against what you said there... I think that private or protected need to exist so that we can verify that people are not infact pushing a squirrel into the machine. A teller would not take a squirrel as leagal tender, a squirrel would not fit into the slot of an ATM... so why should the code not reflect that?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48759675-3188-4d6f-9110-573a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e88fb20ff4a97b4859ad9c25b8d6250e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Leafy&nbsp;						</strong>
+						<strong>said 
+						on Jul 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Not only have I not looked at protected/private methods in this light before, but I completely agree!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4875af4e-ad54-4b14-98ab-5dbd4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=dcdc0812216fdeecde190cc612ae3fb9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://facebook-developer.net" rel="nofollow">Matt Huggins</a>						</strong>
+						<strong>said 
+						on Jul 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I have to strongly disagree with your post, Felix.  My arguments have already been made throughout other comments though. :P</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48767b60-40d4-4877-9af1-7e044834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8a3244c559395100901a7c741a21e754&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Tim Daldini&nbsp;						</strong>
+						<strong>said 
+						on Jul 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Maybe you could say that methods which only process the args passed to them without changing the actual state of the class (by altering class variables) should be public since it's indeed impossible to predict when such a method can come in handy. (such as validates)</p>
+<p>Allowing your balance to be in a temporarly inconsistent state does force programmers to call the exposed validates method before actually using the value</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48768715-a76c-4baa-b815-57574834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8abe2ccbe053852dfb001c975939c839&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Andrew&nbsp;						</strong>
+						<strong>said 
+						on Jul 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>How can you possibly create a somewhat complex object with clean prototype with no private methods without breaking the postulate of "keeping your methods 2 screens or less"?</p>
+<p>Think about it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-487713dc-5120-4ab3-b6e8-273c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=22bb59fa7d790b005a4d1804754a2ad8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.falise.com" rel="nofollow">Sander</a>						</strong>
+						<strong>said 
+						on Jul 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Assuming that you're not just writing code (as in reusable libraries) for yourself it definitely makes sense to use private and public properties and functions. I won't try to explain why, there's an abundance of that above, but I would like to point out two things:</p>
+<p>1) Take responsibility<br />
+2) Document & communicate</br></p>
+<p>As a bank, you have to handle your client's cash in a responsible matter. The same goes for a programmer; take care of your code-consumers bits in a responsible fashion!</p>
+<p>As a bank, you instruct your clients how to deposit and withdraw cash. If people start throwing bags of cash through the windows, or show up with ski-masks and guns they either:<br />
+a) have not read your instructions</br><br />
+b) are criminals</br></p>
+<p>In the former you a responsibility to communicate your terms (documentation) to your clients (or code-consumers). In the latter you have a responsibility to protect the cash (or bits) of your clients from any criminals.</p>
+<p>Especially in the open-source business (with it's many code-consumers) it's imperative that you take responsibility for your code and document it. Not doing so is an outright act of laziness, and you don't get no cake for being lazy ;)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4877e9aa-cf90-4cb1-954b-361e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e4eab41a80556e2af689a72ae6f5e937&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							M N Islam Shihan&nbsp;						</strong>
+						<strong>said 
+						on Jul 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>I must disagree with you. You are just ignoring the main purpose of encapsulation. Encapsulation not just means only packaging the data and functionalities in a capsule called object. It also ensures data integrity through out the life cycle of the objects. Just think yourself as an object (that you are), and try to make your brain (that is now private to yourself) public and I'm pretty sure your brain will be garbased in a while by lots of so called programmers who doesn't understand OOP but claims they does. I believe you also want your brain to be private for yourself. </p>
+<p>Now, don't understand protected? Let's extend the same brain example ;-)</p>
+<p>Just assume you have a brain tumour (I hope yiu won't have any), that can be cured with a minor surgery. But you can't make your brain public to prevent it from being further polluted. Then, how the doctor will do the surgery? Hmm, with protected access (actually it will be friend access, but in case of inheritance both access have same effect) that the object (in this case you will define) for the doctor. </p>
+<p>More over, I believe the best way to write good codes is to restrict thyself to do wrong. You should never run with an axe while you need a small fruit cutter to divide the apple. A good OO programmer thinks well before designing the class architecture, and defines the object with all of its possible use-cases. If a non-OO programmer comes from the heaven and screams OMG, why this has been done and breaks the code with his funky logics, its not fault with the old OO programmer and neither the new heavenly one. Instead the fault is solely with the authority who let the 2nd programmer to deal with this code, if they couldn't find another OO programmer who understands why private/protected access specifiers are used, they should have shut their company off.</p>
+<p>Lastly, I saw this kind of funky commenting tendancy only from the programmers who deals with mainly PHP, JavaScript or similar loosely typed languages, where an object structure can be changed in runtime with some simple tips of finger. I won't argue with competency of these languages and personally I just fond of both of them I've mentioned, but the problem occurs when programmers start with such loosely typed languages and eventually deals a few loosely typed objects that are supported in these languages, and think "Feeww... This is OOP, this was so easy and I knew it very well." Even sometimes, they become so confident that they try to prove the actual OOP concepts wrong with some small code examples. They even don't know that when you need to write such small codes in your application, you probably even don't need OOP as well and thats one of the main reason of PHP's success even though it wasn't supporting full-fledged OO support in it until version 5. OOP comes to rescue large projects where too many objects interact with each other in lots of use cases and scenerios where the object's state is business critical and so a full grain controll over illegal access of retrieval/modfication of those critical data.</p>
+<p>Anyway, I am hoping you are expert enough to cut an apple with your axe, but its not acceptable to encourage other to do the same as that could lead to many unrecoverable accidents by others. And also too err is human, so better protect yourself from thyself.</p>
+<p>Regards,<br />
+Shihan</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48780ebc-5788-4cc8-a9d4-4d6e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f383d8a8b62d7aa173a408c0f1024b34&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://nevaavto.ru" rel="nofollow">neva</a>						</strong>
+						<strong>said 
+						on Jul 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>If somebody does not understand why he is not supposed to modify the balance property - he will find ways around it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-487a02a9-8f3c-4429-9450-2cab4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=45596033957b2b6d7ef8fe6545e0b7e7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Sam F.&nbsp;						</strong>
+						<strong>said 
+						on Jul 13, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I totally can't agree with you. A lot of my arguments are already posted but the one I'm not seeing here stressed enough follows.</p>
+<p>"[...] nobody can mess with the balance of this account class and you don't even have to communicate the rules for using it to other programmers! [...]</p>
+<p>Don't even have to communicate the rules? What the hell do you mean? What else does an error message at that point do? It communicates the rules for using the code.<br />
+How about say an InvalidTypeException with a message of  "Invalid balance given. Values must be of type float." Now to me that communicates how to use the setter i.e. API.</br></p>
+<p>In your poor example you don't communicate anything about how to use the code either. Of if so, please show us where exactly.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-487a26d8-ece0-45fb-9c89-17e84834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=59066e62dbeff30f4af60fb899730b96&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dardo Sordi&nbsp;						</strong>
+						<strong>said 
+						on Jul 13, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>> Don't even have to communicate the rules? What the hell do you mean? What else does<br />
+> an error message at that point do? It communicates the rules for using the code.</br><br />
+> How about say an InvalidTypeException with a message of "Invalid balance given.</br><br />
+> Values must be of type float." Now to me that communicates how to use the setter</br><br />
+> i.e. API.</br></p>
+<p>An exception? Exceptions are meant to be used as a mechanism for handling unexpected events (or should I say an exceptional event?) not as a replacement for error checking routines.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-487c4a75-b968-4c7f-824f-5fee4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a5acf866b8a9ca72bc568cca9852369b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Xr&nbsp;						</strong>
+						<strong>said 
+						on Jul 15, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Why do you bother locking your door ? It's easy to break in anyway.</p>
+<p>Visibility is not about enforcing security, it's about hiding what the API user shouldn't touch during normal usage, just like your lock prevents the passerby from entering your house a have a glass of beer in your kitchen. Of course, it's easy to circumvent (the Java reflection API even allows it out of the box) but it's the easiest way to start with encapsulation.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-487d6d9d-f2e8-4018-b3f0-44634834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8c0a2125a4a02db617671583e022dfaf&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Matthew Purdon&nbsp;						</strong>
+						<strong>said 
+						on Jul 16, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I feel that there are two separate arguments being made here. I agree with the majority of people making comments in that there should definitely be scope visibility on methods so that you can hide the implementation of methods. Hiding these internal methods is key to making sure that the external API of your objects remains consistent.</p>
+<p>What I disagree with though is the idea that the API for your object is defined by its properties. You can't argue that you are hiding your object's properties when you create public getters and setters for all of them. In PHP I personally use the __get and __set methods to avoid the clutter of these pointless methods. Further comments can be found here:</p>
+<p><a rel="nofollow" href="http://codenaked.org/archives/7-Object-Property-Visibility-and-Magic-Methods.html">http://codenaked.org/archives/7-Object-Property-Visibility-and-Magic-Methods.html</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48835d93-5034-4cb5-8ff5-46c64834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5c744871d0cf0a9ead9eef0bd8320b40&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							deltawing1&nbsp;						</strong>
+						<strong>said 
+						on Jul 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Information hiding is one of the cornerstones of OOP. Without private/protected modifiers ... that's like taking a limb off a person.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

@@ -1,0 +1,463 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Code Coverage Analysis soon in CakePHP - Test How Well You Test &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/code-coverage-analysis-soon-in-cakephp---test-how-well-you-test:4814f6a0-fe60-4f50-be0b-07194834cda3">Code Coverage Analysis soon in CakePHP - Test How Well You Test</a></h2>	<div class="posted-on">
+		<p>Posted on 27/4/08 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>the last week I have been dealing with an implementation of code coverage analysis for the upcoming release 1.2 of CakePHP. For those of you who do not yet know what code coverage is, here is a short excerpt from Wikipedia:</p>
+<blockquote><p>
+Code coverage is a measure used in software testing. It describes the degree to which the source code of a program has been tested. It is a form of testing that inspects the code directly and is therefore a form of white box testing.
+</p></blockquote>
+<p>There are several different kinds of criteria to code coverage. The two most important ones are line coverage (or statement coverage as wikipedia puts it) and path coverage. Line coverage basically analyzes if each line of the subject-under-test has been executed during the test. Path coverage examines if every possible route through the code has been executed. Since I rely on <a href="http://xdebug.org">Xdebug</a> for the implementation we are talking line coverage here.</p>
+<p>So how is it going to work? Pretty simple actually. Whenever you run a CakePHP test case Cake assembles information in the background about which lines of your subject-under-test are called. Then it will display all code lines from the subject-under-test and mark those that were "covered" (ie executed by the testcase) and which were not. Lines that play no role for the code coverage percentage, such as multiline comments, will be displayed in a different color with less contrast.</p>
+<p>How could an example report look like? Here you go:</p>
+<p><img src="http://thinkingphp.org/img/code_coverage_html_view.png" /></p>
+<p>I have also implemented a diff-style report. It just lists all the lines that are not covered by your tests and then seven lines before and after each of those. With that view you can really focus on the uncovered lines, but see enough lines around them in order to be able to write a reasonable test case to get the uncovered lines covered.</p>
+<p>This is what the diff view looks like for the cakephp core router.test.php:</p>
+<p><img src="http://thinkingphp.org/img/code_coverage_html_diff_view.png" /></p>
+<p>Within the dev team we are currently discussing these two views. If you favor one of these, can recommend another one or just want to voice your opinion on the looks of them, please do so by commenting on this post. </p>
+<p>For your information: Code coverage analysis currently only works for separate test cases only. However, the plan for this week is to get aggregate code coverage working. This means that your group tests are analyzed and the coverage percentage is displayed for each of the test subjects involved.</p>
+<p>This is a very valuable tool when developing tests for your cakephp application. Although we are talking line coverage here and not path coverage it is still a pretty good indicator of how thorough your tests are. It might as well encourage some more people to start writing tests if they see a neat report after they have done so. :]</p>
+<p>-- Tim Koschuetzki aka DarkAngelBGE<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4814f6a0-fe60-4f50-be0b-07194834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcode-coverage-analysis-soon-in-cakephp---test-how-well-you-test%3A4814f6a0-fe60-4f50-be0b-07194834cda3 &amp;title=Code+Coverage+Analysis+soon+in+CakePHP+-+Test+How+Well+You+Test';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcode-coverage-analysis-soon-in-cakephp---test-how-well-you-test%3A4814f6a0-fe60-4f50-be0b-07194834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcode-coverage-analysis-soon-in-cakephp---test-how-well-you-test%3A4814f6a0-fe60-4f50-be0b-07194834cda3&amp;title=Code+Coverage+Analysis+soon+in+CakePHP+-+Test+How+Well+You+Test&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcode-coverage-analysis-soon-in-cakephp---test-how-well-you-test%3A4814f6a0-fe60-4f50-be0b-07194834cda3&amp;title=Code+Coverage+Analysis+soon+in+CakePHP+-+Test+How+Well+You+Test';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/the-ultimate-cakephp-bootstrap-technique:480f4dd5-2bcc-40cb-b45f-4b1dcbdd56cb">The ultimate CakePHP bootstrap technique</a></li>
+							<li><a href="/posts/update-on-cakephp-google-analytics-apimodel:480f4dd5-7044-47bc-945a-4d90cbdd56cb">Update on CakePHP Google Analytics API/Model</a></li>
+							<li><a href="/posts/cakephp-goes-10:480f4dd5-9008-4af0-b2e7-4c46cbdd56cb">CakePHP goes 1.0!</a></li>
+							<li><a href="/posts/migrating-from-wordpress-to-cakephp:480f4dd6-ef28-4881-b74f-4185cbdd56cb">Migrating from WordPress to CakePHP</a></li>
+							<li><a href="/posts/cakenews-a-cakephp-feed-collection:480f4dd5-d7e4-4dec-831a-4b18cbdd56cb">CakeNews - A CakePHP feed collection</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/cakephp-argentina:4937042e-4864-48e1-98f0-6d3d4834cda3">CakePHP Argentina</a></li>
+							<li><a href="/posts/cakephp-code-coverage-for-group-tests:483b2b77-c420-47e3-b337-653c4834cda3">CakePHP Code Coverage for Group Tests</a></li>
+							<li><a href="/posts/normalizing-cakephp-model-records:48b7ed7f-9498-4b9c-8734-6f014834cda3">Normalizing CakePHP model records</a></li>
+							<li><a href="/posts/learning-from-the-cakephp-source-code-part-i:480f4dd6-28d0-445e-a1dc-4ceacbdd56cb">Learning from the CakePHP source code - Part I</a></li>
+							<li><a href="/posts/cakephp-removecache-shell---remove-your-cache-files-easily:4a277938-977c-43bc-bd83-645c4834cda3">CakePHP RemoveCache Shell - Remove Your Cache Files Easily</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/code-coverage-analysis-soon-in-cakephp---test-how-well-you-test:4814f6a0-fe60-4f50-be0b-07194834cda3">17 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/code-coverage-analysis-soon-in-cakephp---test-how-well-you-test:4814f6a0-fe60-4f50-be0b-07194834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4815dea4-57a4-40e2-8b90-6e634834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c50af17ff68eb6199ddf2b2e2144ce8c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.vizjerai.com" rel="nofollow">Andrew Assarattanakul</a>						</strong>
+						<strong>said 
+						on Apr 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I like both of the sample views. I can see myself using the diff style one more than the full code mainly because it's a lot less reading and scanning. But I can see someone preferring one over the other.</p>
+<p>Since the two different views are similar would it be possible to let the developer choose which one to show and set one of the two that the most people like as the default?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4815f44b-5a44-4867-9e30-4f6d4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Apr 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yeah I also prefer the diff view currently, but having several options is most of the time a good thing.</p>
+<p>Regarding different views: Yeah that is possible. I would probably prefer the diff one being the default one and then on the report page there could be various other options.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4815f470-e1c4-4efc-918a-5c174834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c50af17ff68eb6199ddf2b2e2144ce8c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.vizjerai.com" rel="nofollow">Andrew Assarattanakul</a>						</strong>
+						<strong>said 
+						on Apr 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I asked this in the irc channel and got the answer but I thought it would be helpful for other people to know as well.</p>
+<p>How far along is the Line Code Coverage for CakePHP v1.2?</p>
+<p>And an additional question, is there a chance a Path Code Coverage will be in the works?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4815f791-90d4-4c28-b484-4db04834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Apr 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well I started last week and the basic view is already committed. Tonight I will commit the diff view and some code refactorings, which also make the results a little more accurate. Once I commit this, you just need Xdebug installed and are ready to go already in Cake 1.2. :] So it's pretty far along already in my opinion. ;)</p>
+<p>What I will do after aggregate coverage is done is getting a command line report tool for this. Yeah let's do it -  that would be pretty neat. :D</p>
+<p>And plugins testing needs support, too, but that should not take long.</p>
+<p>Well about Path Coverage: That's pretty hard to do. If all of the abov are done, I will look into it for sure.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48161306-1aac-4f24-808c-44394834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Apr 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Okay the new version is committed to Cake.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4816ad0d-52cc-4ea2-ad0b-44b04834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f0b8fa14cbee5edfdeeac6b8f9ad062d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.sanisoft.com/blog/" rel="nofollow">Tarique Sani</a>						</strong>
+						<strong>said 
+						on Apr 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Have been playing with the code coverage additions for the past few days - great work! and very reassuring to know that the major parts of core are covered pretty well. I feel the diff view is much better</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4816d56d-be2c-4eff-b58a-6daa4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=52d6d1f510025c43edb1b9d19f40b055&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dieter.plaetinck.be" rel="nofollow">Dieter_be</a>						</strong>
+						<strong>said 
+						on Apr 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is *leet*</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4816dc75-1040-401d-b855-25044834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Apr 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Dieter: heh, thanks. :]</p>
+<p>@tarique: Yeah I like the diff view. Got any suggestions about it?</p>
+<p>It's really interesting how the different parts of the core *measure up* with their coverage. Set class and Http socket seem to be the best. *looks at Felix*</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4817a664-0218-491b-adb4-05cc4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5695d132647061781c8f95becd2ddb0f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Grant Cox&nbsp;						</strong>
+						<strong>said 
+						on Apr 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is very cool, and another good reason I should look at migrating all our tests to the Cake 1.2 test suite (currently using Daniel Hofstetter's suite).</p>
+<p>However, for this to work on Windows with magic quoting, you need to clean $_GET first - otherwise all the paths have additional backslashes (ie libs\\set.test.php ).  So while the tests are executed no worries, there is no match found from the xdebug_get_code_coverage() call.</p>
+<p>Something like the following in app/webroot/test.php works fine.</p>
+<p>if (isset($_GET) && ini_get('magic_quotes_gpc') == 1) {<br />
+	$_GET = stripslashes_deep($_GET);</br><br />
+}</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4817e732-a3ac-4bd4-ba4a-0f574834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=669144d1ab0a861af5d54175371bc586&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://mark-story.com" rel="nofollow">Mark Story</a>						</strong>
+						<strong>said 
+						on Apr 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is really neat stuff. Not only is great for the core developers but fantastic for end developers.  I really like the testing focus that cake is taking on.  I for one have found a lot of value in all the improvements to the testing suite over 1.1's test suite.  Awesome work.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-481819b7-c880-434d-b944-6cad4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Apr 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Grant: Oh yeah I have done a lot of the stuff on the coverage in the meantime. I will post about that later. Be sure to go to cake 1.2 soonish. ;]</p>
+<p>About the magic quotes: I doubt this is a problem. In fact I just tested it and it is not. have a look at parseParams($url) in the Dispatcher class.</p>
+<p>@Mark: Thanks. :] Nate, the lead dev, wants all classes to go to 75 - 85% code coverage at least. So it will also help with getting all the core code covered.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-481819e5-af04-4fa1-9c41-24594834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Apr 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Grant: By the way I found a small design issue in Windows IE in the coverage reports due to your hint. Thanks a lot!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48181cdb-264c-4344-b2da-0d3e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5695d132647061781c8f95becd2ddb0f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Grant Cox&nbsp;						</strong>
+						<strong>said 
+						on Apr 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tim - I know about Dispatcher::parseParams, that's where I copied it from :)  It's just that the url is not dispatched when requesting through the /app/webroot/test.php, which is why something is needed.</p>
+<p>You may be working on this, if so no matter.  But with:<br />
+- clean 1.2.x branch r6735 test suite</br><br />
+- magic quotes on</br><br />
+- Firefox 2.0.0.14, or IE7</br><br />
+- requested through http://localhost/cake1.2/test.php</br></p>
+<p>the xdebug coverage does not work, as the $_GET['case'] is 'libs\\set.test.php'</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4818e561-3380-4237-99b6-4dfb4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Apr 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ah okay, I will check it out. :] Thanks for the heads up!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-483d5ce9-d6ec-4b8e-8e3d-54594834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=32378c4f76f261d63c3c3a941054e440&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.neilcrookes.com" rel="nofollow">Neil Crookes</a>						</strong>
+						<strong>said 
+						on May 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice one Tim, this looks great.</p>
+<p>As to which representation of the code coverage, or lack thereof, I prefer - its difficult isn't it, because each best suits different situations.</p>
+<p>The first example is good if your subject under test is short or your code coverage is quite bad, whereas the latter is better if your subject under test is long and your code coverage is good.</p>
+<p>Perhaps you could present one or the other depending on some criteria. A combination of number of lines and the percentage code coverage?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-483e4f21-51e4-4f59-8ae9-1f5e4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on May 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Neil, yeah I can do that. Please give some time. Felix is currently moving to Berlin and I am helping him. Cheers</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49a8a6c5-b180-414d-bf77-260f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=222cff92cc4dbd49651299e400284b42&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.macrophotos.net/" rel="nofollow">Son Nguyen</a>						</strong>
+						<strong>said 
+						on Feb 28, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is indeed really cool. Where can I find the implementation details? How is your progress on making this report on a group of multiple test cases?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

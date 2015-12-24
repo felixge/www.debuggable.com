@@ -1,0 +1,399 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Blog &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="paging">
+	<a href="/posts/index/page:17" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:14">14</a></span> | <span><a href="/posts/index/page:15">15</a></span> | <span><a href="/posts/index/page:16">16</a></span> | <span><a href="/posts/index/page:17">17</a></span> | <span class="current">18</span> | <span><a href="/posts/index/page:19">19</a></span> | <span><a href="/posts/index/page:20">20</a></span> | <span><a href="/posts/index/page:21">21</a></span> | <span><a href="/posts/index/page:22">22</a></span> <a href="/posts/index/page:19" class="next">Next &raquo;</a></div>
+	<div class="post">
+	<h2><a href="/posts/cakephp-html-balancer-helper:4944c48d-7440-4f9d-8638-6e4b4834cda3">Cleaning Html with this HtmlCleaner for CakePHP</a></h2>	<div class="posted-on">
+		<p>Posted on 14/12/08 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>one of the problems we faced back when we merged our old blogs thinkingphp.org and php-coding-practices.com, was this little "Recent Comments" feature in the right navbar. It shows syntax-highlighted code, but makes use of Cake's TextHelper's truncate() method at the same time. The problem is obvious: Html can get cut off, totally screwing the page layout. </p>
+<p>One day I sat down to solve this problem. The result of this is the following ViewHelper "HtmlCleaner", which could be an easy-to-use alternative for <a href="http://www.php.net/tidy">HtmlTidy</a>.</p>
+<p>You can find the code including tests on <a href="http://github.com/felixge/debuggable-scraps/tree/master/cakephp/helpers">Debuggable Scraps / CakePHP / Helpers</a>. Suggestions and feedback are always welcome.</p>
+<p>Usage is very simple:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;"><span class="kw2">&lt;?php</span><br />
+<span class="re0">$bogusHtml</span> = <span class="re0">$htmlCleaner</span>-&gt;<span class="me1">clean</span><span class="br0">&#40;</span><span class="re0">$bogusHtml</span><span class="br0">&#41;</span>;<br />
+<span class="kw2">?&gt;</span></div>
+<p>Enjoy!</p>
+<p>-- Tim Koschuetzki aka DarkAngelBGE<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4944c48d-7440-4f9d-8638-6e4b4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakephp-html-balancer-helper%3A4944c48d-7440-4f9d-8638-6e4b4834cda3 &amp;title=Cleaning+Html+with+this+HtmlCleaner+for+CakePHP';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakephp-html-balancer-helper%3A4944c48d-7440-4f9d-8638-6e4b4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakephp-html-balancer-helper%3A4944c48d-7440-4f9d-8638-6e4b4834cda3&amp;title=Cleaning+Html+with+this+HtmlCleaner+for+CakePHP&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakephp-html-balancer-helper%3A4944c48d-7440-4f9d-8638-6e4b4834cda3&amp;title=Cleaning+Html+with+this+HtmlCleaner+for+CakePHP';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/cakephp-html-balancer-helper:4944c48d-7440-4f9d-8638-6e4b4834cda3">1 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/cakephp-html-balancer-helper:4944c48d-7440-4f9d-8638-6e4b4834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/people-who-thought:4944e6b0-db88-4ecc-a9ee-5c124834cda3">People who thought ...</a></h2>	<div class="posted-on">
+		<p>Posted on 14/12/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><img src="http://images.icanhascheezburger.com/completestore/2008/12/14/128737258000767260.png"></p>
+<p>Sorry to those who <a href="http://debuggable.com/posts/cake-vs-zend-vs-symfony-vs-igniter:4942b243-85bc-404a-afc9-34aa4834cda3">felt offended</a>, this was really just meant as a joke.</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4944e6b0-db88-4ecc-a9ee-5c124834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fpeople-who-thought%3A4944e6b0-db88-4ecc-a9ee-5c124834cda3 &amp;title=People+who+thought+...';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fpeople-who-thought%3A4944e6b0-db88-4ecc-a9ee-5c124834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fpeople-who-thought%3A4944e6b0-db88-4ecc-a9ee-5c124834cda3&amp;title=People+who+thought+...&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fpeople-who-thought%3A4944e6b0-db88-4ecc-a9ee-5c124834cda3&amp;title=People+who+thought+...';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/people-who-thought:4944e6b0-db88-4ecc-a9ee-5c124834cda3">4 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/people-who-thought:4944e6b0-db88-4ecc-a9ee-5c124834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/cake-vs-zend-vs-symfony-vs-igniter:4942b243-85bc-404a-afc9-34aa4834cda3">Cake vs Zend vs Symfony vs Igniter</a></h2>	<div class="posted-on">
+		<p>Posted on 12/12/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><img src="http://images.icanhascheezburger.com/completestore/2008/12/12/128735813340121041.png"></p>
+<p>Just in case you need to explain this to somebody at some point ; ).</p>
+<p>-- Felix Geisendörfer aka the_undefined.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4942b243-85bc-404a-afc9-34aa4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcake-vs-zend-vs-symfony-vs-igniter%3A4942b243-85bc-404a-afc9-34aa4834cda3 &amp;title=Cake+vs+Zend+vs+Symfony+vs+Igniter';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcake-vs-zend-vs-symfony-vs-igniter%3A4942b243-85bc-404a-afc9-34aa4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcake-vs-zend-vs-symfony-vs-igniter%3A4942b243-85bc-404a-afc9-34aa4834cda3&amp;title=Cake+vs+Zend+vs+Symfony+vs+Igniter&amp;bodytext=imgsrchttpimagesicanhascheezburgercomcompletestore20081212128735813340121041pngJustincaseyouneedtoexplainthistosomebodyatsomepointFelixGeisendrferakatheundefinedimgstyledisplaynonesrchttpdebuggablecompoststick4942b24385bc404aafc934aa4834cda3&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcake-vs-zend-vs-symfony-vs-igniter%3A4942b243-85bc-404a-afc9-34aa4834cda3&amp;title=Cake+vs+Zend+vs+Symfony+vs+Igniter';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/cake-vs-zend-vs-symfony-vs-igniter:4942b243-85bc-404a-afc9-34aa4834cda3">48 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/cake-vs-zend-vs-symfony-vs-igniter:4942b243-85bc-404a-afc9-34aa4834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/your-cakephp-applications-homepage:49428953-d2ec-4362-b82e-1ee34834cda3">Your CakePHP application's Homepage</a></h2>	<div class="posted-on">
+		<p>Posted on 12/12/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><a href="http://robwilkerson.org/">Rob Wilkerson</a> and I just talked about what the best place is to put your homepage in CakePHP. My answer was the following:</p>
+<p>If your homepage is static, just use your PagesController to render a home.ctp view.</p>
+<p>If your homepage is dynamic, add a homepage method to your PagesController:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> PagesController <span class="kw2">extends</span> AppController <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">public</span> <span class="kw2">function</span> view<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// Your normal pages</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="kw2">public</span> <span class="kw2">function</span> homepage<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$posts</span> = ClassRegistry::<span class="me2">init</span><span class="br0">&#40;</span><span class="st0">'Post'</span><span class="br0">&#41;</span>-&gt;<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'all'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><a href="http://www.php.net/compact"><span class="kw3">compact</span></a><span class="br0">&#40;</span><span class="st0">'posts'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Don't forget to update your routes. Some apps may also simply point their home route to the index function of another controller. How do you handle homepages in your app?</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/49428953-d2ec-4362-b82e-1ee34834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fyour-cakephp-applications-homepage%3A49428953-d2ec-4362-b82e-1ee34834cda3 &amp;title=Your+CakePHP+application%27s+Homepage';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fyour-cakephp-applications-homepage%3A49428953-d2ec-4362-b82e-1ee34834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fyour-cakephp-applications-homepage%3A49428953-d2ec-4362-b82e-1ee34834cda3&amp;title=Your+CakePHP+application%27s+Homepage&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fyour-cakephp-applications-homepage%3A49428953-d2ec-4362-b82e-1ee34834cda3&amp;title=Your+CakePHP+application%27s+Homepage';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/your-cakephp-applications-homepage:49428953-d2ec-4362-b82e-1ee34834cda3">14 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/your-cakephp-applications-homepage:49428953-d2ec-4362-b82e-1ee34834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/cakefest-buenos-aires-2008:493eb5ea-6db8-4688-a230-5fc84834cda3">CakeFest Buenos Aires 2008</a></h2>	<div class="posted-on">
+		<p>Posted on 9/12/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>this is just a very brief post about the latest cakefest. If you are coming for downloading the pictures, scroll down : ). First to all of you who missed Tim at the fest and in the pictures: He couldn't attend the conference because he broke his knee in a couple of nasty ways when playing soccer and is still recovering : /.</p>
+<p>---</p>
+<p>So I just came back from Buenos Aires where <a href="http://cricava.com/blogs/mariano.php">Mariano Iglesias<br />
+</a> organized an amazing CakePHP conference. Earlier this year we already had a <a href="http://debuggable.com/posts/cakefest-orlando-2008-summary:480f4dd6-6404-4774-a771-4e8fcbdd56cb">fest in Orlando</a> which was unofficially labeled "beerfest" by its attendes. This years conference is probably going to be remembered as either the meat or tubes fest.</p>
+<p>Why meat? Well a picture says more then I ever could:<br />
+<img src="http://static.debuggable.com.s3.amazonaws.com/img/cakefest%202/9.jpg"></p>
+<p>It may also be the tubefest as one of our the main activities was to <a href="http://en.wikipedia.org/wiki/Series_of_tubes">find tubes</a> wherever we went as it was hard to get online during the conference.<br />
+<img src="http://static.debuggable.com.s3.amazonaws.com/img/cakefest%202/6.jpg"></p>
+<p>Thanks to mariano the entire event had full i18n support. Everything from the <a href="http://cakefest.org/">website</a>, down to the attendee cards was bi-lingual.<br />
+<img src="http://static.debuggable.com.s3.amazonaws.com/img/cakefest%202/3.jpg"></p>
+<p>All talks where simultaneously translated by an excellent team of translators who did an amazing job at breaking the language barrier (but may have shortened their live expectancy considerably due to some very fast baking at the stage). In this pic you can see a bunch of us listening to a spanish talk:<br />
+<img src="http://static.debuggable.com.s3.amazonaws.com/img/cakefest%202/4.jpg"></p>
+<p>One night we had a team dinner, this picture was taken afterwards and shows Mariano, Garrett, Nate, Me, Jeff, Renan and Mark:<br />
+<img src="http://static.debuggable.com.s3.amazonaws.com/img/cakefest%202/1.jpg"></p>
+<p>Here you can see Garrett showing off some cool console features:<br />
+<img src="http://static.debuggable.com.s3.amazonaws.com/img/cakefest%202/2.jpg"></p>
+<p>Jim gave an amazing talk about how he and the company he works for used CakePHP to build a massive document processing application that helps people to <a href="https://www.clearmyrecord.com/">clear their criminal records</a>.<br />
+<img src="http://static.debuggable.com.s3.amazonaws.com/img/cakefest%202/5.jpg"></p>
+<p>This was at the last day of the 4 day event, you can see all the presenters and as we're holding up the sponsor logos:<br />
+<img src="http://static.debuggable.com.s3.amazonaws.com/img/cakefest%202/7.jpg"></p>
+<p>And last but not least a nice group shot of fancy dinner we had : ). Btw. if you're looking for that picture of me asleep in the restaurant and the wine bottles next to me, download the full image pack : ).<br />
+<img src="http://static.debuggable.com.s3.amazonaws.com/img/cakefest%202/8.jpg"></p>
+<p>So all in all CakeFest Buenos Aires was a huge success and I really enjoyed meeting everybody and seeing the spanish CakePHP community in action. A special thanks also goes to all of those who travelled the long way from Australia, New Zealand, Canada and elsewhere to attend the event!</p>
+<p>Now, as promised, here is the <a href="http://static.debuggable.com.s3.amazonaws.com/files/cakfest%202%20-%20buenos%20aires.zip">full download to all 307 pictures</a>, most of which were taken by Claudia (Mariano's Girlfriend) who really deserves a big applause for all the great help and work she did behind the scenes. </p>
+<p>-- Felix Geisendörfer aka the_undefined</p>
+<p>PS: Why so serious Mariano?</p>
+<p><img src="http://static.debuggable.com.s3.amazonaws.com/img/cakefest%202/10.jpg"><br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/493eb5ea-6db8-4688-a230-5fc84834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakefest-buenos-aires-2008%3A493eb5ea-6db8-4688-a230-5fc84834cda3 &amp;title=CakeFest+Buenos+Aires+2008';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakefest-buenos-aires-2008%3A493eb5ea-6db8-4688-a230-5fc84834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakefest-buenos-aires-2008%3A493eb5ea-6db8-4688-a230-5fc84834cda3&amp;title=CakeFest+Buenos+Aires+2008&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcakefest-buenos-aires-2008%3A493eb5ea-6db8-4688-a230-5fc84834cda3&amp;title=CakeFest+Buenos+Aires+2008';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/cakefest-buenos-aires-2008:493eb5ea-6db8-4688-a230-5fc84834cda3">14 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/cakefest-buenos-aires-2008:493eb5ea-6db8-4688-a230-5fc84834cda3#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="paging">
+	<a href="/posts/index/page:17" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:14">14</a></span> | <span><a href="/posts/index/page:15">15</a></span> | <span><a href="/posts/index/page:16">16</a></span> | <span><a href="/posts/index/page:17">17</a></span> | <span class="current">18</span> | <span><a href="/posts/index/page:19">19</a></span> | <span><a href="/posts/index/page:20">20</a></span> | <span><a href="/posts/index/page:21">21</a></span> | <span><a href="/posts/index/page:22">22</a></span> <a href="/posts/index/page:19" class="next">Next &raquo;</a></div>	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

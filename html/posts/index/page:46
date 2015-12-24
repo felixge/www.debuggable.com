@@ -1,0 +1,1277 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Blog &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="paging">
+	<a href="/posts/index/page:45" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:42">42</a></span> | <span><a href="/posts/index/page:43">43</a></span> | <span><a href="/posts/index/page:44">44</a></span> | <span><a href="/posts/index/page:45">45</a></span> | <span class="current">46</span> | <span><a href="/posts/index/page:47">47</a></span> | <span><a href="/posts/index/page:48">48</a></span> | <span><a href="/posts/index/page:49">49</a></span> | <span><a href="/posts/index/page:50">50</a></span> <a href="/posts/index/page:47" class="next">Next &raquo;</a></div>
+	<div class="post">
+	<h2><a href="/posts/composing-methods-inline-temp:480f4dfe-73c0-49ec-ad00-4ec6cbdd56cb">Composing Methods: Inline Temp</a></h2>	<div class="posted-on">
+		<p>Posted on 11/6/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><strong>You have a temporary variable that is created with a simple expression. Now the temp is getting into the way of other refactorings. Replace all references to the temporary variable with the expression.</strong></p>
+<h1>Motivation</h1>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>Often you will find yourself having temporary variables that carry the contents of simple method calls. A good thing is to remove the temporary variables and replace all references with the method or function invoked. This leads to much clearer code, as the method or function name ideally speaks for itself already, and saves you one code line. The less code the better!</p>
+<p>Also, often you can use <strong>Inline Temp</strong> when you are having too many temporary variables around so that extracting functionality into their own methods (called <strong>Extract Method</strong>) becomes difficult. An article about Extract Method will be written later.</p>
+<p>Beware of using <strong>Inline Temp</strong> in connection with loops as this can sometimes cause disastrious performance issues. Check <a href="http://php-coding-practices.com/peformance-optimization/optimising-for-loops/">Optimising Loops</a> for further information about that.</p>
+<h1>Code Example</h1>
+<h2>Before</h2>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> underHeavyLoad<span class="br0">&#40;</span><span class="re0">$database</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp;<span class="re0">$numVisitors</span> = <span class="re0">$database</span>-&gt;<span class="me1">getNumberCurrentOnlineUsers</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp;<span class="kw1">return</span> <span class="br0">&#40;</span><span class="re0">$numVisitors</span> &gt; <span class="nu0">200</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<h2>After</h2>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> underHeavyLoad<span class="br0">&#40;</span><span class="re0">$database</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="br0">&#40;</span><span class="re0">$database</span>-&gt;<span class="me1">getNumberCurrentOnlineUsers</span><span class="br0">&#40;</span><span class="br0">&#41;</span> &gt; <span class="nu0">200</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-73c0-49ec-ad00-4ec6cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcomposing-methods-inline-temp%3A480f4dfe-73c0-49ec-ad00-4ec6cbdd56cb &amp;title=Composing+Methods%3A+Inline+Temp';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcomposing-methods-inline-temp%3A480f4dfe-73c0-49ec-ad00-4ec6cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcomposing-methods-inline-temp%3A480f4dfe-73c0-49ec-ad00-4ec6cbdd56cb&amp;title=Composing+Methods%3A+Inline+Temp&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fcomposing-methods-inline-temp%3A480f4dfe-73c0-49ec-ad00-4ec6cbdd56cb&amp;title=Composing+Methods%3A+Inline+Temp';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/composing-methods-inline-temp:480f4dfe-73c0-49ec-ad00-4ec6cbdd56cb">5 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/composing-methods-inline-temp:480f4dfe-73c0-49ec-ad00-4ec6cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/how-to-generate-monochromatic-css-stylesheets-within-seconds-using-php:480f4dfe-d2b4-436b-9a39-437fcbdd56cb">How To Generate Monochromatic CSS Stylesheets Within Seconds Using PHP</a></h2>	<div class="posted-on">
+		<p>Posted on 7/6/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hi folks! As a follow-up to my previous article <a href="http://php-coding-practices.com/cool-stuff/control-your-css-via-php-good-stuff/">Control your CSS via PHP - Good Stuff</a> I have tried to implement the techniques explained there to build monochromatic stylesheets within seconds. First off, I will explain to the ones, that do not know yet, what a monochromatic color scheme is.</p>
+<h1>What Is A Monochromatic Color Scheme?</h1>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>The monochromatic color scheme uses variations in lightness and saturation of a single color. It looks clean and elegant. Monochromatic colors go well together, producing a soothing effect. The monochromatic scheme is very easy on the eyes, especially with blue or green hues.<br />
+You can use it to establish an overall mood, which we will do later with the css generation. The primary color can be integrated with neutral colors such as black, white, or gray. However, it can be difficult, when using this scheme, to highlight the most important elements.</p>
+<p>The monochromatic color scheme is perfect for our task of generating CSS via PHP based on forming shades of a base color. First off, please download the <a href="http://php-coding-practices.com/files/css_generation_with_php.zip">PHP Script</a> for generating CSS. Place it in any folder on your website or your local php installation.</p>
+<h1>Setting Up Our CSS Generation Environment</h1>
+<p>Next off we will borrow some XHTML / CSS code from my buddy <a href="http://pmob.co.uk">Paul O'Brian</a>, one of the greatest CSS Gurus on the net. His site features plenty of css goodness, tutorials and effects I am <strong>sure</strong> you haven't seen before. It is definately worth to check out! We will take the code of his <a href="http://www.pmob.co.uk/temp/3colfixedtest_4.htm">universal three column layout</a> that works in most browsers and allows any column to be the longest. Save that markup to a file named "test.html" in the same folder where you saved the php file. Now, in that same folder, create a file "css.php" where you insert the following CSS code:</p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<br />
+<span class="co1">// Tell the browser that this is CSS instead of HTML</span><br />
+<a href="http://www.php.net/header"><span class="kw3">header</span></a><span class="br0">&#40;</span><span class="st0">&quot;Content-type: text/css&quot;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Get the color generating code</span><br />
+<span class="kw1">require_once</span><span class="br0">&#40;</span><span class="st0">&quot;csscolor.php&quot;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Define a couple color palettes</span><br />
+<span class="co1">//$base = new CSS_Color('C9E3A6');</span><br />
+<span class="re0">$base</span> = <span class="kw2">new</span> CSS_Color<span class="br0">&#40;</span><span class="st0">'99E456'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Trigger an error just to see what happens</span><br />
+<span class="co1">// $trigger = new CSS_Color('');</span>
+</div>
+<div class="clear"></div>
+<div class="code debuggable_sh_css" style="white-space: wrap;white-space: nowrap;"><span class="coMULTI">/* CSS Document */</span><br />
+* <span class="br0">&#123;</span>margin<span class="re2">:<span class="nu0">0</span></span>;padding<span class="re2">:<span class="nu0">0</span></span><span class="br0">&#125;</span><br />
+p <span class="br0">&#123;</span>margin-bottom<span class="re2">:<span class="re3">1em</span></span><span class="br0">&#125;</span><br />
+ul<span class="br0">&#123;</span>margin-left<span class="re2">:<span class="re3">20px</span></span>;margin-bottom<span class="re2">:<span class="re3">1em</span></span><span class="br0">&#125;</span><br />
+<span class="coMULTI">/* commented backslash hack v2 \*/</span> <br />
+html, body<span class="br0">&#123;</span>height<span class="re2">:<span class="nu0">100</span></span>%;<span class="br0">&#125;</span> <br />
+<span class="coMULTI">/* end hack */</span> <br />
+<br />
+body <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">background</span>:#&lt;?php echo $base-&gt;bg<span class="br0">&#91;</span><span class="st0">'-2'</span><span class="br0">&#93;</span> ?&gt; <span class="kw2">repeat-y</span> <span class="kw1">left</span> <span class="kw1">top</span>;<br />
+&nbsp; <span class="kw1">color</span>: <span class="re0">#FFF</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#outer</span><span class="br0">&#123;</span><br />
+&nbsp; margin-left<span class="re2">:<span class="re3">130px</span></span>;<br />
+&nbsp; margin-right<span class="re2">:<span class="re3">130px</span></span>;<br />
+&nbsp; <span class="kw1">background</span>: #&lt;?php echo $base-&gt;bg<span class="br0">&#91;</span><span class="st0">'0'</span><span class="br0">&#93;</span> ?&gt;;<br />
+&nbsp; border-left<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; border-right<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; margin-bottom<span class="re2">:-<span class="re3">52px</span></span>;<br />
+&nbsp; min-height<span class="re2">:<span class="nu0">100</span></span>%<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#header</span><span class="br0">&#123;</span><br />
+&nbsp; position<span class="re2">:absolute</span>;<br />
+&nbsp; top<span class="re2">:<span class="nu0">0</span></span>;<br />
+&nbsp; left<span class="re2">:<span class="nu0">0</span></span>;<br />
+&nbsp; width<span class="re2">:<span class="nu0">100</span></span>%;<br />
+&nbsp; height<span class="re2">:<span class="re3">70px</span></span>;<br />
+&nbsp; <span class="kw1">background</span>: #&lt;?php echo $base-&gt;bg<span class="br0">&#91;</span><span class="st0">'-3'</span><span class="br0">&#93;</span> ?&gt;;<br />
+&nbsp; border-top<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; border-bottom<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; overflow<span class="re2">:hidden</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#left</span> <span class="br0">&#123;</span><br />
+&nbsp; position<span class="re2">:relative</span>;<span class="coMULTI">/*ie needs this to show float */</span><br />
+&nbsp; width<span class="re2">:<span class="re3">130px</span></span>;<br />
+&nbsp; float<span class="re2">:left</span>;<br />
+&nbsp; margin-left<span class="re2">:-<span class="re3">129px</span></span>;<span class="coMULTI">/*must be 1px less than width otherwise won't push footer down */</span><br />
+&nbsp; z-index<span class="re2">:<span class="nu0">100</span></span>;<br />
+&nbsp; left<span class="re2">:-<span class="re3">1px</span></span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#left</span> p, <br />
+<span class="re0">#right</span> p <span class="br0">&#123;</span>padding<span class="re2">:<span class="re3">3px</span></span><span class="br0">&#125;</span><br />
+<span class="re0">#right</span> <span class="br0">&#123;</span><br />
+&nbsp; position<span class="re2">:relative</span>;<span class="coMULTI">/*ie needs this to show float */</span><br />
+&nbsp; width<span class="re2">:<span class="re3">130px</span></span>;<br />
+&nbsp; float<span class="re2">:right</span>;<br />
+&nbsp; margin-right<span class="re2">:-<span class="re3">129px</span></span>;<span class="coMULTI">/*must be 1px less than width otherwise won't push footer down */</span><br />
+&nbsp; left<span class="re2">:<span class="re3">1px</span></span>;<br />
+&nbsp; <span class="kw1">color</span>: <span class="re0">#<span class="nu0">000</span></span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#footer</span> <span class="br0">&#123;</span><br />
+&nbsp; width<span class="re2">:<span class="nu0">100</span></span>%;<br />
+&nbsp; clear<span class="re2">:both</span>;<br />
+&nbsp; height<span class="re2">:<span class="re3">50px</span></span>;<br />
+&nbsp; border-top<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; border-bottom<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; <span class="kw1">background-color</span>: #&lt;?php echo $base-&gt;bg<span class="br0">&#91;</span><span class="st0">'-4'</span><span class="br0">&#93;</span> ?&gt;;<br />
+&nbsp; text-align<span class="re2">:center</span>;<br />
+&nbsp; position<span class="re2">:relative</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#clearheader</span><span class="br0">&#123;</span>height<span class="re2">:<span class="re3">72px</span></span>;<span class="br0">&#125;</span><span class="coMULTI">/*needed to make room for header*/</span><br />
+<span class="re0">#clearfooter</span><span class="br0">&#123;</span>clear<span class="re2">:both</span>;height<span class="re2">:<span class="re3">52px</span></span>;<span class="br0">&#125;</span><span class="coMULTI">/*needed to make room for footer*/</span><br />
+* &gt; html <span class="re0">#clearfooter</span> <span class="br0">&#123;</span>float<span class="re2">:left</span>;width<span class="re2">:<span class="nu0">100</span></span>%;<span class="br0">&#125;</span><span class="coMULTI">/* ie mac styles */</span><br />
+<span class="re0">#centrecontent</span> <span class="br0">&#123;</span><br />
+&nbsp; width<span class="re2">:<span class="nu0">100</span></span>%;<br />
+&nbsp; float<span class="re2">:left</span>;<br />
+&nbsp; position<span class="re2">:relative</span>;<br />
+&nbsp; z-index<span class="re2">:<span class="nu0">1</span></span>;<br />
+&nbsp; margin<span class="re2">:<span class="nu0">0</span></span> -<span class="re3">1px</span>;<span class="coMULTI">/* moz fix*/</span><br />
+&nbsp; <span class="kw1">color</span>: <span class="re0">#<span class="nu0">000</span></span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="coMULTI">/* css stuff below is just for presentation and not needed for the demo */</span><br />
+<span class="re0">#centrecontent</span> p <span class="br0">&#123;</span> <span class="kw1">padding</span>: <span class="nu0">0</span> <span class="re3">20px</span>; <span class="br0">&#125;</span><br />
+h1 <span class="br0">&#123;</span><span class="kw1">font-family</span>: Verdana, Arial, Helvetica, <span class="kw2">sans-serif</span>; <span class="kw1">font-weight</span>: <span class="kw2">lighter</span>; <span class="kw1">font-size</span>: <span class="re3"><span class="nu0">150</span>%</span>; <span class="kw1">padding</span>: <span class="re3">20px</span>;<span class="br0">&#125;</span><br />
+<span class="re0">#left</span> span <span class="br0">&#123;</span><br />
+&nbsp; display<span class="re2">:none</span>;&nbsp;<br />
+<span class="br0">&#125;</span>&nbsp;<br />
+<span class="re0">#left</span> a<span class="re2">:hover</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">text-decoration</span>: <span class="kw2">none</span>;<br />
+&nbsp; <span class="kw1">text-decoration</span>: <span class="kw2">none</span>;<br />
+&nbsp; <span class="kw1">color</span>:<span class="re0">#<span class="nu0">222</span></span>;<br />
+&nbsp; <span class="kw1">background</span>: <span class="re0">#FFF</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#left</span> a<span class="re2">:hover</span> span <span class="br0">&#123;</span><br />
+&nbsp; display<span class="re2">:block</span>;<br />
+&nbsp; position<span class="re2">:absolute</span>;<br />
+&nbsp; left<span class="re2">:<span class="re3">130px</span></span>;<br />
+&nbsp; width<span class="re2">:<span class="re3">150px</span></span>;<br />
+&nbsp; z-index<span class="re2">:<span class="nu0">20</span></span>;<br />
+&nbsp; <span class="kw1">background</span>:<span class="re0">#fff</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="co1">@media all and (min-width: 0px){</span><br />
+&nbsp; <span class="re0">#left</span> a<span class="re2">:hover</span> span <span class="br0">&#123;</span><br />
+&nbsp; top<span class="re2">:<span class="re3">150px</span></span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#footer</span> a, <span class="re0">#left</span> a <span class="br0">&#123;</span> <span class="kw1">color</span>:<span class="re0">#FFF</span>; <span class="br0">&#125;</span><br />
+<span class="re0">#footer</span> span <span class="br0">&#123;</span><br />
+&nbsp; display<span class="re2">:none</span>;&nbsp;<br />
+<span class="br0">&#125;</span>&nbsp;<br />
+<span class="re0">#footer</span> a<span class="re2">:hover</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">text-decoration</span>: <span class="kw2">none</span>;<br />
+&nbsp; <span class="kw1">color</span>:<span class="re0">#<span class="nu0">222</span></span>;<br />
+&nbsp; <span class="kw1">background</span>: <span class="re0">#FFF</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#footer</span> a<span class="re2">:hover</span> span <span class="br0">&#123;</span><br />
+&nbsp; display<span class="re2">:block</span>;<br />
+&nbsp; position<span class="re2">:absolute</span>;<br />
+&nbsp; top<span class="re2">:-<span class="re3">95px</span></span>;<br />
+&nbsp; width<span class="re2">:<span class="re3">150px</span></span>;<br />
+&nbsp; z-index<span class="re2">:<span class="nu0">20</span></span>;<br />
+&nbsp; <span class="kw1">background</span>:<span class="re0">#fff</span>;<br />
+&nbsp; left<span class="re2">:<span class="nu0">50</span></span>%;<br />
+<span class="br0">&#125;</span><br />
+html&gt;body <span class="re0">#minHeight</span><span class="br0">&#123;</span>float<span class="re2">:right</span>;width<span class="re2">:<span class="re3">0px</span></span>;height<span class="re2">:<span class="nu0">100</span></span>%;margin-bottom<span class="re2">:-<span class="re3">52px</span></span>;<span class="br0">&#125;</span> <span class="coMULTI">/*safari wrapper */</span></div>
+<p>What this does is simply using our css generation script to alter the code of the original css file from <a href="http://www.pmob.co.uk/temp/3colfixedtest_4.htm">the universal three column layout</a>.  We create a base color ($base = new CSS_Color('99E456');) and form shade variations for the two navbars, the header and the footer:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_css" style="white-space: wrap;white-space: nowrap;">body <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">background</span>:#&lt;?php echo $base-&gt;bg<span class="br0">&#91;</span><span class="st0">'-2'</span><span class="br0">&#93;</span> ?&gt; <span class="kw2">repeat-y</span> <span class="kw1">left</span> <span class="kw1">top</span>;<br />
+&nbsp; <span class="kw1">color</span>: <span class="re0">#FFF</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#outer</span><span class="br0">&#123;</span><br />
+&nbsp; margin-left<span class="re2">:<span class="re3">130px</span></span>;<br />
+&nbsp; margin-right<span class="re2">:<span class="re3">130px</span></span>;<br />
+&nbsp; <span class="kw1">background</span>: #&lt;?php echo $base-&gt;bg<span class="br0">&#91;</span><span class="st0">'0'</span><span class="br0">&#93;</span> ?&gt;;<br />
+&nbsp; border-left<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; border-right<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; margin-bottom<span class="re2">:-<span class="re3">52px</span></span>;<br />
+&nbsp; min-height<span class="re2">:<span class="nu0">100</span></span>%<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#header</span><span class="br0">&#123;</span><br />
+&nbsp; position<span class="re2">:absolute</span>;<br />
+&nbsp; top<span class="re2">:<span class="nu0">0</span></span>;<br />
+&nbsp; left<span class="re2">:<span class="nu0">0</span></span>;<br />
+&nbsp; width<span class="re2">:<span class="nu0">100</span></span>%;<br />
+&nbsp; height<span class="re2">:<span class="re3">70px</span></span>;<br />
+&nbsp; <span class="kw1">background</span>: #&lt;?php echo $base-&gt;bg<span class="br0">&#91;</span><span class="st0">'-3'</span><span class="br0">&#93;</span> ?&gt;;<br />
+&nbsp; border-top<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; border-bottom<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; overflow<span class="re2">:hidden</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#footer</span> <span class="br0">&#123;</span><br />
+&nbsp; width<span class="re2">:<span class="nu0">100</span></span>%;<br />
+&nbsp; clear<span class="re2">:both</span>;<br />
+&nbsp; height<span class="re2">:<span class="re3">50px</span></span>;<br />
+&nbsp; border-top<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; border-bottom<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; <span class="kw1">background-color</span>: #&lt;?php echo $base-&gt;bg<span class="br0">&#91;</span><span class="st0">'-4'</span><span class="br0">&#93;</span> ?&gt;;<br />
+&nbsp; text-align<span class="re2">:center</span>;<br />
+&nbsp; position<span class="re2">:relative</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Now change the line </p>
+<p>in your site.html file and then launch it via a browser. You should see something like this:</p>
+<p><img src="http://thinkingphp.org/img/generate_css_using_php/1.jpg" title="First Layout" alt="Picture of first generated layout" /></p>
+<h1>Changing The Base Color For Some Cool Results</h1>
+<p>It is not exactly pretty, but we can play around with the base color a bit:</p>
+<p><strong>$base = new CSS_Color('98ccac');</strong><br />
+<img src="http://thinkingphp.org/img/generate_css_using_php/2.jpg" title="Second Layout" alt="Picture of second generated layout" /></p>
+<p><strong>$base = new CSS_Color('ccac99');</strong><br />
+<img src="http://thinkingphp.org/img/generate_css_using_php/3.jpg" title="Third Layout" alt="Picture of thirdgenerated layout" /></p>
+<p><strong>$base = new CSS_Color('ccccff');</strong><br />
+<img src="http://thinkingphp.org/img/generate_css_using_php/4.jpg" title="Forth Layout" alt="Picture of forth generated layout" /></p>
+<h1>What Other Uses For This Can We Think Of?</h1>
+<p>Now you could also add other colors to highlight some other parts, like singleing out the footer from the monochromatic scheme or always staying with white background for the main content column.</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$highlightFooter</span> = <span class="kw2">new</span> CSS_Color<span class="br0">&#40;</span><span class="st0">'973432'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$outer</span> = <span class="kw2">new</span> CSS_Color<span class="br0">&#40;</span><span class="st0">'ffffff'</span><span class="br0">&#41;</span>;<br />
+...</div>
+<p>We could also generate a grayscale website using white or black as the base color. I am sure there are endless cool possibilities for this stuff, like different shades for list elements, headings, paragraphs and what not. I am eager to hear your ideas in the post comments below!</p>
+<h1>So How Does This PHP Thing Work?</h1>
+<p>When you look at the csscolor.php file, you will quickly notice that it is a very well-made object-oriented PHP script. The foundation of the magic is here:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> CSS_Color<span class="br0">&#40;</span><span class="re0">$bgHex</span>, <span class="re0">$fgHex</span>=<span class="st0">''</span><span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// This is the constructor method for the class,</span><br />
+&nbsp; &nbsp; <span class="co1">// which is called when a new object is created.</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// Initialize this PEAR object so I can</span><br />
+&nbsp; &nbsp; <span class="co1">// use the PEAR error return mechanism</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">PEAR</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="co1">// Initialize the palette</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">setPalette</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, <span class="re0">$fgHex</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="co1">//==================================================</span><br />
+&nbsp; <span class="co1">//==METHODS=========================================</span><br />
+&nbsp; <span class="co1">//==================================================</span><br />
+<br />
+&nbsp; <span class="co1">//--------------------------------------------------</span><br />
+&nbsp; <span class="kw2">function</span> setPalette<span class="br0">&#40;</span><span class="re0">$bgHex</span>, <span class="re0">$fgHex</span> = <span class="st0">''</span><span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// Initialize the color palettes</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// If a foreground color was not specified,</span><br />
+&nbsp; &nbsp; <span class="co1">// just use the background color.</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$fgHex</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$fgHex</span> = <span class="re0">$bgHex</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// Clear the existing palette</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">fg</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="co1">// Make sure we got a valid hex value</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$this</span>-&gt;<span class="me1">isHex</span><span class="br0">&#40;</span><span class="re0">$bgHex</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">raiseError</span><span class="br0">&#40;</span><span class="st0">&quot;background color '$bgHex' is not a hex color value&quot;</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="kw2">__FUNCTION__</span>, <span class="kw2">__LINE__</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// Set the bg color</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span> = <span class="re0">$bgHex</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+1'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">85</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+2'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">75</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+3'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">5</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+4'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">25</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+5'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-1'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">85</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-2'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">75</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-3'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">5</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-4'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">25</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-5'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+..</div>
+<p>As you see, the bg-property's values are set via the CssColor::lighten() and CssColor::darken() methods. So, what are we waiting for? Let's look at them:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> lighten<span class="br0">&#40;</span><span class="re0">$hex</span>, <span class="re0">$percent</span><span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">mix</span><span class="br0">&#40;</span><span class="re0">$hex</span>, <span class="re0">$percent</span>, <span class="nu0">255</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="co1">//--------------------------------------------------</span><br />
+&nbsp; <span class="kw2">function</span> darken<span class="br0">&#40;</span><span class="re0">$hex</span>, <span class="re0">$percent</span><span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">mix</span><span class="br0">&#40;</span><span class="re0">$hex</span>, <span class="re0">$percent</span>, <span class="nu0">0</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span></div>
+<p>Hrm okay, nothing really here, escept that we now know the second parameter is treated as a percentage. This makes me think if it is possible to add more shades to choose from. We will look at that later. Let's look at the mix() method. I will leave out the error handling parts to preserve some space. :)</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> mix<span class="br0">&#40;</span><span class="re0">$hex</span>, <span class="re0">$percent</span>, <span class="re0">$mask</span><span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// ...</span><br />
+<br />
+&nbsp; &nbsp; <span class="kw1">for</span> <span class="br0">&#40;</span><span class="re0">$i</span>=<span class="nu0">0</span>; <span class="re0">$i</span>&amp;<span class="co2">#lt;3; $i++) {</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$rgb</span><span class="br0">&#91;</span><span class="re0">$i</span><span class="br0">&#93;</span> = <a href="http://www.php.net/round"><span class="kw3">round</span></a><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="re0">$i</span><span class="br0">&#93;</span> * <span class="re0">$percent</span><span class="br0">&#41;</span> + <a href="http://www.php.net/round"><span class="kw3">round</span></a><span class="br0">&#40;</span><span class="re0">$mask</span> * <span class="br0">&#40;</span><span class="nu0">1</span>-<span class="re0">$percent</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="co1">// In case rounding up causes us to go to 256</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="re0">$i</span><span class="br0">&#93;</span> &gt; <span class="nu0">255</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$rgb</span><span class="br0">&#91;</span><span class="re0">$i</span><span class="br0">&#93;</span> = <span class="nu0">255</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">RGB2Hex</span><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="co1">//--------------------------------------------------</span><br />
+&nbsp; <span class="kw2">function</span> hex2RGB<span class="br0">&#40;</span><span class="re0">$hex</span><span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp;<span class="co1">// ...</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// Regexp for a valid hex digit</span><br />
+&nbsp; &nbsp; <span class="re0">$d</span> = <span class="st0">'[a-fA-F0-9]'</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="co1">// Make sure $hex is valid</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/preg_match"><span class="kw3">preg_match</span></a><span class="br0">&#40;</span><span class="st0">&quot;/^($d$d)($d$d)($d$d)<span class="es0">\$</span>/&quot;</span>, <span class="re0">$hex</span>, <span class="re0">$rgb</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp;<a href="http://www.php.net/hexdec"><span class="kw3">hexdec</span></a><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp;<a href="http://www.php.net/hexdec"><span class="kw3">hexdec</span></a><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp;<a href="http://www.php.net/hexdec"><span class="kw3">hexdec</span></a><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp;<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/preg_match"><span class="kw3">preg_match</span></a><span class="br0">&#40;</span><span class="st0">&quot;/^($d)($d)($d)$/&quot;</span>, <span class="re0">$hex</span>, <span class="re0">$rgb</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp;<a href="http://www.php.net/hexdec"><span class="kw3">hexdec</span></a><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span> . <span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp;<a href="http://www.php.net/hexdec"><span class="kw3">hexdec</span></a><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span> . <span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp;<a href="http://www.php.net/hexdec"><span class="kw3">hexdec</span></a><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span> . <span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp;<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">raiseError</span><span class="br0">&#40;</span><span class="st0">&quot;cannot convert hex '$hex' to RGB&quot;</span>, <span class="kw2">__FUNCTION__</span>, <span class="kw2">__LINE__</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="co1">//--------------------------------------------------</span><br />
+&nbsp; <span class="kw2">function</span> RGB2Hex<span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// ...</span><br />
+<br />
+&nbsp; &nbsp; <span class="re0">$hex</span> = <span class="st0">&quot;&quot;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">for</span><span class="br0">&#40;</span><span class="re0">$i</span>=<span class="nu0">0</span>; <span class="re0">$i</span> &lt; <span class="nu0">3</span>; <span class="re0">$i</span>++<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="co1">// Convert the decimal digit to hex</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$hexDigit</span> = <a href="http://www.php.net/dechex"><span class="kw3">dechex</span></a><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="re0">$i</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="co1">// Add a leading zero if necessary</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><a href="http://www.php.net/strlen"><span class="kw3">strlen</span></a><span class="br0">&#40;</span><span class="re0">$hexDigit</span><span class="br0">&#41;</span> == <span class="nu0">1</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$hexDigit</span> = <span class="st0">&quot;0&quot;</span> . <span class="re0">$hexDigit</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="co1">// Append to the hex string</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$hex</span> .= <span class="re0">$hexDigit</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// Return the complete hex string</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$hex</span>;<br />
+&nbsp; <span class="br0">&#125;</span></div>
+<p>Okay, here is the magic! We simply calculate an array of rgb values out of the supplied hex color string, alternate its contents via some cool math formula ($rgb[$i] = round($rgb[$i] * $percent) + round($mask * (1-$percent));) and convert it back to hex and return it! This is actually quite simple.</p>
+<p>Let us implement more shades. In the CssColor::setPalette() change</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+1'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">85</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+2'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">75</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+3'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">5</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+4'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">25</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+5'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-1'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">85</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-2'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">75</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-3'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">5</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-4'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">25</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-5'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">1</span><span class="br0">&#41;</span>;</div>
+<p>to</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+1'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">95</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+2'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">9</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+3'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">85</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+4'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">8</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+5'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">75</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+6'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">7</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+7'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">65</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+8'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">6</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+9'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">55</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+10'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">5</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+11'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">45</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+12'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">4</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+13'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">35</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+14'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">3</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+15'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">25</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+16'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">2</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+17'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">15</span><span class="br0">&#41;</span>; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+18'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+19'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">05</span><span class="br0">&#41;</span>; &nbsp; <br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-1'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">95</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-2'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">9</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-3'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">85</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-4'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">8</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-5'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">75</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-6'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">7</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-7'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">65</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-8'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">6</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-9'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">55</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-10'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">5</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-11'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">45</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-12'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">40</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-13'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">35</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-14'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">3</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-15'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">25</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-16'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">2</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-17'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">15</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-18'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-19'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">05</span><span class="br0">&#41;</span>;</div>
+<p>This gives us a whole range of new shades! Here are some stylesheets I could come up with using them:</p>
+<p><img src="http://thinkingphp.org/img/generate_css_using_php/5.jpg" title="Fifth Layout" alt="Picture of fifth generated layout" /></p>
+<p><img src="http://thinkingphp.org/img/generate_css_using_php/6.jpg" title="Sixth Layout" alt="Picture of forth generated layout" /></p>
+<p><img src="http://thinkingphp.org/img/generate_css_using_php/7.jpg" title="Seventh Layout" alt="Picture of seventh generated layout" /></p>
+<p>Much credit goes to Patrick Fitzgerald for this very nice script!</p>
+<p>Thanks for reading! Have a good one, all!<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-d2b4-436b-9a39-437fcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-generate-monochromatic-css-stylesheets-within-seconds-using-php%3A480f4dfe-d2b4-436b-9a39-437fcbdd56cb &amp;title=How+To+Generate+Monochromatic+CSS+Stylesheets+Within+Seconds+Using+PHP';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-generate-monochromatic-css-stylesheets-within-seconds-using-php%3A480f4dfe-d2b4-436b-9a39-437fcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-generate-monochromatic-css-stylesheets-within-seconds-using-php%3A480f4dfe-d2b4-436b-9a39-437fcbdd56cb&amp;title=How+To+Generate+Monochromatic+CSS+Stylesheets+Within+Seconds+Using+PHP&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-generate-monochromatic-css-stylesheets-within-seconds-using-php%3A480f4dfe-d2b4-436b-9a39-437fcbdd56cb&amp;title=How+To+Generate+Monochromatic+CSS+Stylesheets+Within+Seconds+Using+PHP';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/how-to-generate-monochromatic-css-stylesheets-within-seconds-using-php:480f4dfe-d2b4-436b-9a39-437fcbdd56cb">15 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/how-to-generate-monochromatic-css-stylesheets-within-seconds-using-php:480f4dfe-d2b4-436b-9a39-437fcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/parsing-xml-with-the-dom-library:480f4dfe-03e4-47f1-bf8c-47dacbdd56cb">Parsing XML With The DOM Library</a></h2>	<div class="posted-on">
+		<p>Posted on 5/6/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><strong>The PHP 4 DOMXML extension has undergone some serious transformation since PHP5 and is a lot easier to use. Unlike SimpleXML, DOM can, at times, be cumbersome and unwiedly. However, it is often a better choice than SimpleXML. Please join me and find out why.</strong></p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>Since SimpleXML and DOM objects are interoperable you can use the former for simplicity and the latter for power. How you can exchange data between the two extensions is explained at the bottom of the article.<br />
+ The DOM extension is especially useful when you want to modify XML documents , as SimpleXML for example does not allow to remove nodes from an XML document. For this article's code examples we will use the same foundation that we used in the <a href="http://php-coding-practices.com/language-specific/parsing-xml-using-simplexml/" title="Parsing XML with SimpleXML">Parsing XML with SimpleXML</a> post.<br />
+We will use this very site's google sitemap file, which can be downloaded <a href="http://php-coding-practices.com/sitemap.xml">here</a>. The sitemap.xml file features an xml list of pages of php-coding-practices.com for easy indexing in google.</p>
+<h1>Loading and Saving XMLDocuments</h1>
+<p>The DOM extension, just like SimpleXML, provides two ways to load xml documents - either by string or by filename:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$source</span> = <span class="st0">'sitemap.xml'</span>;<br />
+<br />
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">load</span><span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// load as string</span><br />
+<span class="re0">$dom2</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom2</span>-&gt;<span class="me1">loadXML</span><span class="br0">&#40;</span><a href="http://www.php.net/file_get_contents"><span class="kw3">file_get_contents</span></a><span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>In addition to that, the DomDocument object provides two functions to load html files. The advantage is that html files do not have to be well-formed to load. Here is an example:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$doc</span> = <span class="kw2">new</span> DOMDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$doc</span>-&gt;<span class="me1">loadHTML</span><span class="br0">&#40;</span><span class="st0">&quot;&lt;html&gt;&lt;body&gt;Test<br />
+&lt;/body&gt;&lt;/html&gt;&quot;</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$doc</span>-&gt;<span class="me1">saveHTML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>The cool news is that mal-formed HTML will automatically be transferred into well-formed one. Look at this script:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$doc</span> = <span class="kw2">new</span> DOMDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$doc</span>-&gt;<span class="me1">loadHTML</span><span class="br0">&#40;</span><span class="st0">&quot;&lt;html&gt;&lt;body&gt;&lt;p&gt;Test<br />
+&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$doc</span>-&gt;<span class="me1">saveHTML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>The <a href="http://www.php.net/manual/en/function.dom-domdocument-loadhtml.php">DomDocument::loadHTML()</a> method will automatically add a DTD (Document Type Definition) and add the missing end-tag for the opened p-tag. Cool, isn't it?</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_html" style="white-space: wrap;white-space: nowrap;"><span class="sc2"><span class="kw2">&lt;</span></a> !DOCTYPE html PUBLIC <span class="st0">&quot;-//W3C//DTD HTML 4.0 Transitional//EN&quot;</span> <span class="st0">&quot;http://www.w3.org/TR/REC-html40/loose.dtd&quot;</span><span class="kw2">&gt;</span></a></span><br />
+<span class="sc2"><a href="http://december.com/html/4/element/html.html"><span class="kw2">&lt;html&gt;</span></a></span><span class="sc2"><a href="http://december.com/html/4/element/body.html"><span class="kw2">&lt;body&gt;</span></a></span><span class="sc2"><a href="http://december.com/html/4/element/p.html"><span class="kw2">&lt;p&gt;</span></a></span>Test<br />
+<span class="sc2"><span class="kw2">&lt;/p&gt;</span></span><span class="sc2"><span class="kw2">&lt;/body&gt;</span></span><span class="sc2"><span class="kw2">&lt;/html&gt;</span></span></div>
+<p>Saving XML data with the DOM library is as easy. Just use <a href="http://www.php.net/manual/en/function.dom-domdocument-savehtml.php">DomDocument::saveHTML()</a> and <a href="http://www.php.net/manual/en/function.dom-domdocument-savexml.php">DomDocument::saveXML()</a> with no parameters. They will automatically create XML or HTML documents from your xml contents and return them. <a href="http://www.php.net/manual/en/function.dom-domdocument-savehtmlfile.php">DomDocument::saveHTMLFile()</a> and <a href="http://www.php.net/manual/en/function.dom-domdocument-save.php">DomDocument::save()</a> save to html and xml files. They request a filepath paramter as a string.</p>
+<h1>XPath Queries</h1>
+<p>One of the most powerful features of the DOM extension is the way in which it integrates with XPath queries. In fact, DomXpath is much more powerful than its SimpleXML equivalent:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$source</span> = <span class="st0">'sitemap.xml'</span>;<br />
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">load</span><span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$xpath</span> = <span class="kw2">new</span> DomXPath<span class="br0">&#40;</span><span class="re0">$dom</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$xpath</span>-&gt;<span class="me1">registerNamespace</span><span class="br0">&#40;</span><span class="st0">'c'</span>, <span class="st0">'http://www.google.com/schemas/sitemap/0.84'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$result</span> = <span class="re0">$xpath</span>-&gt;<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">&quot;//c:loc/text()&quot;</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$result</span>-&gt;<span class="me1">length</span>.<span class="st0">'<br />
+'</span>;<br />
+<span class="co1">//echo $result-&gt;item(3)-&gt;data;</span><br />
+<span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$result</span> <span class="kw1">as</span> <span class="re0">$b</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$b</span>-&gt;<span class="me1">data</span>.<span class="st0">'<br />
+'</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Notice that the sitemap xml file contains a namespace already, which we register using DomXPath::registerNamespace():</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></div>
+<p>We really have to register that namespace with the DomXPath object or else it will not know where to search. ;) You can also register multiple namespaces, but more on that later. Notice that we use text() within the xpath query to get the actual text contents of the nodes.<br />
+If you want to learn the ins and outs of the xpath language, I recommend reading the <a href="http://www.w3.org/TR/xpath" title="XPath Reference">W3C XPath Reference</a>.</p>
+<h1>Modifying XML Documents</h1>
+<h2>Adding New Nodes</h2>
+<p>To add new data to a loaded dom documented, we need to create new DomElement objects by using the <a href="http://www.php.net/manual/en/function.dom-domdocument-createelement.php">DomDocument::createElement(), </a><a href="http://www.php.net/manual/en/function.dom-domdocument-createelementns.php">DomDocument::createElementNS()</a> and <a href="http://www.php.net/manual/en/function.dom-domdocument-createtextnode.php">DomDocument::createTextNode()</a> methods.<br />
+In the following we will add a new url to our urlset:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$source</span> = <span class="st0">'sitemap.xml'</span>;<br />
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">load</span><span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// url element</span><br />
+<span class="re0">$url</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">'url'</span><span class="br0">&#41;</span>;<br />
+<br />
+<br />
+<span class="co1">// location</span><br />
+<span class="re0">$loc</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">'loc'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$text</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createTextNode</span><span class="br0">&#40;</span><span class="st0">'http://php-coding-practices.com/article/'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$loc</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$text</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// last modification</span><br />
+<span class="re0">$lastmod</span>= <span class="re0">$dom</span>-&gt;<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">'lastmod'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$text</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createTextNode</span><span class="br0">&#40;</span><span class="st0">'2007-04-20T10:24:32+00:00'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$lastmod</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$text</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// change frequency</span><br />
+<span class="re0">$changefreq</span>= <span class="re0">$dom</span>-&gt;<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">'changefreq'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$text</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createTextNode</span><span class="br0">&#40;</span><span class="st0">'weekly'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$changefreq</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$text</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// priority</span><br />
+<span class="re0">$priority</span>= <span class="re0">$dom</span>-&gt;<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">'priority'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$text</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createTextNode</span><span class="br0">&#40;</span><span class="st0">'0.3'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$priority</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$text</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+<span class="co1">// add the elements to the url&nbsp; &nbsp; </span><br />
+<span class="re0">$url</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$loc</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$lastmod</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$changefreq</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$url</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$priority</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// add the new url to the root element (urlset)</span><br />
+<span class="re0">$dom</span>-&gt;<span class="me1">documentElement</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$url</span><span class="br0">&#41;</span>;<br />
+<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$dom</span>-&gt;<span class="me1">saveHtml</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>The code is pretty self-explanatory. First we create a new url element as well as some sub-elements. Then we append those sub-elements to the url element, which we in turn append to the document's root element. Note that the root element can be accessed via the $dom->documentElement property. The output:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">....</span><br />
+<span class="sc0">&nbsp; &lt;loc&gt;</span>http://php-coding-practices.com/2007/04/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-04-30T16:54:58+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>yearly<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>0.5<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <br />
+&nbsp; <span class="sc3"><span class="re1">&lt;url<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;loc<span class="re2">&gt;</span></span></span>http://php-coding-practices.com/2007/03/<span class="sc3"><span class="re1">&lt;/loc<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;lastmod<span class="re2">&gt;</span></span></span>2007-03-29T20:04:51+00:00<span class="sc3"><span class="re1">&lt;/lastmod<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;changefreq<span class="re2">&gt;</span></span></span>yearly<span class="sc3"><span class="re1">&lt;/changefreq<span class="re2">&gt;</span></span></span><br />
+&nbsp; &nbsp; <span class="sc3"><span class="re1">&lt;priority<span class="re2">&gt;</span></span></span>0.5<span class="sc3"><span class="re1">&lt;/priority<span class="re2">&gt;</span></span></span><br />
+<br />
+&nbsp; <span class="sc3"><span class="re1">&lt;/url<span class="re2">&gt;</span></span></span></div>
+<p>Now it was certainly not as easy as it would have been had we used SimpleXML. The DOM extension provides many more methods for more power. For example you can associate a namespace with an element<br />
+while creation using <a href="http://www.php.net/manual/en/function.dom-domdocument-createelementns.php">DomDocument::createElementNS()</a>. I will provide some example code on that later in the article.</p>
+<h2>Adding Attributes To Nodes</h2>
+<p>Via <a href="http://www.php.net/manual/en/function.dom-domdocument-setattribute.php">DomDocument::setAttribute()</a> we can easily add an attribute to a node object. Example:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$url</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">'url'</span><span class="br0">&#41;</span>;<br />
+...<br />
+<span class="re0">$url</span>-&gt;<span class="me1">setAttribute</span><span class="br0">&#40;</span><span class="st0">'meta:level'</span>,<span class="st0">'3'</span><span class="br0">&#41;</span>;</div>
+<p>Here we set a fictive meta:level attribute with the value 3 to our url NodeElement from above.</p>
+<h2>Moving Data</h2>
+<p>Moving data is not as obvious as you might expect, as the DOM extension does not provide a real method that takes care of that, explicitly. Instead we will have to use<br />
+a combination of <a href="http://www.php.net/manual/en/function.dom-domdocument-appendchild.php>DomDocument::appendChild()</a> and <a href="http://www.php.net/manual/en/function.dom-domdocument-createelement.php">DomDocument::insertBefore()</a>. As an example, suppose we want to move our new url from above just before the very first url:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$xpath</span> = <span class="kw2">new</span> DomXPath<span class="br0">&#40;</span><span class="re0">$dom</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$xpath</span>-&gt;<span class="me1">registerNamespace</span><span class="br0">&#40;</span><span class="st0">&quot;c&quot;</span>,<span class="st0">&quot;http://www.google.com/schemas/sitemap/0.84&quot;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$result</span> = <span class="re0">$xpath</span>-&gt;<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">&quot;//c:url&quot;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">1</span><span class="br0">&#41;</span>-&gt;<span class="me1">parentNode</span>-&gt;<span class="me1">insertBefore</span><span class="br0">&#40;</span><span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">1</span><span class="br0">&#41;</span>,<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$dom</span>-&gt;<span class="me1">saveXML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p><a href="http://www.php.net/manual/en/function.dom-domdocument-insertbefore.php">DomDocument::insertBefore()</a> takes two parameters, the new node and the reference node. It inserts the new node before the reference node. In our example, we insert the second url ($result->item(1)) before the first one ($result->item(0)).<br />
+I hear you asking why we use <a href="http://www.php.net/manual/en/function.dom-domdocument-insertbefore.php">DomDocument::insertBefore()</a> on the $result->item(1)->parentNode node.. Couldn't we just as easily use simply $result->item(0)? No of course not, as we need to execute <a href="http://www.php.net/manual/en/function.dom-domdocument-insertbefore.php">DomDocument::insertBefore()</a> on the root element, urlset, and not a specific url (look at our xpath query).<br />
+We could use the following code which is perfectly valid and gets us the same results, though:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span>-&gt;<span class="me1">parentNode</span>-&gt;<span class="me1">insertBefore</span><span class="br0">&#40;</span><span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">1</span><span class="br0">&#41;</span>,<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>If we wanted to append the first url at the bottom of the sitemap, the following code is the way to go:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span>-&gt;<span class="me1">parentNode</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// or $dom-&gt;documentElement-&gt;appendChild($result-&gt;item(0)); respectively</span></div>
+<p>Easy is it not? :) <a href="http://www.php.net/manual/en/function.dom-domdocument-insertbefore.php">DomDocument::insertBefore()</a> and <a href="http://www.php.net/manual/en/function.dom-domnode-appendchild.php">DomNode::appendChild()</a> automatically move (and not copy and then move) the corresponding nodes. If you wish to clone a node first before moving it, use DomNode::cloneNode() first:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$source</span> = <span class="st0">'sitemap.xml'</span>;<br />
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">load</span><span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$xpath</span> = <span class="kw2">new</span> DomXPath<span class="br0">&#40;</span><span class="re0">$dom</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$xpath</span>-&gt;<span class="me1">registerNamespace</span><span class="br0">&#40;</span><span class="st0">&quot;c&quot;</span>,<span class="st0">&quot;http://www.google.com/schemas/sitemap/0.84&quot;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$result</span> = <span class="re0">$xpath</span>-&gt;<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">&quot;//c:url&quot;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$clone</span> = <span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span>-&gt;<span class="me1">cloneNode</span><span class="br0">&#40;</span><span class="kw2">true</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">4</span><span class="br0">&#41;</span>-&gt;<span class="me1">parentNode</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$clone</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$dom</span>-&gt;<span class="me1">saveXML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>The important thing here is that you have to supply omNode::cloneNode() with a true parameter (default is false), so that it copies all descendant nodes as well. If we had left that to false, we would have gotten an empty &lt;url&gt;&lt;/url&gt; node, which is not desirable. ;)</p>
+<h2>Modifying Node Data</h2>
+<p>When modifying node data, you want to modify the CDATA within a node. You can use xpath again to find the node you want to edit and then simply supply a new value to its data property:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$source</span> = <span class="st0">'sitemap.xml'</span>;<br />
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">load</span><span class="br0">&#40;</span><span class="re0">$source</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$xpath</span> = <span class="kw2">new</span> DomXPath<span class="br0">&#40;</span><span class="re0">$dom</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$xpath</span>-&gt;<span class="me1">registerNamespace</span><span class="br0">&#40;</span><span class="st0">&quot;c&quot;</span>,<span class="st0">&quot;http://www.google.com/schemas/sitemap/0.84&quot;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$result</span> = <span class="re0">$xpath</span>-&gt;<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">&quot;//c:loc/text()&quot;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$node</span> = <span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span>-&gt;<span class="me1">data</span> = <a href="http://www.php.net/strtoupper"><span class="kw3">strtoupper</span></a><span class="br0">&#40;</span><span class="re0">$node</span>-&gt;<span class="me1">data</span><span class="br0">&#41;</span>;<br />
+<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$dom</span>-&gt;<span class="me1">saveXML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>This code transforms the location data of the second url to uppercase letters.</p>
+<h2>Removing Data From XML Documents</h2>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>There are three types of data that you would possbily want to remove from xml documents: elements, attributes and CDATA. The DOM extension provides a method for each of them:<br />
+<a href="http://www.php.net/manual/en/function.dom-domelement-removeattribute.php">DomElement::removeAttribute()</a>, <a href="http://www.php.net/manual/en/function.dom-domnode-removechild.php">DomNode::removeChild()</a> and <a href="http://www.php.net/manual/en/function.dom-domcharacterdata-deletedata.php">DomCharacterData::deleteData()</a>. We will use a custom xml document and not our sitemap to demonstrate their behavior. This makes it easier for you<br />
+to come back to this article and see at first glance how these methods work. Thank <a href="http://www.1lifestory.com">Nikos</a> if you want to. ;)</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$xml</span> = &lt;&lt;&lt;XML<br />
+&lt;xml&gt;<br />
+&nbsp; &lt;text type=<span class="st0">&quot;input&quot;</span>&gt;This is some really cool text!&lt;/text&gt;<br />
+&nbsp; &lt;text type=<span class="st0">&quot;input&quot;</span>&gt;This is some other really cool text!&lt;/text&gt;<br />
+&nbsp; &lt;text type=<span class="st0">&quot;misc&quot;</span>&gt;This is some cool text!&lt;/text&gt;<br />
+&nbsp; &lt;text type=<span class="st0">&quot;output&quot;</span>&gt;This is text!&lt;/text&gt;<br />
+<br />
+XML;<br />
+<br />
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">loadXML</span><span class="br0">&#40;</span><span class="re0">$xml</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$xpath</span> = <span class="kw2">new</span> DomXPath<span class="br0">&#40;</span><span class="re0">$dom</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$result</span> = <span class="re0">$xpath</span>-&gt;<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">&quot;//text&quot;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// remove first node</span><br />
+<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span>-&gt;<span class="me1">parentNode</span>-&gt;<span class="me1">removeChild</span><span class="br0">&#40;</span><span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// remove attribute from second node</span><br />
+<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">1</span><span class="br0">&#41;</span>-&gt;<span class="me1">removeAttribute</span><span class="br0">&#40;</span><span class="st0">'type'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">//delete data from third element</span><br />
+<span class="re0">$result</span> = <span class="re0">$xpath</span>-&gt;<span class="me1">query</span><span class="br0">&#40;</span><span class="st0">'text()'</span>,<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">2</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span>-&gt;<span class="me1">deleteData</span><span class="br0">&#40;</span><span class="nu0">0</span>, <span class="re0">$result</span>-&gt;<span class="me1">item</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span>-&gt;<span class="me1">length</span><span class="br0">&#41;</span>;<br />
+<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$dom</span>-&gt;<span class="me1">saveXML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>The output of this is:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot;?&gt;</span><br />
+<span class="sc3"><span class="re1">&lt;xml<span class="re2">&gt;</span></span></span><br />
+&nbsp; <br />
+&nbsp; <span class="sc3"><span class="re1">&lt;text<span class="re2">&gt;</span></span></span>This is some other really cool text!<span class="sc3"><span class="re1">&lt;/text<span class="re2">&gt;</span></span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;text</span> <span class="re0">type</span>=<span class="st0">&quot;misc&quot;</span><span class="re2">&gt;</span></span><span class="sc3"><span class="re1">&lt;/text<span class="re2">&gt;</span></span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;text</span> <span class="re0">type</span>=<span class="st0">&quot;output&quot;</span><span class="re2">&gt;</span></span>This is text!<span class="sc3"><span class="re1">&lt;/text<span class="re2">&gt;</span></span></span></div>
+<p>In this example we start by retrieving all text nodes from a document. Then we remove some data from that document. Simple.<br />
+In fact we remove the first node alltogether as well as the attribute of the second node. Finally we truncate the character data of the third node, using xpath to query the corresponding text() node.<br />
+Note that DomCharacterData::deleteData() requires a starting offset and a length parameter. Since we want to truncate the data in our example we supply 0 and the length of the CDATA node.</p>
+<h1>DOM And Working With Namespaces</h1>
+<p>DOM is very capable of handling namespaces on its own. Most of the time you can ignore them and pass attribute and element names with the appropriate prefix directly to most DOM functions.</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$node</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">'ns1:somenode'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span>-&gt;<span class="me1">setAttribute</span><span class="br0">&#40;</span><span class="st0">'ns2:someattribute'</span>,<span class="st0">'somevalue'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$node2</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createElement</span><span class="br0">&#40;</span><span class="st0">'ns3:anothernode'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$node2</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Set xmlns attributes</span><br />
+<br />
+<span class="re0">$node</span>-&gt;<span class="me1">setAttribute</span><span class="br0">&#40;</span><span class="st0">'xmlns:ns1'</span>, <span class="st0">'http://php-coding-practices.com/'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span>-&gt;<span class="me1">setAttribute</span><span class="br0">&#40;</span><span class="st0">'xmlns:ns2'</span>, <span class="st0">'http://php-coding-practices.com/articles/'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span>-&gt;<span class="me1">setAttribute</span><span class="br0">&#40;</span><span class="st0">'xmlns:ns3'</span>, <span class="st0">'http://php-coding-practices.com/sitemap/'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span>-&gt;<span class="me1">setAttribute</span><span class="br0">&#40;</span><span class="st0">'xmlns:ns4'</span>, <span class="st0">'http://php-coding-practices.com/about-the-author/'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$node</span><span class="br0">&#41;</span>;<br />
+<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$dom</span>-&gt;<span class="me1">saveXML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>The output of this script is:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot;?&gt;</span><br />
+<span class="sc3"><span class="re1">&lt;ns1</span> :somenode <br />
+&nbsp; ns2<span class="re0">:someattribute</span>=<span class="st0">&quot;somevalue&quot;</span> <br />
+&nbsp; xmlns:ns1=<span class="st0">&quot;http://php-coding-practices.com/&quot;</span> <br />
+&nbsp; xmlns:ns2=<span class="st0">&quot;http://php-coding-practices.com/articles/&quot;</span> <br />
+&nbsp; xmlns:ns3=<span class="st0">&quot;http://php-coding-practices.com/sitemap/&quot;</span> <br />
+&nbsp; xmlns:ns4=<span class="st0">&quot;http://php-coding-practices.com/about-the-author/&quot;</span><span class="re2">&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;ns3</span> :anothernode<span class="re2">/&gt;</span></span></div>
+<p>We can simplify the use of namespaces somewhat by using <a href="http://www.php.net/manual/en/function.dom-domdocument-createelementns.php">DomDocument::createElementNS()</a> and <a href="http://www.php.net/manual/en/function.dom-domdocument-setattributens.php">DomDocument::setAttributeNS()</a>, which were specifically designed for this purpose:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$node</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createElementNS</span><span class="br0">&#40;</span><span class="st0">'http://php-coding-practices.com/'</span>, <span class="st0">'ns1:somenode'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span>-&gt;<span class="me1">setAttributeNS</span><span class="br0">&#40;</span><span class="st0">'http://somewebsite.com/ns2'</span>, <span class="st0">'ns2:someattribute'</span>, <span class="st0">'somevalue'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$node2</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createElementNS</span><span class="br0">&#40;</span><span class="st0">'http://php-coding-practices.com/articles/'</span>, <span class="st0">'ns3:anothernode'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node3</span> = <span class="re0">$dom</span>-&gt;<span class="me1">createElementNS</span><span class="br0">&#40;</span><span class="st0">'http://php-coding-practices.com/sitemap/'</span>, <span class="st0">'ns1:someothernode'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$node</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$node2</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$node3</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$node</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$dom</span>-&gt;<span class="me1">saveXML</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;</div>
+<p>This results in the following output:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_xml" style="white-space: wrap;white-space: nowrap;">
+<span class="sc0">&lt; ?xml version=&quot;1.0&quot;?&gt;</span><br />
+<span class="sc3"><span class="re1">&lt;ns1</span> :somenode <br />
+&nbsp; xmlns:ns1=<span class="st0">&quot;http://php-coding-practices.com/&quot;</span> <br />
+&nbsp; xmlns:ns2=<span class="st0">&quot;http://somewebsite.com/ns2&quot;</span> <br />
+&nbsp; xmlns:ns3=<span class="st0">&quot;http://php-coding-practices.com/articles/&quot;</span> <br />
+&nbsp; xmlns:ns11=<span class="st0">&quot;http://php-coding-practices.com/sitemap/&quot;</span> <br />
+&nbsp; ns2<span class="re0">:someattribute</span>=<span class="st0">&quot;somevalue&quot;</span><span class="re2">&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;ns3</span> :anothernode xmlns:ns3=<span class="st0">&quot;http://php-coding-practices.com/articles/&quot;</span><span class="re2">/&gt;</span></span><br />
+&nbsp; <span class="sc3"><span class="re1">&lt;ns11</span> :someothernode xmlns:ns1=<span class="st0">&quot;http://php-coding-practices.com/sitemap/&quot;</span><span class="re2">/&gt;</span></span></div>
+<h1>Interfacing With SimpleXML</h1>
+<p>As I have mentioned at the start of our little DOM journey it is very easy to exchange loaded documents between SimpleXML and DOM. Therefore, you can take advantage of both<br />
+systems' strengths - SimpleXML's simplicity and DOM's power.</p>
+<p>You can import SimpleXML object into DOM by using PHP's dom_import_simplexml() function:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$sxml</span> = simplexml_load_file<span class="br0">&#40;</span><span class="st0">'sitemap.xml'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$node</span> = dom_import_simplexml<span class="br0">&#40;</span><span class="re0">$sxml</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">importNode</span><span class="br0">&#40;</span><span class="re0">$node</span>,<span class="kw2">true</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">appendChild</span><span class="br0">&#40;</span><span class="re0">$node</span><span class="br0">&#41;</span>;</div>
+<p><a href="http://www.php.net/manual/en/function.dom-domdocument-importnode.php">DomDocument::importNode()</a> creates a copy of the node and associates it with the current document. Its second parameter - a boolean value - determines if the method will recursively import the subtree or not.</p>
+<p>You can also import a dom object into SimpleXML using simple_xml_import_dom():</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$dom</span> = <span class="kw2">new</span> DomDocument<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$dom</span>-&gt;<span class="me1">load</span><span class="br0">&#40;</span><span class="st0">'sitemap.xml'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$sxe</span> = simplexml_import_dom<span class="br0">&#40;</span><span class="re0">$dom</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$sxe</span>-&gt;<span class="me1">url</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span>-&gt;<span class="me1">loc</span>;</div>
+<h1>Conclusion</h1>
+<p> DOM is certainly a very powerful way of dealing with XML documents. While it provides a good interface for basically every task one could dream of it often takes quite a lot of code lines to accomplish a task. SimpleXML's interface is of course a little easier, but less powerful.</p>
+<p> Especially the fact that SimpleXML is rather incapable of removing data makes DOM the way to go for more complicated XML document processing. DOM's power in dealing with namespaces make it a valuable tool when dealing with large portions of data where naming conflicts are likely.</p>
+<p> In fact we covered only a small portion of DOM's power. There are many other associating objects which have several useful methods. For example, we have not covered how to append character data. Check <a href="http://www.php.net/manual/en/ref.dom.php">the DOM function reference</a> for more information.</p>
+<p> Thanks for staying with me on the DOM-boot till the end of our joirney! I hope you enjoyed it - please beware of the gap between the boot and the footbridge when leaving.</urlset><br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-03e4-47f1-bf8c-47dacbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fparsing-xml-with-the-dom-library%3A480f4dfe-03e4-47f1-bf8c-47dacbdd56cb &amp;title=Parsing+XML+With+The+DOM+Library';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fparsing-xml-with-the-dom-library%3A480f4dfe-03e4-47f1-bf8c-47dacbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fparsing-xml-with-the-dom-library%3A480f4dfe-03e4-47f1-bf8c-47dacbdd56cb&amp;title=Parsing+XML+With+The+DOM+Library&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fparsing-xml-with-the-dom-library%3A480f4dfe-03e4-47f1-bf8c-47dacbdd56cb&amp;title=Parsing+XML+With+The+DOM+Library';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/parsing-xml-with-the-dom-library:480f4dfe-03e4-47f1-bf8c-47dacbdd56cb">24 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/parsing-xml-with-the-dom-library:480f4dfe-03e4-47f1-bf8c-47dacbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/how-i-turned-a-slow-array-sort-into-a-quick-one-using-the-quicksort-algorithmn:480f4dfe-6ef4-4474-ba77-4f89cbdd56cb">How I Turned A Slow Array Sort Into A Quick One Using The Quicksort Algorithmn</a></h2>	<div class="posted-on">
+		<p>Posted on 31/5/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p><strong>Today in the morning I had a very unusual programming job to do - or at least what is for me rather unusual. I was confronted with the question whether it is easy to implement the quicksort algorithmn to sort an array of arrays based on a key in the second-dimension of the array. Join me to find out.</strong></p>
+<p>As you probably know from my <a href="/about/" title="About Tim Koschuetzki">About me</a> page, I am currently working for <a href="http://linklift.de" title="LinkLift">LinkLift</a> as a web programmer. The company is the largest German Textlink-Marketplace and soon we will expand to other countries within Europe. When you click on one of the link categories on our homepage, you are presented with (unfortunately German) website from which you can buy textlinks. </p>
+<p>(Note: We are using the term “adspace” here for purchasable textlinks on a publisher's website.)</p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>Using the links in the table header, you can sort the adspaces by title, available adspaces, page rank and current value. </p>
+<p>Here is an array of adspaces, which we are willing to sort. The data is of course changed to preserve publisher anonymity.</p>
+<p>[code]<br />
+Array<br />
+(<br />
+    [0] => Array<br />
+        (<br />
+            [idv11] => 624059d1f8N0<br />
+            [url] => http://example0.com,<br />
+            [title] => Some title0,<br />
+            [current_pagerank] => 7,<br />
+            [adspots] => 2,<br />
+            [current_available] => 1,<br />
+            [links] => 33,<br />
+            [links_external] => 5,<br />
+    )<br />
+    [1] => Array<br />
+        (<br />
+            [idv11] => 67059d1f8N0<br />
+            [url] => http://example1.com,<br />
+            [title] => Some title1,<br />
+            [current_pagerank] => 4,<br />
+            [adspots] => 4,<br />
+            [current_available] => 3,<br />
+            [links] => 132,<br />
+            [links_external] => 9,<br />
+    )<br />
+    [2] => Array<br />
+        (<br />
+            [idv11] => 6759d1f8N0<br />
+            [url] => http://example2.com,<br />
+            [title] => Some title2,<br />
+            [current_pagerank] => 2,<br />
+            [adspots] => 8,<br />
+            [current_available] => 6,<br />
+            [links] => 12,<br />
+            [links_external] => 3,<br />
+    )<br />
+)<br />
+[/code]</p>
+<p>The idv11 is the primary key. We decided to generate a random number for each new adspace so that our customers cannot guess how many adspaces we have in the marketplace by simply looking at their id. ;) The rest of the information should be straightforward - adspots is the number of textlinks the publisher offers on his site, current_available is the number of textlinks that can be purchased still, links is the number of links on the page where our textlinks will appear and links external is the number of those links that go to an external site.</p>
+<p>The old sort algorithmn was rather slow and thus it was my task to optimize it. I tend to be used for optimisation tasks quite often these days.. Okay, so let's look at the old sort algorithmn:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> sortAdspacesAndUnify<span class="br0">&#40;</span><span class="re0">$adspaceArray</span>, <span class="re0">$sortBy</span><span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#123;</span>&nbsp;<br />
+&nbsp; &nbsp; <span class="re0">$orderBy</span> = <span class="st0">'asc'</span>;<br />
+&nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><span class="re0">$sortBy</span> &lt; <span class="nu0">0</span> &amp;&amp; <span class="re0">$sortBy</span> != <span class="nu0">-1</span><span class="br0">&#41;</span> <span class="re0">$orderBy</span> = <span class="st0">'desc'</span>;<br />
+&nbsp; &nbsp; <span class="re0">$sortUsBy</span> = determineAdspaceSortBy<span class="br0">&#40;</span><span class="re0">$sortBy</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><span class="re0">$sortBy</span> == <span class="nu0">-1</span><span class="br0">&#41;</span> <span class="re0">$sortUsBy</span> = <span class="st0">'revenue'</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$orderedArray</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;&nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$usedIdv11s</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;&nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$numResultArray</span> = <a href="http://www.php.net/count"><span class="kw3">count</span></a><span class="br0">&#40;</span><span class="re0">$adspaceArray</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">while</span> <span class="br0">&#40;</span><span class="re0">$numResultArray</span> &gt; <span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$latestKey</span> = <span class="nu0">0</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$highestValue</span> = <span class="nu0">0</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span><span class="re0">$adspaceArray</span> <span class="kw1">as</span> <span class="re0">$key</span> =&gt; <span class="re0">$adspace</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>&nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><span class="re0">$sortUsBy</span> == <span class="st0">'revenue'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$value</span> = LL_Admin::<span class="me2">calcAdspaceConversion</span><span class="br0">&#40;</span><span class="re0">$adspace</span><span class="br0">&#41;</span>;&nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$value</span> = <span class="re0">$adspace</span><span class="br0">&#91;</span><span class="re0">$sortUsBy</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$value</span> &gt;= <span class="re0">$highestValue</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$highestValue</span> = <span class="re0">$value</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$latestKey</span> = <span class="re0">$key</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>! <a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$adspaceArray</span><span class="br0">&#91;</span><span class="re0">$latestKey</span><span class="br0">&#93;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &amp;&amp; !<a href="http://www.php.net/in_array"><span class="kw3">in_array</span></a><span class="br0">&#40;</span><span class="re0">$adspaceArray</span><span class="br0">&#91;</span><span class="re0">$latestKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'idv11'</span><span class="br0">&#93;</span>,<span class="re0">$usedIdv11s</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$orderedArray</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <span class="re0">$adspaceArray</span><span class="br0">&#91;</span><span class="re0">$latestKey</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$usedIdv11s</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <span class="re0">$adspaceArray</span><span class="br0">&#91;</span><span class="re0">$latestKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'idv11'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/unset"><span class="kw3">unset</span></a><span class="br0">&#40;</span><span class="re0">$adspaceArray</span><span class="br0">&#91;</span><span class="re0">$latestKey</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$numResultArray</span>--;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><span class="re0">$orderBy</span> == <span class="st0">'desc'</span><span class="br0">&#41;</span> <br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$orderedArray</span> = <a href="http://www.php.net/array_reverse"><span class="kw3">array_reverse</span></a><span class="br0">&#40;</span><span class="re0">$orderedArray</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$orderedArray</span>;<br />
+&nbsp; <span class="br0">&#125;</span></div>
+<p>The function might seem a bit overwhelming to you at first, but in fact it's all quite easy. Let's explore the code a bit. </p>
+<p>What the function receives is an array of adspaces. Each adspace itself is an array again to hold its information as presented earlier. The second parameter is an integer determining what to sort by. The function call $sortUsBy = determineAdspaceSortBy($sortBy); maps that integer to one of the following strings: "current_available", "link_value", "title" or "current_pagerank". Unfortunately, I cannot show you all of the code, but the person above me will not allow me to do so. It is not a problem, though, in my opinion. </p>
+<p>If the $sortBy integer is negative we will sort in descending order. If it is -1, we will sort by adspace "revenue" – the default sortation for each category. Sorting by revenue basically means sorting by the product of current_value * (adspots – current_available). As you can see, revenue in this case means the amount of revenue an adspace has generated for the company already.</p>
+<p>Next we declare two arrays - orderedArray, which will be our result array of sorted adspaces, and usedIdv11s, which allows us to track duplicated publishers just in case our input array contained some publishers more than once. </p>
+<p>Now the sortation begins. What my colleagues were doing is simply iterating over the array and for each iteration iterate over all existing publishers again, determine the publisher with the highest value to sort by, track it in the ordered array and remove it from the publisher array.</p>
+<p>What that means is the number of iterations is n + (n-1) + (n-2) + ... + 1 =  (n<sup>2</sup> + n)/2, where n is the number of adspaces of the input array. The average complexity class is therefore n<sup>2</sup> and thus the the performance gets <strong>a lot</strong> worse with increasing numbers of adspaces. By the way, note that the $numResultArray variable gets decreased with every iteration. If we did the outer iteration via </p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">while</span> <span class="br0">&#40;</span><a href="http://www.php.net/count"><span class="kw3">count</span></a><span class="br0">&#40;</span><span class="re0">$adspaceArray</span><span class="br0">&#41;</span> &gt; <span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div>
+<p>..we would have had another real performance bottleneck. Check my article <a href="/peformance-optimization/optimising-for-loops/" title="Optimising For-Loops">Optimising For-Loops</a> for more information on that one. </p>
+<p>Okay, so now we are basically where I had been at 9:00am this morning. What I did at this point is turn to <a href="http://wikipedia.org">Wikipedia</a> and searched for <a href="http://en.wikipedia.org/wiki/Quicksort">Quicksort</a>, one of the fastest sorting algorithmns ever created. I simply remembered quicksort as being a fast sort algorithmn from my past computer science lessons at school. :) Quicksort is rather simple. It determines a random pivot element, then sorts the array so that all elements greater than the pivot are right from it and all which are less than the pivot's value are left to it. After such a sortation the pivot is at the correct place already and we have to sort the two sub-lists via the same approach.</p>
+<p>Quicksort does that recursively and it is extremely fast, check the complexity and time analysis at the end of the wikipedia article there. I thought it will be a lot faster than the old publisher sortation algorithmn and off I went implementing quicksort. :)</p>
+<p>What I turned up with is the following:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="coMULTI">/**<br />
+&nbsp; &nbsp; &nbsp;* Sorts an adspace array based on the quicksort algorithmn<br />
+&nbsp; &nbsp; &nbsp;* <br />
+&nbsp; &nbsp; &nbsp;* @author tim<br />
+&nbsp; &nbsp; &nbsp;* @param array array of adspaces - note that each has to have an 'idv11' key<br />
+&nbsp; &nbsp; &nbsp;* @param string value to sort by - each adspace element has to have such a key<br />
+&nbsp; &nbsp; &nbsp;* @return array sorted array of adspaces<br />
+&nbsp; &nbsp; &nbsp;*/</span><br />
+&nbsp; <span class="kw2">function</span> quicksortAdspaces<span class="br0">&#40;</span><span class="re0">$q</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>, <span class="re0">$sortUsBy</span>, <span class="re0">$level</span> = <span class="nu0">0</span>, <span class="re0">$orderBy</span>=<span class="st0">'desc'</span><span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#123;</span>&nbsp;&nbsp; <br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$greater</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$less</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$pivotList</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/count"><span class="kw3">count</span></a><span class="br0">&#40;</span><span class="re0">$q</span><span class="br0">&#41;</span> &lt; = <span class="nu0">1</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$q</span>;<br />
+&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$pivot</span> = <span class="re0">$q</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$q</span> <span class="kw1">as</span> <span class="re0">$adspace</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$value</span> = <span class="st0">''</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$compareValue</span> = <span class="st0">''</span>; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$sortUsBy</span> == <span class="st0">'revenue'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$value</span> = LL_Admin::<span class="me2">calcAdspaceConversion</span><span class="br0">&#40;</span><span class="re0">$adspace</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$compareValue</span> = LL_Admin::<span class="me2">calcAdspaceConversion</span><span class="br0">&#40;</span><span class="re0">$pivot</span><span class="br0">&#41;</span>;&nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$value</span> = <span class="re0">$adspace</span><span class="br0">&#91;</span><span class="re0">$sortUsBy</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$compareValue</span> = <span class="re0">$pivot</span><span class="br0">&#91;</span><span class="re0">$sortUsBy</span><span class="br0">&#93;</span>;&nbsp; <br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$value</span> &lt; <span class="re0">$compareValue</span><span class="br0">&#41;</span> <span class="re0">$less</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <span class="re0">$adspace</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$value</span> == <span class="re0">$compareValue</span><span class="br0">&#41;</span> <span class="re0">$pivotList</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <span class="re0">$adspace</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$value</span> &gt; <span class="re0">$compareValue</span><span class="br0">&#41;</span> <span class="re0">$greater</span><span class="br0">&#91;</span><span class="br0">&#93;</span> = <span class="re0">$adspace</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$return</span> = <a href="http://www.php.net/array_merge"><span class="kw3">array_merge</span></a><span class="br0">&#40;</span>quicksortAdspaces<span class="br0">&#40;</span><span class="re0">$less</span>,<span class="re0">$sortUsBy</span>, <span class="re0">$level</span><span class="nu0">+1</span><span class="br0">&#41;</span>, <span class="re0">$pivotList</span>, quicksortAdspaces<span class="br0">&#40;</span><span class="re0">$greater</span>,<span class="re0">$sortUsBy</span>, <span class="re0">$level</span><span class="nu0">+1</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$level</span> == <span class="nu0">0</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><span class="re0">$orderBy</span> == <span class="st0">'desc'</span><span class="br0">&#41;</span>&nbsp; <span class="re0">$return</span> = <a href="http://www.php.net/array_reverse"><span class="kw3">array_reverse</span></a><span class="br0">&#40;</span><span class="re0">$return</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$return</span> = cleanUpDoubleAdspaces<span class="br0">&#40;</span><span class="re0">$return</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$return</span>;<br />
+&nbsp; &nbsp; &nbsp;<span class="br0">&#125;</span></div>
+<p>Should not be difficult to understand. We go through all adspaces, determine a pivot by simply using $pivot = $q[0], which takes the first element of the array. Then we determine a value to sort by - either we sort by adspace revenue, which uses our revenue formula or we sort by one of the adspace's keys (current_pagerank, link_value, current_available or title). If the recursion level is zero, we clean up duplicate adspaces and reverse the array if we are to sort in descending order.</p>
+<p>The result? The sortation now is lightning fast with an average complexity class of n * log<sub>2</sub>n, which is a lot better than n<sup>2</sup>.</p>
+<p>Hope you liked my little story from today's morning. Feel free to modify and use this code. :)</p>
+<p><!--adsense#singlepost_banner468horiz--><br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-6ef4-4474-ba77-4f89cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-i-turned-a-slow-array-sort-into-a-quick-one-using-the-quicksort-algorithmn%3A480f4dfe-6ef4-4474-ba77-4f89cbdd56cb &amp;title=How+I+Turned+A+Slow+Array+Sort+Into+A+Quick+One+Using+The+Quicksort+Algorithmn';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-i-turned-a-slow-array-sort-into-a-quick-one-using-the-quicksort-algorithmn%3A480f4dfe-6ef4-4474-ba77-4f89cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-i-turned-a-slow-array-sort-into-a-quick-one-using-the-quicksort-algorithmn%3A480f4dfe-6ef4-4474-ba77-4f89cbdd56cb&amp;title=How+I+Turned+A+Slow+Array+Sort+Into+A+Quick+One+Using+The+Quicksort+Algorithmn&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-i-turned-a-slow-array-sort-into-a-quick-one-using-the-quicksort-algorithmn%3A480f4dfe-6ef4-4474-ba77-4f89cbdd56cb&amp;title=How+I+Turned+A+Slow+Array+Sort+Into+A+Quick+One+Using+The+Quicksort+Algorithmn';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/how-i-turned-a-slow-array-sort-into-a-quick-one-using-the-quicksort-algorithmn:480f4dfe-6ef4-4474-ba77-4f89cbdd56cb">10 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/how-i-turned-a-slow-array-sort-into-a-quick-one-using-the-quicksort-algorithmn:480f4dfe-6ef4-4474-ba77-4f89cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/ten-simple-tricks-that-will-make-you-a-valuable-colleague-part-i:480f4dfe-dfe0-44f3-9af7-46a0cbdd56cb">Ten Simple Tricks That Will Make You A Valuable Colleague, Part I</a></h2>	<div class="posted-on">
+		<p>Posted on 26/5/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Being a productive and happy walker of the earth is what most of us aim at. Ever wanted to find out how you can quicken your programming? How you can earn a lot of money with your sites? How you can be more successful with women? How you can be a valuable colleague? Read the following ten simple tricks and find out how.</p>
+<p>This is a two-part series. I will cover other aspects in the next part.</p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<h2>1. Keep Smiling And Entertain People</h2>
+<p>Smiling is probably the most important thing to be a success. Whenever and wherever you are - keep smiling. People like to go through life and just be happy. When you can get people to laugh and smile you are an easy guy to go with. They will perceive you as a happy person and will like to do business with you. Being a good entertainer can sometimes be as important as being a good coder.</p>
+<h2>2. Get Healthy And Exercise</h2>
+<p>You have to be your own secret weapon and your secret weapon needs a lot of energy and wealth. Be gentle to your body and stay healthy and wealthy. Here is a small list you should keep in mind:</p>
+<ul>
+<li><strong>Stop Smoking.</strong> This goes without explanation.</li>
+<li><strong>Don't eat rubbish.</strong> Refrain from fast food, fat food and candy. Eat a balanced diet with a lot of salad.</li>
+<li><strong>Exercise.</strong> 30 minutes a day is cool. Jogging, bike-riding, swimming or some hard stuff in the gym. Your body will love you for it. So will women.</li>
+<li><strong>Sleep.</strong> Your own secret weapon will need a lot of sleep. Eight hours a day is good. Try to go to bed always at the same time to make it easy for your body to keep track of its inner-clock.</li>
+</ul>
+<h2>3. Set Goals</h2>
+<p>Set a goal before starting <em>anything</em>. How can you tell if your are a success without goals? You need something to measure your success and with goals it will be easy. Either you full-filled your goals or you did not. Whenever you start something new - be it in the morning in the office or before you meet a friend - set a goal that determines what you want to achieve with what you are about to do. Writing down those goals is very valuable, too.</p>
+<p>I for one have a Blog on my personal computer at home where I have things such as <strong>life goals</strong>, <strong>yearly goals</strong>, <strong>weekly goals</strong> and <strong>motivation stuff</strong>. This helps me maintain the bigger picture. When a new week starts I always break up the weekly goals and plan each day. I of course keep some space for additional tasks that come in unexpectedly leaving my weeks  always well-planned. This makes it easy for others to count on me and it also allows me to remember other important things, like friends and going to the gym. What is your way of setting goals?</p>
+<h2>4. Measure Your Performance</h2>
+<p>That goes without saying. When you have goals you can measure if you achieved them. You should actively do so! It will help you find your own weaknesses and strengths and it will help analyse the reasons why you perform like you are performing. For example you will find out to which external distractions you are most vulnerable. Measure your results and quantify them whenever you talk to other people. This will not only sell yourself, but it will also help your teammates or customers to expect the rights thing from you.</p>
+<p>If you told them you are "a great php programmer" they are completely lost. Most often they do not have the technical expertise to review that. However, if you told them you made your last client 15,000 bucks extra within the first month of the relaunch of his new website, people will be impressed. Measure your results and quantify. Then quantify some more.</p>
+<h2>5. Make Information Easily Accessible</h2>
+<p>You have to clean up your workspace and structure all information that you will need. Get away from thinking that people who oversee chaos are genius. It's just a dumb saying. Get clean, organized and have structure and goals with everything you do. You will be a success.</p>
+<p>Are you about to make a new website? Have a list of Design Inspirations in your FireFox bookmarks! Do you want to be a friendly person that cares about his friends? Have a list of all your friends' and general business contacts' birthdays in your palm and be reminded of them. The send off gifts when people celebrate their birthdays. You will wonder how many of your friends or business partners will do that, too. This is an easy opportunity to stand out from the crowd.</p>
+<h2>6. Try To Be The Best-Dressed Person You See Today</h2>
+<p><img class="leftimg" src="http://php-coding-practices.com/files/tim_with_hat.jpg" alt="Tim with Hat" width="200" height="267" /><br />
+People are so cursory when it comes to doing business with people. You have only seven seconds to make a great first impression. You need to be prepared for that! It's not only important for your PHP Programming - it's important for your overall success and personality. People will recognize that you take care when you dress and how you dress. There is not a hard rule as to how you should dress, it of course depends on the occasion. However, clean and shiny (light colors) are always good.</p>
+<p>Watch your dressing - it will make you feel comfortable, self-confident and help you keep smiling.</p>
+<p><img class="rightimg" src="http://php-coding-practices.com/files/business_man.jpg" alt="Business Man" width="200" height="282" /><br />
+As you can guess, the person in the top left image is me. Probably not a very good photo that will sell my services. The person on the lower right photo is much better dressed and smiles, whereas I look almost evil. :)</p>
+<blockquote><p>As they say, dress for the job you want, not the job you have. - Paul Basar, <a href="http://wildfiregames.com">Wildfire Games</a></p></blockquote>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<h2>7. Ask Yourself The Magic Question</h2>
+<p><a href="http://tailored.com.au">Brendon Sinclair</a> had a great productivity idea in his <a href="http://www.sitepoint.com/books/freelance1/">Webdesign Business Kit</a>: He proposed that whenever you make first contact with a client you should ask yourself <strong>Why should the client do business with me?</strong>. The answer would be "To provide the best possible solution to his problem and make him a lot of money".</p>
+<p>I am going a bit further and suggest that you ask yourself this question as often as possible - and not only with clients! For example - when you meet up with a woman ask the question. It will make you think about what the other person wants and expects from you. More so will it make you think why you are where you are and what to expect from the contact. It's something like reviewing your goals. It works like magic, try it out.</p>
+<h2>8. Keep In Contact</h2>
+<p>Now this is a classic one. Probably one of the most important things to keep yourself happy, productive and profitable. Keep in contact with everybody that could be of benefit to you, your business, your programming skills, your privacy life, etc. In my opinion it's the most essential thing to have good friends and contacts. They should be like you  - smiling, setting goals, etc. You will all benefit from each other.</p>
+<p>Having a couple of buds that drink beer all day long won't help your php career very much. Joining a PHP meet-up group will, however! Get out and actively seek the right people. You will be able to drink beer with them, too. ;)</p>
+<p> Then keep in contact - at least once a month. Sending gifts or cards for things like anniversaries is always a good way to keep in contact. Keep in contact, then offer your services to friends and business partners. If they don't need your services at the moment they will at least ask around among their friends. However, only if you kept contact.</p>
+<h2>9. Regularly Work <em>On</em> Yourself</h2>
+<p>Sometimes people work too often <em>in</em> their <em>business</em> instead of <em>on</em> it. I think one should regularly work on one's knowledge and personality, not only to get better and better, but also to have a better way to measure your performance and eliminate the weaknesses. Here is a small list of what I consider important:</p>
+<ul>
+<li><strong>Learn A New Programming Language Every Year.</strong> For some of us, one year is even too long...</li>
+<li><strong>Read A New Programming-related Book Every Three Months.</strong>Our profession is a hard and ever-changing one. Keeping track of the latest technology and developments is crucial to success.</li>
+<li><strong>Regularly Read Relevant Feeds.</strong> There are a ton of cool sites with valuable content and feeds out there. Read them! <a href="http://php-coding-practices.com/files/feedreader.opml">Here</a> is a list of feeds that I read regularly in .OPML format. You can easily import them into your own feed reader.</li>
+<li><strong>Read Non-programming Books.</strong> Spread your general knowledge and get interested in politics and all that kind of stuff. Small-talk is very crucial to selling your services and programming skills. However, with business partners (mostly intelligent people) you will not talk about the weather, but about sports events, politics, etc. Reading newspapers is good for you, too!</li>
+</ul>
+<h2>10. Use A PHP Framework</h2>
+<p>This is the first technical point I will make in this list. The second part will contain more technical tips.</p>
+<p>Whenever possible, use a framework for your php projects. As you can guess, I highly recommend <a href="http://cakephp.org">CakePHP</a>, because it is very easy-to-use and has a steep learning curve. Even if you do not want to use Cake - do not reinvent the wheel with your programs. When you build an application from scratch you will have to worry about security, n-tier-architecture (Model-View-Controller and that stuff), internationalization, etc. all by yourself. Use a framework when possible. Period.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-dfe0-44f3-9af7-46a0cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ften-simple-tricks-that-will-make-you-a-valuable-colleague-part-i%3A480f4dfe-dfe0-44f3-9af7-46a0cbdd56cb &amp;title=Ten+Simple+Tricks+That+Will+Make+You+A+Valuable+Colleague%2C+Part+I';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Ften-simple-tricks-that-will-make-you-a-valuable-colleague-part-i%3A480f4dfe-dfe0-44f3-9af7-46a0cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ften-simple-tricks-that-will-make-you-a-valuable-colleague-part-i%3A480f4dfe-dfe0-44f3-9af7-46a0cbdd56cb&amp;title=Ten+Simple+Tricks+That+Will+Make+You+A+Valuable+Colleague%2C+Part+I&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ften-simple-tricks-that-will-make-you-a-valuable-colleague-part-i%3A480f4dfe-dfe0-44f3-9af7-46a0cbdd56cb&amp;title=Ten+Simple+Tricks+That+Will+Make+You+A+Valuable+Colleague%2C+Part+I';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/ten-simple-tricks-that-will-make-you-a-valuable-colleague-part-i:480f4dfe-dfe0-44f3-9af7-46a0cbdd56cb">9 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/ten-simple-tricks-that-will-make-you-a-valuable-colleague-part-i:480f4dfe-dfe0-44f3-9af7-46a0cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="paging">
+	<a href="/posts/index/page:45" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:42">42</a></span> | <span><a href="/posts/index/page:43">43</a></span> | <span><a href="/posts/index/page:44">44</a></span> | <span><a href="/posts/index/page:45">45</a></span> | <span class="current">46</span> | <span><a href="/posts/index/page:47">47</a></span> | <span><a href="/posts/index/page:48">48</a></span> | <span><a href="/posts/index/page:49">49</a></span> | <span><a href="/posts/index/page:50">50</a></span> <a href="/posts/index/page:47" class="next">Next &raquo;</a></div>	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

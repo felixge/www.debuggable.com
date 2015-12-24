@@ -1,0 +1,438 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Using generateFields() + Fix fields of the type 'date' &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/using-generatefields-fix-fields-of-the-type-date:480f4dd5-1410-4124-86b2-4f0ccbdd56cb">Using generateFields() + Fix fields of the type 'date'</a></h2>	<div class="posted-on">
+		<p>Posted on 12/1/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p>If you didn't use the generateFields() function before you've missed out on some good Cake. But there is a little thing you definitly should know when using it. One thing I've  discovered is that you can easily create interfaces in scaffolding-speed with it (scaffolding actually makes use of this function as well) but with the advantage of having a lot more control over the way the data is displayed, proccessed and saved.</p>
+<p>But here comes the problem: If you use fields of the type <em>date</em> in your database generateFields will generate 3 Selects called <em>date_month</em>, <em>date_day</em> and <em>date_year</em> for them, but once the data get's back in and you want to save it you are responsible for merging it to one 'date' field.</p>
+<p>But don't worry there already is a function that does that for you, but it's only inside the Scaffolding Component which means you have to copy and modify it a little bit to make it work inside of your Controller.</p>
+<p>Let's look at a complete example on how to do that:</p>
+<h3>1. The 'add' function of your controller:</h3>
+<p>Inside of your add() function you have the following code. (If you wonder why there is a @$this->params['data'] inside of the generateFields() call: It's because this gives you the possibilty of providing links to adding items with information already filled in)</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> add<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span> &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="re0">$fieldNames</span> = <span class="re0">$this</span>-&gt;<span class="me1">generateFieldNames</span><span class="br0">&#40;</span>@<span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'fieldNames'</span>, <span class="re0">$fieldNames</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">render</span><span class="br0">&#40;</span><span class="st0">'edit'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<h3>2. The view 'edit.thtml'</h3>
+<p>You'll have a view called edit.thtml which will be used for both, creating new data and editing existing data:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">if</span><span class="br0">&#40;</span><span class="re0">$type</span> == <span class="st0">'Edit'</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$html</span>-&gt;<span class="me1">formTag</span><span class="br0">&#40;</span><span class="st0">'/'</span>. Inflector::<span class="me2">underscore</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">name</span><span class="br0">&#41;</span> .<span class="st0">'/update'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="kw1">else</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$html</span>-&gt;<span class="me1">formTag</span><span class="br0">&#40;</span><span class="st0">'/'</span>. Inflector::<span class="me2">underscore</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">name</span><span class="br0">&#41;</span>.<span class="st0">'/create'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="kw2">?&gt;</span><br />
+<span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$form</span>-&gt;<span class="me1">generateFields</span><span class="br0">&#40;</span> <span class="re0">$fieldNames</span> <span class="br0">&#41;</span>; <span class="kw2">?&gt;</span> <br />
+<span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$form</span>-&gt;<span class="me1">generateSubmitDiv</span><span class="br0">&#40;</span> <span class="st0">'Save'</span> <span class="br0">&#41;</span>; <span class="kw2">?&gt;</span><br />
+&lt;/form&gt;</div>
+<p>The Result will be a scaffolding like 'magical' user interface, that will (depending on your table fields) look like this:<br />
+<img src="http://img59.imageshack.us/img59/6063/generatefieldsadd6vi.jpg" alt="generateFields User Interface" /></p>
+<h3>3. Save the Posted Data</h3>
+<p>The next thing is saving the data if a user clicks on the Save button which will lead him to /create of your controller: The easiest way is by doing it like this.</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> create<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">add</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;_cleanUpFields<span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">Item</span>-&gt;<span class="me1">save</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'message'</span>, <span class="st0">'Your Item has been created. The Id is: '</span> . <span class="re0">$this</span>-&gt;<span class="me1">Item</span>-&gt;<span class="me1">getLastInsertID</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">else</span> <br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">'error'</span>, <span class="st0">'Something went wrong and your item could not be created'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <a href="http://www.php.net/unset"><span class="kw3">unset</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">add</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<h3>4. Merge datefields with _cleanUpFields()</h3>
+<p><b>Important:</b> As it turns out this might not be the most "best practice" solution to working with date fields since this stuff should be better inside of the model. If you care to do things the right way definitly have a look at <a href="http://cakebaker.wordpress.com/2006/01/23/two-useful-functions-for-your-appmodel/">CakerBaker's Blog</a> post that deals with that topic and forget about the this step here ; ).</p>
+<p>The function _cleanUpFields() is not part of your controller by default but only available in the scaffolding class. But since it comes really handy for merging the day/month/year select boxes of date fields into one variable I've modified it to work from within a regular controller. All you have to do is to Add this to the controller you want to use generateFields() with, or another controller that your controller extends:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> _cleanUpFields<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="re0">$modelKey</span> = Inflector::<span class="me2">humanize</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">modelKey</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw1">foreach</span><span class="br0">&#40;</span> <span class="re0">$this</span>-&gt;<span class="br0">&#123;</span><span class="re0">$modelKey</span><span class="br0">&#125;</span>-&gt;_tableInfo <span class="kw1">as</span> <span class="re0">$table</span> <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$table</span> <span class="kw1">as</span> <span class="re0">$field</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><span class="st0">'date'</span> == <span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'type'</span><span class="br0">&#93;</span> &amp;&amp; <a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$modelKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>.<span class="st0">'_year'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$newDate</span> &nbsp;= <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$modelKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>.<span class="st0">'_year'</span><span class="br0">&#93;</span>.<span class="st0">'-'</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$newDate</span> .= <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$modelKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>.<span class="st0">'_month'</span><span class="br0">&#93;</span>.<span class="st0">'-'</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$newDate</span> .= <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$modelKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>.<span class="st0">'_day'</span><span class="br0">&#93;</span>.<span class="st0">' '</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$modelKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span><span class="br0">&#93;</span> = <span class="re0">$newDate</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span> <span class="kw1">if</span><span class="br0">&#40;</span> <span class="st0">'datetime'</span> == <span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'type'</span><span class="br0">&#93;</span> &amp;&amp; <a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$modelKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>.<span class="st0">'_year'</span><span class="br0">&#93;</span> <span class="br0">&#41;</span> <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$hour</span> = <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$modelKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>.<span class="st0">'_hour'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span> <span class="re0">$hour</span> != <span class="nu0">12</span> &amp;&amp; <span class="st0">'pm'</span> == <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$modelKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>.<span class="st0">'_meridian'</span><span class="br0">&#93;</span> <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$hour</span> = <span class="re0">$hour</span> + <span class="nu0">12</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$newDate</span> &nbsp;= <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$modelKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>.<span class="st0">'_year'</span><span class="br0">&#93;</span>.<span class="st0">'-'</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$newDate</span> .= <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$modelKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>.<span class="st0">'_month'</span><span class="br0">&#93;</span>.<span class="st0">'-'</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$newDate</span> .= <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$modelKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>.<span class="st0">'_day'</span><span class="br0">&#93;</span>.<span class="st0">' '</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$newDate</span> .= <span class="re0">$hour</span>.<span class="st0">':'</span>.<span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$modelKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>.<span class="st0">'_min'</span><span class="br0">&#93;</span>.<span class="st0">':00'</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$modelKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span><span class="br0">&#93;</span> = <span class="re0">$newDate</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span> <span class="kw1">if</span><span class="br0">&#40;</span> <span class="st0">'tinyint(1)'</span> == <span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'type'</span><span class="br0">&#93;</span> <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span> <a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span> <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$modelKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span><span class="br0">&#93;</span><span class="br0">&#41;</span> &amp;&amp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">&quot;on&quot;</span> == <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$modelKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span><span class="br0">&#93;</span> <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$modelKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span><span class="br0">&#93;</span> = <span class="kw2">true</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'data'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$modelKey</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$field</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span><span class="br0">&#93;</span> = <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>I just started working with generateFields() so there might be some things to improve here and there, but all in all this is the stuff that will really speed up development and using it can be a ton of fun  ; ).</p>
+<p>A little tip at the end: If you have fields in your database that you want to provide a different interface to then the one generated by generateFields() just do something like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$fieldNames</span> = <span class="re0">$this</span>-&gt;<span class="me1">generateFieldNames</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/unset"><span class="kw3">unset</span></a><span class="br0">&#40;</span><span class="re0">$fieldNames</span><span class="br0">&#91;</span><span class="st0">'tag'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;</div>
+<p>This way you can use your own Html for certain fields in the database!</p>
+<p>--Felix<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-1410-4124-86b2-4f0ccbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fusing-generatefields-fix-fields-of-the-type-date%3A480f4dd5-1410-4124-86b2-4f0ccbdd56cb &amp;title=Using+generateFields%28%29+%2B+Fix+fields+of+the+type+%27date%27';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fusing-generatefields-fix-fields-of-the-type-date%3A480f4dd5-1410-4124-86b2-4f0ccbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fusing-generatefields-fix-fields-of-the-type-date%3A480f4dd5-1410-4124-86b2-4f0ccbdd56cb&amp;title=Using+generateFields%28%29+%2B+Fix+fields+of+the+type+%27date%27&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fusing-generatefields-fix-fields-of-the-type-date%3A480f4dd5-1410-4124-86b2-4f0ccbdd56cb&amp;title=Using+generateFields%28%29+%2B+Fix+fields+of+the+type+%27date%27';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/unlimited-model-fields-expandable-behavior:48428c2e-9a88-47ec-ae8e-77a64834cda3">Unlimited Model fields - Expandable Behavior</a></li>
+							<li><a href="/posts/validating-fields-with-costum-functions:480f4dd5-af28-4979-ab39-493bcbdd56cb">Validating fields with custom validateField() functions</a></li>
+							<li><a href="/posts/making-two-form-fields-required-to-match-each-other:480f4dfd-5c40-4c1d-ad0d-42b6cbdd56cb">Making two form fields required to match each other</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/using-generatefields-fix-fields-of-the-type-date:480f4dd5-1410-4124-86b2-4f0ccbdd56cb">9 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/using-generatefields-fix-fields-of-the-type-date:480f4dd5-1410-4124-86b2-4f0ccbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dd7-62f4-48d0-9dd2-4271cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=067b1e443a7598888c07f5b2c2968e73&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							gwoo&nbsp;						</strong>
+						<strong>said 
+						on Jan 20, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice work Felix. How about putting the _cleanUpFields() in a custom app_controller.php. Then its available to all the controllers in your app. I like the unset trick. Happy Baking.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-0824-4f17-a065-4724cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 20, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey gwoo, I'm glad you liked the unset() idea, it really helped me saving times already. About putting _cleanUpFields() in a costum app_controller.php -> I kind of indicated this by saying:<br />
+"All you have to do is to Add this to the controller you want to use generateFields() with, or another controller that your controller extends"</br></p>
+<p>Anyway -> I think the _cleanUpFields() should belong in the controller.php inside of cake and not the in the scaffolding class since it's something that is needed to work with generateFieldNames(). There should also be a parameter for generateFieldNames() that allows you to set an array of fields you want to generate the field names for.</p>
+<p>But besides that I really think this functionality of Cake is one of the biggest "WoW"-Effect's I had so far since I normally would have needed a lot longer for my interfaces without this!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-b048-464e-a890-450fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8da51a7068ca38cc312b584659582c7c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							runlevel&nbsp;						</strong>
+						<strong>said 
+						on Feb 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi</p>
+<p>Like the little article and am trying it out. I am using RC4 of cake.<br />
+But trying it ran me into some problems. I am a cake newbie so it is prob. something stupid.</br></p>
+<p>these are the notices I get when generating the edit.thtml<br />
+Undefined variable: type</br><br />
+Undefined variable: form</br></p>
+<p>Think I am missing some helpers here? Tried it with and without scaffold.<br />
+Do you have any idea?</br><br />
+Thanks Cheers</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-aee0-4916-acaa-495ccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>You need the Helper Form for this. So just do var $helpers = Array('Html', 'Form'); on top of your controller.<br />
+I think the error about type is because I've not pasted the entire code. Try to put this in your controller function add():</br><br />
+$this->set('type', 'Add');</br></p>
+<p>and this one in your edit() function:<br />
+$this->set('type', 'Edit');</br></p>
+<p>I hope this helps.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-51ac-41a1-958b-49e6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2006/02/09/reusing-views-for-crud/" rel="nofollow">ThinkingPHP &raquo; Reusing Views for CRUD</a>						</strong>
+						<strong>said 
+						on Feb 09, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] As he did once before, tobius inspired me to write some code again. This time he was trying to make scaffolding more individual, so the first thing I pointed out to him was my blog post about using generateFields for using some of the scaffolding powers. Now one problem remained: He wanted to use the same views over and over again so I had an idea about how to reuse views in a simple and efficient manner. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-7e84-4d9e-9ed8-4b4bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://gnuandy.wordpress.com/2006/04/14/reusing-views-for-crud/" rel="nofollow">Mi Blog Cakephp &raquo; Blog Archive &raquo; Reusing Views for C</a>						</strong>
+						<strong>said 
+						on Apr 26, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] As he did once before, tobius inspired me to write some code again. This time he was trying to make scaffolding more individual, so the first thing I pointed out to him was my blog post about using generateFields for using some of the scaffolding powers. Now one problem remained: He wanted to use the same views over and over again so I had an idea about how to reuse views in a simple and efficient manner. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-3354-4f4f-a981-4339cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=185b8bfb7fa75f8f84ea5e1df7e7c813&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://ww.fishbucket.com/" rel="nofollow">chief</a>						</strong>
+						<strong>said 
+						on Apr 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi, just starting to learn CakePHP and I came across this site in search of how to use Date fields. Anyhow, thanks a lot for the code, but I ran into a problem when trying to populate the fields on Edit() view. You have to add this code into your controller Edit() before you can generateFields($this-&gt;params['data'])...</p>
+<p>$this-&gt;params['data'] = $this-&gt;ModelName-&gt;read();</p>
+<p>Then again, I'm a newbie, so maybe I am missing something? Let me know if I am incorrect.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd7-c748-4d36-a08f-4633cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey chief,</p>
+<p>I've published this code in the beginning of the year and a lot of things have changed since then. But I think in this case it's just the fact that I've not pasted the entire code, but rather a general outline on how to do things. So if your code line fixes the problem and fits your needs, go with it ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-00b8-4603-b5f1-4f2ccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Feb 02, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I just closed comments on this post because it seems to be attracting spammers more then any other posts and it's old enough so I don't expect any further discussion on it ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

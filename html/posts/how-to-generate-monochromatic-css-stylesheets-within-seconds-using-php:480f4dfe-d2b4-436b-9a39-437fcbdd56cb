@@ -1,0 +1,803 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>How To Generate Monochromatic CSS Stylesheets Within Seconds Using PHP &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/how-to-generate-monochromatic-css-stylesheets-within-seconds-using-php:480f4dfe-d2b4-436b-9a39-437fcbdd56cb">How To Generate Monochromatic CSS Stylesheets Within Seconds Using PHP</a></h2>	<div class="posted-on">
+		<p>Posted on 7/6/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hi folks! As a follow-up to my previous article <a href="http://php-coding-practices.com/cool-stuff/control-your-css-via-php-good-stuff/">Control your CSS via PHP - Good Stuff</a> I have tried to implement the techniques explained there to build monochromatic stylesheets within seconds. First off, I will explain to the ones, that do not know yet, what a monochromatic color scheme is.</p>
+<h1>What Is A Monochromatic Color Scheme?</h1>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<p>The monochromatic color scheme uses variations in lightness and saturation of a single color. It looks clean and elegant. Monochromatic colors go well together, producing a soothing effect. The monochromatic scheme is very easy on the eyes, especially with blue or green hues.<br />
+You can use it to establish an overall mood, which we will do later with the css generation. The primary color can be integrated with neutral colors such as black, white, or gray. However, it can be difficult, when using this scheme, to highlight the most important elements.</p>
+<p>The monochromatic color scheme is perfect for our task of generating CSS via PHP based on forming shades of a base color. First off, please download the <a href="http://php-coding-practices.com/files/css_generation_with_php.zip">PHP Script</a> for generating CSS. Place it in any folder on your website or your local php installation.</p>
+<h1>Setting Up Our CSS Generation Environment</h1>
+<p>Next off we will borrow some XHTML / CSS code from my buddy <a href="http://pmob.co.uk">Paul O'Brian</a>, one of the greatest CSS Gurus on the net. His site features plenty of css goodness, tutorials and effects I am <strong>sure</strong> you haven't seen before. It is definately worth to check out! We will take the code of his <a href="http://www.pmob.co.uk/temp/3colfixedtest_4.htm">universal three column layout</a> that works in most browsers and allows any column to be the longest. Save that markup to a file named "test.html" in the same folder where you saved the php file. Now, in that same folder, create a file "css.php" where you insert the following CSS code:</p>
+<p><!--adsense#singlepost_banner468horiz--></p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<br />
+<span class="co1">// Tell the browser that this is CSS instead of HTML</span><br />
+<a href="http://www.php.net/header"><span class="kw3">header</span></a><span class="br0">&#40;</span><span class="st0">&quot;Content-type: text/css&quot;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Get the color generating code</span><br />
+<span class="kw1">require_once</span><span class="br0">&#40;</span><span class="st0">&quot;csscolor.php&quot;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Define a couple color palettes</span><br />
+<span class="co1">//$base = new CSS_Color('C9E3A6');</span><br />
+<span class="re0">$base</span> = <span class="kw2">new</span> CSS_Color<span class="br0">&#40;</span><span class="st0">'99E456'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="co1">// Trigger an error just to see what happens</span><br />
+<span class="co1">// $trigger = new CSS_Color('');</span>
+</div>
+<div class="clear"></div>
+<div class="code debuggable_sh_css" style="white-space: wrap;white-space: nowrap;"><span class="coMULTI">/* CSS Document */</span><br />
+* <span class="br0">&#123;</span>margin<span class="re2">:<span class="nu0">0</span></span>;padding<span class="re2">:<span class="nu0">0</span></span><span class="br0">&#125;</span><br />
+p <span class="br0">&#123;</span>margin-bottom<span class="re2">:<span class="re3">1em</span></span><span class="br0">&#125;</span><br />
+ul<span class="br0">&#123;</span>margin-left<span class="re2">:<span class="re3">20px</span></span>;margin-bottom<span class="re2">:<span class="re3">1em</span></span><span class="br0">&#125;</span><br />
+<span class="coMULTI">/* commented backslash hack v2 \*/</span> <br />
+html, body<span class="br0">&#123;</span>height<span class="re2">:<span class="nu0">100</span></span>%;<span class="br0">&#125;</span> <br />
+<span class="coMULTI">/* end hack */</span> <br />
+<br />
+body <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">background</span>:#&lt;?php echo $base-&gt;bg<span class="br0">&#91;</span><span class="st0">'-2'</span><span class="br0">&#93;</span> ?&gt; <span class="kw2">repeat-y</span> <span class="kw1">left</span> <span class="kw1">top</span>;<br />
+&nbsp; <span class="kw1">color</span>: <span class="re0">#FFF</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#outer</span><span class="br0">&#123;</span><br />
+&nbsp; margin-left<span class="re2">:<span class="re3">130px</span></span>;<br />
+&nbsp; margin-right<span class="re2">:<span class="re3">130px</span></span>;<br />
+&nbsp; <span class="kw1">background</span>: #&lt;?php echo $base-&gt;bg<span class="br0">&#91;</span><span class="st0">'0'</span><span class="br0">&#93;</span> ?&gt;;<br />
+&nbsp; border-left<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; border-right<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; margin-bottom<span class="re2">:-<span class="re3">52px</span></span>;<br />
+&nbsp; min-height<span class="re2">:<span class="nu0">100</span></span>%<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#header</span><span class="br0">&#123;</span><br />
+&nbsp; position<span class="re2">:absolute</span>;<br />
+&nbsp; top<span class="re2">:<span class="nu0">0</span></span>;<br />
+&nbsp; left<span class="re2">:<span class="nu0">0</span></span>;<br />
+&nbsp; width<span class="re2">:<span class="nu0">100</span></span>%;<br />
+&nbsp; height<span class="re2">:<span class="re3">70px</span></span>;<br />
+&nbsp; <span class="kw1">background</span>: #&lt;?php echo $base-&gt;bg<span class="br0">&#91;</span><span class="st0">'-3'</span><span class="br0">&#93;</span> ?&gt;;<br />
+&nbsp; border-top<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; border-bottom<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; overflow<span class="re2">:hidden</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#left</span> <span class="br0">&#123;</span><br />
+&nbsp; position<span class="re2">:relative</span>;<span class="coMULTI">/*ie needs this to show float */</span><br />
+&nbsp; width<span class="re2">:<span class="re3">130px</span></span>;<br />
+&nbsp; float<span class="re2">:left</span>;<br />
+&nbsp; margin-left<span class="re2">:-<span class="re3">129px</span></span>;<span class="coMULTI">/*must be 1px less than width otherwise won't push footer down */</span><br />
+&nbsp; z-index<span class="re2">:<span class="nu0">100</span></span>;<br />
+&nbsp; left<span class="re2">:-<span class="re3">1px</span></span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#left</span> p, <br />
+<span class="re0">#right</span> p <span class="br0">&#123;</span>padding<span class="re2">:<span class="re3">3px</span></span><span class="br0">&#125;</span><br />
+<span class="re0">#right</span> <span class="br0">&#123;</span><br />
+&nbsp; position<span class="re2">:relative</span>;<span class="coMULTI">/*ie needs this to show float */</span><br />
+&nbsp; width<span class="re2">:<span class="re3">130px</span></span>;<br />
+&nbsp; float<span class="re2">:right</span>;<br />
+&nbsp; margin-right<span class="re2">:-<span class="re3">129px</span></span>;<span class="coMULTI">/*must be 1px less than width otherwise won't push footer down */</span><br />
+&nbsp; left<span class="re2">:<span class="re3">1px</span></span>;<br />
+&nbsp; <span class="kw1">color</span>: <span class="re0">#<span class="nu0">000</span></span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#footer</span> <span class="br0">&#123;</span><br />
+&nbsp; width<span class="re2">:<span class="nu0">100</span></span>%;<br />
+&nbsp; clear<span class="re2">:both</span>;<br />
+&nbsp; height<span class="re2">:<span class="re3">50px</span></span>;<br />
+&nbsp; border-top<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; border-bottom<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; <span class="kw1">background-color</span>: #&lt;?php echo $base-&gt;bg<span class="br0">&#91;</span><span class="st0">'-4'</span><span class="br0">&#93;</span> ?&gt;;<br />
+&nbsp; text-align<span class="re2">:center</span>;<br />
+&nbsp; position<span class="re2">:relative</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#clearheader</span><span class="br0">&#123;</span>height<span class="re2">:<span class="re3">72px</span></span>;<span class="br0">&#125;</span><span class="coMULTI">/*needed to make room for header*/</span><br />
+<span class="re0">#clearfooter</span><span class="br0">&#123;</span>clear<span class="re2">:both</span>;height<span class="re2">:<span class="re3">52px</span></span>;<span class="br0">&#125;</span><span class="coMULTI">/*needed to make room for footer*/</span><br />
+* &gt; html <span class="re0">#clearfooter</span> <span class="br0">&#123;</span>float<span class="re2">:left</span>;width<span class="re2">:<span class="nu0">100</span></span>%;<span class="br0">&#125;</span><span class="coMULTI">/* ie mac styles */</span><br />
+<span class="re0">#centrecontent</span> <span class="br0">&#123;</span><br />
+&nbsp; width<span class="re2">:<span class="nu0">100</span></span>%;<br />
+&nbsp; float<span class="re2">:left</span>;<br />
+&nbsp; position<span class="re2">:relative</span>;<br />
+&nbsp; z-index<span class="re2">:<span class="nu0">1</span></span>;<br />
+&nbsp; margin<span class="re2">:<span class="nu0">0</span></span> -<span class="re3">1px</span>;<span class="coMULTI">/* moz fix*/</span><br />
+&nbsp; <span class="kw1">color</span>: <span class="re0">#<span class="nu0">000</span></span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="coMULTI">/* css stuff below is just for presentation and not needed for the demo */</span><br />
+<span class="re0">#centrecontent</span> p <span class="br0">&#123;</span> <span class="kw1">padding</span>: <span class="nu0">0</span> <span class="re3">20px</span>; <span class="br0">&#125;</span><br />
+h1 <span class="br0">&#123;</span><span class="kw1">font-family</span>: Verdana, Arial, Helvetica, <span class="kw2">sans-serif</span>; <span class="kw1">font-weight</span>: <span class="kw2">lighter</span>; <span class="kw1">font-size</span>: <span class="re3"><span class="nu0">150</span>%</span>; <span class="kw1">padding</span>: <span class="re3">20px</span>;<span class="br0">&#125;</span><br />
+<span class="re0">#left</span> span <span class="br0">&#123;</span><br />
+&nbsp; display<span class="re2">:none</span>;&nbsp;<br />
+<span class="br0">&#125;</span>&nbsp;<br />
+<span class="re0">#left</span> a<span class="re2">:hover</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">text-decoration</span>: <span class="kw2">none</span>;<br />
+&nbsp; <span class="kw1">text-decoration</span>: <span class="kw2">none</span>;<br />
+&nbsp; <span class="kw1">color</span>:<span class="re0">#<span class="nu0">222</span></span>;<br />
+&nbsp; <span class="kw1">background</span>: <span class="re0">#FFF</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#left</span> a<span class="re2">:hover</span> span <span class="br0">&#123;</span><br />
+&nbsp; display<span class="re2">:block</span>;<br />
+&nbsp; position<span class="re2">:absolute</span>;<br />
+&nbsp; left<span class="re2">:<span class="re3">130px</span></span>;<br />
+&nbsp; width<span class="re2">:<span class="re3">150px</span></span>;<br />
+&nbsp; z-index<span class="re2">:<span class="nu0">20</span></span>;<br />
+&nbsp; <span class="kw1">background</span>:<span class="re0">#fff</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="co1">@media all and (min-width: 0px){</span><br />
+&nbsp; <span class="re0">#left</span> a<span class="re2">:hover</span> span <span class="br0">&#123;</span><br />
+&nbsp; top<span class="re2">:<span class="re3">150px</span></span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#footer</span> a, <span class="re0">#left</span> a <span class="br0">&#123;</span> <span class="kw1">color</span>:<span class="re0">#FFF</span>; <span class="br0">&#125;</span><br />
+<span class="re0">#footer</span> span <span class="br0">&#123;</span><br />
+&nbsp; display<span class="re2">:none</span>;&nbsp;<br />
+<span class="br0">&#125;</span>&nbsp;<br />
+<span class="re0">#footer</span> a<span class="re2">:hover</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">text-decoration</span>: <span class="kw2">none</span>;<br />
+&nbsp; <span class="kw1">color</span>:<span class="re0">#<span class="nu0">222</span></span>;<br />
+&nbsp; <span class="kw1">background</span>: <span class="re0">#FFF</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#footer</span> a<span class="re2">:hover</span> span <span class="br0">&#123;</span><br />
+&nbsp; display<span class="re2">:block</span>;<br />
+&nbsp; position<span class="re2">:absolute</span>;<br />
+&nbsp; top<span class="re2">:-<span class="re3">95px</span></span>;<br />
+&nbsp; width<span class="re2">:<span class="re3">150px</span></span>;<br />
+&nbsp; z-index<span class="re2">:<span class="nu0">20</span></span>;<br />
+&nbsp; <span class="kw1">background</span>:<span class="re0">#fff</span>;<br />
+&nbsp; left<span class="re2">:<span class="nu0">50</span></span>%;<br />
+<span class="br0">&#125;</span><br />
+html&gt;body <span class="re0">#minHeight</span><span class="br0">&#123;</span>float<span class="re2">:right</span>;width<span class="re2">:<span class="re3">0px</span></span>;height<span class="re2">:<span class="nu0">100</span></span>%;margin-bottom<span class="re2">:-<span class="re3">52px</span></span>;<span class="br0">&#125;</span> <span class="coMULTI">/*safari wrapper */</span></div>
+<p>What this does is simply using our css generation script to alter the code of the original css file from <a href="http://www.pmob.co.uk/temp/3colfixedtest_4.htm">the universal three column layout</a>.  We create a base color ($base = new CSS_Color('99E456');) and form shade variations for the two navbars, the header and the footer:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_css" style="white-space: wrap;white-space: nowrap;">body <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw1">background</span>:#&lt;?php echo $base-&gt;bg<span class="br0">&#91;</span><span class="st0">'-2'</span><span class="br0">&#93;</span> ?&gt; <span class="kw2">repeat-y</span> <span class="kw1">left</span> <span class="kw1">top</span>;<br />
+&nbsp; <span class="kw1">color</span>: <span class="re0">#FFF</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#outer</span><span class="br0">&#123;</span><br />
+&nbsp; margin-left<span class="re2">:<span class="re3">130px</span></span>;<br />
+&nbsp; margin-right<span class="re2">:<span class="re3">130px</span></span>;<br />
+&nbsp; <span class="kw1">background</span>: #&lt;?php echo $base-&gt;bg<span class="br0">&#91;</span><span class="st0">'0'</span><span class="br0">&#93;</span> ?&gt;;<br />
+&nbsp; border-left<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; border-right<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; margin-bottom<span class="re2">:-<span class="re3">52px</span></span>;<br />
+&nbsp; min-height<span class="re2">:<span class="nu0">100</span></span>%<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#header</span><span class="br0">&#123;</span><br />
+&nbsp; position<span class="re2">:absolute</span>;<br />
+&nbsp; top<span class="re2">:<span class="nu0">0</span></span>;<br />
+&nbsp; left<span class="re2">:<span class="nu0">0</span></span>;<br />
+&nbsp; width<span class="re2">:<span class="nu0">100</span></span>%;<br />
+&nbsp; height<span class="re2">:<span class="re3">70px</span></span>;<br />
+&nbsp; <span class="kw1">background</span>: #&lt;?php echo $base-&gt;bg<span class="br0">&#91;</span><span class="st0">'-3'</span><span class="br0">&#93;</span> ?&gt;;<br />
+&nbsp; border-top<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; border-bottom<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; overflow<span class="re2">:hidden</span>;<br />
+<span class="br0">&#125;</span><br />
+<span class="re0">#footer</span> <span class="br0">&#123;</span><br />
+&nbsp; width<span class="re2">:<span class="nu0">100</span></span>%;<br />
+&nbsp; clear<span class="re2">:both</span>;<br />
+&nbsp; height<span class="re2">:<span class="re3">50px</span></span>;<br />
+&nbsp; border-top<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; border-bottom<span class="re2">:<span class="re3">1px</span></span> <span class="kw2">solid</span> <span class="re0">#<span class="nu0">000</span></span>;<br />
+&nbsp; <span class="kw1">background-color</span>: #&lt;?php echo $base-&gt;bg<span class="br0">&#91;</span><span class="st0">'-4'</span><span class="br0">&#93;</span> ?&gt;;<br />
+&nbsp; text-align<span class="re2">:center</span>;<br />
+&nbsp; position<span class="re2">:relative</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>Now change the line </p>
+<p>in your site.html file and then launch it via a browser. You should see something like this:</p>
+<p><img src="http://thinkingphp.org/img/generate_css_using_php/1.jpg" title="First Layout" alt="Picture of first generated layout" /></p>
+<h1>Changing The Base Color For Some Cool Results</h1>
+<p>It is not exactly pretty, but we can play around with the base color a bit:</p>
+<p><strong>$base = new CSS_Color('98ccac');</strong><br />
+<img src="http://thinkingphp.org/img/generate_css_using_php/2.jpg" title="Second Layout" alt="Picture of second generated layout" /></p>
+<p><strong>$base = new CSS_Color('ccac99');</strong><br />
+<img src="http://thinkingphp.org/img/generate_css_using_php/3.jpg" title="Third Layout" alt="Picture of thirdgenerated layout" /></p>
+<p><strong>$base = new CSS_Color('ccccff');</strong><br />
+<img src="http://thinkingphp.org/img/generate_css_using_php/4.jpg" title="Forth Layout" alt="Picture of forth generated layout" /></p>
+<h1>What Other Uses For This Can We Think Of?</h1>
+<p>Now you could also add other colors to highlight some other parts, like singleing out the footer from the monochromatic scheme or always staying with white background for the main content column.</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$highlightFooter</span> = <span class="kw2">new</span> CSS_Color<span class="br0">&#40;</span><span class="st0">'973432'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$outer</span> = <span class="kw2">new</span> CSS_Color<span class="br0">&#40;</span><span class="st0">'ffffff'</span><span class="br0">&#41;</span>;<br />
+...</div>
+<p>We could also generate a grayscale website using white or black as the base color. I am sure there are endless cool possibilities for this stuff, like different shades for list elements, headings, paragraphs and what not. I am eager to hear your ideas in the post comments below!</p>
+<h1>So How Does This PHP Thing Work?</h1>
+<p>When you look at the csscolor.php file, you will quickly notice that it is a very well-made object-oriented PHP script. The foundation of the magic is here:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> CSS_Color<span class="br0">&#40;</span><span class="re0">$bgHex</span>, <span class="re0">$fgHex</span>=<span class="st0">''</span><span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// This is the constructor method for the class,</span><br />
+&nbsp; &nbsp; <span class="co1">// which is called when a new object is created.</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// Initialize this PEAR object so I can</span><br />
+&nbsp; &nbsp; <span class="co1">// use the PEAR error return mechanism</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">PEAR</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="co1">// Initialize the palette</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">setPalette</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, <span class="re0">$fgHex</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="co1">//==================================================</span><br />
+&nbsp; <span class="co1">//==METHODS=========================================</span><br />
+&nbsp; <span class="co1">//==================================================</span><br />
+<br />
+&nbsp; <span class="co1">//--------------------------------------------------</span><br />
+&nbsp; <span class="kw2">function</span> setPalette<span class="br0">&#40;</span><span class="re0">$bgHex</span>, <span class="re0">$fgHex</span> = <span class="st0">''</span><span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// Initialize the color palettes</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// If a foreground color was not specified,</span><br />
+&nbsp; &nbsp; <span class="co1">// just use the background color.</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$fgHex</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$fgHex</span> = <span class="re0">$bgHex</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// Clear the existing palette</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">fg</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="co1">// Make sure we got a valid hex value</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$this</span>-&gt;<span class="me1">isHex</span><span class="br0">&#40;</span><span class="re0">$bgHex</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">raiseError</span><span class="br0">&#40;</span><span class="st0">&quot;background color '$bgHex' is not a hex color value&quot;</span>,<br />
+&nbsp; &nbsp; &nbsp; <span class="kw2">__FUNCTION__</span>, <span class="kw2">__LINE__</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// Set the bg color</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span> = <span class="re0">$bgHex</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+1'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">85</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+2'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">75</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+3'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">5</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+4'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">25</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+5'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-1'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">85</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-2'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">75</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-3'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">5</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-4'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">25</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-5'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+..</div>
+<p>As you see, the bg-property's values are set via the CssColor::lighten() and CssColor::darken() methods. So, what are we waiting for? Let's look at them:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> lighten<span class="br0">&#40;</span><span class="re0">$hex</span>, <span class="re0">$percent</span><span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">mix</span><span class="br0">&#40;</span><span class="re0">$hex</span>, <span class="re0">$percent</span>, <span class="nu0">255</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="co1">//--------------------------------------------------</span><br />
+&nbsp; <span class="kw2">function</span> darken<span class="br0">&#40;</span><span class="re0">$hex</span>, <span class="re0">$percent</span><span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">mix</span><span class="br0">&#40;</span><span class="re0">$hex</span>, <span class="re0">$percent</span>, <span class="nu0">0</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span></div>
+<p>Hrm okay, nothing really here, escept that we now know the second parameter is treated as a percentage. This makes me think if it is possible to add more shades to choose from. We will look at that later. Let's look at the mix() method. I will leave out the error handling parts to preserve some space. :)</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> mix<span class="br0">&#40;</span><span class="re0">$hex</span>, <span class="re0">$percent</span>, <span class="re0">$mask</span><span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// ...</span><br />
+<br />
+&nbsp; &nbsp; <span class="kw1">for</span> <span class="br0">&#40;</span><span class="re0">$i</span>=<span class="nu0">0</span>; <span class="re0">$i</span>&amp;<span class="co2">#lt;3; $i++) {</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$rgb</span><span class="br0">&#91;</span><span class="re0">$i</span><span class="br0">&#93;</span> = <a href="http://www.php.net/round"><span class="kw3">round</span></a><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="re0">$i</span><span class="br0">&#93;</span> * <span class="re0">$percent</span><span class="br0">&#41;</span> + <a href="http://www.php.net/round"><span class="kw3">round</span></a><span class="br0">&#40;</span><span class="re0">$mask</span> * <span class="br0">&#40;</span><span class="nu0">1</span>-<span class="re0">$percent</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="co1">// In case rounding up causes us to go to 256</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="re0">$i</span><span class="br0">&#93;</span> &gt; <span class="nu0">255</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$rgb</span><span class="br0">&#91;</span><span class="re0">$i</span><span class="br0">&#93;</span> = <span class="nu0">255</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$this</span>-&gt;<span class="me1">RGB2Hex</span><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="co1">//--------------------------------------------------</span><br />
+&nbsp; <span class="kw2">function</span> hex2RGB<span class="br0">&#40;</span><span class="re0">$hex</span><span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp;<span class="co1">// ...</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// Regexp for a valid hex digit</span><br />
+&nbsp; &nbsp; <span class="re0">$d</span> = <span class="st0">'[a-fA-F0-9]'</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="co1">// Make sure $hex is valid</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/preg_match"><span class="kw3">preg_match</span></a><span class="br0">&#40;</span><span class="st0">&quot;/^($d$d)($d$d)($d$d)<span class="es0">\$</span>/&quot;</span>, <span class="re0">$hex</span>, <span class="re0">$rgb</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp;<a href="http://www.php.net/hexdec"><span class="kw3">hexdec</span></a><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp;<a href="http://www.php.net/hexdec"><span class="kw3">hexdec</span></a><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp;<a href="http://www.php.net/hexdec"><span class="kw3">hexdec</span></a><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp;<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/preg_match"><span class="kw3">preg_match</span></a><span class="br0">&#40;</span><span class="st0">&quot;/^($d)($d)($d)$/&quot;</span>, <span class="re0">$hex</span>, <span class="re0">$rgb</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp;<a href="http://www.php.net/hexdec"><span class="kw3">hexdec</span></a><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span> . <span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp;<a href="http://www.php.net/hexdec"><span class="kw3">hexdec</span></a><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span> . <span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp;<a href="http://www.php.net/hexdec"><span class="kw3">hexdec</span></a><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span> . <span class="re0">$rgb</span><span class="br0">&#91;</span><span class="nu0">3</span><span class="br0">&#93;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp;<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">raiseError</span><span class="br0">&#40;</span><span class="st0">&quot;cannot convert hex '$hex' to RGB&quot;</span>, <span class="kw2">__FUNCTION__</span>, <span class="kw2">__LINE__</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; <span class="co1">//--------------------------------------------------</span><br />
+&nbsp; <span class="kw2">function</span> RGB2Hex<span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#41;</span><br />
+&nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// ...</span><br />
+<br />
+&nbsp; &nbsp; <span class="re0">$hex</span> = <span class="st0">&quot;&quot;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">for</span><span class="br0">&#40;</span><span class="re0">$i</span>=<span class="nu0">0</span>; <span class="re0">$i</span> &lt; <span class="nu0">3</span>; <span class="re0">$i</span>++<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="co1">// Convert the decimal digit to hex</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$hexDigit</span> = <a href="http://www.php.net/dechex"><span class="kw3">dechex</span></a><span class="br0">&#40;</span><span class="re0">$rgb</span><span class="br0">&#91;</span><span class="re0">$i</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="co1">// Add a leading zero if necessary</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span><span class="br0">&#40;</span><a href="http://www.php.net/strlen"><span class="kw3">strlen</span></a><span class="br0">&#40;</span><span class="re0">$hexDigit</span><span class="br0">&#41;</span> == <span class="nu0">1</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$hexDigit</span> = <span class="st0">&quot;0&quot;</span> . <span class="re0">$hexDigit</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="co1">// Append to the hex string</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$hex</span> .= <span class="re0">$hexDigit</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="co1">// Return the complete hex string</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$hex</span>;<br />
+&nbsp; <span class="br0">&#125;</span></div>
+<p>Okay, here is the magic! We simply calculate an array of rgb values out of the supplied hex color string, alternate its contents via some cool math formula ($rgb[$i] = round($rgb[$i] * $percent) + round($mask * (1-$percent));) and convert it back to hex and return it! This is actually quite simple.</p>
+<p>Let us implement more shades. In the CssColor::setPalette() change</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+1'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">85</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+2'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">75</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+3'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">5</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+4'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">25</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+5'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-1'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">85</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-2'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">75</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-3'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">5</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-4'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">25</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-5'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">1</span><span class="br0">&#41;</span>;</div>
+<p>to</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+1'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">95</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+2'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">9</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+3'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">85</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+4'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">8</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+5'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">75</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+6'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">7</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+7'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">65</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+8'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">6</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+9'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">55</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+10'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">5</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+11'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">45</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+12'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">4</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+13'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">35</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+14'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">3</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+15'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">25</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+16'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">2</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+17'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">15</span><span class="br0">&#41;</span>; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+18'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'+19'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">lighten</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">05</span><span class="br0">&#41;</span>; &nbsp; <br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-1'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">95</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-2'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">9</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-3'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">85</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-4'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">8</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-5'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">75</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-6'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">7</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-7'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">65</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-8'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">6</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-9'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">55</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-10'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">5</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-11'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">45</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-12'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">40</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-13'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">35</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-14'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">3</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-15'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">25</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-16'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">2</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-17'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">15</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-18'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">bg</span><span class="br0">&#91;</span><span class="st0">'-19'</span><span class="br0">&#93;</span> = <span class="re0">$this</span>-&gt;<span class="me1">darken</span><span class="br0">&#40;</span><span class="re0">$bgHex</span>, .<span class="nu0">05</span><span class="br0">&#41;</span>;</div>
+<p>This gives us a whole range of new shades! Here are some stylesheets I could come up with using them:</p>
+<p><img src="http://thinkingphp.org/img/generate_css_using_php/5.jpg" title="Fifth Layout" alt="Picture of fifth generated layout" /></p>
+<p><img src="http://thinkingphp.org/img/generate_css_using_php/6.jpg" title="Sixth Layout" alt="Picture of forth generated layout" /></p>
+<p><img src="http://thinkingphp.org/img/generate_css_using_php/7.jpg" title="Seventh Layout" alt="Picture of seventh generated layout" /></p>
+<p>Much credit goes to Patrick Fitzgerald for this very nice script!</p>
+<p>Thanks for reading! Have a good one, all!<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-d2b4-436b-9a39-437fcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-generate-monochromatic-css-stylesheets-within-seconds-using-php%3A480f4dfe-d2b4-436b-9a39-437fcbdd56cb &amp;title=How+To+Generate+Monochromatic+CSS+Stylesheets+Within+Seconds+Using+PHP';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-generate-monochromatic-css-stylesheets-within-seconds-using-php%3A480f4dfe-d2b4-436b-9a39-437fcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-generate-monochromatic-css-stylesheets-within-seconds-using-php%3A480f4dfe-d2b4-436b-9a39-437fcbdd56cb&amp;title=How+To+Generate+Monochromatic+CSS+Stylesheets+Within+Seconds+Using+PHP&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-generate-monochromatic-css-stylesheets-within-seconds-using-php%3A480f4dfe-d2b4-436b-9a39-437fcbdd56cb&amp;title=How+To+Generate+Monochromatic+CSS+Stylesheets+Within+Seconds+Using+PHP';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/dessert-3-generate-a-random-password:480f4dd5-f280-4051-b815-452dcbdd56cb">Dessert #3 - Generate a random password</a></li>
+							<li><a href="/posts/fixturize-shell---generate-your-fixtures-automatically:48c12ad0-2350-4b5a-94d4-5f424834cda3">Fixturize Shell - Generate your fixtures automatically</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/how-to-generate-monochromatic-css-stylesheets-within-seconds-using-php:480f4dfe-d2b4-436b-9a39-437fcbdd56cb">15 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/how-to-generate-monochromatic-css-stylesheets-within-seconds-using-php:480f4dfe-d2b4-436b-9a39-437fcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4e00-1178-4a19-bdfe-47eecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.developercast.com/2007/06/07/php-coding-practicescom-how-to-generate-monochromatic-css-stylesheets-within-seconds-using-php/" rel="nofollow">developercast.com &raquo; PHP-Coding-Practices.com: How To Gener</a>						</strong>
+						<strong>said 
+						on Jun 07, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] the PHP-Coding-Practices.com site today, there&#8217;s a new tutorial posted showing how to create monocromatic (variations of the same color) CSS stylesheets quickly [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e00-f6b0-4a06-b9f9-4d32cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.content4.symphora.com/index.php/2007/06/08/links-for-2007-06-09/" rel="nofollow">&lt;CONTENT /&gt; v.4 &raquo; links for 2007-06-09</a>						</strong>
+						<strong>said 
+						on Jun 09, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] How To Generate Monochromatic CSS Stylesheets Within Seconds Using PHP | PHP Coding Practices - Beco... (tags: php css) [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e00-2d7c-45eb-ae31-4586cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e5d2649671370f31fa5edcaed48b88e2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.hagrin.com" rel="nofollow">Hagrin</a>						</strong>
+						<strong>said 
+						on Jun 10, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great tutorial!  I'm actually going to try and give this a try later on my dev server and see how it works.  I actually liked the other article too so this site has been producing some solid info - keep up the great work.</p>
+<p>I think the Drupal Garland theme works off a monochomatic theme, but I could be wrong.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e00-3c70-48af-9d91-4b9fcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Jun 10, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thank you for the nice comments, Hagrin. :) I very much appreciate them.</p>
+<p>Please let me know how your trial run turns out. I will provide as much help as possible if you run into problems.</p>
+<p>Thank you!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e00-1944-4c57-803d-4237cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b8e26753e9254ce82ad87178c1069e10&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							tomtom&nbsp;						</strong>
+						<strong>said 
+						on Jun 10, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks!</p>
+<p>Nice tutorial. Working cool for me. </p>
+<p>cheers</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e01-f46c-4731-b557-4aabcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=80acb818826f70823d6afb30d70fb5b9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://sf.jogger.pl/postgresql/" rel="nofollow">postgresql</a>						</strong>
+						<strong>said 
+						on Jun 12, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Good work :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e01-b700-46e9-aec8-4530cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.digitalistic.com/2007/06/12/links-for-2007-06-12/" rel="nofollow">DIGITALISTIC &raquo; Blog Archive &raquo; links for 2007-06-12</a>						</strong>
+						<strong>said 
+						on Jun 12, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] How To Generate Monochromatic CSS Stylesheets Within Seconds Using PHP | PHP Coding Practices - Beco... (tags: css php webdesign color monchromatic) [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e01-804c-4298-8e96-48f3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0916eb88675dbaca6a800fe596cbe2c4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://webdevlogs.com" rel="nofollow">Mgccl</a>						</strong>
+						<strong>said 
+						on Jun 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The first thought in my head:<br />
+All those CSS masters got totally owned.</br></p>
+<p>Good work, I might implement it on my site so it is a different color everyday</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-a9f4-46b7-94a6-4abecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Jul 08, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thank you, all. :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e03-e02c-46df-b30e-4ecbcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=804c7648db0e842f1b52e30d1e4df9b8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							haiko&nbsp;						</strong>
+						<strong>said 
+						on Sep 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>if say, i'd want to work with a mysql database.<br />
+is it possible to change</br></p>
+<p>$base = new CSS_Color('99E456');</p>
+<p>so that the value is a variable, that has been extracted from a database?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e03-946c-4105-a176-4e77cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Sep 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sure, why should this be a problem? The CSS_Color object has a constructor which receives a string as the base color, so you can supply anything that is a string, no matter where it came from.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e03-9238-43a1-aaca-4ff0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=804c7648db0e842f1b52e30d1e4df9b8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							haiko&nbsp;						</strong>
+						<strong>said 
+						on Sep 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>ok, thanks for the quick reply.</p>
+<p>since i'm not an expert on php, i tried this:</p>
+<p>$base = new CSS_Color($newcolor);<br />
+and</br><br />
+$base = $newcolor;</br></p>
+<p>where, of course $newcolor is the variable taken from the database. but it didnt work out. how should i do this? any suggestions?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e03-b3d8-4a3b-8d12-41cecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Sep 15, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>$base = new CSS_Color($newcolor);</p>
+<p>Should work fine. What is the contents of $newcolor?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e03-d140-438d-a9d1-407acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=804c7648db0e842f1b52e30d1e4df9b8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							haiko&nbsp;						</strong>
+						<strong>said 
+						on Sep 15, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>the contents are extracted, eg. extract(mysql_fetch_assoc($result));</p>
+<p>the content is a text string, just like a manual input like FFCC00 or any color. but it won't turn up in the page.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e03-77b0-406b-9f1a-45c8cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Sep 15, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Please show the entire script.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

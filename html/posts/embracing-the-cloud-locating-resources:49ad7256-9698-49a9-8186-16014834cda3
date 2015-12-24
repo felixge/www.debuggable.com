@@ -1,0 +1,379 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Embracing the Cloud - Locating Resources &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/embracing-the-cloud-locating-resources:49ad7256-9698-49a9-8186-16014834cda3">Embracing the Cloud - Locating Resources</a></h2>	<div class="posted-on">
+		<p>Posted on 3/3/09 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>With the rise of affordable cloud computing (especially services like EC2 and S3) we need to learn to apply additional skills to our craft. One of those is using <a href="http://en.wikipedia.org/wiki/Hashtable">Hashtables</a> to locate resources in our system.</p>
+<p>Here is an example. Lets say your application stores image files uploaded by its users. At some point your hard disk is filling up. Now you have two choices.</p>
+<ul>
+<li>Add another hard drive</li>
+<li>Distribute the files amongst multiple servers</li>
+</ul>
+<p>Choice A is called "<a href="http://en.wikipedia.org/wiki/Scaling_(computer_network)#Scale_vertically_.28scale_up.29">Vertical Scaling</a>" and usually easier. Choice B is "<a href="http://en.wikipedia.org/wiki/Scaling_(computer_network)#Scale_horizontally_.28scale_out.29">Horizontal Scaling</a>". Horizontal scaling is obviously the future, since the <a href="http://www.gotw.ca/publications/concurrency-ddj.htm">free lunch is over</a>.</p>
+<p>So once you decided you want to be serious and not place your bets on vertical scaling, you face a problem. On any given server X how do I know which server holds File Y? The answer is simple, you look it up using a hash function. Since the rise of <a href="http://en.gravatar.com/">Gravatar</a> and <a href="http://git.or.cz/">Git</a>, cryptographic hash functions, especially <a href="http://en.wikipedia.org/wiki/MD5">MD5</a> and <a href="http://en.wikipedia.org/wiki/SHA_hash_functions">SHA1</a>, have become popular general-purpose hashing functions of choice.</p>
+<p>So if you previously stored your file urls in the database like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span> = <span class="st0">'http://example.org/files/'</span>. <span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'id'</span><span class="br0">&#93;</span>;<br />
+storeAt<span class="br0">&#40;</span><span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span>, <a href="http://www.php.net/file_get_contents"><span class="kw3">file_get_contents</span></a><span class="br0">&#40;</span><span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'path'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>You would rewrite it to look like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> url<span class="br0">&#40;</span><span class="re0">$file</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$servers</span> = <a href="http://www.php.net/file_get_contents"><span class="kw3">file_get_contents</span></a><span class="br0">&#40;</span><span class="st0">'http://resources.example.org/file_servers.json'</span><span class="br0">&#41;</span>.<br />
+&nbsp; <span class="re0">$servers</span> = json_decode<span class="br0">&#40;</span><span class="re0">$servers</span>, <span class="kw2">true</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="re0">$sha1</span> = <a href="http://www.php.net/sha1_file"><span class="kw3">sha1_file</span></a><span class="br0">&#40;</span><span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'path'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$servers</span> <span class="kw1">as</span> <span class="re0">$key</span> =&gt; <span class="re0">$server</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/preg_match"><span class="kw3">preg_match</span></a><span class="br0">&#40;</span><span class="re0">$key</span>, <span class="re0">$sha1</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$server</span> . <span class="st0">'/'</span> . <span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'id'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span><br />
+&nbsp; throw <span class="kw2">new</span> Exception<span class="br0">&#40;</span><span class="st0">'invalid server list'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span> = url<span class="br0">&#40;</span><span class="re0">$file</span><span class="br0">&#41;</span>;<br />
+storeAt<span class="br0">&#40;</span><span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'url'</span><span class="br0">&#93;</span>, <a href="http://www.php.net/file_get_contents"><span class="kw3">file_get_contents</span></a><span class="br0">&#40;</span><span class="re0">$file</span><span class="br0">&#91;</span><span class="st0">'path'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;</div>
+<p>And store a file called file_servers.json on resources.example.org:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+<span class="br0">&#123;</span><br />
+&nbsp; <span class="st0">&quot;/^[a-l]/&quot;</span>: <span class="st0">&quot;http://bob.files.example.org&quot;</span>,<br />
+&nbsp; <span class="st0">&quot;/^[l-z]/&quot;</span>: <span class="st0">&quot;http://john.files.example.org&quot;</span>,<br />
+<span class="br0">&#125;</span></div>
+<p>If you now cache the file_servers.json list on each machine and make sure resources.example.org is available, you can scale to pretty much infinity.</p>
+<p>How does it work? Simple. We wrote a hash function called url() which will assign a unqiue location to each newly uploaded file. This works by computing the sha1 fingerprint for the file. Then we pick a server based on the leading characters of the sha1, using the ranges defined in file_servers.json.</p>
+<p>If you need to remove full servers or add new ones, you simply modify file_servers.json file.</p>
+<p>The probably largest and most sophisticated implementation of the concept above seems to be <a href="http://en.wikipedia.org/wiki/Amazon_S3">Amazon S3</a> right now.</p>
+<p>The jury is still out if they will manage to win the upcoming cloud war, but there are exciting times ahead of us. The recession is putting many companies, big and small, in need of saving costs through innovation. So what renewable energies and fuel efficient cars are for other industries, is  what cloud computing is to us.</p>
+<p>Think that cloud computing is not going to help with your current clients and applications? Invest an hour to put your clients static files (and uploads) in Amazon S3 and downgrade his shared hosting account. He now needs less storage, bandwidth and CPU power and gets redundant backup as a bonus.</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/49ad7256-9698-49a9-8186-16014834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fembracing-the-cloud-locating-resources%3A49ad7256-9698-49a9-8186-16014834cda3 &amp;title=Embracing+the+Cloud+-+Locating+Resources';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fembracing-the-cloud-locating-resources%3A49ad7256-9698-49a9-8186-16014834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fembracing-the-cloud-locating-resources%3A49ad7256-9698-49a9-8186-16014834cda3&amp;title=Embracing+the+Cloud+-+Locating+Resources&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fembracing-the-cloud-locating-resources%3A49ad7256-9698-49a9-8186-16014834cda3&amp;title=Embracing+the+Cloud+-+Locating+Resources';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/transload-it-css-as-a-cloud-service:4a970aa5-da04-4822-bf67-1155cbdd56cb">Transload.it - XSS as a Cloud Service</a></li>
+							<li><a href="/posts/releasing-resources:480f4dfd-7650-443d-926a-40e7cbdd56cb">Releasing Resources</a></li>
+							<li><a href="/posts/cloud-behavior:48ba9455-30c8-46de-9e24-4cd94834cda3">Cloud Behavior</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/embracing-the-cloud-locating-resources:49ad7256-9698-49a9-8186-16014834cda3">11 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/embracing-the-cloud-locating-resources:49ad7256-9698-49a9-8186-16014834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-49adc100-23dc-44f1-8f64-4f334834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9f70334a8d2b026223f965453e714da3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.mistercameron.com" rel="nofollow">Cameron Perry</a>						</strong>
+						<strong>said 
+						on Mar 03, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nifty. I really like how simple and straightforward this solution is - I might have to use the idea on my next project.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49ade5ee-d3f0-47da-aba2-172c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=669144d1ab0a861af5d54175371bc586&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://mark-story.com" rel="nofollow">Mark Story</a>						</strong>
+						<strong>said 
+						on Mar 04, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Good article felix, and a simple straightforward implementation.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49ae461c-d838-4ad8-b2f8-2dda4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5f7d4136aa418d38d89d8b4792a03f16&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.ministryofwebdevelopment.nl" rel="nofollow">primeminister</a>						</strong>
+						<strong>said 
+						on Mar 04, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice Felix. Just sold a new project to a customer that involves uploading for clients. Might be as well at S3.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b02c85-d108-4015-b084-24aa4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=52d6d1f510025c43edb1b9d19f40b055&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dieter.plaetinck.be" rel="nofollow">Dieter_be</a>						</strong>
+						<strong>said 
+						on Mar 05, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>If you're really concerned about scaling the storage of small files, you do not want to do this.  I've manually maintaind a setup of about 100TB of small files in a similar fashion and it became a nightmare.  Basically because if users keep uploading, the amount of images that will match your regex will grow too, and your servers will get full nonetheless. and it becomes really hard to rebalance.</p>
+<p>A really nice implementation of a good distributed storage is mogileFS (<a rel="nofollow" href="http://www.danga.com/mogilefs/),">http://www.danga.com/mogilefs/),</a> which we ended up implementing.<br />
+it keeps track of all files in a database, it can move files around without downtime, you can give specific redundancy policies (eg store thumbnails once, and full images twice etc).</br></p>
+<p>Also, you probably don't want to do so many http requests just to get some really basic data. rather keep it in a database/memcache/etc</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b03ece-5030-42ea-8f35-5d864834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=999fca25a3b0a6e6808d68ccffd68e60&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakery.de" rel="nofollow">Siegfried Hirsch</a>						</strong>
+						<strong>said 
+						on Mar 05, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The other big player when it comes to hashtables is Google. They are using BigTable as their storage engine for nearly everything. Right now I am looking into google app engine and it makes it clear, that using large amounts of data distributed of really large amounts of servers BigTable seems to be a good implementation. As you can use the app engine there should be a way to use a small app to store what you need in BigTable. Just another idea than to implement everything by yourself. And btw they offer now their services like Amazon aws does.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b0d143-ced8-4b91-a620-76804834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ff3cac27665f30fa245c990f53d0b9e3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://jojosiao.com" rel="nofollow">Jojo Siao</a>						</strong>
+						<strong>said 
+						on Mar 06, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>"Think that cloud computing is not going to help with your current clients and applications? Invest an hour to put your clients static files (and uploads) in Amazon S3 and downgrade his shared hosting account. He now needs less storage, bandwidth and CPU power and gets redundant backup as a bonus."</p>
+<p>Wow, so that's really good advantage if you own/use a cloud.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b15dde-17b0-4d32-97a2-27ee4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9f70334a8d2b026223f965453e714da3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.mistercameron.com" rel="nofollow">Cameron Perry</a>						</strong>
+						<strong>said 
+						on Mar 06, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Dieter_be mogileFS looks interesting. How involved is the set-up (i.e., will the average developer with some *nix skills be able to implement this on a server)? If anything the library seems pretty straightforward.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b15e59-9a38-4ebc-aa49-27ee4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5f7d4136aa418d38d89d8b4792a03f16&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.cake-toppings.com" rel="nofollow">primeminister</a>						</strong>
+						<strong>said 
+						on Mar 06, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Aside: @felix? How can I unsubscribe the comment notifications for this post?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b16192-03f8-4c2b-b99c-07894834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=52d6d1f510025c43edb1b9d19f40b055&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dieter.plaetinck.be" rel="nofollow">Dieter_be</a>						</strong>
+						<strong>said 
+						on Mar 06, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Cameron. it's not that hard, you just need a little luck to find a good tutorial for your distro, with a bit of luck everything works out of the box if you install it through perl CPAN (check their wiki for tutorials).</p>
+<p>They have some good api's, though no official one for PHP iirc, we ended up implementing Erik Osterman's version.  See <a rel="nofollow" href="http://groups.google.com/group/mogile/browse_thread/thread/e0183a72ad6b0f1a">http://groups.google.com/group/mogile/browse_thread/thread/e0183a72ad6b0f1a</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b161f7-0508-493f-a374-6db44834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 06, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>primeminister: Not yet, but I'll add this feature very soon. Sorry : (</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49e44d2a-5480-486b-8865-6dc84834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=77c00d4affe9d965e85098e27da7bc1b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://binarycrafts.com" rel="nofollow">cosmin</a>						</strong>
+						<strong>said 
+						on Apr 14, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,<br />
+I'm about to get into the cloud with a CakePHP YouTube like app and right now I'm set on using a Mosso Server and Mosso files. They say that the files are automatically served using the LimeLight CDN so that sounds really sweet.</br><br />
+Would you say that the AmazonWS suite would be better suited for some heavy ffmpeg encoding queue management?</br></p>
+<p>Have a Great Day,<br />
+cosmin</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

@@ -1,0 +1,1368 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Keystroke Counter Tool &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/keystroke-counter-tool:480f4dfe-304c-4b0b-91bd-4664cbdd56cb">Keystroke Counter Tool</a></h2>	<div class="posted-on">
+		<p>Posted on 8/5/07 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Today I felt like finding out how many keystrokes I do during the day. For that I made a little program that counts them.  Maybe this can be an indicator for lame days and for very productive days.</p>
+<p>I would love it if some of you could share their keystroke counts here via the commenting system. :) I for one will start to record mine tomorrow.</p>
+<p>You can download it <a href="http://thinkingphp.org/downloads/keystroke.rar" title="Download Keystroke Tool">here</a>.</p>
+<p><strong>Edit:</strong> Thanks to Michael Proctor the tool now has a great logging capability that tracks your keystrokes on an hourly and daily basis. It saves appropriate log files in your c:\keycounter\ directory. Enjoy and kudos to Michael for that!<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dfe-304c-4b0b-91bd-4664cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fkeystroke-counter-tool%3A480f4dfe-304c-4b0b-91bd-4664cbdd56cb &amp;title=Keystroke+Counter+Tool';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fkeystroke-counter-tool%3A480f4dfe-304c-4b0b-91bd-4664cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fkeystroke-counter-tool%3A480f4dfe-304c-4b0b-91bd-4664cbdd56cb&amp;title=Keystroke+Counter+Tool&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fkeystroke-counter-tool%3A480f4dfe-304c-4b0b-91bd-4664cbdd56cb&amp;title=Keystroke+Counter+Tool';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/php-code-beautifier-tool:480f4dfe-523c-455a-a2c9-4c6fcbdd56cb">PHP Code-Beautifier Tool</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/keystroke-counter-tool:480f4dfe-304c-4b0b-91bd-4664cbdd56cb">58 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/keystroke-counter-tool:480f4dfe-304c-4b0b-91bd-4664cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dff-2cd0-4b7b-9fe4-4dedcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on May 15, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hrm I made a total of 36,789 keystrokes today. :O</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-e8e8-4a96-854d-4ad2cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7c68ace2dfda2916fd8ad27ac699a646&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Michael Proctor&nbsp;						</strong>
+						<strong>said 
+						on May 22, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Awesome little app, what language did you do that up in?</p>
+<p>Would love to extend it a bit by making it keep a hourly count for reporting for my boss. If it was in .NET 1.1 or .NET 2.0 that would be great. :)</p>
+<p>Hopefully he can appreciate what exactly happen behind the scenes.</p>
+<p>Only had it installed for 10 minutes and have racked up 1264 :)</p>
+<p>Again thanks for the contribution.</p>
+<p>Cheers</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-2738-487a-aa99-4b3acbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on May 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi there, Michael. Glad you are liking the application. :)</p>
+<p>I did it with <a href="http://autoitscript.com" rel="nofollow">AutoIt</a>, a new easy-to-learn windows scripting language. I can send you the source code if you want to.</p>
+<p>Or I may add your idea myself and release it here. What do you think? :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-b00c-46f1-9077-47a0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7c68ace2dfda2916fd8ad27ac699a646&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Michael Proctor&nbsp;						</strong>
+						<strong>said 
+						on May 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>never heard of AutoIt before, seems pretty cool though. </p>
+<p>It is wierd I would have thought that someone would have had something out there, but I can't seem to find anything :(</p>
+<p>Then I found your tool :)</p>
+<p>How hard you reckon it would be to get it to store "hourly" values into a text file? </p>
+<p>I was thinking of having daily log text files with the ,<br />
+inside it.</br></p>
+<p>The idea was to have a variable holding the last hour written into the file.</p>
+<p>On each keystroke check the variable against current hour, if the current hour is &gt; 1, store the last keystroke count into the file with the just passed hour and set the variable to the just passed hour.</p>
+<p>On first run if there is no day log yet create the file and fill it with<br />
+, 0</br><br />
+up until the hour just passed.</br></p>
+<p>Your thoughts?</p>
+<p>If you could send the source that would be cool, be interested in seeing how you achieved what you did. :) *envy*, can't find a way to do it in VB.NET :)</p>
+<p>Cheers</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-0fa4-42bc-88f7-40f7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7c68ace2dfda2916fd8ad27ac699a646&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Michael Proctor&nbsp;						</strong>
+						<strong>said 
+						on May 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Umm wierd your blogger doesn't like me, those bits where the sentance seems to "blank" is because I used &lt; &gt; signs, and it interpretted them as &#8220; &#8221;</p>
+<p>All I was saying it I was thinking of storing it as comma delimited with hour, keystrokecount</p>
+<p>Have a good one</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-4fd4-4268-934e-49d9cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on May 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Michael,</p>
+<p>hrm will give it a try this evening. :] This sure sounds like some fun and you more or less provided the code already. ;)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-116c-4514-a12b-471acbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on May 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Actually I was a little worried that people could think the tool is a keylogger. :p Of course, it is not.</p>
+<p>Will post the source code this evening, so everybody can enjoy it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-afec-4e56-ac29-403fcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on May 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Okay here is the source code. Couldn't work on the hourly rates, because I had to watch the Champions League Final. :)</p>
+<p>log.au3</p>
+<p>[code]<br />
+;Copyright by Tim Koschuetzki</br><br />
+;http://php-coding-practices.com</br></p>
+<p>HotKeySet('!q', '_Terminate')<br />
+Local $output = FileOpen('c:\log.htm', 2)</br><br />
+Global $bGoing = 1</br><br />
+Global $aKeys[166]</br><br />
+Global $DllUser32 = DllOpen('user32')</br></p>
+<p>Func _IsPressed($hexKey)<br />
+   Local $aR</br><br />
+   $aR = DllCall($DllUser32, "int", "GetAsyncKeyState", "int", $hexKey)</br><br />
+   If Not @error And BitAND($aR[0], 0x8000) = 0x8000 Then</br><br />
+      Return 1</br><br />
+   Else</br><br />
+      Return 0</br><br />
+   EndIf</br><br />
+EndFunc  ;==>_IsPressed</br></p>
+<p>Func _ShiftState()<br />
+   Local $aR</br><br />
+   $aR = DllCall($DllUser32, "int", "GetKeyState", "int", 0xA0)</br><br />
+   If Not @error And BitAND($aR[0], 0x8000) = 0x8000 Then</br><br />
+      Return 1</br><br />
+   Else</br><br />
+      Return 0</br><br />
+   EndIf</br><br />
+EndFunc</br></p>
+<p>Func _Terminate()<br />
+   $bGoing = 0</br><br />
+EndFunc  ;==>_Terminate</br></p>
+<p>Func init_keylog()<br />
+   $aKeys[0x01] = 'Left mouse button ' & @CRLF</br><br />
+   $aKeys[0x02] = 'Right mouse button ' & @CRLF</br><br />
+   $aKeys[0x04] = 'Middle mouse button ' & @CRLF</br><br />
+   $aKeys[0x05] = 'X1 mouse button ' & @CRLF</br><br />
+   $aKeys[0x06] = 'X2 mouse button ' & @CRLF</br><br />
+   $aKeys[0x08] = 'BACKSPACE '</br><br />
+   $aKeys[0x09] = 'TAB ' & @CRLF</br><br />
+   $aKeys[0x0C] = 'CLEAR ' & @CRLF</br><br />
+   $aKeys[0x0D] = 'ENTER' & @CRLF</br><br />
+   $aKeys[0x10] = 'SHIFT '</br><br />
+   $aKeys[0x11] = 'CTRL '</br><br />
+   $aKeys[0x12] = 'ALT '</br><br />
+   $aKeys[0x13] = 'PAUSE '</br><br />
+   $aKeys[0x14] = 'CAPS LOCK '</br><br />
+   $aKeys[0x1B] = 'ESC ' & @CRLF</br><br />
+   $aKeys[0x20] = ' '</br><br />
+   $aKeys[0x21] = 'PAGE UP ' & @CRLF</br><br />
+   $aKeys[0x22] = 'PAGE DOWN ' & @CRLF</br><br />
+   $aKeys[0x23] = 'END ' & @CRLF</br><br />
+   $aKeys[0x24] = 'HOME ' & @CRLF</br><br />
+   $aKeys[0x25] = 'LEFT ARROW ' & @CRLF</br><br />
+   $aKeys[0x26] = 'UP ARROW ' & @CRLF</br><br />
+   $aKeys[0x27] = 'RIGHT ARROW ' & @CRLF</br><br />
+   $aKeys[0x28] = 'DOWN ARROW ' & @CRLF</br><br />
+   $aKeys[0x29] = 'SELECT '</br><br />
+   $aKeys[0x2A] = 'PRINT ' & @CRLF</br><br />
+   $aKeys[0x2B] = 'EXECUTE ' & @CRLF</br><br />
+   $aKeys[0x2C] = 'PRINT SCREEN ' & @CRLF</br><br />
+   $aKeys[0x2D] = 'INS '</br><br />
+   $aKeys[0x2E] = 'DEL '</br><br />
+   $aKeys[0x30] = '0'</br><br />
+   $aKeys[0x31] = '1'</br><br />
+   $aKeys[0x32] = '2'</br><br />
+   $aKeys[0x33] = '3'</br><br />
+   $aKeys[0x34] = '4'</br><br />
+   $aKeys[0x35] = '5'</br><br />
+   $aKeys[0x36] = '6'</br><br />
+   $aKeys[0x37] = '7'</br><br />
+   $aKeys[0x38] = '8'</br><br />
+   $aKeys[0x39] = '9'</br><br />
+   $aKeys[0x41] = 'a'</br><br />
+   $aKeys[0x42] = 'b'</br><br />
+   $aKeys[0x43] = 'c'</br><br />
+   $aKeys[0x44] = 'd'</br><br />
+   $aKeys[0x45] = 'e'</br><br />
+   $aKeys[0x46] = 'f'</br><br />
+   $aKeys[0x47] = 'g'</br><br />
+   $aKeys[0x48] = 'h'</br><br />
+   $aKeys[0x49] = 'i'</br><br />
+   $aKeys[0x4A] = 'j'</br><br />
+   $aKeys[0x4B] = 'k'</br><br />
+   $aKeys[0x4C] = 'l'</br><br />
+   $aKeys[0x4D] = 'm'</br><br />
+   $aKeys[0x4E] = 'n'</br><br />
+   $aKeys[0x4F] = 'o'</br><br />
+   $aKeys[0x50] = 'p'</br><br />
+   $aKeys[0x51] = 'q'</br><br />
+   $aKeys[0x52] = 'r'</br><br />
+   $aKeys[0x53] = 's'</br><br />
+   $aKeys[0x54] = 't'</br><br />
+   $aKeys[0x55] = 'u'</br><br />
+   $aKeys[0x56] = 'v'</br><br />
+   $aKeys[0x57] = 'w'</br><br />
+   $aKeys[0x58] = 'x'</br><br />
+   $aKeys[0x59] = 'y'</br><br />
+   $aKeys[0x5A] = 'z'</br><br />
+   $aKeys[0x5B] = 'Left Windows ' & @CRLF</br><br />
+   $aKeys[0x5C] = 'Right Windows ' & @CRLF</br><br />
+   $aKeys[0x60] = 'Numeric pad 0'</br><br />
+   $aKeys[0x61] = 'Numeric pad 1'</br><br />
+   $aKeys[0x62] = 'Numeric pad 2'</br><br />
+   $aKeys[0x63] = 'Numeric pad 3'</br><br />
+   $aKeys[0x64] = 'Numeric pad 4'</br><br />
+   $aKeys[0x65] = 'Numeric pad 5'</br><br />
+   $aKeys[0x66] = 'Numeric pad 6'</br><br />
+   $aKeys[0x67] = 'Numeric pad 7'</br><br />
+   $aKeys[0x68] = 'Numeric pad 8'</br><br />
+   $aKeys[0x69] = 'Numeric pad 9'</br><br />
+   $aKeys[0x6A] = 'Multiply'</br><br />
+   $aKeys[0x6B] = 'Add'</br><br />
+   $aKeys[0x6C] = 'Separator'</br><br />
+   $aKeys[0x6D] = 'Subtract'</br><br />
+   $aKeys[0x6E] = 'Decimal'</br><br />
+   $aKeys[0x6F] = 'Divide'</br><br />
+   $aKeys[0x70] = ' F1 '</br><br />
+   $aKeys[0x71] = ' F2 '</br><br />
+   $aKeys[0x72] = ' F3 '</br><br />
+   $aKeys[0x73] = ' F4 '</br><br />
+   $aKeys[0x74] = ' F5 '</br><br />
+   $aKeys[0x75] = ' F6 '</br><br />
+   $aKeys[0x76] = ' F7 '</br><br />
+   $aKeys[0x77] = ' F8 '</br><br />
+   $aKeys[0x78] = ' F9 '</br><br />
+   $aKeys[0x79] = ' F10 '</br><br />
+   $aKeys[0x7A] = ' F11 '</br><br />
+   $aKeys[0x7B] = ' F12 '</br><br />
+   $aKeys[0x7C] = ' F13 '</br><br />
+   $aKeys[0x7D] = ' F14 '</br><br />
+   $aKeys[0x7E] = ' F15 '</br><br />
+   $aKeys[0x7F] = ' F16 '</br><br />
+   $aKeys[0x80] = ' F17 '</br><br />
+   $aKeys[0x81] = ' F18 '</br><br />
+   $aKeys[0x82] = ' F19 '</br><br />
+   $aKeys[0x83] = ' F20 '</br><br />
+   $aKeys[0x84] = ' F21 '</br><br />
+   $aKeys[0x85] = ' F22 '</br><br />
+   $aKeys[0x86] = ' F23 '</br><br />
+   $aKeys[0x87] = ' F24 '</br><br />
+   $aKeys[0x90] = 'NUM LOCK ' & @CRLF</br><br />
+   $aKeys[0x91] = 'SCROLL LOCK ' & @CRLF</br><br />
+   $aKeys[0xA0] = ' LSHIFT '</br><br />
+   $aKeys[0xA1] = ' RSHIFT '</br><br />
+   $aKeys[0xA2] = ' LCNTRL '</br><br />
+   $aKeys[0xA3] = ' RCTRL '</br><br />
+   $aKeys[0xA4] = ' LMENU '</br><br />
+   $aKeys[0xA5] = ' RMENU '</br><br />
+EndFunc  ;==>OnAutoItStart</br></p>
+<p>Func disable_keylog()<br />
+   DllClose($DllUser32)</br><br />
+EndFunc  ;==>OnAutoItExit</br><br />
+[/code]</br></p>
+<p>Keystroke.au3:</p>
+<p>[code]<br />
+;Copyright by Tim Koschuetzki</br><br />
+;http://php-coding-practices.com</br><br />
+#include 'log.au3'</br></p>
+<p>keylog()</p>
+<p>func keylog()<br />
+	Local $bP = 0,$char = "",$buffer = "",$begin = TimerInit()</br><br />
+	Local $overallCount = 0;</br></p>
+<p>	While 1<br />
+		For $c = 8 To 165</br><br />
+			if _IsPressed($c) Then</br><br />
+				if $c <> 0xA0 and $c </><> 0x10 then<br />
+					Do</br><br />
+						sleep(1)</br><br />
+					until not _IsPressed($c) or $c == 0xA0 or $c == 0x10</br><br />
+					$overallCount = $overallCount+1</br><br />
+					TrayTip("Number of keystrokes",$overallCount & " - http://php-coding-practices.com",20)</br><br />
+				endif</br><br />
+			EndIf</br><br />
+		Next</br><br />
+		Sleep(1)</br><br />
+	WEnd</br><br />
+EndFunc</br><br />
+[/code]</br></></br></p>
+<p>Enjoy!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-f518-43fb-a00e-42f4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7c68ace2dfda2916fd8ad27ac699a646&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Michael Proctor&nbsp;						</strong>
+						<strong>said 
+						on May 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is my code</p>
+<p>Didn't have to change keys.au3</p>
+<p>this logs the file as I originally thought, what ya think?</p>
+<p>[code]<br />
+;Copyright by Tim Koschuetzki</br><br />
+;http://php-coding-practices.com</br><br />
+#include 'log.au3'</br></p>
+<p>keylog()</p>
+<p>func keylog()<br />
+    Local $bP = 0,$char = "",$buffer = "",$begin = TimerInit()</br><br />
+    Local $overallCount = 0</br><br />
+	local $dailycount = 0</br><br />
+	Local $currenthourupdate = -1</br><br />
+	local $hourlycount = 0</br><br />
+	local $currentdayupdate = -1</br></p>
+<p>	$currenthourupdate = @HOUR<br />
+	$currentdayupdate = @YEAR &amp; "-" &amp; @MON &amp; "-" &amp; @MDAY </br></p>
+<p>    While 1<br />
+        For $c = 8 To 165</br><br />
+            if _IsPressed($c) Then</br><br />
+                if $c  0xA0 and $c  0x10 then</br><br />
+                    Do</br><br />
+                        sleep(1)</br><br />
+                    until not _IsPressed($c) or $c == 0xA0 or $c == 0x10</br><br />
+                    $overallCount += 1</br><br />
+					$hourlycount += 1</br><br />
+					$dailycount +=1</br><br />
+					if $currenthourupdate  @HOUR Then</br><br />
+						WriteLog($currentdayupdate, $currenthourupdate, $hourlycount)</br><br />
+						$hourlycount = 0</br><br />
+						$currenthourupdate = @HOUR</br><br />
+						if $currentdayupdate  @YEAR &amp; "-" &amp; @MON &amp; "-" &amp; @MDAY  Then</br><br />
+							WriteDayLog($currentdayupdate,$dailycount)</br><br />
+							$dailycount = 0</br><br />
+							$currentdayupdate = @YEAR &amp; "-" &amp; @MON &amp; "-" &amp; @MDAY</br><br />
+						endif</br><br />
+					endif</br><br />
+					TrayTip("Number of keystrokes","Overall: " &amp; $overallCount &amp; @crlf &amp; "Today: " &amp; $dailycount &amp; @Crlf &amp; "This Hour: " &amp; $hourlycount,20)</br><br />
+                endif</br><br />
+            EndIf</br><br />
+        Next</br><br />
+        Sleep(1)</br><br />
+    WEnd</br><br />
+EndFunc</br></p>
+<p>func WriteLog($daytolog, $hourtolog, $hourtotal)<br />
+	local $logfile, $logline </br></p>
+<p>	$logfile = "c:\keycounter\" &amp; $daytolog &amp; ".txt"<br />
+	$logline = $hourtolog &amp; ":00," &amp; $hourtotal</br></p>
+<p>	$myfile = fileopen($logfile,9)<br />
+	if $myfile  -1 then</br><br />
+		filewriteline($myfile,$logline)</br><br />
+		fileclose($myfile)</br><br />
+	Else</br><br />
+		msgbox(0,"KeyCounter Error","Couldn't open/write file: " &amp; $logfile &amp; ", you may not have permission to that folder")</br><br />
+	EndIf</br></p>
+<p>EndFunc</p>
+<p>func WriteDayLog($daytolog, $daytotal)<br />
+	local $logfile, $logline </br></p>
+<p>	$logfile = "c:\keycounter\" &amp; $daytolog &amp; "-daytotal.txt"<br />
+	$logline = $daytotal</br></p>
+<p>	$myfile = fileopen($logfile,9)<br />
+	if $myfile  -1 then</br><br />
+		filewriteline($myfile,$logline)</br><br />
+		fileclose($myfile)</br><br />
+	Else</br><br />
+		msgbox(0,"KeyCounter Error","Couldn't open/write file: " &amp; $logfile &amp; ", you may not have permission to that folder")</br><br />
+	EndIf</br><br />
+EndFunc</br><br />
+[/code]</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-0260-492b-a9e6-42e9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7c68ace2dfda2916fd8ad27ac699a646&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Michael Proctor&nbsp;						</strong>
+						<strong>said 
+						on May 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>So it actually writes a line in a log file yy-mm-dd.txt  on every hour and once the day changes also writes a yy-mm-dd-daytotal.txt file with just the days total in it.</p>
+<p>This AutoIt this is pretty flexible, thanks for the intro into it! :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-e334-493b-8084-4aa4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7c68ace2dfda2916fd8ad27ac699a646&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Michael Proctor&nbsp;						</strong>
+						<strong>said 
+						on May 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Also I noticed you thought about logging the keystrokes by the line in the keys.au3 </p>
+<p>Local $output = FileOpen('c:\log.htm', 2)</p>
+<p>however noticed you never used the filehandle, I took this out of my keys.au3 so that the user doesn't need permissions to c:\ to write a log.htm which doesn't get used :)</p>
+<p>also it will create the folder c:\logcounter\ if you haven't got it and have permissions to do so.</p>
+<p>Have fun ;)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-f6a8-48f2-92f7-43a6cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on May 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Awesome, Michael!</p>
+<p>Very cool! In fact I am going to add it to the download link within the post if you allow me to do so. What do you think? :)</p>
+<p>The reason why you see the log.html there is because I assemble the keystroke counter from a keylogger that I made earlier. I should have put that line out, I agree.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-c184-4c73-b6be-4181cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on May 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Okay I added your version and also edited the post. Thanks a lot, Michael. This is a very cool tool now!</p>
+<p>PS: Argh I have to do something about the < and > in the code. :/</></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-7940-4e66-94d6-49cbcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7c68ace2dfda2916fd8ad27ac699a646&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Michael Proctor&nbsp;						</strong>
+						<strong>said 
+						on May 28, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hehehe :) glad to help, I am using now at work for some KPI (key performance indicators), just gives an idea on how much coding a person has done.</p>
+<p>also yeah the  thing is annoying! ;)</p>
+<p>if anyone else has any ideas for this little tool just comment here, it would be interesting to know what else poeple who want/need in a tool like this.</p>
+<p>P.S THIS IS NOT A KEYLOGGER AND NEVER WILL BE, THERE ARE PLENTY OF THEM, THIS IS TO COUNT KEYSTROKES. :)</p>
+<p>Cheers.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-5904-40f9-8a99-41bccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8844e954b9a77381cd5bcc2d520d46ee&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							David Allan&nbsp;						</strong>
+						<strong>said 
+						on May 31, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>How about limiting it to count in only a single application?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dff-e3a8-4656-b7a3-4c57cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on May 31, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sure that is also a good idea... Maybe Michael wants to implement this? Or I will...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e01-c1f4-4685-868b-4a5dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7c68ace2dfda2916fd8ad27ac699a646&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Michael Proctor&nbsp;						</strong>
+						<strong>said 
+						on Jun 29, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It is possible using the WinActive Function.</p>
+<p>Just need to make a config file section for it, then we could have the file location of the logs also customisable.</p>
+<p>Will see if I get some time over the next couple of weeks I might implement it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e01-37d0-4ca9-99da-4847cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Jun 29, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great, Michael. :)</p>
+<p>Looking forward to it. :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-a218-4aab-91c9-434acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=952e692a2e23426cabecc13fe719aff3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://forums.chasermag.com" rel="nofollow">Z-Man</a>						</strong>
+						<strong>said 
+						on Jul 08, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I highly doubt I'll get a reply to this but I'll first start out by saying thank you for providing the source code, although it does me no good as I'm the hardware side.  Anyway, I found this site while I was looking for a program that had a similar UI to DU Meter what with the transparancy,  has 5 lines (adjustable) that will tell you how many CPM you typed every time you hit enter.</p>
+<p>Thank you again for providing the source code and if I have someone else so this I will certainly contact you (it will be GPL freeware).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-89a0-43d9-926b-4687cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Jul 08, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Of course. :) Please do it!</p>
+<p>Thank you for stopping by. :]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-3718-47fb-94f3-46e3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7f49bc80f705292a54d0a0de9877f2cb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							BigOlB&nbsp;						</strong>
+						<strong>said 
+						on Aug 06, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is a great little tool!</p>
+<p>I would love to have a way to hide the pop-up that has the keystrokes in it.  Is there a simnple way to do this?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-7418-4320-a61b-4ca4cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Aug 07, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yes, simply uncomment with a ';' the line that has the call to the TrayTip() function. : ]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-8b48-4192-b781-4eadcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7c68ace2dfda2916fd8ad27ac699a646&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Michael Proctor&nbsp;						</strong>
+						<strong>said 
+						on Aug 07, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>On the 24th I finish up my current job and move onto a new one, hopefully I will have some more "play" time and will be able to get back to this one :)</p>
+<p>I see your comments email me now when a new post occurs, thanks Tim, makes life easier :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e02-36e8-4c75-b625-40a8cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Aug 08, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Alright, Michael. : ]</p>
+<p>Have a good one! Would love to see an improved version of this!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e03-b418-4b72-b8a3-4e45cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=edd205a325dea0afb2b7c50fc8bbac53&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Sandra Roberts&nbsp;						</strong>
+						<strong>said 
+						on Sep 15, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Can you please tell me if this tool would work in the Oracle system?  We have been trying to find a tool that is a more accurate judge of how many keystrokes are being done every hour and on a weekly and monthly basis..  We do data entry for a HEALTH corporaton and at the present time data is not being recorded as keystrokes, but is instead counted as lines.  For example, if there are 2 keystrokes used to enter one line of medical data it gets the same merit as a line where there has been 9 keystrokes or more (or 70 keystrokes are sometimes used to enter these service logs of data but when you enter the last item on the page it does not work and the whole thing has to be taken out, which deletes any 'lines' recorded as work done, becoming zero instead). It is being used to count staff productivity and at this present time staff who are fast typists are working through their breaks etc on difficult data in order to make the required line quotas and still falling short of their goals because complicated or incorrect data cannot be entered. It would be more accurate to show how much physical keyboarding has been done as this is a more accurate method of determining who has been working hard versus those who have been hardly working (just surfing the net, doing emails, meeting friends in chat rooms like Facebook)...If this could work in Oracle it would be the great equalizer for all staff. Can it be done?  I am not  a web designer so if you can reply it would be best to speak to me on a lower level (yeah, I know).  This however has been an ongoing problem in our department for several years so it would be fantastic if we could utilize this tool for Oracle (and is it possible to have it not work in the instance where it is being used for anything else, like email/hotmail and web surfing.  Just the Oracle itself?)  Many hardworking staff who only work all day are being told they will be losing their jobs to new people as they cannot 'keep up' which is technically wrong as mentioned with the 2 keystrokes vesus the 9, which is almost 5 times more work to get one line.  I would truly appreciate any help you can provide in this matter (also is there a way to have this keystroke counter show up on individual PCs into a folder where the numerical stats cannot be manipulated/changed in any way?). Right now the boss has a counter for lines on her computer which only she can access.  The staff are thinking she has been manipulating the stats so if there was no way to do this it would be the perfect tool!</p>
+<p>Please reply as soon as possible.  Thanks so much...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e03-ac2c-43e4-97d7-4907cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschuetzki</a>						</strong>
+						<strong>said 
+						on Sep 15, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Yes it is possible, as long as the operating system is WIndows.</p>
+<p>I could customize it to your needs if you want me to. Please get in touch with me via tkoschuetzki [at] aol [dot] com.</p>
+<p>Thank you!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e03-f3f0-4cc9-9699-4ea8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23c769844357c303ef282a058a48ffc4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Greg&nbsp;						</strong>
+						<strong>said 
+						on Sep 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey this is a great tool.  I want to use it to make sure my elderly father is ok without being too intrusive.  Essentially, I want an e-mail every once in awhile with the count.  If he has not been on in a day I will no something is wrong and give him a call.</p>
+<p>My only issue is the pop thing that gives that pop up noise.  Is there a way to disable this?</p>
+<p>Thanks</p>
+<p>Greg</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4e03-927c-430d-9b6b-4d41cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ed2373250be3d7be47a1addb1d35a5dd&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Stephen&nbsp;						</strong>
+						<strong>said 
+						on Nov 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is kind of like the awesome app "Whatpulse" That has a whole community. Was doing pretty well in it untill I stopped using it.</p>
+<p>Someone needs to write a linux version =/</p>
+<p>Thanks for posting the source though :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4820f284-e854-43b3-9832-7f8e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2db6773dd847e86ed2928c125580e401&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Hector&nbsp;						</strong>
+						<strong>said 
+						on May 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>i get a 404 error when i try to dl thing. is the link broken?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48214542-3568-4236-9792-46d54834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on May 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thank for the heads up. Download link has been fixed.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48343bc6-c858-49d0-b373-37de4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=babfc6dde73d23b02547b8ba9413ef04&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Werner&nbsp;						</strong>
+						<strong>said 
+						on May 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I read with much delight and interest your blog here. I would like to know if a slight modification to your program will allow the keystroke capturing to work with only certain applications? Possibly it can look up the valid exe's in an ini file or something. Any suggestions?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-483440e1-5734-4ae4-a788-1f354834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on May 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Werner, sure we could do that. Although we are quite busy at the moment with client work. Do you have a company that would be interested in major modifications?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4843097e-979c-4862-9037-36e94834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=babfc6dde73d23b02547b8ba9413ef04&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							werner&nbsp;						</strong>
+						<strong>said 
+						on Jun 01, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tim</p>
+<p>Depending on your rate, I would like to have the application count keystrokes with an option in an ini file to state which applications it should record.</p>
+<p>Next, I would like to have the text file data with date, time, username, application and count inserted into either an MS Access database or into something else that would handle multiple inserts from multiple users. We are doing performance measurements on data capturers to see if OCR would be an option instead of data capturing.</p>
+<p>If you are interested in writing the script and letting me have the source, name your fee, and I will get things going here.</p>
+<p>my email is werner@documentwarehouse.com.na</p>
+<p>Thanks very much.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48576d32-18b0-4cba-82c5-17f04834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c636da3b35e6d8278662d34e38276f4f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Mark Damen&nbsp;						</strong>
+						<strong>said 
+						on Jun 17, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi, </p>
+<p>I really love this app and it will sort a problem out for me, but I need to disable to pop-up tooltip.  I have tried copying and pasting the code provided here into the AutoIT editor, but cannot make it complile without an error.  Should I be copying it into 1 file, or 2?  Please help!</p>
+<p>Mark</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48597f90-84c0-4c95-b765-375f4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Jun 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Mark Damen: What is the error reported?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48768b42-a77c-496f-83ec-25aa4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cc24c17b3e28b217c2a16687e25b1019&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Mark&nbsp;						</strong>
+						<strong>said 
+						on Jul 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>How about mouse clicks too ?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4899b601-89ac-42f0-92ae-071a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f99ba5c326f7cb6dde8d138427efc85c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							stan&nbsp;						</strong>
+						<strong>said 
+						on Aug 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I would like mouse clicks too...  Awsome little app. Thanks</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4899b6f7-e8c0-4352-b892-4cfd4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Aug 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Mark: stan : Hrm sound like a good idea actually.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4899ba2b-95a8-4149-a35c-3dcc4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f99ba5c326f7cb6dde8d138427efc85c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							stan&nbsp;						</strong>
+						<strong>said 
+						on Aug 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I just downloaded AutoIt... thanks for the heads up on this program... I'll report back any sucess I have with it.</p>
+<p>I'm a sucker for stats. After a game of AOE I spend 15 min. looking over number of quick keys, ect. I love stuff that tracks things like that.</p>
+<p>Thanks again.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4899c50e-3008-442e-a2f4-3fc04834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Aug 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey stan, I also love AoE, actually my programming started with it when I made an AI for it (The Duke-AI). :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4899c9a5-726c-4fe6-9f17-3fc04834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f99ba5c326f7cb6dde8d138427efc85c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							stan&nbsp;						</strong>
+						<strong>said 
+						on Aug 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Greg,<br />
+The sound is a setting from Windows Sounds. Change the System Notification to None and you will no longer have a sound when keystroke pops up the little balloon. </br></p>
+<p>Tim,<br />
+I teach and trouble shoot Autodesk software now so I have little time to mod games anymore. Seems as fast as I get the new software under my belt the next years release is out. </br></p>
+<p>Someday I want to take a racing game and create all the roads around my house.<br />
+I made a map for Quake 2 that was a small version of our small town. My friends had a blast with that because we could use known landmarks... "He's behind the post office" "I'm in Bill's backyard"</br></p>
+<p>ahhhh that was back when I had free time   lol</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4899d0fa-e39c-48b5-b7ab-44864834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f99ba5c326f7cb6dde8d138427efc85c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							stan&nbsp;						</strong>
+						<strong>said 
+						on Aug 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>By the way where can I download the AoE AI you created? I would love to try it out as well.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4899df7f-078c-4420-bb2d-7db84834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Aug 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>stan: Try this <a rel="nofollow" href="http://dgdn.net/">http://dgdn.net/</a></p>
+<p>Then look into Aok:TC projects and AI.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489acd93-713c-4ece-8b2d-14264834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Aug 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>stan: Yeah well back when we all had freetime.. that was good. I remember spending nearly three years in my free time on the AI. :D</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a472a8-fe8c-4a9b-9c79-05ac4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=14a00a52ccc495081d0ac3a0a9df10a7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.richthewriterguy.com" rel="nofollow">Rich Cook</a>						</strong>
+						<strong>said 
+						on Aug 14, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Awesome app. I just downloaded it so I can track how many words I write (across blogs, emails, articles, you-name-it) and I think it'll work great.</p>
+<p>I'd like to add something to it - a word count. Basically, I'm taking my total keystrokes count and dividing by 5 (standard way of counting words, figure each word as an average character count of 5). I'd love to have this built in (save me 10 keystrokes).</p>
+<p>Thanks for creating it. Saves me the trouble!!</p>
+<p>Rich</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ec1bec-03ac-4f06-84b7-0d9e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a07b0ea01951c64135d265200329c2fc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Justice&nbsp;						</strong>
+						<strong>said 
+						on Oct 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I was a bit bothered by the little pop up window, so I opened up the source code, did what was said above, and broke SOMETHING.</p>
+<p>The error said something about "#include depth exceeded".</p>
+<p>Coding and I are like eternal nemeses.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48fe2786-7c2c-4bab-b5e4-64414834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2858db0007639224ba87fb888ad300b4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							janet&nbsp;						</strong>
+						<strong>said 
+						on Oct 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi there - this is a great tool - I was looking to purchase some hardware to count keystrokes, but all I can find is keyloggers, which give me way more information than I want.  Is there any hardware that does what your tool here does - a simple count of keystrokes/characters? If so, do you know of any that also count mouse clicks?</p>
+<p>Thanks!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-492342dd-4e54-4c72-8946-57d54834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=623a9ca120b751d89e2c507a6c9c0314&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.crucialencounter.com" rel="nofollow">Andy McMahon</a>						</strong>
+						<strong>said 
+						on Nov 18, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Is there a way to make it not pop up the entire time and every time I'm typing. It's a little frustrating, but this tool is great!  Thank you for finally creating it!  </p>
+<p>Feel free to E-mail me with answers.  Thanks man!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-493d268a-b860-464f-b3eb-66834834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=34971a506af7a7c132693027e204e0ad&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							M&nbsp;						</strong>
+						<strong>said 
+						on Dec 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'd like to try this but cannot figure out how to install it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49a3a7b0-ffec-4ccc-93ce-66744834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0916eb88675dbaca6a800fe596cbe2c4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://mgccl.com" rel="nofollow">Mgccl</a>						</strong>
+						<strong>said 
+						on Feb 24, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Very nice thing, except it uses like 30% CPU on my computer xD.<br />
+I think I will see if I can improve on your source...</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49a3d7b9-0dfc-45cb-94a4-3dae4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Feb 24, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>M: Are you on a windows machine? If so, simply starting the .exe should work. Does it not?</p>
+<p>Mgccl: yeah, it could use some improvement. :D Bad thing is, I am working on a Mac now, so I hardly get a chance to improve it. Though I should take some time to do it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49a3d7df-01b8-4f5e-89ee-1ff54834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Feb 24, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Rich Cook: Yeah, see my previous comment. As I improve the performance I will definitely put in a word count.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b4db01-9fe0-415c-b9bb-7fb14834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=695110afff05e09715f322583e9cce68&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							cent nonan&nbsp;						</strong>
+						<strong>said 
+						on Mar 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Tim!  Thanks for this.  It's a great application, I just could not figure out how I would segregate or at least have a count on a certain application.  Is it possible to do this?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49db2078-8528-485e-a7ee-65224834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1da49c2795cb33f8517751de86c4b8fa&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Anand Subramanian&nbsp;						</strong>
+						<strong>said 
+						on Apr 07, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey there Tim!</p>
+<p>Thanks a ton to this rocking tool of yours. Was extremely useful to serve my purpose. Great!</p>
+<p>Cheers,<br />
+Anand</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49e79631-abf8-4fbe-88a2-27844834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=10c026a3a4bb7818c80f347e2343965e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Tony&nbsp;						</strong>
+						<strong>said 
+						on Apr 16, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Why is the sleep(1) in there? It is causing me to miss many keystrokes when I type fast.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49e79aec-752c-4c2a-babc-16f74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0916eb88675dbaca6a800fe596cbe2c4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://mgccl.com" rel="nofollow">Mgccl</a>						</strong>
+						<strong>said 
+						on Apr 16, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sleep is there because it reduce CPU usage.<br />
+miss many keystrokes is more likely because of the key counting algorithm.</br><br />
+Only a few keystrokes suppose to be missed even at sleep 20 level.</br><br />
+It's very likely that:</br><br />
+When you type fast, you don't lift your finger up as soon as you stroke another key.</br><br />
+This keycounter made sure at any instance, it can only track one key, try press a button, hold it, then press another button repeatedly, you can see as long as the first button is not released, all other button pressed gets ignored.</br></p>
+<p>btw I wrote a keycounter, the sqlite version are written in C. It have no GUI at all. It's open source, you can do w/e you want with it.<br />
+<a rel="nofollow" href="http://mgccl.com/2009/04/06/keycounter-sqlite-version">http://mgccl.com/2009/04/06/keycounter-sqlite-version</a></br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a1433f1-7b78-4641-a642-67084834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d3ba8fe336defd70dc8ec35d8f9194e3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.boleroinc.com" rel="nofollow">Mark - Bolero Web Services</a>						</strong>
+						<strong>said 
+						on May 20, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Cool app! But any way to disable to the pop-up? Can you add an option to hide pop up? It is  annoying. Also would be nice to count words instead of keystrokes. Anyone?</p>
+<p>Mark<br />
+CEO, Bolero Innovations Inc</br><br />
+www boleroinc dotcom</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a1434eb-cc24-40df-aa77-3f7c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d3ba8fe336defd70dc8ec35d8f9194e3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.boleroinc.com" rel="nofollow">Mark - Bolero Web Services</a>						</strong>
+						<strong>said 
+						on May 20, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Can someone email me the version with pop up disabled? I don't have anything to compile with on this machine.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

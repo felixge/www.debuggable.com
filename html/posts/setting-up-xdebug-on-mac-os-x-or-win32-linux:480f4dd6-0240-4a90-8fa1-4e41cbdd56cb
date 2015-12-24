@@ -1,0 +1,1078 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Setting up Xdebug on Mac OS X (or Win32 / Linux) &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/setting-up-xdebug-on-mac-os-x-or-win32-linux:480f4dd6-0240-4a90-8fa1-4e41cbdd56cb">Setting up Xdebug on Mac OS X (or Win32 / Linux)</a></h2>	<div class="posted-on">
+		<p>Posted on 21/9/07 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>If you want to take your debugging to the next level by getting a nice stack / function trace on errors that occur, then you should check out <a href="http://xdebug.org/">Xdebug</a> by <a href="http://derickrethans.nl/who.php">Derick Rethans</a> (who I had the pleasure to meet at <a href="http://works.phparch.com/c/p/index">php|works</a>). I've only been touching the surface of this powerful extensions so far, but its already been a pleasure to work with and I'll try to write more about it in future. Maybe I can even integrate it into the CakePHP test suite for code coverage analysis at some point.</p>
+<p>Anyway, one of the biggest obstacles when getting started with Xdebug was that I had a hard time finding good instructions on how to set it up on Mac OS X (I finally got rid of windows, yeah !). The only good resource I found was stored in Googles cache (wasn't live anymore) and had instructions on how to manually build xdebug from source. However, I didn't have a lot of time back then and compiling would have involved setting up all kinds of additional tools. This was the point when I vaguely remembered that the <a href="http://www.activestate.com/products/komodo_ide/">Komodo IDE</a> was using xdebug. So I did some more research and sure enough, the good folks over at ActivateState actually provide their Xdebug binaries as stand-alone downloads for all major platforms.</p>
+<p>On my macbook I'm using <a href="http://www.mamp.info/en/mamp.html">MAMP</a>, but the basic concept of setting this up should be cross plattform:</p>
+<ol>
+<li>Download the latest Xdebug binaries for your OS from: <a href="http://aspn.activestate.com/ASPN/Downloads/Komodo/RemoteDebugging">http://aspn.activestate.com/ASPN/Downloads/Komodo/RemoteDebugging</a></li>
+<li>Copy the xdebug.so / xdebug.dll for your PHP version to your extensions directory (for MAMP this was: /Applications/MAMP/bin/php5/lib/php/extensions/no-debug-non-zts-20050922/xdebug.so, in Windows its probably C:\php\modules\xdebug.dll)</li>
+<li>Find your php.ini file (for my MAMP install this was in /Applications/MAMP/conf/php5/php.ini, under Windows it should be C:\Windows\php.ini)</li>
+<li>Add the following lines to your php.ini configuration (MAMP):</li>
+</ol>
+<div class="clear"></div>
+<div class="code debuggable_sh_ini" style="white-space: wrap;white-space: nowrap;"><span class="re0"><span class="br0">&#91;</span>xdebug<span class="br0">&#93;</span></span><br />
+<span class="re1">zend_extension</span>=<span class="re2">/Applications/MAMP/bin/php5/lib/php/extensions/no-debug-non-zts<span class="nu0">-20050922</span>/xdebug.so</span></div>
+<p>or for Windows:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_ini" style="white-space: wrap;white-space: nowrap;">zend_extension_ts=<span class="st0">&quot;c:/php/modules/xdebug.dll&quot;</span></div>
+<p>To test if things worked or not run a phpinfo() script and see if xdebug shows up in your list of extensions (you'll probably have to restart Apache first). Once that is accomplished you can start to indulge yourself in discovering all the various <a href="http://www.xdebug.org/docs/all_settings">configuration options</a> and <a href="http://www.xdebug.org/docs/all_functions">functions</a> there are.</p>
+<p>One of my favorite settings allows to make all file paths that show up in error messages turn into links that will open my text editor for the given file at the right line. For <a href="http://macromates.com/">Textmate</a> this is simply a matter of adding this line to your php.ini:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_ini" style="white-space: wrap;white-space: nowrap;">xdebug.<span class="re1">file_link_format </span>= <span class="st0">&quot;txmt://open?url=file://%f&amp;line=%l&quot;</span></div>
+<p>Check the manual of your editor of choice to see what "protocol" it is using for accomplishing the same thing. Also make sure to check out if your editor happens to have built-in Remote Debugging support for Xdebug. A list of those editors can be <a href="http://www.xdebug.org/docs/remote">found in the Xdebug documention</a> (Textmate is not in there yet : /).</p>
+<p>Alright, I hope some of you find this useful. If you run Windows or Linux there are also more <a href="http://www.xdebug.org/docs/install">detailed instructions</a> on the Xdebug website itself, I just found the lack of OS X info out there worth making this little blog post. Kudos go out to Derick for writing this awesome extension and ActiveState for providing Mac OS X (and other plattform) binaries for all kinds of PHP versions.</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-0240-4a90-8fa1-4e41cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsetting-up-xdebug-on-mac-os-x-or-win32-linux%3A480f4dd6-0240-4a90-8fa1-4e41cbdd56cb &amp;title=Setting+up+Xdebug+on+Mac+OS+X+%28or+Win32+%2F+Linux%29';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsetting-up-xdebug-on-mac-os-x-or-win32-linux%3A480f4dd6-0240-4a90-8fa1-4e41cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsetting-up-xdebug-on-mac-os-x-or-win32-linux%3A480f4dd6-0240-4a90-8fa1-4e41cbdd56cb&amp;title=Setting+up+Xdebug+on+Mac+OS+X+%28or+Win32+%2F+Linux%29&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fsetting-up-xdebug-on-mac-os-x-or-win32-linux%3A480f4dd6-0240-4a90-8fa1-4e41cbdd56cb&amp;title=Setting+up+Xdebug+on+Mac+OS+X+%28or+Win32+%2F+Linux%29';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/access-your-config-files-rapidly-win32-only:480f4dd6-3ed4-4725-b26e-40e5cbdd56cb">Access your config files rapidly (Win32 only)</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/setting-up-xdebug-on-mac-os-x-or-win32-linux:480f4dd6-0240-4a90-8fa1-4e41cbdd56cb">53 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/setting-up-xdebug-on-mac-os-x-or-win32-linux:480f4dd6-0240-4a90-8fa1-4e41cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4def-24f0-4030-bb5b-46aecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2f11c840ab7eccb6788ab0c4331f5dad&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakeexplorer.wordpress.com" rel="nofollow">Yevgeny</a>						</strong>
+						<strong>said 
+						on Sep 21, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>&gt; xdebug.file_link_format = "txmt://open?url=file://%f&amp;line=%l"</p>
+<p>For widows system there is two way for using textmate style links.<br />
+First - use E-texteditor that very young. I dislike it even most of bundles implemented but functionality is very very young.</br><br />
+The second is my solution. I create universal wrapper that process such links and start extarnal application (editor). In mmy case i use notepad++ that also use xdebug for debuging php code.</br><br />
+Also in future i plan to integrate textmate bundles and scripts in it.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4def-a264-4659-9995-41cfcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f0b8fa14cbee5edfdeeac6b8f9ad062d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://sanisoft.com/blog/" rel="nofollow">Tarique Sani</a>						</strong>
+						<strong>said 
+						on Sep 21, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>For Linux users - http://protoeditor.sourceforge.net/ has a nice lightweight client for Xdebug which is also available as a plugin for Kate (this is not mentioned on the Xdebug site)</p>
+<p>Xdebug also runs happily with XAMPP - if you figure out where to put the compiled .so file ;)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4def-be30-4e63-94d8-44bfcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Sep 21, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tarique: Thanks for that info.</p>
+<p>@Everybody: There also is an article describing on how to install Xdebug on Linux w/ XAMPP on the SaniSoft blog: http://www.sanisoft.com/blog/2007/06/23/how-to-install-xdebug-php-extension-for-xampp-on-linux/</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4def-859c-48b8-96d2-4041cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2f11c840ab7eccb6788ab0c4331f5dad&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakeexplorer.wordpress.com" rel="nofollow">Yevgeny</a>						</strong>
+						<strong>said 
+						on Sep 21, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The link to my wrapper is http://cakeexplorersamples.googlecode.com/files/nppwrapper.rar<br />
+Also i integrate this solution with cakephp (Footnotes article on bakery)</br><br />
+Soon I create extended article (where will possible to open files from cake stack trace)</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4def-d104-4bd4-9b51-4812cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.phpdeveloper.org/news/8701" rel="nofollow">PHPDeveloper.org</a>						</strong>
+						<strong>said 
+						on Sep 21, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p><strong>Felix Geisendorfer's Blog: Setting up Xdebug on Mac OS X (or Win32 / Linux)...</strong></p>
+<p>...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4def-7868-416c-b156-4869cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8fad3c4d1c8ad049449720897bb3eb68&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://teemow.com" rel="nofollow">Timo Derstappen</a>						</strong>
+						<strong>said 
+						on Sep 21, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Together with xdebug phpcoverage detects your test coverage while running your testsuite. This is really helpful to find important parts in your application which are still untested:</p>
+<p>http://developer.spikesource.com/wiki/index.php/Projects:phpcoverage</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4def-5e68-4436-9df7-4ca3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.developercast.com/2007/09/21/felix-geisendorfers-blog-setting-up-xdebug-on-mac-os-x-or-win32-linux/" rel="nofollow">developercast.com &raquo; Felix Geisendorfer&#8217;s Blog: Setti</a>						</strong>
+						<strong>said 
+						on Sep 21, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Felix Geisendorfer shows, in a new blog post today, how to setup XDebug (the popular debugging extension for PHP) on a Mac OSx (or Win32/Linux) system.   One of the biggest obstacles when getting started with Xdebug was that I had a hard time finding good instructions on how to set it up on Mac OS X (I finally got rid of windows, yeah !). The only good resource I found was stored in Googles cache (wasn&#8217;t live anymore) and had instructions on how to manually build xdebug from source. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4def-f4ac-4e4a-8675-44a0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e13552be946ed37a10684c75e4d1598&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://simon.geek.nz/" rel="nofollow">Simon</a>						</strong>
+						<strong>said 
+						on Sep 21, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I just installed it through pecl and added the zend_extension line to php.ini</p>
+<p>Works prefectly.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4def-6f00-484b-9042-4c25cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f7b7b49e45303258c9fee072a3a19d17&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							JNunez&nbsp;						</strong>
+						<strong>said 
+						on Sep 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>For those with fresh installs of MAMP make sure that you add the xdebug directives to the bottom of the php.ini file (after the ZendExtension manager). Also switch to php 4 and turn off APC in the MAMP control panel.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4def-5aac-4678-93d8-4144cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bbe501053c983cd78d2f7e24976a1578&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							tyler&nbsp;						</strong>
+						<strong>said 
+						on Sep 24, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Awesome! Thank you!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df0-47c8-4204-816b-4295cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=51f538c167b96f7fb0e7fe09c215b45c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Remco&nbsp;						</strong>
+						<strong>said 
+						on Sep 27, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for sharing this, Felix! Works perfectly :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df2-f2d4-44e9-b08d-4221cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fd47e275314ab72efc7005f970cf0eaa&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://inkdeep.com" rel="nofollow">jeremy</a>						</strong>
+						<strong>said 
+						on Nov 03, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It installed no problem through macports in OS X 10.5 for me. Thank you for the pointer!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df2-e454-4ebd-b8e3-40b5cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9b65ac7d2683e9fae16113e2dbf0e82d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Tesh&nbsp;						</strong>
+						<strong>said 
+						on Nov 19, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for sharing this!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df3-f508-452e-bee6-472fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d387b6ea2d490c766977c20b15392609&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://invalid8.com" rel="nofollow">Matt</a>						</strong>
+						<strong>said 
+						on Dec 17, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Just got xdebug 2.1dev running today with leopard. The file_link_format is proving to be very useful when developing locally. Thanks.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df4-b9cc-4213-93e1-45aacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2c9e8502e67a57ae5b3527239599d0a8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Joe&nbsp;						</strong>
+						<strong>said 
+						on Jan 13, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>These instructions worked *nearly* perfectly for me.  One little hitch (on my 2.4 Ghz Intel Core Duo iMac) is that I had to disable the "Zend Optimizer".</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-77c0-4e6c-b3e2-49b6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4ff55056da5e0e65eadb07af82e46adf&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							SCUM&nbsp;						</strong>
+						<strong>said 
+						on Jan 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>On Leopard, both the pecl install and the Komodo download worked... but they needed to be referenced in php.ini with this line:</p>
+<p>extension=/usr/lib/php/extensions/no-debug-non-zts-20060613/xdebug.so</p>
+<p>The "zend-extension=" line would not load the extension for me.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-1afc-4278-8500-48d5cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cc47a8b461fcebd5968d0923642aa737&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://ananich.wordpress.com" rel="nofollow">Antonio</a>						</strong>
+						<strong>said 
+						on Feb 28, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>You wrote:<br />
+&gt;On of my favorite settings allows to make all file paths ...</br><br />
+Should be:</br><br />
+&gt;One of my favorite settings allows to make all file paths ...</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-cd7c-498e-97ee-4df9cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 01, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thx Antonio - fixed.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-7ebc-4b62-b219-4a1fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8c324dc274834319379218b0c677559a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://xentek.net/" rel="nofollow">xentek</a>						</strong>
+						<strong>said 
+						on Mar 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@scum - that's because it's zend_extension not zend-extension.</p>
+<p>For everyone else: This one of the best XDEBUG tutorials I've seen yet:<br />
+http://devzone.zend.com/article/2803-Introducing-xdebug</br></p>
+<p>It will totally get you started on how to properly configure its options, and what to do with its output.</p>
+<p>Happy bug hunting!</p>
+<p>-xentek</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-a5bc-4747-9eb8-4f70cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7ccacaa49f6b7c5ea0e40b6e1c5d8c4d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Olivier&nbsp;						</strong>
+						<strong>said 
+						on Mar 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I ran into some problems when I added the xdebug.so line in my php.ini. For some reason the Zend optimizer had a conflict with xdebug. The php_error.log showed the following error:</p>
+<p>[30-Mar-2008 17:17:32] PHP Fatal error:  [Zend Optimizer] Zend Optimizer 3.2.2 is incompatible with Xdebug 2.1.0-dev in Unknown on line 0</p>
+<p>Apache wouldn't start anymore!</p>
+<p>I solved by turning off the Zend Optimizer in php.in:</p>
+<p>;[Zend]<br />
+;zend_optimizer.optimization_level=15</br><br />
+;zend_extension_manager.optimizer=/Applications/MAMP/bin/php5/zend/lib/Optimizer-3.2.2</br><br />
+;zend_optimizer.version=3.2.2</br></p>
+<p>;zend_extension=/Applications/MAMP/bin/php5/zend/lib/ZendExtensionManager.so</p>
+<p>Cheers, Olivier</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-481e817a-6ae4-4461-aa68-1fa24834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5e85c2531b62297371cdaefbddfb0d24&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dano!&nbsp;						</strong>
+						<strong>said 
+						on May 05, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Be careful of getting the latest xdebug.so.  The version I found was v2.1.0-dev, which has some problems with the most recent version of Eclipse and PDT.  Tripped me up for quite some time.</p>
+<p>From the Eclipse newsgroup:<br />
+---</br><br />
+A change has been made in the xdebug 2.0.3 which appears to causes a problem for PDT using xdebug. So at this time it is not recommended to upgrade to 2.0.3 and to continue using xdebug 2.0.2 with PDT 1.0.2 and the PDT 1.1 Nightly/Integration builds.</br><br />
+---</br></p>
+<p>The only way I found to get the old version is to download the source from xdebug.org and compile it.  If you don't have the Xcode tools, they are not hard to install: insert Disc 2 from the install CDs, open the "Xcode Tools", double click on the XcodeTools.mpkg, and go outside for a bit and enjoy the weather.  When you come back, greb the 2.0.2 version of xdebug, unpack it, go to that directory in a terminal, and follow the directions in the README.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48265c79-2170-4b66-8234-1cf84834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a08a23a234e85b615f7775ae15ab9cba&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://kentrichards.net" rel="nofollow">Kent</a>						</strong>
+						<strong>said 
+						on May 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>After compiling xdebug and failing to get the server to start back up, this was nice to find.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48285687-3a64-4c28-94ac-06cf4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c32140908bf7b6ddfae74e01ea89836b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dream.adeli.ca" rel="nofollow">Tim Fletcher</a>						</strong>
+						<strong>said 
+						on May 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Olivier</p>
+<p>Yes, the install docs on the xdebug site state:</p>
+<p><i>Xdebug does not work together with the Zend Optimizer or any other Zend extension (DBG, APD etc). This is due to compatibility problems with those modules. We will be working on figuring out what the problems are, and of course try to fix those.</i></p>
+<p>I only had to comment out this line</p>
+<p>zend_extension=/Applications/MAMP/bin/php5/zend/lib/ZendExtensionManager.so</p>
+<p>to get it all working.</p>
+<p>Great tutorial! Thanks!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-482b4887-8d70-44ee-b843-1c744834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4ff55056da5e0e65eadb07af82e46adf&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							scum&nbsp;						</strong>
+						<strong>said 
+						on May 14, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>On Mac OS X (Leopard) on Intel Core 2 Cuo processors, the pre-built binaries do not seem to work.  Instead, grab the xdebug binaries at <a rel="nofollow" href="http://xdebug.org/">http://xdebug.org/</a> and in the downloaded directory run:</p>
+<p>phpize</p>
+<p>then</p>
+<p>MACOSX_DEPLOYMENT_TARGET=10.5 CFLAGS="-arch ppc -arch ppc64 -arch i386 -arch x86_64 -g -Os  -pipe -no-cpp-precomp" CCFLAGS="-arch ppc -arch ppc64 -arch i386 -arch x86_64 -g -Os  -pipe" CXXFLAGS="-arch ppc -arch ppc64 -arch i386 -arch x86_64 -g -Os  -pipe" LDFLAGS="-arch ppc -arch ppc64 -arch i386 -arch x86_64 -bind_at_load" ./configure --enable-xdebug</p>
+<p>This will create the module you want in the `modules` directory.  Copy these into your php extensions directory (probably /usr/lib/php/extensions/no-debug-non-zts-20060613).  </p>
+<p>Add<br />
+extension=xdebug.so</br><br />
+to your php.ini</br></p>
+<p>Restart apache.  And you should be good to go.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-482b4a3a-2174-4d71-9c67-6cc94834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 14, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>scum: I run the same setup as you (unless you really mean cuo processors, not duo ^^) and the binaries from komodo work for me.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4855fe49-6234-4d2b-b1ee-7eb74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=535d6388fa5b748d9d69e3c00fefd7e6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Stuart&nbsp;						</strong>
+						<strong>said 
+						on Jun 16, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>For what it's worth... I could not get the komodo binary to work for me  and I am on the same setup as Felix (same Macbook, MAMP, etc.).</p>
+<p>In my apache error logs I could see that the extension failed to load but no clues as to why. I finally compiled everything myself from the binaries on the xdebug site (using version 2.0.2, not the latest also using my own install of phpize... not MAMP's. It is a very fast configure and make so don't worry), copied that over into the extensions dir and Felix's direction then worked fine.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48565109-9194-41b9-9e01-4fe04834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 16, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Stuart: Tried disabling zend optimizer?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-485ad5ce-f914-4fae-9ec2-35f04834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=49ae25d94f3bc1c64c9f9b8d65e1a6a7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							lightspeed&nbsp;						</strong>
+						<strong>said 
+						on Jun 19, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This was great, thanks.  I've got everything going...sorta.</p>
+<p>I have two issues:  a.) the debugger will not stop at a checkpoint on my *second* page.  Checkpoints on the first page are fine.  b.)  the implicit_flush doesn't seem to work.  On or off, I only see my page after the php page completes.  I'm running:</p>
+<p>Leopard 10.5.3 on 2.4GHz Intel Core 2 Duo.<br />
+MAMP 1.7.1, Zend Engine v2.2.0, Xdebug v2.1.0-dev.</br></p>
+<p>Recommendations where to start digging into this?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-485b0f12-128c-4abe-b5ce-27554834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=49ae25d94f3bc1c64c9f9b8d65e1a6a7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							lightspeed&nbsp;						</strong>
+						<strong>said 
+						on Jun 20, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>compiled xdebug 2.0.2 as instructed above.  both issues resolved.  :-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4863f214-1674-4726-842d-64e74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9050d2bad5a33d4dc3fabeea71ed1d12&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Luke Barton&nbsp;						</strong>
+						<strong>said 
+						on Jun 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>To all with issues enabling the extension with MAMP PRO, it seems to ignore the ini @ '/Applications/MAMP/conf/php5/php.ini' completely.</p>
+<p>On server start-up it actually overwrites '/Library/Application Support/living-e/MAMP PRO/conf/php.ini' (which is the config loaded by php, see phpinfo();) with the one stored inside the .app contents.</p>
+<p>So you need to edit you need to edit '/Applications/MAMP PRO x.x.x/MAMP PRO.app/Contents/Resources/php5.ini'</p>
+<p>Hope this helps some people.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48728798-4d98-45de-980d-2fb04834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9056e0fc2ddd0f8b79151e2449fbd279&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Ira Rainey&nbsp;						</strong>
+						<strong>said 
+						on Jul 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Luke: Top job on picking that up. I've been banging my head against the wall trying to get this up and running on MAMP Pro. All sorted now though - and using the Komodo binaries. Cheers.</p>
+<p>Leopard 10.5.4 on 2GHz Intel Core 2 Duo.<br />
+MAMP Pro 1.7.1, Xdebug v2.1.0-dev.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4873a581-f6f0-466d-be2e-64064834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=535d6388fa5b748d9d69e3c00fefd7e6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Stuart&nbsp;						</strong>
+						<strong>said 
+						on Jul 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix: Yes, I had done that. I'm as certain as I can be that I tried everything (but you know that feeling of "I'm certain I haven't missed anything and it STILL isn't working" and then you find you have indeed missed something). Compiling things myself ended up working for me so for others who are comfortable with terminal and configure, make, make install may just want to go that route.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48764bac-d980-46b9-a139-45694834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=21d9c11de70ec53e5ec6c60ac3f747c0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Joel&nbsp;						</strong>
+						<strong>said 
+						on Jul 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Luke: I just spent the better part of an hour trying to figure out why MAMP Pro 1.7.1 refused to load the php.ini configuration files.  In the end, I simply used the MAMP Pro menu to get File->Edit Template->php5 php.ini and include the directives there.  Thanks for pointing out where this template file actually resides.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ad8c6d-fd34-44df-a037-16e74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=97e7e4a1bcfc72c90289295619ea3444&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Pete&nbsp;						</strong>
+						<strong>said 
+						on Aug 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Leopard: 10.5.4<br />
+2.4GHZ Intel Core 2 Duo</br></p>
+<p>Still can't get this to work :( Nothing with xdebug appears in my php.info file.  I've downloaded  the 4.4 version of Mac OS X / x86 off the website listed above, extracted it and used the xdebug.so from the 5.2 folder, the 5.1 folder and the 5.0 folder. None of them allow my mamp to start.</p>
+<p>Any suggestions on what I am doing wrong?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48ad9ed0-d6d0-4a61-b489-376b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=97e7e4a1bcfc72c90289295619ea3444&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Pete&nbsp;						</strong>
+						<strong>said 
+						on Aug 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Fixed: downloaded the Komodo IDE and took the xdebug.so from there, worked.</p>
+<p>Thanks for the post (Also ;zend_extension=/Applications/MAMP/bin/php5/zend/lib/ZendExtensionManager.so )</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b17cfc-7b8c-4d44-a942-76e64834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6b2de4a52338737999da78cf40e0a3c1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.careermantra.com" rel="nofollow">Vineet</a>						</strong>
+						<strong>said 
+						on Aug 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Your article saved me a lot of time.<br />
+It is difficult to get information on php and OSX.</br><br />
+Thanks a lot!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-490e68e3-74d0-4804-98cc-1c0e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c06a4f86f697317163377f499d914b03&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							kai&nbsp;						</strong>
+						<strong>said 
+						on Nov 03, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks Felix! Worked great for me.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-491b3834-2ad0-402a-bb9a-3e9e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=dc76de7bb17588b1aa020d240b0b785f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.bitmatixmedia.com" rel="nofollow">dan</a>						</strong>
+						<strong>said 
+						on Nov 12, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Saved me a lot of time too. Thank you for sharing this!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-493ad765-7428-4b23-bf18-0e3e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f637b0336529254d12a519fffbff8212&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.givegoodweb.com" rel="nofollow">Matt</a>						</strong>
+						<strong>said 
+						on Dec 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The Apache that comes with Max OS 10.5 is compiled as 64-bit application, and I think Xdebug is 32-bit. These commands will restart Apache in 32-bit mode, and it now shows up in phpinfo() for me:</p>
+<p>sudo apachectl stop<br />
+sudo arch -i386 /usr/sbin/httpd</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-493b0cab-8ef0-41b4-acb0-1ee14834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b98707e2f002a1663475d445e9ffb283&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							farhaan&nbsp;						</strong>
+						<strong>said 
+						on Dec 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Do you have to have apple developer tools to compile xdebug on a mac. I dont have the developer tools and when i phpize it throws an error </p>
+<p>Cannot find config.m4.<br />
+Make sure that you run '/usr/bin/phpize' in the top level source directory of the module</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49586ef1-0dcc-4bdc-919e-6c544834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b3093c98f39f95de7b07af1dc6172da2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://typeoneerror.com" rel="nofollow">ben</a>						</strong>
+						<strong>said 
+						on Dec 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I've got xdebug installed fine (showing up in phpinfo()) but I'm trying to get it to work with PHPUnit's code coverage functionality. It keeps telling me "XDebug is not loaded". I've got phpunit working fine with MAMP. Anyone have any ideas?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-495fe092-c70c-46fd-9c35-7cd24834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=15a4f1d0f4f5099cb388963b18e66f8f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://code.google.com/p/sjsb/downloads/list" rel="nofollow">Nicola Ferruzzi</a>						</strong>
+						<strong>said 
+						on Jan 03, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>To get it working using Leopard 10.5.6 with the system php and apache, just download the source of xdebug then follow Scum instructions:</p>
+<p>phpize</p>
+<p>MACOSX_DEPLOYMENT_TARGET=10.5 CFLAGS="-arch ppc -arch ppc64 -arch i386 -arch x86_64 -g -Os -pipe -no-cpp-precomp" CCFLAGS="-arch ppc -arch ppc64 -arch i386 -arch x86_64 -g -Os -pipe" CXXFLAGS="-arch ppc -arch ppc64 -arch i386 -arch x86_64 -g -Os -pipe" LDFLAGS="-arch ppc -arch ppc64 -arch i386 -arch x86_64 -bind_at_load" ./configure --enable-xdebug</p>
+<p>make</p>
+<p>sudo cp modules/xdebug.so /usr/lib/php/extensions/no-debug-non-zts-20060613</p>
+<p>edit your php.ini and add </p>
+<p>zend_extension = "/usr/lib/php/extensions/no-debug-non-zts-20060613/xdebug.so"<br />
+xdebug.remote_enable = 1</br></p>
+<p>(you might add all other options listed in the thread)</p>
+<p>restart the "Web Sharing" service</p>
+<p>php -m</p>
+<p>you should see at the bottom</p>
+<p>[Zend Modules]<br />
+Xdebug</br></p>
+<p>!! :-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4962690b-51d4-4486-b0ce-0cc64834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a4b5bdb7da93a42917fd86f80e0bf8f2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://local.werstnet.com" rel="nofollow">hereNT</a>						</strong>
+						<strong>said 
+						on Jan 05, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I was having a lot of trouble getting this to actually load on my mac with the proper (x86) versions of the debugger from Komodo.  I had this same problem trying to compile under XAMPP for linux.</p>
+<p>The problem is that MAMP and XAMPP both run as 32 bit.  The xdebug.so file for x86 is 64bit, so it can't be loaded.</p>
+<p>To get it working on the mac with the Komodo file, I downloaded the PPC version instead and it came up fine.</p>
+<p>For the *nix box, I ended up just installing Apache, PHP, etc from source or yum as 64bit.  I needed a couple of other extensions besides debug that were giving me the same problem where the extension that I'd compile from the source would be 64 and wouldn't run under the 32bit XAMPP.</p>
+<p>Hopefully that helps someone else that's trying to figure out why this isn't working for them :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49626d02-b41c-46ba-9158-57844834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a4b5bdb7da93a42917fd86f80e0bf8f2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://local.werstnet.com" rel="nofollow">hereNT</a>						</strong>
+						<strong>said 
+						on Jan 05, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nevermind, seems like this mac actually is running a PPC processor, for some reason I thought it was intel.  Silly macs.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49e9cc80-9d18-4a5a-8925-0ca54834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d7b6f56d567f446f43d986c9109cc3e6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							nasigoreng&nbsp;						</strong>
+						<strong>said 
+						on Apr 18, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hi guys... i have followed this instruction but i still couldnt get it to work. On php error log i got this error message</p>
+<p>PHP Warning:  PHP Startup: Unable to load dynamic library '/Applications/MAMP/bin/php5/lib/php/extensions/no-debug-non-zts-20050922//Applications/MAMP/bin/php5/lib/php/extensions/no-debug-non-zts-20050922/xdebug.so</p>
+<p>any idea?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49e9ce3a-f9a4-42fa-8d1e-272b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d7b6f56d567f446f43d986c9109cc3e6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							nasigoreng&nbsp;						</strong>
+						<strong>said 
+						on Apr 18, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>oops i didn't copy the whole thing</p>
+<p>PHP Warning:  PHP Startup: Unable to load dynamic library '/Applications/MAMP/bin/php5/lib/php/extensions/no-debug-non-zts-20050922//Applications/MAMP/bin/php5/lib/php/extensions/no-debug-non-zts-20050922/xdebug.so' - (null) in Unknown on line 0</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a0c4c41-49d8-41d6-99f2-5e5d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1653498fe7f387b3f39d40741b2f9a4b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.juliendesrosiers.com" rel="nofollow">julien</a>						</strong>
+						<strong>said 
+						on May 14, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for this tutorial and thanks Olivier for your comment, that helped me out!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a0de26c-2ac0-473f-9edd-74034834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=77954460bdf92a83c8f7123619a9de69&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.rootyhollow.com" rel="nofollow">jalama</a>						</strong>
+						<strong>said 
+						on May 15, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>If anyone needs it this is the settings for the php.ini with XAMPP</p>
+<p>;xdebug code<br />
+[xdebug]</br><br />
+zend_extension=/Applications/XAMPP/xamppfiles/lib/php/php-5.2.9/extensions/xdebug.so</br><br />
+xdebug.remote_enable=on</br><br />
+xdebug.remote_handler=dbgp</br><br />
+xdebug.remote_host=localhost</br><br />
+xdebug.remote_port=9000</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a30fe32-c704-4e7f-97f9-6d984834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=33c2a29a936466503b218c5f18d492f7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://24b6.net" rel="nofollow">arthur</a>						</strong>
+						<strong>said 
+						on Jun 11, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>If you want to get KCachegrind working on OSX along side of xdebug, you may find this post helpful get the environment up and running: <a rel="nofollow" href="http://24b6.net/2009/06/11/kcachegrind-osx">http://24b6.net/2009/06/11/kcachegrind-osx</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a5f73b5-583c-4af8-a541-7d394834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b2136d751bc859f800a92c83edf92eb8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.theglinkacompany.com" rel="nofollow">Werner Glinka</a>						</strong>
+						<strong>said 
+						on Jul 16, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great post - it certainly has a long halflive! I researched this several month ago. At that time I used MAMP Pro and run into many problems which let me to set up my Mac dev environs with Entropy PHP, mySQL, Eclipse and XDebug. If anybody is interested in that info you can read about it here: <a rel="nofollow" href="http://www.theglinkacompany.com/blog">http://www.theglinkacompany.com/blog</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a7ed809-8d28-4a9c-8780-557fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8e3a77f50fc2a9a71c868d5492febe96&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Ryan Blunden&nbsp;						</strong>
+						<strong>said 
+						on Aug 09, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>If anyone is using Macports and having a hard time of it, try using zend_extension_debug=/path/to/xdebug.so instead of the standard zend_extension</p>
+<p>It took me 3 hours to figure this out and I only came across this tip thanks to a brilliant page at <a rel="nofollow" href="http://community.activestate.com/forum-topic/php-xdebug-troubleshootin">http://community.activestate.com/forum-topic/php-xdebug-troubleshootin</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a98ca0b-f41c-47ef-8f1c-594dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1a9a02403243f6bbf9936163b6cb70a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Matt Young&nbsp;						</strong>
+						<strong>said 
+						on Aug 29, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I finally got xdebug working on MAMP.</p>
+<p>1. Must disable Zend Optimizer. I enable startup error log and see the message indicating Xdebuger is not compitable with it.</p>
+<p>2. Must use version 5.2. I initially try 5.3 and it just silently fail!</p>
+<p>3. I'm not sure but I think the extension manager must be enabled also.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ab15968-9d90-4332-81b2-5b76cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=45136524b98c55cbc759b3c6ee5ad0bf&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://harvardmagazine.com" rel="nofollow">Blaise Freeman</a>						</strong>
+						<strong>said 
+						on Sep 16, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Some more tips: </p>
+<p>4. In MAMP, you have to edit the template for the php.ini file, not the php.ini in the folder structure. </p>
+<p>5. You don't need to use Komodo to use their binary in case you were wondering.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

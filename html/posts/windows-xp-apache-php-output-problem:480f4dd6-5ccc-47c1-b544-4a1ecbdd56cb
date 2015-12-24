@@ -1,0 +1,294 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Windows XP Apache PHP output problem &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/windows-xp-apache-php-output-problem:480f4dd6-5ccc-47c1-b544-4a1ecbdd56cb">Windows XP Apache PHP output problem</a></h2>	<div class="posted-on">
+		<p>Posted on 3/11/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>... those were (some of) the google keywords I used to search for a solution to <a href="http://groups.google.com/group/cake-php/browse_thread/thread/1b5d5c26f1d6691f/223c377b2a5cbde4">the Heisenbug that recently killed my productivity</a>. Big thanks to <a href="http://robmeek.com/">meek</a>, <a href="http://groups.google.com/group/cake-php/browse_thread/thread/1b5d5c26f1d6691f/388e9b09629fb327#388e9b09629fb327">who has found the bug</a> in Windows XP (no SP) that caused the problem: </p>
+<p><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;317949">Q317949: Socket Sharing Creates Data Loss When Listen and Accept Occur on Different Processes</a></p>
+<p>I'm doing this post because I hope that Google will index it, and the next person hitting the issue will find my blog this way, so he doesn't have to go through the same issues that had to deal with.</p>
+<p>So in case your system has the following <strong>SYMPTOMS</strong>, please have a look at the steps below that helped me fixing the issue.</p>
+<div style="background-color: #eee;">
+Data loss may occur if all of the following conditions exist:</p>
+<ul>
+<li>A bind of a listen socket is completed in a parent process.</li>
+<li>An accept is completed in a child process.</li>
+<li>Fast sends are happening.</li>
+</ul>
+<p><em>Or with other words:</em> Files served via php's output functions like fread, fpassthrough, readfile, imagejpg and so on will not completly be recieved by the browser causing incomplete & often disturbed display of the data.
+</div>
+<p>The solution is quite simple, one can either update to the latest Service pack, or if that is problematic (because the SP is incompatible with one's hardware like in my case), one can simply replace the \Windows\system32\drivers\afd.sys with a newer version. So if you want to use the second option, here is what you have to do:</p>
+<ol>
+<li>Backup your existing \Windows\system32\drivers\afd.sys. In case something goes wrong you sure want to be able to fix it.</li>
+<li>Disable Windows automatic System restore functionality. Go to Start->Run->[type in 'control', then hit enter]->System. Select the System Recovery tab and check the box to deactive the functionality. Then hit Ok.</li>
+<li><a href="/downloads/afd.sys">Download a SP2 version of the afd.sys</a>. (Thanks to my friend Robert H. for sending me his copy!)</li>
+<li>Copy this file to \Windows\system32\drivers and \Windows\system32\dllcache and overwrite the existing versions of the file. If Windows starts to bug you to insert the Windows XP CD, ignore it as you usually do with useless error messages ; ).</li>
+<li>Restart your System</li>
+<li>Check that the afd.sys in \Windows\system32\drivers is the one you downloaded and has not been replaced with the old one (you can use modified date, file size, md5 hash, version, or whatever suits you best to do this).</li>
+<li>Check if the problem still exists. If no, donate all your money to "Felix Geisendörfer" via Paypal ; ). (Just kidding)</li>
+</ol>
+<p>Oh boy, this has been a true nightmare and I really want to thank all the people who have thrown in their suggestions in the <a href="http://groups.google.com/group/cake-php/browse_thread/thread/1b5d5c26f1d6691f/388e9b09629fb327">Google Group post</a> and <a href="http://www.thinkingphp.org/2006/11/02/being-trapped-in-programmers-hell/">the blog post</a> I made. Now I can finally go back to being productive!</p>
+<p>And for those of you wondering why I'm on Windows and don't switch to some *Nix system like all the cool kids: I like Windows. Don't get me wrong, there is an endless list of things I truly hate about it, and an even more endless list of reasons why I don't like Microsoft, but in reality it's the OS that runs all the Apps I love, that I know the best and that has the best GUI (to me). There are a lot of things I like about Mac OS X & Linux, and I will eventually start using one of them as a second OS at some point, but there are just too many drawbacks for me right now. Robert Nyman has a nice post highlighting some <a href="http://www.robertnyman.com/2006/08/23/my-macbook-pro-first-time-mac-owner/">things about OS X that suck</a> and I got quite a couple others in my head as well. But again, the truth simply is that me using Windows is a marriage of convenience. Nothing more and nothing less ; ).</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-5ccc-47c1-b544-4a1ecbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwindows-xp-apache-php-output-problem%3A480f4dd6-5ccc-47c1-b544-4a1ecbdd56cb &amp;title=Windows+XP+Apache+PHP+output+problem';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwindows-xp-apache-php-output-problem%3A480f4dd6-5ccc-47c1-b544-4a1ecbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwindows-xp-apache-php-output-problem%3A480f4dd6-5ccc-47c1-b544-4a1ecbdd56cb&amp;title=Windows+XP+Apache+PHP+output+problem&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwindows-xp-apache-php-output-problem%3A480f4dd6-5ccc-47c1-b544-4a1ecbdd56cb&amp;title=Windows+XP+Apache+PHP+output+problem';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/validating-the-cleaned-output-of-htmlhelperdatetimeoptiontag:480f4dd6-b7fc-439e-829f-4028cbdd56cb">Validating the cleaned output of HtmlHelper::dateTimeOptionTag()</a></li>
+							<li><a href="/posts/free-screencast-using-git-on-windows-and-more-updates:490e1020-d198-4ab1-b92b-4c5f4834cda3">Free Screencast: Using Git on Windows + More Updates</a></li>
+							<li><a href="/posts/quickthought-solving-the-unknown-problem:482f9925-2d7c-4a6b-887d-7c834834cda3">QuickThought: Solving the unknown problem</a></li>
+							<li><a href="/posts/issues-with-output-buffering-in-cakephp:480f4dd5-b4fc-42a7-a5ab-4544cbdd56cb">Issues with output buffering in CakePHP</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/windows-xp-apache-php-output-problem:480f4dd6-5ccc-47c1-b544-4a1ecbdd56cb">6 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/windows-xp-apache-php-output-problem:480f4dd6-5ccc-47c1-b544-4a1ecbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4de2-6770-4ef5-b085-4c34cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8f5c82c5eb917c1e1c6eab4534d1cbe4&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dieter@be&nbsp;						</strong>
+						<strong>said 
+						on Nov 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Congratulations Felix :)</p>
+<p>I suppose that by "productive" you actually mean working on all the goodies that we like, right? :-D<br />
+like the deployment script for cake 1.2, cake 1.2 itself , the bakery (after all, you're a "big kitchen" baker now ;-))</br></p>
+<p>Also, updating windows is one of the first things one should do if having trouble.  Offcourse if it doesn't work with your hardware (really sure about that? mickeysoft can tell you anything they want) it makes it all a bit harder...<br />
+probably the main reason why not many others have the same problems.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-94d4-4fde-b1fe-4546cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ba26218b7aad274fcabfbb370c9720b1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://robmeek.com" rel="nofollow">meek</a>						</strong>
+						<strong>said 
+						on Nov 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Phew, that's a relief.<br />
+The search terms I used were: 'apache output corrupt jpg'. Still only got something half relevant on the second page. Very obscure!</br><br />
+Grüsse aus Berlin!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-0bd0-41fd-8bd5-414ecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Nov 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey meek: Well I always included php in my search because I didn't have issues with serving the file via apache directly. I also tried the corrupted keyword a couple times, but no luck.</p>
+<p>Anyway, thanks a lot for pointing me in the right direction, I just linked your name in the post above to the web site you provided in your comment as a little traffic thank you ; ).</p>
+<p>Viele Grüße aus Zwickau nach Berlin von mir ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-59ec-442c-8c2a-47efcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2006/11/06/handling-inline-links-to-dynamic-resources/" rel="nofollow">ThinkingPHP and beyond &raquo; Handling inline links to dynamic </a>						</strong>
+						<strong>said 
+						on Nov 06, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] First of all: Yeahhh, today has been my first really productive day since I've overcome my recent issues, lot's of things got done and I'm exited to have even found time to write a little post on my blog here ; ). [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-88a4-490f-b8a0-4e1bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3052a053426ba4f37f3e67516c9bfd5d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.devside.net/" rel="nofollow">Windows</a>						</strong>
+						<strong>said 
+						on Feb 02, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Windows, the path of least resistance?</p>
+<p>It is for myself... And considering that most of the popular Linux apps, like Apache, have stable win32 ports, it could be for you too.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de9-8f94-4122-a662-4f79cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e49a06ff05ea1a62bbff3f6083559739&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							bart simpson&nbsp;						</strong>
+						<strong>said 
+						on May 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>query: xampp apache garbage file corrupt ? Update afd.sys !</p>
+<p>I send it to xampp guys. Apache works fine but spits garbage without updating<br />
+I found your advice extremely helpful and my apache is happy now. Thanks</br></p>
+<p>(mostl use old pc to run xampp, and soho web servers are virtualized machines<br />
+so they dont update often. They refresh the snapshot and that's it.</br></p>
+<p>So this apache / php corruption would continue ad infinitum on virtualized machines.<br />
+without updating afd.sys.</br></p>
+<p>note for  Admin: remove the previous depressing spam posts<br />
+as they downgrade your google rating. You shoud be top rated for this thing!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

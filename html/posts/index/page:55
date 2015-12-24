@@ -1,0 +1,471 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Blog &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="paging">
+	<a href="/posts/index/page:54" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:51">51</a></span> | <span><a href="/posts/index/page:52">52</a></span> | <span><a href="/posts/index/page:53">53</a></span> | <span><a href="/posts/index/page:54">54</a></span> | <span class="current">55</span> | <span><a href="/posts/index/page:56">56</a></span> | <span><a href="/posts/index/page:57">57</a></span> | <span><a href="/posts/index/page:58">58</a></span> | <span><a href="/posts/index/page:59">59</a></span> <a href="/posts/index/page:56" class="next">Next &raquo;</a></div>
+	<div class="post">
+	<h2><a href="/posts/basic-cakephp-templating-skills:480f4dd6-4040-4c57-8c17-4606cbdd56cb">Basic CakePHP templating skills</a></h2>	<div class="posted-on">
+		<p>Posted on 11/10/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>One of the things I don't see getting to much coverage is how to create good templates when working with CakePHP. Since those are written in plain PHP, this does not apply to CakePHP only. So I'm sure many people have already developed their own style that they are comfortable with and I don't ask for them to change it. However, maybe some people new to the framework / language can benifit by taking a look at the one I'm using.</p>
+<h3>PHP tags</h3>
+<p>The first thing I recommend is using the fully qualified syntax (&lt;?php ?&gt;) for php tags instead of the short one (&lt;? ?&gt;). Why? Well that's what the <a href="https://trac.cakephp.org/wiki/Developement/CodingStandards#PHPtags">CakePHP coding standards</a> recommend you to use, and it makes those statments stand out a little more in your html code. But the main reason still is that the short tags syntax <a href="http://de2.php.net/ini.core">can be turned off via php.ini</a>, so using them makes your app less portable and could cause raw code output incidents. </p>
+<h3>Conditions</h3>
+<p>While you are used to use to wrap conditional commands in curly braces in your normal PHP code, they are not quite as practical in templates. Instead you should make use of this syntax which makes your code easier to read & write:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+&lt;p&gt;Could not find a user matching your criteria&lt;/p&gt;<br />
+<span class="kw2">&lt;?php</span> <span class="kw1">else</span>: <span class="kw2">?&gt;</span><br />
+&lt;p&gt;The name of the User you are looking for is: <span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$user</span><span class="br0">&#91;</span><span class="st0">'User'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>; <span class="kw2">?&gt;</span>&lt;/p&gt;</div>
+<p>The advantage of this is that you don't have to use curly braces to wrap your command blocks, but instead simply use if, else and endif to do so.</p>
+<h3>Loops</h3>
+<p>When working with CakePHP the foreach loop is your best friend. A lot of things are done via associative arrays and even plain numerical arrays are quite comfortable to process this way. The syntax I recommend is the same one as for if statements:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+&lt;h2&gt;<span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$html</span>-&gt;<span class="me1">link</span><span class="br0">&#40;</span><span class="re0">$event</span><span class="br0">&#91;</span><span class="st0">'Event'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'title'</span><span class="br0">&#93;</span>, Event::<span class="me2">getUrl</span><span class="br0">&#40;</span><span class="re0">$event</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="kw2">?&gt;</span>&lt;/h2&gt;<br />
+<span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$event</span><span class="br0">&#91;</span><span class="st0">'Event'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'html'</span><span class="br0">&#93;</span> <span class="kw2">?&gt;</span></div>
+<h3>The linebreak issue</h3>
+<p>Now when using loops (or several inline statements) and manually viewing your html output, you'll often notice that line breaks are apparantly swallowed, and everything is on one line. Well this is not CakePHP's fault, but rather the default PHP behavior. Whenever an inline statement ends with ?> followed by a line break, this line break will not appear in the output. But don't you worry, there is a simple fix for this: Simply add a space in between ?> and the line break and voila, the output turns out as expected.</p>
+<h3>Avoid multi-line statements</h3>
+<p>One thing I found usefull when writing templates was to adobt an "avoid multi-line commands" policy. This means that you should do one command per inline statement, and not several ones at once. On occassions I break this rule, but most of the time it serves as a very good indicator for showing you that you using Controller logic in your views, or you should start writing a Helper for something. The worst thing you can do, is define functions inside your View. Not only should those be moved to helpers, but when this view get's rendered twice in one request you'll get a nasty php error, telling you you can't define the function twice ...</p>
+<h3>Creating Zebra striped table rows</h3>
+<p>This is a little specific, but I've seen some really horrible approaches for assigning varying css classes to every row in the past, so this is how I would recommend you to do it:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+&lt;tr class=&quot;<span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="br0">&#40;</span><span class="re0">$num</span> % <span class="nu0">2</span><span class="br0">&#41;</span> ? <span class="st0">'row-a'</span>: <span class="st0">'row-b'</span>; <span class="kw2">?&gt;</span>&quot;&gt;<br />
+&nbsp; &lt;td&gt;<span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$event</span><span class="br0">&#91;</span><span class="st0">'Event'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'title'</span><span class="br0">&#93;</span>; <span class="kw2">?&gt;</span>&lt;/td&gt;<br />
+&nbsp; ... More columns go here ...<br />
+&lt;/tr&gt;</div>
+<p>Since only every 2nd number in a consecetuive series of integer values can be divided by 2 without leaving a remainder (even numbers), this can be used to constantly switch the css class between 'row-a' and 'row-b'.</p>
+<p>Alright, I hope this little tutorial will help some new folks, and maybe some others as well.</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-4040-4c57-8c17-4606cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbasic-cakephp-templating-skills%3A480f4dd6-4040-4c57-8c17-4606cbdd56cb &amp;title=Basic+CakePHP+templating+skills';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbasic-cakephp-templating-skills%3A480f4dd6-4040-4c57-8c17-4606cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbasic-cakephp-templating-skills%3A480f4dd6-4040-4c57-8c17-4606cbdd56cb&amp;title=Basic+CakePHP+templating+skills&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbasic-cakephp-templating-skills%3A480f4dd6-4040-4c57-8c17-4606cbdd56cb&amp;title=Basic+CakePHP+templating+skills';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/basic-cakephp-templating-skills:480f4dd6-4040-4c57-8c17-4606cbdd56cb">14 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/basic-cakephp-templating-skills:480f4dd6-4040-4c57-8c17-4606cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/what-happens-if-you-dont-update-your-blog-regulary:480f4dd6-dbf4-41be-954e-411acbdd56cb">What happens if you don't update your Blog regulary!</a></h2>	<div class="posted-on">
+		<p>Posted on 6/10/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Not too long ago, I made a promise to you as my readers. I promised that I would post one useful tip regarding the excellent <a href="http://cakephp.org/">CakePHP Framework</a> every day for a period of 10 days. I also <a href="http://www.thinkingphp.org/2006/09/13/10-days-of-free-dessert-cakephp-tips/">said</a> what I would do if I would miss one day of posting:</p>
+<p><em>In case I break my promise and miss only 1 day of posting a new tip (my time zone is GMT+1), I’ll take & post a picture of myself putting my face into a cake.</em></p>
+<p>After already doing 14 posts (<a href="http://www.phpdeveloper.org/news/6289">checkout the list on PHPDeveloper.org</a>) in 8 days, I missed to do a post on day 9. It was Friday, I was tired and the next thing I remembered was waking up on my couch, knowing that I had missed to post a tip. So I admited, that <a href="http://www.thinkingphp.org/2006/09/23/alright-i-lost/">I had lost my bet</a>, and now it  was time to take the beating.</p>
+<p>Let's start with a picture of the Cake itself. It was a cheap frozen one that I picked up from a bigger store in the city. So far nothing special. But while I was preparing everything and the Cake was already sitting on my desk, he was smiling at me! Now you wouldn't believe that, but fortunately I was able to capture a shot of him doing that right before he turned back into a normal Cake, pretending it had never happened:</p>
+<p><img src="http://www.thinkingphp.org/img/caked/1.jpg" alt="The evil Cake" /></p>
+<p>Now even so my Cake seemed to have a great time, I didn't feel exited about this entire proccess at all.</p>
+<p><img src="http://www.thinkingphp.org/img/caked/2.jpg" alt="Felix isn't exited" /></p>
+<p>But well, I had to do it, and this time it was the Cake that didn't seem to have any fun. In case you have moral or religious concerns about violence against Cake's, you should probably skip this image.</p>
+<p><img src="http://www.thinkingphp.org/img/caked/3.jpg" alt="The smashed Cake" /></p>
+<p>And here comes my final punishment - getting the Cake all over my face. For those of you very interested in details: Yes I know there is one piece of Cake on my upper lip, and yes I am German, but NO this did not happen on purpose - I am no Cake nazi, I swear.</p>
+<p><img src="http://www.thinkingphp.org/img/caked/4.jpg" alt="The eagle has landed" /></p>
+<p>After the initial shock, I got angry at the Cake that had put me into this entire situation:</p>
+<p><img src="http://www.thinkingphp.org/img/caked/5.jpg" alt="Getting angry at the Cake" /></p>
+<p>And finally another shot of the blogger that didn't update his blog regulary. This one is looking rather awkward, but so what:</p>
+<p><img src="http://www.thinkingphp.org/img/caked/6.jpg" alt="Resignation" /></p>
+<p>So, I did it. I embaressed myself in the open public, and nobody is probably ever going <a href="http://www.fg-webdesign.de/en/">to hire me</a> again. But at least I've not broken my promise and shown the blogging community what can happen if you don't update your blog regulary. May other's be more lucky then I was ...</p>
+<p><strong><a href="http://digg.com/programming/What_happens_if_you_don_t_update_your_Blog_regulary">Please don't forget to digg this story, thanks!</a></strong></p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-dbf4-41be-954e-411acbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwhat-happens-if-you-dont-update-your-blog-regulary%3A480f4dd6-dbf4-41be-954e-411acbdd56cb &amp;title=What+happens+if+you+don%27t+update+your+Blog+regulary%21';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwhat-happens-if-you-dont-update-your-blog-regulary%3A480f4dd6-dbf4-41be-954e-411acbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwhat-happens-if-you-dont-update-your-blog-regulary%3A480f4dd6-dbf4-41be-954e-411acbdd56cb&amp;title=What+happens+if+you+don%27t+update+your+Blog+regulary%21&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwhat-happens-if-you-dont-update-your-blog-regulary%3A480f4dd6-dbf4-41be-954e-411acbdd56cb&amp;title=What+happens+if+you+don%27t+update+your+Blog+regulary%21';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/what-happens-if-you-dont-update-your-blog-regulary:480f4dd6-dbf4-41be-954e-411acbdd56cb">13 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/what-happens-if-you-dont-update-your-blog-regulary:480f4dd6-dbf4-41be-954e-411acbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/the-ignorant-client-vs-the-passionate-developer:480f4dd6-d680-4a6d-9bb0-4b94cbdd56cb">The Ignorant Client vs. The Passionate Developer</a></h2>	<div class="posted-on">
+		<p>Posted on 4/10/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>As some of you might have suspected for years,- our fine field of web development is a place of war. The alliance of passionate web developers who care about standards, good code, accessibility, usability and other things are in a constant hate/love relationships with the union of clients who know as much about this field as some presidents know about 'nucular' weapons. The battlefield is filled with table layouts, WYSIWYG editors, inaccessible web 2.0 sites and bad code.</p>
+<p>I think one of the biggest issues thesese days is, that we, the passionate developers, try to create systems a 10 year old could use. We fall for the clients demanding Word-like WYSIWYG editors and build right management systems for people we wouldn't trust to spell out the word 'Security'. And to make it even worse, the people we work for consider our work to be something everybody could do. The 90s created a mindset saying that everybody could make a web site (see <a href="http://jeffcroft.com/2006/oct/01/what-does-it-mean-be-professional-web-designer/">this article</a>). And it's true, every 12 year old can make his own web page. So I can understand the difficulty clients have when they are demanded to pay somebody $50 (or more) per hour for something their kids could do. I mean, how should one go about explaining them the difference between invalid tag soup and standard compliant beauty? How do you raise their aweareness for quality that's invisible to them? </p>
+<p>I think the answer is education. Uhm, that doesn't sound very original, does it? So let me try to rephrase it. Taking away their WYSIWYG toys and replacing them with our geeky alternatives like Textile is not going to cut it. Telling them it's going to be very benifital for them isn't going to cut it either, because after looking at the obscure markup they already decided it's way to complicated and stoped to listening to you. I've tried it - saying "it's really simple, just take a look at it" - and failed. Same goes for other things like standards based html, accessible JS and good php code. Clients will not be able to percieve the difference between a good and a bad site just because you tell them it's bad to use table's, inline JS or even worse crimes against progress in our field. I think we've all tried to convince a client to use a certain technology or follow our suggestions and failed misserably because we bored them to death by being to technical. We spent way too much time talking in our geeky language with our geeky friends and build a huge barrier in terms of communication. And I think our only way out, is to understand how our clients think:</p>
+<p>If I was a client, I would think it's perfectly fine to expect somebody to make a web page, for $300. I would tell the developer that I want this really sharp looking site and the ability to maintain it myself. I know my 13 year old son has his own site, so this should be more then enough money for the task, so maybe I can get it for as low as $250. So after sending out a short email with my basic requirements to 2-3 developers, they give me estimates ranging from $350 to $1500. The cheapest one says he'll use some system called Joomla and editing my page will be as easy as editing a word document. The most expensive one talks about (x)HTML, CSS, PHP, MySql, Textile, ACL, AJAX, Accessibility, Usability and how all of this will be really good in terms of SEO and standard compliance. Hm the expensive guy sure sounds like he knows a lot of stuff, but I really can't see how this beats "editing my page like a word document" for $350. So I give the job to the cheap guy, get an alright-looking web site, fill in my content and finally got rid of this "get a business web site" task from my todo list.</p>
+<p>We as the passionate developers will look at the resulting web site with disgust. The cheap guy used Dreamweaver and created a table based layout, and if that wasn't bad enough, the WYSIWYG editor added an ugly tag soup called 'content' to the page. Search engines might have indexed the site, but the non existing alexa rank indicates the amount of traffic the site recieves. But I say that's the better of two scenario. The client got what he paid for. The other scenario is that you dropped your price and talked him into hiring you for $500-600. But now he expects magical things to happen in terms of design, while you are enjoying the frustration of tweaking CSS to work in IE and getting the WYSIWYG (he rejected to use Textile) editor not ruin your efforts and to spit out valid html. All of this while being payed ~$20 per hour. This is no fun and at some point you'll just want the project to be over. You'll fix some php bugs without knowing what caused them, deliver the site and take your money. You might have invested a lot more work, but the site won't get more visitors, nor will the client feel like he recieved a better page. Why? Because your passion turned into hate for the ignorance of the client. Because you feel like you were paid badly and the client was demanding too much.</p>
+<p>Now it wasn't until recently that I got to enjoy working for media agencies instead of end consumers, that paid me a decent wage doing exactly what I'm good at - php coding. They were happy with the quality they got and exited about the passion I brought into the project. On the other hand this felt much more like a regular job and I couldn't make all the decisions I was normally able to make. So I still want to work for end clients, but I want to do it for a reasonable wage and with the feeling of having created a web site that will help the client increase his/her business. So how does one go about this while maintaining high standards?</p>
+<h2>Let's join our efforts, let's educate our clients</h2>
+<p>I think it's about time for us passionated developers (and designers) to unite. I think it's the time to create a foundation dedicated to educate clients and to tell them the truth about web development. Let us talk to them in a language that makes sense, one that isn't filled with technical overhead. Let us work with illustrations and let's maintain a list with the most common questions clients have about pricing, technology, what can be done and what can't. Let us create something we can referr to when clients demand WYSIWYG editors, or don't understand the difference between table based layouts and ones that rely on CSS. Let us put up example's and demos demonstrating the difference between good and pure quality sites. But most importantly, let us  <a href="http://en.wikipedia.org/wiki/KISS_principle">KISS</a> ; ). As soon as articles gets longer then 1 page or get filled with technology abbreviations something goes wrong.</p>
+<p>So let me ask, who would be interested in such a project? This isn't something I could do alone in my spare time. It would need a couple people who are willing to donate content, a skilled illustrator and somebody helping me to create a little CakePHP CMS for it. We would also need a name for the project, maybe something like "The truth about web development"? We could also need the support of some of the leading people in the field, and a good amount of blogsphere buzz. Let me know what you guys think and if you would be willing to help.</p>
+<p>--Felix Geisendörfer the_undefined</p>
+<p>PS: If you think I should stop ranting, write about PHP, and <a href="http://www.thinkingphp.org/2006/09/23/alright-i-lost/">put my head in a cake</a>, that's fine too. It will happen ;).<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-d680-4a6d-9bb0-4b94cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-ignorant-client-vs-the-passionate-developer%3A480f4dd6-d680-4a6d-9bb0-4b94cbdd56cb &amp;title=The+Ignorant+Client+vs.+The+Passionate+Developer';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-ignorant-client-vs-the-passionate-developer%3A480f4dd6-d680-4a6d-9bb0-4b94cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-ignorant-client-vs-the-passionate-developer%3A480f4dd6-d680-4a6d-9bb0-4b94cbdd56cb&amp;title=The+Ignorant+Client+vs.+The+Passionate+Developer&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fthe-ignorant-client-vs-the-passionate-developer%3A480f4dd6-d680-4a6d-9bb0-4b94cbdd56cb&amp;title=The+Ignorant+Client+vs.+The+Passionate+Developer';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/the-ignorant-client-vs-the-passionate-developer:480f4dd6-d680-4a6d-9bb0-4b94cbdd56cb">20 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/the-ignorant-client-vs-the-passionate-developer:480f4dd6-d680-4a6d-9bb0-4b94cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/a-lightweight-approach-to-acl-the-33-lines-of-magic:480f4dd6-639c-44f4-a62a-49a8cbdd56cb">A lightweight approach to ACL - The 33 lines of Magic</a></h2>	<div class="posted-on">
+		<p>Posted on 3/10/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Ok, I just finished a terrible (extended) weekend that featured 12 hours of CSS coding. The only reason I didn't loose my sanity was that I finally decided to figure out <a href="http://www.positioniseverything.net/explorer.html">what the heck is wrong with IE</a>. Those of you who have to do get their hands dirty in the field of graphics, css, and other non-php work from time to time as well, make sure to check out <a href="http://www.positioniseverything.net/">Position is Everything</a> at some point, it really <a href="http://www.positioniseverything.net/articles/onetruelayout/">helped me out quite a bit</a> so far.</p>
+<p>Anyway, that's not really what I want to talk about today. One of the topics I have been very silent about for months is ACL. At the end of May <a href="http://www.thinkingphp.org/2006/05/31/cakephp-and-acl-why-is-it-so-difficult/">I was somewhat unhappy</a> with some of the things regarding the CakePHP DB ACL implementation. And it wasn't until last week that I finally decided to implement some basic rights management in one of my applications again. So since I didn't want to bother to frustrate myself with Cake's ACL again, I started to roll my own solution. While I was happily hacking away at some code, I suddenly realized that there were a lot of familarities between the code I was writing and the way ACL was working. A couple minutes later and I was already convinced that I basically had created 33 lines of code giving me pretty much all the flexibility CakePHP's well over 500 lines would ever give me.</p>
+<p>But let me go a step back and explain my initial idea. My basic plan was to have a User belongsTo Group relationship and that each group entry in my database would have a field listing the controller actions the members of this group would be allowed to access. When helping another company to get their CakePHP based CMS done before the deadline I saw them using a Controller:action style syntax to do this which I liked. I modified it a little bit and came up with a Syntax like this:</p>
+<pre style="background-color: #eee">Posts:index,Posts:view,Posts:admin_edit,Articles:index,...</pre>
+<p>But since I felt it was too much work to type in all Controller actions for the admin account I decided to create some wildchar functionality:</p>
+<pre style="background-color: #eee">Posts:*,Articles:*</pre>
+<p>or even shorter:</p>
+<pre style="background-color: #eee">*:*</pre>
+<p>But since I wanted the visitors of the page to be able to use any Controller action besides the ones starting with 'admin_', I had to add negative statements as well:</p>
+<pre style="background-color: #eee">*:*,!*:admin_*</pre>
+<p>That's when I realized, wait, that's essentially the same thing as ACL. You start with some basic statement like DENY or ALLOW ALL at the beginning and then go down the tree (or the string) for the specific rules. All rules farther to the right in the ACL string will overwrite the ones farther left. So if you start out by saying Posts:* but add a !Posts:secret somewhere down the road, it means the group can access all Posts actions besides 'secret'. Or a little more creative set of rules could look like this:</p>
+<pre style="background-color: #eee">*:*,!*:admin_*,*:admin_index</pre>
+<p>But since I wanted even more control, I decided to add an ACL string to my user table as well so I could make exceptions on a per-user basis, even if all users belong to the same group. The basic logic I used for that was to first check the access the User group had to a certain action, and then use this value as the default value for the user-specific check. That means if the group says yes and the user has no rule matching the current Controller:action, he's allowed to request it. But if he has a matching rule, this rule is used to determine the outcome regardless of the group's permission.</p>
+<p>Ok, at this point I've got to disappoint you guys a little bit. I'm not quite ready to release my SimpleAuth / SimpleAcl class I'm using right now quite yet. The reason for this is that there is a very cool Security class coming with Cake 1.2 and I really want to make use of it as well. If you  want the code anyway, I'll put it in Cake bin - it's fully documented and should be ready to go, but I won't be able to give you much suppport on it. But what I'll give you, are the 33 lines of Magic code I was talking about, the ones taking apart a given set of $rules in order to determine if an $object is allowed to access a certain $property:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> requestAllowed<span class="br0">&#40;</span><span class="re0">$object</span>, <span class="re0">$property</span>, <span class="re0">$rules</span>, <span class="re0">$default</span> = <span class="kw2">false</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// The default value to return if no rule matching $object/$property can be found</span><br />
+&nbsp; &nbsp; <span class="re0">$allowed</span> = <span class="re0">$default</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="co1">// This Regex converts a string of rules like &quot;objectA:actionA,objectB:actionB,...&quot; into the array $matches.</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/preg_match_all"><span class="kw3">preg_match_all</span></a><span class="br0">&#40;</span><span class="st0">'/([^:,]+):([^,:]+)/is'</span>, <span class="re0">$rules</span>, <span class="re0">$matches</span>, PREG_SET_ORDER<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$matches</span> <span class="kw1">as</span> <span class="re0">$match</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/list"><span class="kw3">list</span></a><span class="br0">&#40;</span><span class="re0">$rawMatch</span>, <span class="re0">$allowedObject</span>, <span class="re0">$allowedProperty</span><span class="br0">&#41;</span> = <span class="re0">$match</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$allowedObject</span> = <a href="http://www.php.net/str_replace"><span class="kw3">str_replace</span></a><span class="br0">&#40;</span><span class="st0">'*'</span>, <span class="st0">'.*'</span>, <span class="re0">$allowedObject</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$allowedProperty</span> = <a href="http://www.php.net/str_replace"><span class="kw3">str_replace</span></a><span class="br0">&#40;</span><span class="st0">'*'</span>, <span class="st0">'.*'</span>, <span class="re0">$allowedProperty</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/substr"><span class="kw3">substr</span></a><span class="br0">&#40;</span><span class="re0">$allowedObject</span>, <span class="nu0">0</span>, <span class="nu0">1</span><span class="br0">&#41;</span>==<span class="st0">'!'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$allowedObject</span> = <a href="http://www.php.net/substr"><span class="kw3">substr</span></a><span class="br0">&#40;</span><span class="re0">$allowedObject</span>, <span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$negativeCondition</span> = <span class="kw2">true</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span> <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$negativeCondition</span> = <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/preg_match"><span class="kw3">preg_match</span></a><span class="br0">&#40;</span><span class="st0">'/^'</span>.<span class="re0">$allowedObject</span>.<span class="st0">'$/i'</span>, <span class="re0">$object</span><span class="br0">&#41;</span> &amp;&amp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/preg_match"><span class="kw3">preg_match</span></a><span class="br0">&#40;</span><span class="st0">'/^'</span>.<span class="re0">$allowedProperty</span>.<span class="st0">'$/i'</span>, <span class="re0">$property</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$negativeCondition</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$allowed</span> = <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span> <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$allowed</span> = <span class="kw2">true</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$allowed</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>As you see, this is not specific to Controller actions. This can be used to control access on any kind of objects like Models, or other things. If you are familiar with CakePHP's ACL, you'll know there is nothing this does that CakePHP couldn't do. But what really makes me happy about this solution is the simplicity behind it. You don't have to really study ACL to grasp how it works, neither to you have to get into <a href="http://www.sitepoint.com/article/hierarchical-data-database/2">Modified Preorder Tree Traversal</a> nor do you have to plan complicated Model-Aro-Aco relationships. You simply add a field called 'rules' to the Model (table) you want to control access on, and use the function to perform your security checks.</p>
+<p>Some of you might point out performance issues, or the fact that the rights field shouldn't really be mixed in with the other Model fields. Heck, even all the rules should be seperate entries if you want to go for really high database normalization. But that's not what this solution is about, this solution is about simplicity. It's about being able to grasp the entire security concept in less then 5 minutes, avoiding all the dangerous complexity people usally tend to bring into this field. If you want to optimize, normalize or add more complexity in general, feel free to do so and let me know about the outcome ; ). But I think this is going for what most of us Baker's need in our daily kitchen work.</p>
+<p>So, write a comment if you like this approach or if you see some issue with it, so I can make a fix before releasing the Auth/Acl bundle of 2 drop-in components at some point soon.</p>
+<p>--Felix Geisendörfer aka the_undefined</p>
+<p>PS: I got my car back this weekend, so <a href="http://www.thinkingphp.org/2006/09/23/alright-i-lost/">the long promised cake party</a> should be happening this week for sure! Which reminds me, Thursday is my birthday, so maybe I don't even have to buy the cake myself ; ).<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-639c-44f4-a62a-49a8cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-lightweight-approach-to-acl-the-33-lines-of-magic%3A480f4dd6-639c-44f4-a62a-49a8cbdd56cb &amp;title=A+lightweight+approach+to+ACL+-+The+33+lines+of+Magic';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-lightweight-approach-to-acl-the-33-lines-of-magic%3A480f4dd6-639c-44f4-a62a-49a8cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-lightweight-approach-to-acl-the-33-lines-of-magic%3A480f4dd6-639c-44f4-a62a-49a8cbdd56cb&amp;title=A+lightweight+approach+to+ACL+-+The+33+lines+of+Magic&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-lightweight-approach-to-acl-the-33-lines-of-magic%3A480f4dd6-639c-44f4-a62a-49a8cbdd56cb&amp;title=A+lightweight+approach+to+ACL+-+The+33+lines+of+Magic';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/a-lightweight-approach-to-acl-the-33-lines-of-magic:480f4dd6-639c-44f4-a62a-49a8cbdd56cb">47 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/a-lightweight-approach-to-acl-the-33-lines-of-magic:480f4dd6-639c-44f4-a62a-49a8cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/learning-from-the-cakephp-source-code-part-ii:480f4dd6-57fc-4715-8709-439acbdd56cb">Learning from the CakePHP source code - Part II</a></h2>	<div class="posted-on">
+		<p>Posted on 29/9/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Sorry this post took me a while. The last couple days have been sort of busy and a lot of things on my lists didn't get done. Anyway, I'll continue right where I stopped, with the Dispatcher:</p>
+<h2>The heart of CakePHP - The Dispatcher</h2>
+<p>In the <a href="http://www.thinkingphp.org/2006/09/25/learning-from-the-cakephp-source-code-part-i/">previous post</a> I was showing how to use the Dispatcher::dispatch() function. Now what's more interesting, is what it actually does and in what order.</p>
+<ol style="list-style-position: inside;">
+<li><strong>Build the $params array.</strong> The first thing the Dispatcher::dispatch() function does is to perform an array_merge between $this->parseParams($url) and $additionalParams. Dispatcher::parseParams() is quite interesting as well. The first thing it does is to create a new Instance of the Router and call Router::parse($from_url). This returns an array with fields like 'controller', 'action', etc.. After that all variables from $_GET, $_POST and $_FILE are being merged into the $params array as well and finally returned to the Dispatcher function.</li>
+<li><strong>Find the base url: </strong> The next thing Dispatcher::dispatch() does, is to find the base url, that all controller actions, routes, etc. happen within. This url is then assigned to $this->base. All the base url retrieving logic is implemented in Dispatcher::baseUrl().</li>
+<li><strong>Load/Include the requested Controller:</strong> From now on I'll focus on the most important things going on because it would be insane to go into every little detail. The next block of code basically sees if $params['controller'] is emtpy, and if yes object::cakeError() is invoked to show the 'missingController' page all of us know. If the controller field is not empty, the first thing CakePHP tries to do is to load this controller (via loadController) from within /app/controllers. If that fails, CakePHP looks if there is a plugin with the name of $params['controller'] (via loadPluginController), and if not, missingController is invoked as well.</li>
+<li><strong>Possible Plugin Logic:</strong> In case there was a plugin found, the next thing that happens is some plugin logic that does not get executed for normal Controller requests. It's basically some $params shifting magic (Dispatcher::_restructureParams()), and most notably the point where loadPluginModels() get's executed.</li>
+<li><strong>Executing the Admin Route:</strong> If you have CAKE_ADMIN defined in your /app/config/core.php, then this is the point where the 'admin_' prefix (or whatever CAKE_ADMIN is set to) is added to the $params['action'] parameter. And here you also have a check that protects CAKE_ADMIN routes as private actions. This basically means if somebody would call /posts/admin_index instead of /admin/posts/index he wouldn't get very far.</li>
+<li><strong>Render a possible missingController error:</strong> If at some point in the code above $missingController was set to true, this is the point where $this->cakeError('missingController', ...) is invoked. If not, $controller is being assigned a new instance of our $ctrlClass.</li>
+<li><strong>Action exists? Action private?: </strong> The next couple of lines are dedicated to perform some checks on the $params['action'] parameter. The following things happen in the order I mention them: If $params['action'] is empty, it is set to 'index' instead. If the Controller has an action with the name $params['action'] but it starts with '_', $privateAction is set to true. If the Controller does not have an action $params['action'], or it happens to be named: 'beforeFilter', 'beforeRender' or 'afterFilter', $missingAction is set true.</li>
+<li><strong>Set Controller variables:</strong> Now it's time for all of the Controller variables to be set with interesting information. This includes the 'autoRender', 'base', 'here', 'webroot', 'params', 'action', 'data', 'passedArgs', 'autoLayout', 'webservices' and 'plugin'.</li>
+<li><strong>Load Components & Models:</strong> The Dispatcher now calls $controller->_initComponents() which attaches all components as references to the Controller object, but does not yet call their startup() function. After that, the same thing happens with Models when calling $controller->constructClasses().</li>
+<li><strong>Render possible missingAction/privateActione errors:</strong> If there had been a missingAction or privateAction error before, this is the point where $this->cakeError() get's called to render those.</li>
+<li><strong>Invoke the controller:</strong> The last call in Dispatcher::dispatch() goes to Dispatcher::_invoke(), but since it's still the same operation we are doing, I'll continue writing about things like before. The _invoke function directly executes Dispatcher::start(), which does the following things: If Controller::beforeFilter is a string/array, call the/all function(s) in this string/array (Warning: This is depracted!). Afterwards Controller::beforeFilter() get's executed without further checking. And the last thing happening in Dispatcher::start() is that all component's startup() functions get called. So back in Dispatcher::_invoke() there comes a check whether we are scaffolding or not, and if no, our Controller action get's called via call_user_func_array. Then, if $controller->autoRender is set to true, $controller->render() is called, and finally the afterFilter get's executed. Depending on whether there was some rendering going on or not either the raw output or the action's return value are getting returned to Dispatcher::dispatch() which directly returns this value back to the point where the initial call came from.</li>
+</ol>
+<p>That's it, you've just witnessed the miracle of birth ... er dispatching. I've skipped some minor things here and there, but in general this together with <a href="http://www.thinkingphp.org/2006/09/25/learning-from-the-cakephp-source-code-part-i/">Part I</a> should be a good guide to the things happening before all your wonderful application code kicks in. Of course, there is a lot more like all the Model and View stuff. But talking about all of this would take for ever, bore you to death and would only be useful to very few of us. However, <strong>if you guys would be interested in it</strong>, I would post a <strong>Part III</strong> where I would just do some pointing at classes and code snippets a CakePHP user should have read to get a better understanding of the things going on in the background.</p>
+<p>Oh, and today is probably also going to be the day I'll <a href="http://www.thinkingphp.org/2006/09/23/alright-i-lost/">buy myself some yummy Cake</a> ... : /. I'm not sure if I'll be able to take the picture and everything today, but I'll try my best. Hmm ... after that I should probably close this blog since nobody is going to hire me in the field of web development any more and I'll have to look for a new area to work in : /.</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-57fc-4715-8709-439acbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Flearning-from-the-cakephp-source-code-part-ii%3A480f4dd6-57fc-4715-8709-439acbdd56cb &amp;title=Learning+from+the+CakePHP+source+code+-+Part+II';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Flearning-from-the-cakephp-source-code-part-ii%3A480f4dd6-57fc-4715-8709-439acbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Flearning-from-the-cakephp-source-code-part-ii%3A480f4dd6-57fc-4715-8709-439acbdd56cb&amp;title=Learning+from+the+CakePHP+source+code+-+Part+II&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Flearning-from-the-cakephp-source-code-part-ii%3A480f4dd6-57fc-4715-8709-439acbdd56cb&amp;title=Learning+from+the+CakePHP+source+code+-+Part+II';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/learning-from-the-cakephp-source-code-part-ii:480f4dd6-57fc-4715-8709-439acbdd56cb">16 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/learning-from-the-cakephp-source-code-part-ii:480f4dd6-57fc-4715-8709-439acbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="paging">
+	<a href="/posts/index/page:54" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:51">51</a></span> | <span><a href="/posts/index/page:52">52</a></span> | <span><a href="/posts/index/page:53">53</a></span> | <span><a href="/posts/index/page:54">54</a></span> | <span class="current">55</span> | <span><a href="/posts/index/page:56">56</a></span> | <span><a href="/posts/index/page:57">57</a></span> | <span><a href="/posts/index/page:58">58</a></span> | <span><a href="/posts/index/page:59">59</a></span> <a href="/posts/index/page:56" class="next">Next &raquo;</a></div>	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

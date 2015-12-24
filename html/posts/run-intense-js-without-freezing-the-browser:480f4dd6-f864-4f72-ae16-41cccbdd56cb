@@ -1,0 +1,523 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Run intense JS without freezing the browser &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/run-intense-js-without-freezing-the-browser:480f4dd6-f864-4f72-ae16-41cccbdd56cb">Run intense JS without freezing the browser</a></h2>	<div class="posted-on">
+		<p>Posted on 23/3/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>this is probably one of the most exciting things I've come up with since I started playing around with JavaScript. If you ever wrote a somewhat complex JS snippet you might have noticed that slower computers / browsers (like FF2 on mac) will freeze if you run through a big loop that does some heavy operations (event bindings, dom manipulations, etc.).</p>
+<p>For me at a user this has always been very annoying since it just gets into your work flow and if you get unlucky might even crash your browser. So far I thought the only way to avoid this was by simply writing less intense JavaScript and/or optimizing the hell out of it.</p>
+<p>However, with the recent upgrades coming for <a href="http://www.posttask.com/">PostTask</a> we've reached the point were we often need to bind up to 300 events (!) on page load as well as perform a whole bunch of other operations. It got to the point where loading the side would freeze FF2 on mac for an insane ~16 seconds - absolutely unacceptable by any standard. This post is about how a simple trick reduced initialization time down to 5 seconds while avoiding any browser freezing whatsoever at the same time.</p>
+<h3>The big secret - Using JavaScript to partition workload</h3>
+<p>The key problem I identified that is responsible for browser freezing is that JavaScript runs in a single thread. This means while there is some JS code executing, no other code can run at the same time. From my old VB days I remembered that there used to be a function called doEvents() which you could put into big loops to keep your apps from freezing. What it did was essentially to see if there was any other code that needed to run, execute it and then go back into your loop. JavaScript doesn't have such a function, but something that comes very close - timers. <a href="http://ejohn.org/blog/how-javascript-timers-work/">John recently did a good post about</a> them that confirmed my previous experiments with them: If you set an interval or timeout of lets say 50ms in JavaScript there is no guarantee whatsoever to when the event will fire. The only thing JS promises you is to not fire the event *before* 50ms are over. Other then that it just tries to execute the event ASAP. That means if there is any JS code currently running then no event will fire until the block of code finished executing. It also means that several events (interval / timeout / click / etc. callbacks) can queue up over a while and then fire back to back. What seems like a very annoying problem that you have to work around if you want to do lets say smooth animations, it turns out that this also opens a broad series of possibilities of writing "asynchronous code" in JS. And by asynchronous I mean code that will not execute as part of your normal program flow, but whenever it is convenient for JS / the browser to execute it. You might already have come to the conclusion I made a little while ago: This is a perfect mechanism to split a big operation up into smaller chunks that the browser can process whenever its convenient and will not cause any freezes. This always works best if you leave the some room to "breathe" for the browser in between executing the code chunks (1-5ms usually are enough).</p>
+<p>Here is some code that can accomplish this in an easy-to-use fashion:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$.<span class="me1">queue</span> = <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; _timer: <span class="kw2">null</span>,<br />
+&nbsp; &nbsp; _queue: <span class="br0">&#91;</span><span class="br0">&#93;</span>,<br />
+&nbsp; &nbsp; add: <span class="kw2">function</span><span class="br0">&#40;</span>fn, context, time<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw2">var</span> setTimer = <span class="kw2">function</span><span class="br0">&#40;</span>time<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; $.<span class="me1">queue</span>._timer = setTimeout<span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; time = $.<span class="me1">queue</span>.<span class="me1">add</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>$.<span class="me1">queue</span>._queue.<span class="me1">length</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; setTimer<span class="br0">&#40;</span>time<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span>, time || <span class="nu0">2</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>fn<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; $.<span class="me1">queue</span>._queue.<span class="me1">push</span><span class="br0">&#40;</span><span class="br0">&#91;</span>fn, context, time<span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>$.<span class="me1">queue</span>._queue.<span class="me1">length</span> == <span class="nu0">1</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; setTimer<span class="br0">&#40;</span>time<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw2">var</span> next = $.<span class="me1">queue</span>._queue.<span class="me1">shift</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!next<span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="nu0">0</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; next<span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span>.<span class="me1">call</span><span class="br0">&#40;</span>next<span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span> || window<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> next<span class="br0">&#91;</span><span class="nu0">2</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span>,<br />
+&nbsp; &nbsp; clear: <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; clearTimeout<span class="br0">&#40;</span>$.<span class="me1">queue</span>._timer<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; $.<span class="me1">queue</span>._queue = <span class="br0">&#91;</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span>;</div>
+<h3>Late event binding</h3>
+<p>One of the things we use this for in PostTask is what I call late event binding. Lets say you have the following code: (Note: This could be simplified a lot, but this way its easier to understand how the refactoring works)</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$<span class="br0">&#40;</span>document<span class="br0">&#41;</span>.<span class="me1">ready</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// a lot of li's, lets say 500</span><br />
+&nbsp; &nbsp; $<span class="br0">&#40;</span><span class="st0">'li'</span><span class="br0">&#41;</span>.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; $<span class="br0">&#40;</span><span class="kw1">this</span><span class="br0">&#41;</span>.<span class="me1">bind</span><span class="br0">&#40;</span><span class="st0">'click'</span>, <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw3">alert</span><span class="br0">&#40;</span><span class="st0">'Yeah you clicked me'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span>;</div>
+<p>You will probably notice that it already has a noticeable impact on your pages initialization time while freezing the browser during it. To avoid it can be as easy as:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_js" style="white-space: wrap;white-space: nowrap;">
+$<span class="br0">&#40;</span>document<span class="br0">&#41;</span>.<span class="me1">ready</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// a lot of li's, lets say 500</span><br />
+&nbsp; &nbsp; $<span class="br0">&#40;</span><span class="st0">'li'</span><span class="br0">&#41;</span>.<span class="me1">each</span><span class="br0">&#40;</span><span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw2">var</span> self = <span class="kw1">this</span>, doBind = <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; $<span class="br0">&#40;</span>self<span class="br0">&#41;</span>.<span class="me1">bind</span><span class="br0">&#40;</span><span class="st0">'click'</span>, <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw3">alert</span><span class="br0">&#40;</span><span class="st0">'Yeah you clicked me'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; $.<span class="me1">queue</span>.<span class="me1">add</span><span class="br0">&#40;</span>doBind, <span class="kw1">this</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span>;</div>
+<p>This should minimize your pages initialization time down to almost its non-JS speed while also binding the events in a timely fashion. Essentially instead of binding the event on directly with the document ready invent, you simply encapsulate each bind into its own closure that you add to a queue for later execution. This means that the user will see the page very fast while in the background every 2ms a new li element gets its binding done. Of course the user could now do something really annoying and click on an element before its bind finishes which might screw things up. However, this is very unlikely. Fore one, the user needs to be very fast, because he'll need to click in < 1 second on one of the last elements (which is likely outside the current viewport because of the amount of elements). But also its very unnatural behavior for the user. And even if you have to make 100% sure the user is not able to interact you can use this technique to avoid freezes. You can for example start with all elements being hidden and only start showing them 1 by 1 after they've been processed. Or you can also use an overlay like the jquery blockUI plugin to block any interaction. Either way you'll give the user a better experience by not freezing the browser and allowing him to see the page as fast as possible (even if people can't use something right away, visual response of the page loading up is very important).</p>
+<h3>Async calculations</h3>
+<p>One other usage case I had with a client a couple days ago was that he was using a jquery UI slider which was supposed to dynamically filter a list of keywords depending on the selected value and doing some calculations. My first implementation of this would constantly freeze the browser b/c the values where live updated as you moved the slider and moving it over 20 values caused 20x intense loops to occur right after each other. The solution? Use the time queue from above. I simply split the keyword filtering loop up into distinct chunks, and whenever the slider was moved I ran $.queue.clear() first so if the previous filtering hadn't finished yet it would simply be discarded. This does two things at the same time: It allows the user to freely drag the slider back & forth without any freezing, while also easing work load by being able to discard ongoing operations for the previous value. If the operation for each value takes more then a second you can also easily add an ajax spinner that indicates activity. It also makes sense b/c working with this trick really feels like suddenly being able to use "ajax" for loops locally executed on the client ; ).</p>
+<h3>Other usage cases</h3>
+<p>I'm sure there are many other situations where you can use this. I've comen up with a rough draft for dramatically improving the responsiveness of jQuery UI's sortable plugin on slower browsers and am working on some other neat things. One could also write a jQuery plugin to ease late event bindings and other operations with a syntax like: $('li').delayed('bind', 'click', function() {}).</p>
+<p>Alright, I hope this is useful to those of you writing heavy JavaScript applications and maybe interesting for the rest as well. I wish I had more time to provide a more comprehensive solution, but I'm leaving for a week of non-computer fun to Thailand tomorrow.</p>
+<p>Let me know what you think and what other usage cases you can think of,<br />
+-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-f864-4f72-ae16-41cccbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frun-intense-js-without-freezing-the-browser%3A480f4dd6-f864-4f72-ae16-41cccbdd56cb &amp;title=Run+intense+JS+without+freezing+the+browser';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Frun-intense-js-without-freezing-the-browser%3A480f4dd6-f864-4f72-ae16-41cccbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frun-intense-js-without-freezing-the-browser%3A480f4dd6-f864-4f72-ae16-41cccbdd56cb&amp;title=Run+intense+JS+without+freezing+the+browser&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frun-intense-js-without-freezing-the-browser%3A480f4dd6-f864-4f72-ae16-41cccbdd56cb&amp;title=Run+intense+JS+without+freezing+the+browser';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/run-intense-js-without-freezing-the-browser:480f4dd6-f864-4f72-ae16-41cccbdd56cb">19 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/run-intense-js-without-freezing-the-browser:480f4dd6-f864-4f72-ae16-41cccbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4df7-d0b8-407f-8376-4336cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=212ca5e58231b5dd1719d22eb4cf69c9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.gigapromoters.com/blog/" rel="nofollow">Abhimanyu Grover</a>						</strong>
+						<strong>said 
+						on Mar 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>WOW... this will help me out for sure. This problem usually strikes our team once in a while. I never thought if this could be possible. We used to put most of our efforts in optimizing the JS code, and that is a real pain in a--</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-aa70-471d-bc58-43d3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=961aaa53a056ddbe150fe9b9d9bdffbf&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://vasilev.name" rel="nofollow">Atanas Vasilev</a>						</strong>
+						<strong>said 
+						on Mar 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Felix: you have my admirations for this clever and creative idea! I'll definitely find at least 2 places to integrate something similar. Thanks for sharing it with us.</p>
+<p>P.S.<br />
+The 500-elements event binding thing could be easily avoided by binding to the parent UL and and waiting for the event to bubble up to it. Then determine the object that fired it and do whatever you originally wanted to do with it. I'm sure you meant something to that effect by saying 'This could be simplified a lot... ', but I just couldn't help mentioning how I was dealing with it. Hope that helps someone out there :)</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-183c-4387-954d-4623cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Atanas: Yes, that is a very powerful optimization strategy and no - I didn't mean that with my comment. I mostly meant the code could be shortened : ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df7-dbb8-4931-98f4-4d76cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f4112f3023c643bf2f7b32c9c5dcfcba&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakebaker.42dh.com" rel="nofollow">Daniel Hofstetter</a>						</strong>
+						<strong>said 
+						on Mar 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Maybe this approach could be used for the navigation of the cookbook?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-cca8-42e9-8c45-4ef3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=612ad7c3adee43c41ee3e88affe94472&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							NOSLOW&nbsp;						</strong>
+						<strong>said 
+						on Mar 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Neat. I've been using ExtJS to develop my webapp and haven't ran into this issue (yet) or even considered if there was a "DoEvents" like call for js.  I wonder if this strategy can be easily implemented in ExtJS...when I need it, I'll come knocking ;)</p>
+<p>For any of you are still "stuck in the day" like myself, for intensive loops in VB, call DoEvents *and* the "sleep" API call (zero ms is sufficient) to truly yield processing. Otherwise, the CPU will remain pegged during the loop.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-ba0c-46f4-b6ad-4c5dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=86fa2bcac48632d550fa791bfc7be073&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://jasonleveille.com" rel="nofollow">leveille</a>						</strong>
+						<strong>said 
+						on Mar 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great article Felix!  I'm tucking this away for a rainy day for sure.</p>
+<p>I'm with Atanas regarding the handling of event binding to the parent ul rather than the individual children, but of course all event binding isn't always this clean cut.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-a4fc-490c-a073-415fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cf0f75551c8e25b3c2d652ad323fb5ec&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Peter Xue&nbsp;						</strong>
+						<strong>said 
+						on Apr 04, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Should line 6 in your first code read:<br />
+            $.queue._timer = setTimeout(function() {</br><br />
+I believe the logic is a little bit tricky and could use some commenting.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-3054-481a-8312-4069cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=67190bee79df56f1cea2461656a3337d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.forexratestoday.com" rel="nofollow">Forex Rates Today</a>						</strong>
+						<strong>said 
+						on Apr 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Javascript is like a joke. It's giving errors lots of time. They are all based on browser compatibility. Why the software  developers stop beating themselfs and develop a common browser?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-a874-41e0-bc74-4e7acbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Peter: I fixed it, thanks for spotting that. Sorry about the code, this is meant as a PoC and I want to make some changes in it before putting out a release version.</p>
+<p>Forex: No, trying to boost your PR with a no-follow link is a joke ; ). You should think about a career switch - neither JS nor spamming seems to be something your good at.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4811c4dd-9a8c-4007-b29b-3e964834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=3210e1be3e4059b93c4a88309e2183a2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://kevin.vanzonneveld.net" rel="nofollow">kvz</a>						</strong>
+						<strong>said 
+						on Apr 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice one Felix!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-481a42d9-b9f8-44cd-87cc-0c504834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c241d440bf549aa59d0642a59de5884f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.query7.com" rel="nofollow">Panzer</a>						</strong>
+						<strong>said 
+						on May 01, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is the problem with the latest wordpress update (2.5.1). The post page has far too many scripts. Pity theres not a hack on the firefox side of things that fixes it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-484f4d5d-b434-472f-8f00-5f1d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a2f3a73b86387f9e4747c5af180991de&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.schedulemyclasses.com/" rel="nofollow">Rae</a>						</strong>
+						<strong>said 
+						on Jun 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Felix<br />
+Nice job! Never thought VB knowledge would come in handy again.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-484f69ec-8618-42c0-b83a-66af4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ac97b5f71c623d60aa7e8f534908dd75&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Silver Knight&nbsp;						</strong>
+						<strong>said 
+						on Jun 11, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Pure GENIUS!  'Nuff said...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4875a656-58f0-46b2-a6b7-5dbd4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e88fb20ff4a97b4859ad9c25b8d6250e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Leafy&nbsp;						</strong>
+						<strong>said 
+						on Jul 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>You can make it accept functions if you change next[0].call to next[0].apply and have it look at the arguments[] array when you add it, using .slice(3) to get all of them.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48edfb7c-c588-4a4f-94b4-2cf84834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cebde98fcaa042805d8b5491d912acc5&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Grizly&nbsp;						</strong>
+						<strong>said 
+						on Oct 09, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Could you write this into a greasemonkey script or FF extension?</p>
+<p>If it works as well as you say, they should add it into the language, so that all events are bound in this fashion, speeding up JS for us all.</p>
+<p>Google's Chrome maybe... ;-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4933df2f-3c74-4f47-9b70-56964834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d509c5fc0d1a72f6e294479c709c4111&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							chris&nbsp;						</strong>
+						<strong>said 
+						on Dec 01, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I too am looking for the ability to put this into a greasemonkey script.  Any help would be appreciated.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-494fe9a0-1b48-4863-b11e-5e424834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=354841dbef1affc63a4ca610fdd50a5b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Kevin&nbsp;						</strong>
+						<strong>said 
+						on Dec 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This will work to stop the browser from freezing on loadup, but not when you leave the page. If you try to navigate away from the page, jQuery will still have to unbind every event it binded, and that will still freeze up a browser if you have a lot of events.</p>
+<p>I had to settle for the old-fashioned events to solve the problem. =/</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49cf4815-6884-49c6-8c15-25864834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ef8288acbad0eb76991e63e9cec5261e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Vaer&nbsp;						</strong>
+						<strong>said 
+						on Mar 29, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>"The 500-elements event binding thing could be easily avoided by binding to the parent UL and and waiting for the event to bubble up to it. Then determine the object that fired it and do whatever you originally wanted to do with it." - Atanas Vasilev</p>
+<p>I've thought of doing that before but never worked out how to figure out which child was clicked.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4b02d37f-7184-48f8-b5b1-1245cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7483ada15ec03efea2bf6ec571f12f9b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://JournoTwit.com" rel="nofollow">Spode</a>						</strong>
+						<strong>said 
+						on Nov 17, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I like the idea of this - but am having no luck getting it to work with jQuery 1.3.3</p>
+<p>Don't suppose you fancy updating the code?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

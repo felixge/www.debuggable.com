@@ -1,0 +1,839 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>jQuery is a true prototype killer &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/jquery-is-a-true-prototype-killer:480f4dd5-6634-48f4-99c2-4a2dcbdd56cb">jQuery is a true prototype killer</a></h2>	<div class="posted-on">
+		<p>Posted on 24/8/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p><strong>Update:</strong> jQuery 1.0 has just been released. Go and <a href="http://jquery.com/blog/2006/08/26/jquery-10/">check it out</a>!</p>
+<p>After spending (too) much time on learning how to use prototype, I recently gave <a href="http://jquery.com/">jQuery </a> a serious try. Saying that I'm amazed is maybe an understatement. I think I'll never go back.</p>
+<p>Just take look at my code for opening external links (with a rel attribute = 'external') in prototype:<br />
+<br/><br/><br/><br/><br/><br/><br />
+[javascript]/**<br />
+ * This attaches an onClick event to all anchors containing rel="external" on the site<br />
+ **/<br />
+this.Behaviors.externalLink = function()<br />
+{<br />
+    var anchors = document.getElementsByTagName('a');<br />
+    for (var i=0; i<anchors.length; i++)<br />
+    {<br />
+        var anchor = anchors[i];<br />
+        var relAttribute = String(anchor.getAttribute('rel'));<br />
+        if (relAttribute.toLowerCase().match('external'))<br />
+        {<br />
+            Event.observe(anchor, 'click', function(event){Lugsteinhof.Behaviors.externalLink.click(event);});<br />
+        }<br />
+    }<br />
+}</p>
+<p>/**<br />
+ * This is the behavior for externalLinks that are clicked (open them in a new window).<br />
+ **/<br />
+this.Behaviors.externalLink.click = function(event)<br />
+{<br />
+    Event.stop(event);<br />
+    var element = Event.findElement(event, 'a');<br />
+    window.open(element.getAttribute('href'));<br />
+}<br />
+[/javascript]</p>
+<p>And now jQuery:<br />
+[javascript]/**<br />
+ * This attaches an onClick event to all anchors containing rel="external" on the site<br />
+ **/<br />
+this.Behaviors.externalLink = function()<br />
+{<br />
+    $("a[@rel='external']").click(function(){window.open(this.href); return false;});<br />
+}[/javascript]</p>
+<p>If you think that's cool, go and checkout <a href="http://jquery.com/">their website</a> and refactor your site to use jQuery like <a href="http://jquery.com/blog/2006/07/24/technorati-using-jquery/">technorati already did</a>.</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-6634-48f4-99c2-4a2dcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fjquery-is-a-true-prototype-killer%3A480f4dd5-6634-48f4-99c2-4a2dcbdd56cb &amp;title=jQuery+is+a+true+prototype+killer';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fjquery-is-a-true-prototype-killer%3A480f4dd5-6634-48f4-99c2-4a2dcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fjquery-is-a-true-prototype-killer%3A480f4dd5-6634-48f4-99c2-4a2dcbdd56cb&amp;title=jQuery+is+a+true+prototype+killer&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fjquery-is-a-true-prototype-killer%3A480f4dd5-6634-48f4-99c2-4a2dcbdd56cb&amp;title=jQuery+is+a+true+prototype+killer';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/jac-comment-box-auto-completer-jquery-plugin:48ce581c-a2ac-48ed-9a27-2c4c4834cda3">Jac: Comment box name auto completer (jQuery plugin)</a></li>
+							<li><a href="/posts/getting-serious-with-jquery-adding-custom-css-selectors:480f4dd6-e834-4cf6-a5cc-478ccbdd56cb">Getting serious with jQuery - Adding custom CSS selectors</a></li>
+							<li><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li>
+							<li><a href="/posts/simple-global-ajax-activity-indicator-with-jquery:480f4dd6-7508-4aea-9850-4139cbdd56cb">Simple global Ajax activity indicator with jQuery</a></li>
+							<li><a href="/posts/uhhhwat-introduction-to-the-jquery-community:480f4dd6-c598-474e-a57a-44e7cbdd56cb">&quot;uhhh.......WAT?&quot; - Introduction to the jQuery community</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/rightjs-1-5-6-8-times-faster-than-jquery:4b1fc009-1940-4d26-bdc6-0af2cbdd56cb">RightJS 1.5: 6-8 times faster than jQuery</a></li>
+							<li><a href="/posts/encode-html-entities-with-jquery:480f4dd6-13cc-4ce9-8071-4710cbdd56cb">Encode HTML entities with jQuery</a></li>
+							<li><a href="/posts/with-jquery-cakephp-to-world-domination-slides:480f4dd6-7cb8-4e84-af4f-4dc6cbdd56cb">With jQuery &amp; CakePHP to World Domination (Slides)</a></li>
+							<li><a href="/posts/jquery-madness-at-the-workshop-in-raleigh,-nc,-sepetember-6th---7th:48a9b405-7574-495b-b75e-2d284834cda3">jQuery Goodness at the Workshop in Raleigh, NC, September 6th - 7th</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/jquery-is-a-true-prototype-killer:480f4dd5-6634-48f4-99c2-4a2dcbdd56cb">35 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/jquery-is-a-true-prototype-killer:480f4dd5-6634-48f4-99c2-4a2dcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dda-beb0-4bc5-8a84-48c3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c28cbc5ff5f63a4fa191af3bb49a36a7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.theklaibers.com" rel="nofollow">Nate K</a>						</strong>
+						<strong>said 
+						on Aug 24, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wow - thats pretty nice! I have been reading up on both, weighing out decisions based on my needs. Your examples have helped me to narrow down this process. </p>
+<p>Gonna go play with it now :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dda-eb3c-4340-b913-479acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4f99b5eb6e9b9a9d08891011cdeb13d8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://bbuchs.f2o.org" rel="nofollow">Bryan Buchs</a>						</strong>
+						<strong>said 
+						on Aug 24, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Now all we need is for someone to write a jQuery Cake Helper... Any takers??? Please? </p>
+<p>Version 1.0 of jQuery should be released tomorrow (I hope I hope I hope), and the author of the Interface plugins (jQuery's Scriptaculous) said that he'll be releasing his update around the same time.</p>
+<p>I used jQuery on a small project recently, and another developer who had never seen nor heard of it was able to look over my code and understand exactly what was going on.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dda-e430-45ab-b3ef-4632cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 24, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Bryan,</p>
+<p>I really dislike the CakePHP Ajax/Prototype helper and I won't ever code something like this for jQuery. The reason I don't like it, is that it produces "inline" js and leaves back a mess of crapy non-semantic html/javascript. It's not the fault of the helper itself, it does the best it can do. But JS should not be embedded in Html(attributes) in first place. Because it will very likely make your site inaccessible. Javascript should be an additional layer on a solid html/css basis.</p>
+<p>So really, what advantage do those helpers give you? Besides generating code that one should write himself in js (not php) ?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-d0cc-40d8-9998-4056cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=aada563a822e75226e088412f64c8526&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							wluigi&nbsp;						</strong>
+						<strong>said 
+						on Aug 24, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I think Felix is right "inline" js is a realy bad think and helpers are not a solution</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dda-8174-4db9-930c-4185cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b3e04a46e85ad3e165d66f5d927eb609&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://ejohn.org/" rel="nofollow">John Resig</a>						</strong>
+						<strong>said 
+						on Aug 24, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Glad to see that you're enjoying jQuery - let me know if you hit any snags.</p>
+<p>As far as CakePHP + jQuery integration, I'd be happy to promote this and donate any support possible to making this happen. We're currently, also, working with two other PHP projects: Symfony and Drupal, trying to get jQuery integrated with their code base. If you have any questions, there's a good number of PHP/jQuery developers on the jQuery Mailing List (http://jquery.com/discuss/) so feel free to bring up your questions there.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-51bc-4c61-be0f-4168cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f793cc057337bf92646d9cd3ed3aa501&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.nolimit-studio.com" rel="nofollow">sosa</a>						</strong>
+						<strong>said 
+						on Aug 24, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'm not really sure, but I think that prototype can be a lot simpler than your example. Maybe something like this (not tested):</p>
+<p>$$('a').each(function(element){if element.toLowerCase().match('external') Event.observe(element,'click',function(event){window.open(event.target..getAttribute('href'))});</p>
+<p>jQuery is cool, but many of their examples are misleading. (and your jQuery example is case sensitive, while the Prototype one is not)</p>
+<p>Btw, Cake does a very good job on unobtrusive javascript if you use Event:Selectors and  the Javascript::Event</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-c7b8-48bb-b1b9-43b8cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 24, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>John: Hey, thx for stopping by, I subscribed to the RSS feed of the mailing list for now, maybe I'll get active in it at some point. As far as integration with CakePHP goes I'm not sure what would be a good way for this. In my oppinion there is something wrong with your JS if you have to write PHP wrappers for it to reduce complexity. If it's ment to get non-JS programmers into using JS then this is like letting people create html with frontpage - not a good idea. But maybe somebody else will pick you up on that one?</p>
+<p>sosa: Yes, maybe my prototype example is a little too long / bad, but I was able to make the jQuery one after working with it for about ~30 minutes. I used prototype way longer then that and didn't see something easier right away. In general I was able to reduce/replace half of the JS in my current project by using jQuery without thinking about it too much. Prototype definitly allows you to do the same stuff as jQuery, but it's just a lot more difficult/complex & less intuitive.</p>
+<p>Regarding CakePHP's Javascript::Event: Yes that looked like it wasn't too bad, but it still is inline js and therefor I'm not going to use it. I much rather code my entire application the traditional way and then do all the fancy web 2.0 stuff as a JS layer on top of it. Because when it comes to maintainance/redesigning etc. you'll have to go through all your views(templates) and rewrite id's, classes', etc. instead of having a central js file with all of it.</p>
+<p>Another thing I really hate about these new "web 2.0" sites, are those embedded ajax spinners with style="display: none;". I mean come on, the people who use it claim to do semantic html with ajax. I can't see that! That stuff can easily be attached to the dom tree via js instead of a hidden div.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dda-8170-4e09-a877-44e2cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=33d3d7ca72a538f64bf5fdc01d2ae3ae&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://ouch.kiev.ua" rel="nofollow">Vladislav</a>						</strong>
+						<strong>said 
+						on Aug 25, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>About helpers, Felix have a reason.</p>
+<p>When I programming my application with html-&gt;ajax, I got a lot of problem... Why? Becouse I need more functionality with scriptalous/prototype. More &amp; different, then can make AJAX helper...</p>
+<p>Finally, after a long dance around computer, I write all code by myself... without helper. Yep, I am not a JS programming and not so understanding how all work's (smile). But it's not impossible.</p>
+<p>Whe you need fast code with functionality different, then standart drop shadows/hide...  You couldn't use helper. </p>
+<p>Sorry for my bad english ;-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-8ae8-4302-8403-4b4fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4f99b5eb6e9b9a9d08891011cdeb13d8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://bbuchs.f2o.org" rel="nofollow">Bryan Buchs</a>						</strong>
+						<strong>said 
+						on Aug 25, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wow, I didn't realize that an innocent comment about a Helper would generate such discussion. I only suggested it because I don't like the fact that Prototype/Scriptaculous is the default/only JS solution in the Cake package, and would like to see an alternative available for PHP developers who aren't javascript-savvy.</p>
+<p>For the record, I totally agree about inline scripting. But it would be nice to quickly spit out simple jQuery functions ("$.post" for example) while I'm prototyping an application.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-1e68-4443-a6c9-4df1cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 25, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Bryan,</p>
+<p>I agree that Prototype/Scriptaculous as the default/only Helper solution in CakePHP is questionable. But I still stay with my oppinnion that people who don't know javascript shouldn't use javascript code generators to pretend they do, unless it's for their personal/experimental needs. </p>
+<p>I know that CakePHP has to go with the web 2.0 hype from a marketing stand point, but if you want to write a real application, using cutting edge technology, you should really know what you are doing. And this sometimes includes learning "new languages like javascript ...</p>
+<p>I'm no expert at javascript, I admit, but I write all my js code myself (err, besides the libraries I use), so I understand what it does. It also allows me to perfectly seperate behavior (js) from content (html) which results in almost automatic graceful degration.</p>
+<p>However, using inline js and code generators for prototyping needs as you suggessted is totally reasonable and worth the effort of writing some helpers. I just can't stand that sometimes 1/4th of the CakePHP mailing list is cluttered with people who use the javascript/ajax helpers without having the slightest clue about what they are doing.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-3a28-4f30-9735-4746cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=20fbd1cc70c0d30f595c78955c44b267&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.championsupplyinc.com" rel="nofollow">Vijay</a>						</strong>
+						<strong>said 
+						on Aug 25, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great, realy i am appreciate.<br />
+Thanks for new things.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-d1d8-4987-a79d-44e6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4e3ed95df080a431a41316795a3dc978&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Kiyoshi (nemontemi)&nbsp;						</strong>
+						<strong>said 
+						on Aug 26, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Why don't you give a try to the Dojo (http://dojotoolkit.org) Ajax library?</p>
+<p>As far as I know, Dojo was the first Ajax library and has the best 'mommentum' among the other libraries.</p>
+<p>Also, an 'underground' news said that the OpenAJAX Alliance, leaded by IBM and has members like Sun, will invite the Dojo staff to become member of the group.<br />
+Talking about standarts and development, for sure this is a remark to pay attention to.</br></p>
+<p>Besides this, I see no problem trying new alternatives =)</p>
+<p>Best regards, Felix.<br />
+And luck in the development road!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-5f48-4b89-b567-467dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6d4a1321d5df506713744badf5e55441&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							olivvv&nbsp;						</strong>
+						<strong>said 
+						on Aug 28, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The Head helper (Rossoft) is the quick and simple solution to your hepler without inline scripting worries...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-c4ec-42d5-9190-4641cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4f99b5eb6e9b9a9d08891011cdeb13d8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://bbuchs.f2o.org" rel="nofollow">Bryan Buchs</a>						</strong>
+						<strong>said 
+						on Aug 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Good suggestion olivvv! I had not seen the Head Helper before, and wondered why there wasn't some way to accomplish that.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-af5c-449f-a824-4183cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=13cd13dd12c27d6a05437b0154a2816f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://bakesale.jeepen.net/" rel="nofollow">Matti Putkonen</a>						</strong>
+						<strong>said 
+						on Sep 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>We used JQuery on Bakesale and have been very happy with it. Though with my limited imagination it is hard to see how an CakePHP helper would actually help as part of the beauty of Jquery has been the fact we can just link the external javascript files and JQuery library and the thing works :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddb-b9b4-488c-ba7f-4bd3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f72d844cd647e3a0b36255724bfd9c9f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.m3nt0r.de" rel="nofollow">m3nt0r</a>						</strong>
+						<strong>said 
+						on Sep 09, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>What about a "helper" which redirects its output into an external javacript file(php), auto-adds it to the header and associates its actions by using the IDs provided by the view-author? This way the Helper can be used within the view (for the sake of easy element association) but when it comes down to parsing it outputs just one *.js file containing all the observers. :) Besides the resulting fact that ther will be no inline javascript whatsoever, gzip support and other fancy stuff could be added.  What you think?</p>
+<p>PS: Also consider Behaviour.JS .. creating a rule file with php is pretty easy and also pretty straight forward.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dde-8228-4e6e-8450-4359cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2006/10/10/how-to-organize-your-cakephp-apps-javascript/" rel="nofollow">ThinkingPHP and beyond &raquo; How to organize your CakePHP App&</a>						</strong>
+						<strong>said 
+						on Oct 10, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Ok, I'm no expert on Javascript but I know enough to have some fun with it. Unlike lot's of folks, I'm not into using all those bloated JS libs, frameworks and other things around. However, I'm in love with the lightweight jQuery library, since it allows to write amazingly elegant code that's easy for others to read, and fun to work with. One of the coolest aspects about jQuery is that it doesn't use prototypes to turn Javascript into a new language (like the Prototype library does), but rather encapsulates all functionality into the $ object that is used as a wrapper/selector for the elements you want to manipulate. So if your app includes more then 100 kbyte of JS bloat right now, do yourself a favor and switch to the fresh jQuery 1.0.2. It will not only reduce your JS dependencies to 15kb, but also give you the chance to reduce your own code considerably (2-3x for me). [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-8ee0-40f6-a346-4c78cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0776b67b148e2f3b5abb3a983ef25d2d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							gosciu&nbsp;						</strong>
+						<strong>said 
+						on Mar 03, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sorry, but Your example of propotype sucks. You just dont know how to use prototype /NEVER do _for_ loops with propotype my friend, use $R(x,y).each(i) instead/ ;)</p>
+<p>[code]<br />
+/**</br><br />
+* This attaches an onClick event to all anchors containing rel="external" on the site</br><br />
+**/</br><br />
+this.Behaviors.externalLink = function() {</br><br />
+    $$('a[rel="external"]').each(function(el){</br><br />
+            Event.observe(el, 'click', externalLinkClick(event));</br><br />
+    }</br><br />
+}</br></p>
+<p>/**<br />
+* This is the behavior for externalLinks that are clicked (open them in a new window).</br><br />
+**/</br><br />
+function externalLinkClick(e)</br><br />
+{</br><br />
+    Event.stop(e);</br><br />
+    var element = Event.findElement(event, 'a');</br><br />
+    window.open(</br><br />
+        Event.findElement(event, 'a')</br><br />
+    );</br><br />
+}</br><br />
+[/code]</br></p>
+<p>PS. I use jquery as DOM selector/manipulator, but prototype has some unique JS language extensions which i cant resist (and noting prevents you from using them both).<br />
+PS2. Look at dom_query from you_ext if your're insrested in DOM selectors</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de7-46f4-41e6-bd2e-45adcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 03, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>gosciu: Please keep in mind that this post was made quite a while ago when there was a) no official prototype docs, and b) prototype might not have had the capabilities you based your example on.</p>
+<p>As far as JS language extensions go: That is why I actually *hate* prototype. I want to be able to do for - in loops without having to filter out stupid prototype functions and properties. I want regular JS code to not be effected by the library of my choice and most of all I want *one lightweight library*  that selects elements *and* provides sophisticated DOM manipulation functionality ... ; ). And that's jQuery and nobody else these days.</p>
+<p>Other then that I'm familiar with dom_query and think it's pretty neat but wouldn't use it because it doesn't come with the DOM manipulation package jQuery does unless I include huge EXT dependencies ...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de8-6904-4aae-9da7-47c3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cf650a1627e11023d8a69bc43f3a87eb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							valenluis&nbsp;						</strong>
+						<strong>said 
+						on Apr 11, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>jQuery seems good, but i agree with Felix Geisendörfer, the helpers aren't helpful enough if you really want to make an accesible website :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de8-8714-4437-835d-4caccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f6c9ba19c4f086cebf3cabf63a406413&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							el_vartauy&nbsp;						</strong>
+						<strong>said 
+						on Apr 21, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I agree with Felix about:<br />
+_ usefulness of some helpers when you have to fine-tune your app for accesibility and special behaviors.</br><br />
+_ semantic considerations on the helpers output, aka inline js or unreadable auto-generated id's, i prefer behaviors.</br><br />
+_ prototype &amp;co are a little bloated. (someone mentioned Dojo, another bloated one)</br><br />
+_ the elegance of resulting jQuery code over prototype one's, handwrite or generated.</br></p>
+<p>but:<br />
+_ i have to agree with Thomas Fuchs (scriptaculous author) that in one pdf slide i saw his recommendation is to use the ugly inline style "display:none;", because the css or js behavior will be delayed on large docs, so some elements will start visible until the css style is applied by the browser.</br><br />
+_ i'm a 7 year's experienced PHP developer, and i have to tell that the same beauty and elegance that you find jQuery has over Prototye, Ruby has over PHP. i'm seriously considering the switch, with the advantage that CakePHP philosophy is based on Rails.</br></p>
+<p>i think my next web stack will be Rails+jQuery.<br />
+long life to behaviors, microformats and conventions over configuration.</br></p>
+<p>good thread.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de8-8910-40e2-9fde-4db0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f6c9ba19c4f086cebf3cabf63a406413&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							el_vartauy&nbsp;						</strong>
+						<strong>said 
+						on Apr 21, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>i forgot to mention i think it could be handy the use of CJS/RJS for complex app behaviors and data logics.</p>
+<p>imho.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de8-29ac-4a43-8a51-4d54cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>el_vartauy: Sure ruby definitely has some elegance PHP does not offer. I will do some ruby playing myself in my spare time (uh wait what was that again?) in the future I guess, but I know I'll mainly stay with PHP for various reasons for a good while:</p>
+<p>- Hosting<br />
+- Sub-contractor costs</br><br />
+- Speed</br><br />
+- Knowledge in PHP over Ruby</br><br />
+- Vendor libraries</br><br />
+- My love and commitment to CakePHP</br></p>
+<p>So if you feel like moving on go ahead. We'll see what PHP6 brings and if the market share will do a significant shift over the future, but for now I still think PHP ain't dead yet nor is it dieing ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-ae80-4b1d-83ea-456acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=61bb1230a4328c0b260f2b7f1933eb23&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.pablasso.com" rel="nofollow">pablasso</a>						</strong>
+						<strong>said 
+						on May 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>you are open minded when it comes to js frameworks, but not when it comes to languages</p>
+<p>go figure</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-773c-43b1-84d8-4b2ccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 23, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>pablasso: Says who? I'm learning Haskell right now ... go figure.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-744c-4071-8dc9-42a2cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fbb1bdc5d2c019ff8e3cd4188209fd83&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.electricprism.com/aeron/slideshow" rel="nofollow">rloaderro</a>						</strong>
+						<strong>said 
+						on Jun 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Felix "And that’s jQuery and nobody else these days."</p>
+<p>I know this article is a little dated now. Last year I moved from Prototype + Scriptaculous to prototype.lite + moo.fx. But since Mootools (http://www.mootools.net) was released it has been a paradigm shift in the world of JS frameworks for me. If you have a chance take a look at the latest release (1.11 atm). Really look at it - read the source - every line of code is beautifully engineered. Worth checking out since it does the same things you like about jQuery, only probably smaller and faster.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-dee4-4f78-96fc-4a14cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 04, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>rloaderro: Sry, but jQuery is way more elegant, beautifully engineered and so on then mootools. Now I'm not an expert at mootools but just checked out how to update a div via ajax in mootools and compared it to jQuery.</p>
+<p>Mootools: http://bin.cakephp.org/view/902640095<br />
+jQuery: http://bin.cakephp.org/view/1657913354</br></p>
+<p>Here is what's different: Mootools goes the prototype way of having objects for everything. jQuery uses the bucket concept: Selected html elements via CSS / XPATH, then do cool stuff with it. It's just much more effective when writing lot's of JS and I couldn't imagine anything better right now. But hey who says I'm not wrong. So if you can find some stuff where mootools is directly less verbose and more elegant then jQuery then go ahead and it show it to me.</p>
+<p>Thanks, Felix</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-ade0-4484-b144-40e7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=fbb1bdc5d2c019ff8e3cd4188209fd83&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.electricprism.com/aeron/slideshow" rel="nofollow">rloaderro</a>						</strong>
+						<strong>said 
+						on Jun 05, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hi Felix:</p>
+<p>I guess your examples aren't entirely fair. For example, with just reformatting mootools is not too different than jQuery:</p>
+<p>http://bin.cakephp.org/view/1659581237</p>
+<p>But I think where mootools really shines is with OO and extensibility. For example, a mootools approach to the above might be:</p>
+<p>http://bin.cakephp.org/view/1811996526</p>
+<p>Which results in a much more elegant, one line solution. For motive of size and speed mootools doesn't really waste any lines of code. I guess it is a framework for programmers - in that regard. mootools brings the heavy machinery and it is up to you to add the polish.</p>
+<p>Anyway, I was always under the impression that Prototype was a good thing?</p>
+<p>http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Guide:Class-Based_vs._Prototype-Based_Languages</p>
+<p>Peace</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-f870-403b-ac51-47fbcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 05, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>rloaderro: I took the example straight from the mootools docs. Anyway, your reformatted example is not much better. Why do I have to specify the HTTP method? Why do I have to manually invoke the request? Why do I have to use a class? Why do I need to specify an 'update' parameter? Can't mootools guess what I want to update? (And why can you suddenly use 'return false' to stop event propagation when you don't do so in your following example?)</p>
+<p>And your polished up example doesn't really impress me either. I can do something similar in jQuery like this:</p>
+<p>http://bin.cakephp.org/view/288283534</p>
+<p>However, it's much better then extending the prototype of the Element object for many reasons. Once you start doing this then for (var p in el) loops will lead to different results than they would in vanilla Javascript. You have essentially hacked the core language. Now if you want to go down this path then please do. But personally I like to have my stuff as compatible as possible and not build my stuff on shaky ground.</p>
+<p>And so far I've been nice enough to talk with you about manipulating elements that have an ID attribute. Where jQuery's true strength arises however is when you get into situations where you have many elements you need to select. Here is a little older example that shows you jQuery beats the competition in that regard:</p>
+<p>http://jquery.com/blog/2006/10/18/zebra-table-showdown/</p>
+<p>> Anyway, I was always under the impression that Prototype was a good thing?<br />
+Well every tool is good as long as you use it properly. To me 'Prototype' makes bad usage of Javascript's prototype feature because it essentially uses it to alter the JS language itself which is very confusing if you ever get into some more abstract programming in JS.</br></p>
+<p>So what's next? You can continue to show me why everything that can be done in jQuery can also be done in mootools and argue that this shows how it's better or at least equally good. I will continue to explain the value of stuff that already ships exactly the way I want it to be over something that I have to manually "Configure" in order to make it work to my liking. And when it comes down to Conventions over Configuration I think even you should agree with me that jQuery does a better job at that ; ).</p>
+<p>Thanks for the interesting discussion, Felix</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df4-ac2c-48a8-a68b-4bebcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d335c6e8083a3897713077e72c2216bc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://Wiersze" rel="nofollow">Xaviego</a>						</strong>
+						<strong>said 
+						on Jan 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>jQuery help my on my sites, thx for this art, very helpfull!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-0b74-4bec-926e-48accbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=df7389c2b45f6e44d15fb1f39e1901fe&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://modernsearch.cn" rel="nofollow">Bibingio Alaksn</a>						</strong>
+						<strong>said 
+						on Feb 04, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Looks great! I found lots of intresting things here. Please more updates.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-11d0-4c08-9f6d-4838cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=79f6b3a4222c7b1b746bb08eca56373b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://modernsearch.cn" rel="nofollow">Bibingio Alaksy</a>						</strong>
+						<strong>said 
+						on Feb 04, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Guys! What Your Blog Powered By?  Keep up the great work!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-d490-48bf-b7c8-4ac7cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=095a93b1d19c58cde8d0b5355f9a99c1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://gucci-handbag.mustclickbuy.com/" rel="nofollow">Alabama Manz</a>						</strong>
+						<strong>said 
+						on Feb 05, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for taking the time and effort in creating this content to share your knowledge with all of us.<br />
+<a href="http://accessory-gucci-handbag-womens.mustclickbuy.com/site_map.html|accessory" rel="nofollow"></a></br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-e458-43f1-8f9c-4c2acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2cc9f63dfd053b30b1010145ac5c17b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://index1.chasehunt.com" rel="nofollow">kistov</a>						</strong>
+						<strong>said 
+						on Feb 06, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p><a href="http://index1.chasehunt.com" rel="nofollow">winter olympics of 1972</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df5-8fa8-42e7-b8a8-4bebcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0cb7782136842370159038d5a9acf265&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://accessory-gucci-handbag-womens.mustclickbuy.com/" rel="nofollow">Alabama Mana</a>						</strong>
+						<strong>said 
+						on Feb 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Good site! It very impressive, easy to find helpful information. Keep up the great work.<br />
+http://accessory-gucci-handbag-womens.mustclickbuy.com/site_map.html accessory gucci handbag womens</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

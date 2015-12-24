@@ -1,0 +1,593 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Blog &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="paging">
+	<a href="/posts/index/page:53" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:50">50</a></span> | <span><a href="/posts/index/page:51">51</a></span> | <span><a href="/posts/index/page:52">52</a></span> | <span><a href="/posts/index/page:53">53</a></span> | <span class="current">54</span> | <span><a href="/posts/index/page:55">55</a></span> | <span><a href="/posts/index/page:56">56</a></span> | <span><a href="/posts/index/page:57">57</a></span> | <span><a href="/posts/index/page:58">58</a></span> <a href="/posts/index/page:55" class="next">Next &raquo;</a></div>
+	<div class="post">
+	<h2><a href="/posts/should-i-refactor-this-piece-of-code:480f4dd6-eafc-4fd3-9302-4f44cbdd56cb">Should I refactor this piece of code?</a></h2>	<div class="posted-on">
+		<p>Posted on 9/11/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Most of you will probably be familiar with the concept of refactoring. It is the process of modifying an exisiting piece of code in order to improve it's readibility or structure while preserving it's original meaning or behavior. Automated testing makes refactoring a lot easier, as you can see if the changes you make to the code break it's original functionality. Anyway, this post was actually going to be about a little Helper function I wrote and felt like sharing and not about refactoring. But as it's the case with most of my code, the first step before blogging about it, is to refactor it for readability. But often I also tend to refactor code on here to be more generic / reusable then it needs to be for my actual application to make it more attractive to a broader audience. This was also the case with the little Helper function that can be used to convert a given amount of bytes into a more meaningful string using the appropriate units. The end result was that I decided to use the resulting code as an example for refactoring instead.</p>
+<p>First of all, consider the function I initially thought about posting:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> UnitsHelper <span class="kw2">extends</span> Helper<br />
+<span class="br0">&#123;</span> &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="kw2">function</span> bytesToString<span class="br0">&#40;</span><span class="re0">$bytes</span>, <span class="re0">$round</span> = <span class="nu0">1</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$bytes</span>==<span class="nu0">0</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'0 bytes'</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">elseif</span> <span class="br0">&#40;</span><span class="re0">$bytes</span>==<span class="nu0">1</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'1 byte'</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$units</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'bytes'</span> =&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">0</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'kb'</span> &nbsp; &nbsp;=&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">10</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'mb'</span> &nbsp; &nbsp;=&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">20</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'gb'</span> &nbsp; &nbsp;=&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">30</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'tb'</span> &nbsp; &nbsp;=&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">40</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'pb'</span> &nbsp; &nbsp;=&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">50</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'eb'</span> &nbsp; &nbsp;=&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">60</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'zb'</span> &nbsp; &nbsp;=&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">70</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'yb'</span> &nbsp; &nbsp;=&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">80</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$lastUnit</span> = <span class="st0">'bytes'</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$units</span> <span class="kw1">as</span> <span class="re0">$unitName</span> =&gt; <span class="re0">$unitFactor</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$bytes</span> &nbsp;&gt;= <span class="re0">$unitFactor</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$lastUnit</span> = <span class="re0">$unitName</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span> <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/round"><span class="kw3">round</span></a><span class="br0">&#40;</span><span class="re0">$bytes</span>/<span class="re0">$units</span><span class="br0">&#91;</span><span class="re0">$lastUnit</span><span class="br0">&#93;</span>, <span class="re0">$round</span><span class="br0">&#41;</span>.<span class="st0">' '</span>.<span class="re0">$lastUnit</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>Now even so I expect most of us to deal within units much smaller then 1 TB on the web, I added the units that come afterwards for completeness. But that's not really important. What's interesting is is that this function above serves a well defined purpose and there is no strong reason for not leaving it as is. However, when posting about it on here (so I thought), it should be more generic as it's part of an object called UnitsHelper. What happened was a ridiculous little refactoring session turning this innocent little function into being part of an automagic unitToString function that works like the Model::findBy&lt;Field&gt;() stuff in CakePHP. Only that in this case it's UnitsHelper::&lt;unit&gt;ToString(). Before explaining any further, take a look at the result:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> UnitsHelper <span class="kw2">extends</span> Helper<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">function</span> __call__<span class="br0">&#40;</span><span class="re0">$method</span>, <span class="re0">$param</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/preg_match"><span class="kw3">preg_match</span></a><span class="br0">&#40;</span><span class="st0">'/^(.+)toString$/i'</span>, <span class="re0">$method</span>, <span class="re0">$match</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/array_unshift"><span class="kw3">array_unshift</span></a><span class="br0">&#40;</span><span class="re0">$param</span>, <span class="re0">$match</span><span class="br0">&#91;</span><span class="nu0">1</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/call_user_func_array"><span class="kw3">call_user_func_array</span></a><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span>&amp;<span class="re0">$this</span>, <span class="st0">'unitToString'</span><span class="br0">&#41;</span>, <span class="re0">$param</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw2">function</span> unitToString<span class="br0">&#40;</span><span class="re0">$unit</span>, <span class="re0">$quanitity</span>, <span class="re0">$round</span> = <span class="nu0">1</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$quanitity</span>==<span class="nu0">0</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'0 '</span>.<span class="re0">$unit</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">elseif</span> <span class="br0">&#40;</span><span class="re0">$quanitity</span>==<span class="nu0">1</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="st0">'1 '</span>.Inflector::<span class="me2">singularize</span><span class="br0">&#40;</span><span class="re0">$unit</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$unitFct</span> = <span class="re0">$unit</span>.<span class="st0">'Units'</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/is_callable"><span class="kw3">is_callable</span></a><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span>&amp;<span class="re0">$this</span>, <span class="re0">$unitFct</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$quanitity</span>.<span class="st0">' '</span>.<span class="re0">$unit</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$units</span> = <span class="re0">$this</span>-&gt;<span class="br0">&#123;</span><span class="re0">$unitFct</span><span class="br0">&#125;</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$units</span> <span class="kw1">as</span> <span class="re0">$unitName</span> =&gt; <span class="re0">$unitFactor</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$quanitity</span> &nbsp;&gt;= <span class="re0">$unitFactor</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$lastUnit</span> = <span class="re0">$unitName</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span> <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/round"><span class="kw3">round</span></a><span class="br0">&#40;</span><span class="re0">$quanitity</span>/<span class="re0">$units</span><span class="br0">&#91;</span><span class="re0">$lastUnit</span><span class="br0">&#93;</span>, <span class="re0">$round</span><span class="br0">&#41;</span>.<span class="st0">' '</span>.<span class="re0">$lastUnit</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="kw2">function</span> bytesUnits<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span> <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'bytes'</span> &nbsp; &nbsp; &nbsp; &nbsp;=&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">0</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'kb'</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">10</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'mb'</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">20</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'gb'</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">30</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'tb'</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">40</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'pb'</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">50</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'eb'</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">60</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'zb'</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">70</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="st0">'yb'</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; =&gt; <a href="http://www.php.net/pow"><span class="kw3">pow</span></a><span class="br0">&#40;</span><span class="nu0">2</span>, <span class="nu0">80</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span></div>
+<p>First of all: Note that this code will only work in CakePHP 1.2 where Helper extends Overloadable and therefor makes it easy to implement automagic functions like the one used here.</p>
+<p>Other then that this is good example to answer the question about when to refactor. What I did  in this case was to refactor the function, so it would be easy to use it's core functionality for other (linear) unit systems as well. So if I was to expect that I will deal with lot's of units in the metric system in a project, this little refactoring would become very useful as the amount of used units grows. However, in the little experimental project I'm using this Helper in (a code review assistant) there probably won't ever be another unit then bytes.</p>
+<p>So what does this mean? Well I think it's obvious: The principle of <a href="http://c2.com/xp/YouArentGonnaNeedIt.html">YAGNI</a> (You Arent Gonna Need It) says that in my case I just wasted a lot of time. However, in the scope of somebody elses project who might reads this post, refactoring this Helper was very benifital. In general I'm in big favor of 37 Signals philosophy of not trying to be everything to everybody, and sticking with what you need. So just because there are a lot of benifits to staying DRY (Don't Repeat Yourself), this doesn't mean it should become your #1 priority. If you are unsure if you are going to need something, don't code it. If you are not sure if refactoring some piece of code will make the world a better place, don't do it. Try to get a feel of where the critical parts of your application are located and focus on making them the most beautiful code you can imagine (or afford in terms of time investment ^^). But don't try to be as insane and refactor the little bytesToString function of mine if all you need is a bytesToString function ... ; ).</p>
+<p>Now even if so this post didn't answer all your questions about refactoring, it at least provides you with (one) solution to a common problem ; ).</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-eafc-4fd3-9302-4f44cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fshould-i-refactor-this-piece-of-code%3A480f4dd6-eafc-4fd3-9302-4f44cbdd56cb &amp;title=Should+I+refactor+this+piece+of+code%3F';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fshould-i-refactor-this-piece-of-code%3A480f4dd6-eafc-4fd3-9302-4f44cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fshould-i-refactor-this-piece-of-code%3A480f4dd6-eafc-4fd3-9302-4f44cbdd56cb&amp;title=Should+I+refactor+this+piece+of+code%3F&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fshould-i-refactor-this-piece-of-code%3A480f4dd6-eafc-4fd3-9302-4f44cbdd56cb&amp;title=Should+I+refactor+this+piece+of+code%3F';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/should-i-refactor-this-piece-of-code:480f4dd6-eafc-4fd3-9302-4f44cbdd56cb">6 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/should-i-refactor-this-piece-of-code:480f4dd6-eafc-4fd3-9302-4f44cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/windows-xp-apache-php-output-problem:480f4dd6-5ccc-47c1-b544-4a1ecbdd56cb">Windows XP Apache PHP output problem</a></h2>	<div class="posted-on">
+		<p>Posted on 3/11/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>... those were (some of) the google keywords I used to search for a solution to <a href="http://groups.google.com/group/cake-php/browse_thread/thread/1b5d5c26f1d6691f/223c377b2a5cbde4">the Heisenbug that recently killed my productivity</a>. Big thanks to <a href="http://robmeek.com/">meek</a>, <a href="http://groups.google.com/group/cake-php/browse_thread/thread/1b5d5c26f1d6691f/388e9b09629fb327#388e9b09629fb327">who has found the bug</a> in Windows XP (no SP) that caused the problem: </p>
+<p><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;317949">Q317949: Socket Sharing Creates Data Loss When Listen and Accept Occur on Different Processes</a></p>
+<p>I'm doing this post because I hope that Google will index it, and the next person hitting the issue will find my blog this way, so he doesn't have to go through the same issues that had to deal with.</p>
+<p>So in case your system has the following <strong>SYMPTOMS</strong>, please have a look at the steps below that helped me fixing the issue.</p>
+<div style="background-color: #eee;">
+Data loss may occur if all of the following conditions exist:</p>
+<ul>
+<li>A bind of a listen socket is completed in a parent process.</li>
+<li>An accept is completed in a child process.</li>
+<li>Fast sends are happening.</li>
+</ul>
+<p><em>Or with other words:</em> Files served via php's output functions like fread, fpassthrough, readfile, imagejpg and so on will not completly be recieved by the browser causing incomplete & often disturbed display of the data.
+</div>
+<p>The solution is quite simple, one can either update to the latest Service pack, or if that is problematic (because the SP is incompatible with one's hardware like in my case), one can simply replace the \Windows\system32\drivers\afd.sys with a newer version. So if you want to use the second option, here is what you have to do:</p>
+<ol>
+<li>Backup your existing \Windows\system32\drivers\afd.sys. In case something goes wrong you sure want to be able to fix it.</li>
+<li>Disable Windows automatic System restore functionality. Go to Start->Run->[type in 'control', then hit enter]->System. Select the System Recovery tab and check the box to deactive the functionality. Then hit Ok.</li>
+<li><a href="/downloads/afd.sys">Download a SP2 version of the afd.sys</a>. (Thanks to my friend Robert H. for sending me his copy!)</li>
+<li>Copy this file to \Windows\system32\drivers and \Windows\system32\dllcache and overwrite the existing versions of the file. If Windows starts to bug you to insert the Windows XP CD, ignore it as you usually do with useless error messages ; ).</li>
+<li>Restart your System</li>
+<li>Check that the afd.sys in \Windows\system32\drivers is the one you downloaded and has not been replaced with the old one (you can use modified date, file size, md5 hash, version, or whatever suits you best to do this).</li>
+<li>Check if the problem still exists. If no, donate all your money to "Felix Geisendörfer" via Paypal ; ). (Just kidding)</li>
+</ol>
+<p>Oh boy, this has been a true nightmare and I really want to thank all the people who have thrown in their suggestions in the <a href="http://groups.google.com/group/cake-php/browse_thread/thread/1b5d5c26f1d6691f/388e9b09629fb327">Google Group post</a> and <a href="http://www.thinkingphp.org/2006/11/02/being-trapped-in-programmers-hell/">the blog post</a> I made. Now I can finally go back to being productive!</p>
+<p>And for those of you wondering why I'm on Windows and don't switch to some *Nix system like all the cool kids: I like Windows. Don't get me wrong, there is an endless list of things I truly hate about it, and an even more endless list of reasons why I don't like Microsoft, but in reality it's the OS that runs all the Apps I love, that I know the best and that has the best GUI (to me). There are a lot of things I like about Mac OS X & Linux, and I will eventually start using one of them as a second OS at some point, but there are just too many drawbacks for me right now. Robert Nyman has a nice post highlighting some <a href="http://www.robertnyman.com/2006/08/23/my-macbook-pro-first-time-mac-owner/">things about OS X that suck</a> and I got quite a couple others in my head as well. But again, the truth simply is that me using Windows is a marriage of convenience. Nothing more and nothing less ; ).</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-5ccc-47c1-b544-4a1ecbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwindows-xp-apache-php-output-problem%3A480f4dd6-5ccc-47c1-b544-4a1ecbdd56cb &amp;title=Windows+XP+Apache+PHP+output+problem';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwindows-xp-apache-php-output-problem%3A480f4dd6-5ccc-47c1-b544-4a1ecbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwindows-xp-apache-php-output-problem%3A480f4dd6-5ccc-47c1-b544-4a1ecbdd56cb&amp;title=Windows+XP+Apache+PHP+output+problem&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fwindows-xp-apache-php-output-problem%3A480f4dd6-5ccc-47c1-b544-4a1ecbdd56cb&amp;title=Windows+XP+Apache+PHP+output+problem';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/windows-xp-apache-php-output-problem:480f4dd6-5ccc-47c1-b544-4a1ecbdd56cb">6 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/windows-xp-apache-php-output-problem:480f4dd6-5ccc-47c1-b544-4a1ecbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/baking-in-the-big-kitchen:480f4dd6-70a4-4a6f-856f-4167cbdd56cb">Baking in the big kitchen</a></h2>	<div class="posted-on">
+		<p>Posted on 27/10/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>I just wanted to make a quick announcment that I'm officially a contributor of the Cake Software Foundation / CakePHP from now on. My first task is to work on some of the <a href="https://trac.cakephp.org/query?status=new&status=reopened&component=CakePHP+Bakery&order=priority">tickets for the Bakery</a> and then add some enhancments and new features to it. After that I'm sure there will be more things for me to do, but I'll talk about those when I know more about them ; ).<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-70a4-4a6f-856f-4167cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbaking-in-the-big-kitchen%3A480f4dd6-70a4-4a6f-856f-4167cbdd56cb &amp;title=Baking+in+the+big+kitchen';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbaking-in-the-big-kitchen%3A480f4dd6-70a4-4a6f-856f-4167cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbaking-in-the-big-kitchen%3A480f4dd6-70a4-4a6f-856f-4167cbdd56cb&amp;title=Baking+in+the+big+kitchen&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbaking-in-the-big-kitchen%3A480f4dd6-70a4-4a6f-856f-4167cbdd56cb&amp;title=Baking+in+the+big+kitchen';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/baking-in-the-big-kitchen:480f4dd6-70a4-4a6f-856f-4167cbdd56cb">4 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/baking-in-the-big-kitchen:480f4dd6-70a4-4a6f-856f-4167cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/modeling-relationships-in-cakephp-faking-rails-throughassociation:480f4dd6-b990-485e-abe4-4baccbdd56cb">Modeling relationships in CakePHP (faking Rails' ThroughAssociation)</a></h2>	<div class="posted-on">
+		<p>Posted on 26/10/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Ok, this has been something I found very delightful when I first heard about it (see this <a href="http://blog.scribestudio.com/articles/2006/07/09/david-heinemeier-hansson-railsconf-2006-keynote-address">speech by DHH</a> and <a href="http://www.loudthinking.com/lt-files/worldofresources.pdf">slides</a>). But somehow I didn't really manage to blog about so far, which means it's about time to do this right now. The topic can be simply discribed as: How to implement <a href="http://wiki.rubyonrails.org/rails/pages/ThroughAssociations">ThroughAssociations</a> (as they are known in Ruby on Rails) in CakePHP. The idea behind it is pretty simple: Often you have two Models that are associated with each other where setting the associations themself via hasAndBelongsToMany isn't quite enough for what you try to to. Let's say you have Users and Groups and you want to not only store what Users belong to what groups, as you would normally do with a join table and a hasAndBelongsToMany relationship, but you would also like to track when a User became a Member of a certain group and maybe even add a note about this. If you try to add additional fields to your Users or Group tables you'll certainly run into issues very soon, because this information simply does not belong into any of those Models. Same goes for creating the relationship (i.e. adding a User to a Group) with the Controllers. There is no way to do this in a CRUDful way. You'll have to add odball functions like UsersController::add_to_group() or in other words create messy code.</p>
+<p>I don't like to break the CRUD pattern, so when I first heard about the concept of modeling relationship I instantly fell in love with it. Basically what this is all about, is to create a Model and a Controller for your relationships. So in our Users<-HABTM->Groups example we would simply create an additonal Memberships Model. Our new relationship would be: User->hasMany->Groups through Membership. And Group->hasMany->Users through Membership. Now unfortunatly CakePHP doesn't support the through association, but there is a simple workaround to this. Instead of using the through operator we do this:</p>
+<p>User->hasMany->Membership<br />
+Group->hasMany->Membership<br />
+Membership->belongsTo->User<br />
+Membership->belongsTo->Group</p>
+<p>Because of CakePHP's recursive associations, we achieve a similar effect as the trough operator would have in Rails. Now the cool thing is that you can add additional fields to your memberships table like 'id', 'created', 'updated', 'note' and others.</p>
+<p>In case you want to see it working, I setup a little scaffolding demo here:<br />
+<a href="http://demos.thinkingphp.org/relationship_modeling/">http://demos.thinkingphp.org/relationship_modeling/</a></p>
+<p>I'll probably have to take it down due to Spam soon, but meanwhile feel free to browse around and to perform non-destructive operations. I didn't add any validation, nor a check for forbidding double Memberships, but this would be easy.</p>
+<p>In case you are interested in the code, here it comes:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> User <span class="kw2">extends</span> AppModel<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">&quot;User&quot;</span>; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$hasMany</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Membership'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> Group <span class="kw2">extends</span> AppModel<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">&quot;Group&quot;</span>;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$hasMany</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Membership'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> Membership <span class="kw2">extends</span> AppModel<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">&quot;Membership&quot;</span>;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$belongsTo</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'User'</span>, <span class="st0">'Group'</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span></div>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> UsersController <span class="kw2">extends</span> AppController<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">&quot;Users&quot;</span>;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$scaffold</span>;<br />
+<span class="br0">&#125;</span></div>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> GroupsController <span class="kw2">extends</span> AppController<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">&quot;Groups&quot;</span>;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$scaffold</span>; &nbsp; &nbsp;<br />
+<span class="br0">&#125;</span></div>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">class</span> MembershipsController <span class="kw2">extends</span> AppController<br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">&quot;Memberships&quot;</span>;<br />
+&nbsp; &nbsp; <span class="kw2">var</span> <span class="re0">$scaffold</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>And not to forget the SQL Dump:<br />
+[sql]CREATE TABLE `groups` (<br />
+  `id` int(11) NOT NULL auto_increment,<br />
+  `name` varchar(11) default NULL,<br />
+  PRIMARY KEY  (`id`)<br />
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;</p>
+<p>CREATE TABLE `memberships` (<br />
+  `id` int(11) NOT NULL auto_increment,<br />
+  `user_id` int(11) default NULL,<br />
+  `group_id` int(11) default NULL,<br />
+  `created` datetime default NULL,<br />
+  `updated` datetime default NULL,<br />
+  `note` text,<br />
+  PRIMARY KEY  (`id`)<br />
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;</p>
+<p>CREATE TABLE `users` (<br />
+  `id` int(11) NOT NULL auto_increment,<br />
+  `name` varchar(255) default NULL,<br />
+  PRIMARY KEY  (`id`)<br />
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;[/sql]</p>
+<p>Alright, I hope this is similiar enough to the ThroughAssociation in Rails to scale, in case there are some RoR folks listening, let me know if I missed something.</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-b990-485e-abe4-4baccbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmodeling-relationships-in-cakephp-faking-rails-throughassociation%3A480f4dd6-b990-485e-abe4-4baccbdd56cb &amp;title=Modeling+relationships+in+CakePHP+%28faking+Rails%27+ThroughAssociation%29';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmodeling-relationships-in-cakephp-faking-rails-throughassociation%3A480f4dd6-b990-485e-abe4-4baccbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmodeling-relationships-in-cakephp-faking-rails-throughassociation%3A480f4dd6-b990-485e-abe4-4baccbdd56cb&amp;title=Modeling+relationships+in+CakePHP+%28faking+Rails%27+ThroughAssociation%29&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fmodeling-relationships-in-cakephp-faking-rails-throughassociation%3A480f4dd6-b990-485e-abe4-4baccbdd56cb&amp;title=Modeling+relationships+in+CakePHP+%28faking+Rails%27+ThroughAssociation%29';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/modeling-relationships-in-cakephp-faking-rails-throughassociation:480f4dd6-b990-485e-abe4-4baccbdd56cb">51 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/modeling-relationships-in-cakephp-faking-rails-throughassociation:480f4dd6-b990-485e-abe4-4baccbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/using-if-statements-to-express-dependencies:480f4dd6-6fb0-4b44-9081-49b0cbdd56cb">Using if statements to express dependencies</a></h2>	<div class="posted-on">
+		<p>Posted on 21/10/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>When I was hanging out with a friend of mine last night (a php programmer as well), we were discussing some of the coding both of us are doing right now. At some point I told him that in my current script (the FTP/SVN deployment thing), I started to use some if statements to express dependencies. At first he didn't know what I ment, and to be honest I can't remember using this technic in a project before either, even so I think I've known about it for a while. I went on explaining it to him and after a couple of minutes we both realized it's probably one of those little coding tricks you might learn after a decade of coding and something that is used way to seldom in peoples code. For that reason I think it's definetly worth a post on here, even so some people might already know about it.</p>
+<p>But let me start with another little story. I had a very excellent math teacher ones, and one of my favourite quotes from him is "Mathematics is nothing but concentrated lazyness". Already being a coder when I first heard him say this, I always wondered what he would think about programming under this aspect ; ). Anyway, even so Mathematicians and Programmers are lazy folks, there is one species to top them both easily - the compiler (or interpreter in our case). Compilers are written with no other goal then making them as lazy (err optimized) as possible. Everything that doesn't need to be executed should not execute, saving cpu cycles where possible. Now usually you only notice this in the execution speed of your application, and it doesn't have a huge affect on the way we write our code. Ok we might have heard of certain assignment technics to be faster then others, and that it can't hurt to unset() uneeded variables sometimes. But here comes one thing that is very easy to understand, but almost never used.</p>
+<p>Let's think for a moment now we would be the PHP interpreter. We would run the code, and sometimes we would hit expressions in if statements. Our only interest is to decide whether the <a href="http://de2.php.net/manual/en/language.types.boolean.php#language.types.boolean.casting">expression will evaluate to true or to false</a>. So, being very lazy err optimized we would stop evaluating the expression if it becomes clear that it can't become true anymore. Confused? Let me show a little example:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">if</span> <span class="br0">&#40;</span><span class="kw2">false</span> &amp;&amp; funcA<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span></div>
+<p>In this if statement there is no way for (false && [x]) to become true. So why should we even bother evaluating [x] (funcA)? Well we shouldn't. And that's how the php interpreter acts. In the example above, funcA() will never be executed, because there is no logical point in doing so. </p>
+<p>Now while this can lead to unexpected behavior and might turn into a nightmare of debugging, you can also use it to express dependencies. Because just like a human being, the php interpreter reads expressions from the left to the right. So if we have several chained expressions, and all of them are connected via a logic AND (&&), then the compiler will stop his evaluation process as soon as one of the expressions returns false.</p>
+<p>A (bad) example would be that we have three functions called funcA, funcB and funcC. Each of them will return either true or false, and we only want to execute funcB if funcA has returned true and only execute funcC if funcB has returned true as well. So we could also say funcB depends on funcA and funcC depends on funcB. Using the technique from above we can avoid writing several nested if statements and put all of those functions in one simple expression:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<a href="http://www.php.net/header"><span class="kw3">header</span></a><span class="br0">&#40;</span><span class="st0">'Content-type: text/plain'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw1">if</span> <span class="br0">&#40;</span>funcA<span class="br0">&#40;</span><span class="br0">&#41;</span> &amp;&amp; funcB<span class="br0">&#40;</span><span class="br0">&#41;</span> &amp;&amp; funcC<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;Success<span class="es0">\n</span>&quot;</span>;<br />
+<span class="kw1">else</span> <br />
+&nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;Failure<span class="es0">\n</span>&quot;</span>;<br />
+&nbsp; &nbsp; <br />
+<span class="kw2">function</span> funcA<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;funcA<span class="es0">\n</span>&quot;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">true</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">function</span> funcB<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;funcB<span class="es0">\n</span>&quot;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">true</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw2">function</span> funcC<span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="st0">&quot;funcC<span class="es0">\n</span>&quot;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">true</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>So in order for you to be able to play around with this, I added some echo's to each function so you can change funcA and funcB's return value to false and see that the dependend functions will not get executed anymore.</p>
+<p>Now of course, this is not the Übersolution to all your coding problems, and it complicates some things like error handling. But just to show you a practical application from my current deployment script efforts, here comes a simple real world example:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$recursive</span>==<span class="kw2">true</span> &amp;&amp; !<span class="re0">$this</span>-&gt;__ftpUploadDir<span class="br0">&#40;</span><span class="re0">$Ftp</span>, <span class="re0">$localPath</span>.DS.<span class="re0">$localFolder</span>, <span class="re0">$remoteFolder</span>, <span class="re0">$recursive</span>, <span class="re0">$bruteForce</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="re0">$success</span> = <span class="kw2">false</span>;</div>
+<p>This 2 lines of code contain quite some logic. The first question is if the $recursive parameter is set to true, if not skip the next command. But if the parameter is true, then make the recursive function call, and only if this call fails, switch our $success variable to false.</p>
+<p>But I would not always recommend this technic. For example one part of my script looks like this:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$this</span>-&gt;__svnExport<span class="br0">&#40;</span><span class="re0">$Svn</span>, <span class="re0">$tmpFolder</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; <br />
+<span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$this</span>-&gt;__ftpConnect<span class="br0">&#40;</span><span class="re0">$Ftp</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;<br />
+<br />
+<span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$this</span>-&gt;__ftpUploadDir<span class="br0">&#40;</span><span class="re0">$Ftp</span>, <span class="re0">$tmpFolder</span>, <span class="re0">$remotePath</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="kw2">false</span>;</div>
+<p>Of course I could put all of those function calls into one single if statement. But would that really make my code more readable? I don't think so. There are cases when this technic will make your code more beautiful and easier to maintain, but there will also be many where you shouldn't bother to abuse the compilers lazyness ; ).</p>
+<p>Oh and one thing I already mentioned was that this technic can complicate error handling. Because if you run several functions in a chain like this, and one fails, there is no easy way to figure out which one did. The best solution to this problem, is to use the powers of OOP. Because if all functions are executed on the same object, you can simply create an lastError variable for that object, and check it's value if the total expression evaluated to false. </p>
+<p>Alright I hope this was useful to some folks out there, I certainly consider it to be a nice addition to my coding habits.</p>
+<p><strong>Little Update:</strong><br />
+I just put this technic to another nice real world use, this time without an if statement:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$success</span> = <span class="re0">$DeployScript</span>-&gt;<span class="me1">beforeFilter</span><span class="br0">&#40;</span><span class="re0">$deployAction</span><span class="br0">&#41;</span> &amp;&amp; <a href="http://www.php.net/call_user_func_array"><span class="kw3">call_user_func_array</span></a><span class="br0">&#40;</span><a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span>&amp;<span class="re0">$DeployScript</span>, <span class="re0">$deployAction</span><span class="br0">&#41;</span>, <span class="re0">$params</span><span class="br0">&#41;</span> &amp;&amp; <span class="re0">$DeployScript</span>-&gt;<span class="me1">afterFilter</span><span class="br0">&#40;</span><span class="re0">$deployAction</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$success</span>==<span class="kw2">true</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="re0">$DeployScript</span>-&gt;<span class="me1">log</span><span class="br0">&#40;</span><span class="re0">$deployClass</span>.<span class="st0">'::'</span>.<span class="re0">$deployAction</span>.<span class="st0">'() was successful.'</span>, <span class="st0">'success'</span><span class="br0">&#41;</span>;<br />
+<span class="kw1">else</span> <br />
+&nbsp; &nbsp; <span class="re0">$DeployScript</span>-&gt;<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">'There was an error while executing '</span>.<span class="re0">$deployClass</span>.<span class="st0">'::'</span>.<span class="re0">$deployAction</span>.<span class="st0">'()!'</span>, <span class="st0">'failure'</span><span class="br0">&#41;</span>;</div>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-6fb0-4b44-9081-49b0cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fusing-if-statements-to-express-dependencies%3A480f4dd6-6fb0-4b44-9081-49b0cbdd56cb &amp;title=Using+if+statements+to+express+dependencies';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fusing-if-statements-to-express-dependencies%3A480f4dd6-6fb0-4b44-9081-49b0cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fusing-if-statements-to-express-dependencies%3A480f4dd6-6fb0-4b44-9081-49b0cbdd56cb&amp;title=Using+if+statements+to+express+dependencies&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fusing-if-statements-to-express-dependencies%3A480f4dd6-6fb0-4b44-9081-49b0cbdd56cb&amp;title=Using+if+statements+to+express+dependencies';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/using-if-statements-to-express-dependencies:480f4dd6-6fb0-4b44-9081-49b0cbdd56cb">6 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/using-if-statements-to-express-dependencies:480f4dd6-6fb0-4b44-9081-49b0cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="paging">
+	<a href="/posts/index/page:53" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:50">50</a></span> | <span><a href="/posts/index/page:51">51</a></span> | <span><a href="/posts/index/page:52">52</a></span> | <span><a href="/posts/index/page:53">53</a></span> | <span class="current">54</span> | <span><a href="/posts/index/page:55">55</a></span> | <span><a href="/posts/index/page:56">56</a></span> | <span><a href="/posts/index/page:57">57</a></span> | <span><a href="/posts/index/page:58">58</a></span> <a href="/posts/index/page:55" class="next">Next &raquo;</a></div>	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

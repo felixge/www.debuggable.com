@@ -1,0 +1,470 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Running Tests from The Commandline in CakePHP &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/running-tests-from-the-commandline-in-cakephp:4821f908-da38-4987-909a-25c74834cda3">Running Tests from The Commandline in CakePHP</a></h2>	<div class="posted-on">
+		<p>Posted on 8/5/08 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>I have contributed some new cool feature for you to the cake branch. A testsuite shell that allows you to run your tests from the commandline. It allows you to run all of the following:</p>
+<ul>
+<li>All core testcases at once</li>
+<li>All core test groups</li>
+<li>Each core test case individually</li>
+<li>All application-specific testcases at once</li>
+<li>All application-specific test groups</li>
+<li>Each core test case individually</li>
+</ul>
+<p>It also supports plugins, which means you can run plugin cases and groups. </p>
+<h3>How does it work?</h3>
+<p>Actually it's very simple. You just call</p>
+<pre class="terminal">
+./cake testsuite category test_type file
+</pre>
+<p><strong>Category</strong> can either be "core", "app" or the name of a plugin.</p>
+<p><strong>The Test Type</strong> can be "case", "group" or "all".</p>
+<p><strong>The file</strong> is the name of the file with the folder prefix, but without the test.php / group.php suffix. Examples are: models/my_model, controllers/my_controller, etc.</p>
+<h3>Can you show me examples of valid calls to the testshell?</h3>
+<p>Yes, of course! Although I am going to directly copy this from the help screen from the testshell. Why should I reinvent the wheel? : P</p>
+<pre class="terminal">
+./cake testsuite app all
+./cake testsuite core all
+</pre>
+<pre class="terminal">
+./cake testsuite app case behaviors/debuggable
+./cake testsuite app case models/my_model
+./cake testsuite app case controllers/my_controller
+</pre>
+<pre class="terminal">
+./cake testsuite core case file
+./cake testsuite core case router
+./cake testsuite core case set
+</pre>
+<pre class="terminal">
+./cake testsuite app group mygroup
+./cake testsuite core group acl
+./cake testsuite core group socket
+</pre>
+<pre class="terminal">
+./cake testsuite bugs case models/bug  // for the plugin 'bugs' and its test case 'bug'
+./cake testsuite bugs group bug  // for the plugin bugs and its test group 'bug'
+./cake testsuite bugs_me case models/bug  // for the plugin 'bugs_me' and its test case 'bug'
+./cake testsuite bugs_me group bug  // for the plugin bugs_me and its test group 'bug'
+</pre>
+<h3>What does the output look like?</h3>
+<pre class="terminal">
+Welcome to CakePHP v1.2.0.6311 beta Console
+---------------------------------------------------------------
+App : app
+Path: /Applications/MAMP/htdocs/cakephp/branch/app
+---------------------------------------------------------------
+CakePHP Test Shell
+---------------------------------------------------------------
+Running core case router
+Individual test case: libs/router.test.php
+1/1 test cases complete: 190 passes.
+
+Macintosh-6:branch dakangelbge$ 
+</pre>
+<pre class="terminal">
+elcome to CakePHP v1.2.0.6311 beta Console
+---------------------------------------------------------------
+App : app
+Path: /Applications/MAMP/htdocs/cakephp/branch/app
+---------------------------------------------------------------
+CakePHP Test Shell
+---------------------------------------------------------------
+Running app all
+All App Tests
+2/2 test cases complete: 6 passes.
+
+Macintosh-6:branch dakangelbge$
+</pre>
+<p>Got any questions? </p>
+<p>PS: There is some hidden feature in it, which I am not going to reveal until another thing got written about first. ; ) Anybody who knows already please do not spoil the fun. : P</p>
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/4821f908-da38-4987-909a-25c74834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frunning-tests-from-the-commandline-in-cakephp%3A4821f908-da38-4987-909a-25c74834cda3 &amp;title=Running+Tests+from+The+Commandline+in+CakePHP';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Frunning-tests-from-the-commandline-in-cakephp%3A4821f908-da38-4987-909a-25c74834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frunning-tests-from-the-commandline-in-cakephp%3A4821f908-da38-4987-909a-25c74834cda3&amp;title=Running+Tests+from+The+Commandline+in+CakePHP&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Frunning-tests-from-the-commandline-in-cakephp%3A4821f908-da38-4987-909a-25c74834cda3&amp;title=Running+Tests+from+The+Commandline+in+CakePHP';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/how-to-execute-only-specific-test-methods-in-cakephp-unit-tests:4858fa7b-7194-4652-9c7f-47784834cda3">How To Execute Only Specific Test Methods in CakePHP Unit Tests</a></li>
+							<li><a href="/posts/how-to-transform-html-to-textile-markup-the-cakephp-textilehelper-revisited:480f4dfe-a258-4b54-a31b-4933cbdd56cb">How To Transform HTML To Textile Markup - The CakePHP TextileHelper Revisited</a></li>
+							<li><a href="/posts/a-solution-for-e-mail-sending-in-cakephp:480f4dd5-b500-4bdc-a6c5-4ef6cbdd56cb">A solution for e-mail sending in CakePHP</a></li>
+							<li><a href="/posts/use-html-401-in-cakephp-12:480f4dd6-ef94-4a7d-894c-46f6cbdd56cb">How-to: Use Html 4.01 in CakePHP 1.2</a></li>
+							<li><a href="/posts/testing-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes:4890ed55-be28-4d4a-ba4c-7fd64834cda3">Testing Models in CakePHP - Now let&#039;s get rid of the unnecessary ModelTest classes !</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/quick-dessert-list-all-controllers-of-a-cakephp-application:480f4dd6-adf4-4b18-9fe8-4b99cbdd56cb">Quick dessert: List all controllers of a CakePHP application</a></li>
+							<li><a href="/posts/how-to-have-multiple-paginated-widgets-on-the-same-page-with-cakephp:48ad241e-b018-4532-a748-0ec74834cda3">How to have multiple paginated widgets on the same page with CakePHP</a></li>
+							<li><a href="/posts/starting-a-cakephp-community-website-website-framework:480f4dd5-179c-4ff2-be55-4b7acbdd56cb">Starting a CakePHP community website / Website Framework</a></li>
+							<li><a href="/posts/job-interested-in-working-on-a-huge-cakephp-project:480f4dd6-55b4-43ae-9e63-491dcbdd56cb">[Job] Interested in working on a huge CakePHP project?</a></li>
+							<li><a href="/posts/learning-from-the-cakephp-source-code-part-ii:480f4dd6-57fc-4715-8709-439acbdd56cb">Learning from the CakePHP source code - Part II</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/running-tests-from-the-commandline-in-cakephp:4821f908-da38-4987-909a-25c74834cda3">14 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/running-tests-from-the-commandline-in-cakephp:4821f908-da38-4987-909a-25c74834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4822ac2a-1a3c-45f7-b85f-0e6e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=be965afd8e05334af7ed2adc64736310&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.schreiblogade.de" rel="nofollow">Patrick</a>						</strong>
+						<strong>said 
+						on May 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thank you very much! I immediately have to try this out…</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4822c9f0-003c-40cf-9f89-77074834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on May 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Please let me know how you like it, Patrick.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4824c2ae-aeec-4295-b497-77ca4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2a4f4f2259921a89fbb16f44034f395a&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.marianoiglesias.com.ar" rel="nofollow">Mariano Iglesias</a>						</strong>
+						<strong>said 
+						on May 09, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is particularly useful to make sure the CakePHP code you share with others stay compatible on other PHP versions. For example, I'm running Apache 2.2, to which there's no PHP4 module, and at the same time I need to make sure stuff like Bindable is still working on PHP4.</p>
+<p>So I run the web based version of the test suite on my normal web server (PHP 5.2.6 over Apache 2.2) and when I want to run the tests on PHP4 I use the command line, priorly modifying the path to PHP.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4825504f-e1a8-46c8-b8e9-669d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=68f0049842700597b89972e1fbf6f542&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://traviscline.com/blog" rel="nofollow">Travis</a>						</strong>
+						<strong>said 
+						on May 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Heya Tim, you left out one of the diffs between our Geoff-inspired work -- returning an indication of pass/fail to the invoking environment.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4825636a-8cc0-4361-af7a-4dde4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on May 10, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Travis: Good thinking yeah. I think I will add that.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4846df0e-feec-4211-abde-7c664834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c3c5907d2d49cbe8f230115d022332a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thomas-sittig.de" rel="nofollow">Thomas</a>						</strong>
+						<strong>said 
+						on Jun 04, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>nice extension. i've tried it now, after i updated to the newest branch.<br />
+is it possible to flexibilize the generated output. a text-based and flag-based. the flag-based could f.e. return a simple 0 for success and -n for the count of failöed tests.</br><br />
+with updated you could integrate thhis shell-script into the client-side build-process of eclipse to provide tests during the checkout/checkin/build of a project. sure, there are existing much other tools to secure stable code. but i like this extra option ;)</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4846e978-1340-495b-9b9a-34584834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Jun 04, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Okay it got added to the core. It exists with 0 on success and 1 on failure.  On Unix system the exit code is actually an error code so counting and returning the number of failures might not match the original intention of exit codes. However, I guess we could do it though. :] What do you think?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48c12af8-5a64-4fef-bd91-5f424834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=22c59f3ab6aaf89b0e38cc866057e525&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.sagetree.net" rel="nofollow">Rich Yumul</a>						</strong>
+						<strong>said 
+						on Sep 05, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Would anybody know how to make the commandline output display the test results using the XMLReporter?  If so, I think it might be possible to link together the SimpleTest plugin in Eclipse to your CakePHP Unit tests, which would be sweet:  coding and running your unit tests from Eclipse without having to switch focus to the browser or commandline to run your tests.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48c3d199-9b74-4926-8940-4e714834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Sep 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sure Rich, give me a shot via email, we'll figure it out.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48c4e473-30f4-4138-8681-645c4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e63576e06ac45ab78bb6b242587f0113&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dirk&nbsp;						</strong>
+						<strong>said 
+						on Sep 08, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>We were working on exactly that and came with something that made its way into a ticket. Have a look:</p>
+<p><a rel="nofollow" href="https://trac.cakephp.org/ticket/5332">https://trac.cakephp.org/ticket/5332</a></p>
+<p>Its intention here is, to have the valid (!) xml output be parsed by bitten. bitten is a trac-plugin that makes continuous integration much easier.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48e4bd82-c45c-41a4-8801-54144834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=043150d26c5dbd195791389f3d2560b2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Mich3l&nbsp;						</strong>
+						<strong>said 
+						on Oct 02, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>How could this be integrated with ANT? Can anyone post a sample for the ant exec task? Can't get the exitcode do it's work and stop the ANT build. I do have "failonerror=true".</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a8123db-b218-4d17-8c76-6a23cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=212ca5e58231b5dd1719d22eb4cf69c9&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.gigapromoters.com/blog/" rel="nofollow">Abhimanyu Grover</a>						</strong>
+						<strong>said 
+						on Aug 11, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Is there any shortcut to run tests for all plugins together?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ac4fb34-2e8c-4a53-ba37-52dacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=aa208b941620952b3d26c398bdc30d63&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.livemocha.com" rel="nofollow">Masato mocha</a>						</strong>
+						<strong>said 
+						on Oct 01, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi, thanks for the post. Here is the issue I found with command line test execution.</p>
+<p>When I run test script through cmd line and if the script calls apache_note(),<br />
+the test fails with "undefined function apache_note()"</br></p>
+<p>The function has to be called through apache and if you run the script with cmd line, it does not like it.</p>
+<p>If I run the script from browser <a rel="nofollow" href="http://localhost/test.php....">http://localhost/test.php....</a> then it works since apache is handling.</p>
+<p>Do you have any idea how we can work around this issue?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ac5b623-1394-4474-9c13-5a1ccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Oct 02, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Massato mocha: Well apache isnt available in the cli environment, so you'd need to skip that particular test using:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$skip</span> = !<a href="http://www.php.net/function_exists"><span class="kw3">function_exists</span></a><span class="br0">&#40;</span><span class="st0">'apache_note'</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$this</span>-&gt;<span class="me1">skipIf</span><span class="br0">&#40;</span><span class="re0">$skip</span>, <span class="st0">'%s apache_note is not available!'</span><span class="br0">&#41;</span>;</br></div>
+<p>@Abhimanyu Grover: Sorry, there isn't yet, however, you could file a ticket for CakePHP and I could look into it.</p>
+<p>Mich3l: Hmm this is weird. The exist code should work fine. Did you try to debug the problem? Ie check if the proper exit code is returned?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

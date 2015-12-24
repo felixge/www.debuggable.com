@@ -1,0 +1,964 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>How to paginate a CakePHP search over a HABTM relation without hacking the core &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/how-to-paginate-a-search-using-the-cakephp-framework:48fc5f77-38d0-41e0-b711-77c64834cda3">How to paginate a CakePHP search over a HABTM relation without hacking the core</a></h2>	<div class="posted-on">
+		<p>Posted on 21/11/08 by 
+		<a href="/tim">Tim Koschützki</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/tim_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>this post is going to deal with the pretty common problem of paginating a search with the <a href="http://cakephp.org">CakePHP framework</a>. </p>
+<h3>The Problem</h3>
+<p>The problem is that a user inputs some search criteria into a form, the resultset exceeds 30 rows for example and the user must be able to browse through the resultset via different pages. The search criteria has to be the same everytime, the form prepopulated with the used search keywords/data and the resultset still has to match the input conditions everytime a new page is clicked.</p>
+<p>This problem itself is in fact not much of a problem. We just need to store the form conditions somewhere and then hack it together. So what we are going to do is that we raise the difficulty bar a lot more by trying to get the pagination work over a HABTM relation.</p>
+<h3>Battlefield Briefing</h3>
+<p>We agreed we need to store the search criteria somewhere, so we can access it later. No we won't use the DB for that as it is overkill. We will also not use files, since many users may use the search at the same time screwing our hd. :P Yes, we will use the session for that as it is made exactly for these things.</p>
+<p>For the example code we are going to use the "Advanced Search" of <a href="http://flashfun247.com">Flashfun247</a>, a flashgame site which is one of my freetime projects. If you want to see some more of its code, feel free to ask.</p>
+<p>We want to search for games based on some input conditions. The Game model is related to the GameCategory model over a HABTM relation, so the same game can be in many categories and a category contains many games. CakePHP's paginator cannot handle pagination over a HABTM so well in its current version. The incident here is that we want every game listed only once in the resultset - and not n times, where n is the number of categories it belongs to.</p>
+<p>So we must at some point include a group by statement. However, the paginator will use that group by statement for its internal find('count') call as well, which it does to determine the size of the resultset. This will in fact corrupt the page count screwing us all over. We will see that we can trick the paginator, though. ; )</p>
+<h3>The View</h3>
+<p>To get us started, let's have a look at the view in /views/searches/advanced.ctp, which is very simple:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+&lt;h1&gt;&lt;?php <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$this</span>-&gt;<span class="me1">pageTitle</span> = <span class="st0">'Advanced Game Search'</span>; <span class="kw2">?&gt;</span>&lt;/h1&gt;<br />
+<span class="kw2">&lt;?php</span><br />
+<span class="re0">$html</span>-&gt;<span class="me1">addCrumb</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">pageTitle</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$form</span>-&gt;<span class="me1">create</span><span class="br0">&#40;</span><span class="st0">'Search'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'action'</span> =&gt; <span class="st0">'advanced'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$formData</span><span class="br0">&#41;</span> &amp;&amp; !<a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$formData</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$form</span>-&gt;<span class="me1">data</span> = <span class="re0">$formData</span>;<br />
+<span class="br0">&#125;</span><br />
+<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$form</span>-&gt;<span class="me1">input</span><span class="br0">&#40;</span><span class="st0">'game_category_id'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'label'</span> =&gt; <span class="st0">'Category:'</span>, <span class="st0">'options'</span> =&gt; <span class="re0">$searchCategories</span>, <span class="st0">'empty'</span> =&gt; <span class="st0">'All Categories'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$form</span>-&gt;<span class="me1">input</span><span class="br0">&#40;</span><span class="st0">'keywords'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'label'</span> =&gt; <span class="st0">'Text from game name, description or instructions:'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$form</span>-&gt;<span class="me1">input</span><span class="br0">&#40;</span><span class="st0">'tags'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'label'</span> =&gt; <span class="st0">'Is tagged with (separate tags by comma):'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<span class="re0">$orderOptions</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; <span class="st0">'Game.name'</span> =&gt; <span class="st0">'Name'</span>,<br />
+&nbsp; <span class="st0">'GameCategory.name'</span> =&gt; <span class="st0">'Game Category'</span>,<br />
+&nbsp; <span class="st0">'Game.avg_rating'</span> =&gt; <span class="st0">'Game Rating'</span>,<br />
+&nbsp; <span class="st0">'Game.clicks'</span> =&gt; <span class="st0">'Number of Plays'</span>,<br />
+<span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$form</span>-&gt;<span class="me1">input</span><span class="br0">&#40;</span><span class="st0">'order_by'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'label'</span> =&gt; <span class="st0">'Order Results By:'</span>, <span class="st0">'options'</span> =&gt; <span class="re0">$orderOptions</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$form</span>-&gt;<span class="me1">input</span><span class="br0">&#40;</span><span class="st0">'order_dir'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'label'</span> =&gt; <span class="st0">'Direction:'</span>, <span class="st0">'options'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'asc'</span> =&gt; <span class="st0">'Ascending'</span>, <span class="st0">'desc'</span> =&gt; <span class="st0">'Descending'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<span class="kw2">?&gt;</span><br />
+&lt;div class=&quot;clear&quot;&gt;&lt;/div&gt;<br />
+<span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$form</span>-&gt;<span class="me1">end</span><span class="br0">&#40;</span><span class="st0">'Search'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'action'</span> =&gt; <span class="st0">'search'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="kw2">?&gt;</span><br />
+<br />
+<span class="kw2">&lt;?php</span> <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$games</span><span class="br0">&#41;</span><span class="br0">&#41;</span> : <span class="kw2">?&gt;</span><br />
+&nbsp; &lt;div class=&quot;clear&quot;&gt;&lt;/div&gt;<br />
+<br />
+&nbsp; <span class="kw2">&lt;?php</span> <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$games</span><span class="br0">&#41;</span><span class="br0">&#41;</span> : <span class="kw2">?&gt;</span><br />
+&nbsp; &nbsp; <span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$this</span>-&gt;<span class="me1">element</span><span class="br0">&#40;</span><span class="st0">'../games/list'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'games'</span> =&gt; <span class="re0">$games</span>, <span class="st0">'hilite'</span> =&gt; <span class="re0">$query</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="kw2">?&gt;</span><br />
+&nbsp; &nbsp; &lt;div class=&quot;clear&quot;&gt;&lt;/div&gt;<br />
+&nbsp; &nbsp; <span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$this</span>-&gt;<span class="me1">element</span><span class="br0">&#40;</span><span class="st0">'paging'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'model'</span> =&gt; <span class="st0">'GameCategoriesGame'</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="kw2">?&gt;</span><br />
+&nbsp; <span class="kw2">&lt;?php</span> <span class="kw1">else</span> : <span class="kw2">?&gt;</span><br />
+&nbsp; &nbsp; &lt;p class=&quot;error-message&quot;&gt;Sorry, your search returned no results&lt;/p&gt;<br />
+&nbsp; <span class="kw2">&lt;?php</span> <span class="kw1">endif</span>; <span class="kw2">?&gt;</span><br />
+<span class="kw2">&lt;?php</span> <span class="kw1">endif</span>; <span class="kw2">?&gt;</span></div>
+<p>It should be pretty straightforward. The only weird thing here is that $formData array. It is basically the placeholder for our search criteria that the user originally typed into the search form field. The view only needs to know where the form data is and not where it comes from. We simply assign the data to the form helper so it can prepopulate the fields for us (line 7).</p>
+<p>The user can input here a substring of the name/description/instructions of a game and he can pick a category where the game must be in. Notice the different order options as well as the string "All Categories" for the empty option of the select tag. One other remarkable thing is that we have both isset($games) and !empty($games) calls there. This is to differentiate if the user has submitted the form already ( isset($games) ) and, if he did, the resultset is not empty which allows us to display that "Nothing found" message.</p>
+<p>Here is the /views/games/list.ctp view just so you have the complete code:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;"><span class="kw2">&lt;?php</span><br />
+<span class="re0">$short</span> = <a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$short</span><span class="br0">&#41;</span> ? <span class="re0">$short</span> : <span class="kw2">false</span>;<br />
+<span class="re0">$class</span> = <span class="re0">$short</span> ? <span class="st0">' short'</span> : <span class="st0">''</span>;<br />
+<span class="kw2">?&gt;</span><br />
+&lt;div class=&quot;games-list&quot;&gt;<br />
+&nbsp; <span class="kw2">&lt;?php</span> <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$games</span> <span class="kw1">as</span> <span class="re0">$game</span><span class="br0">&#41;</span> : <span class="kw2">?&gt;</span><br />
+&nbsp; &nbsp; &lt;div class=&quot;game<span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$class</span> <span class="kw2">?&gt;</span>&quot;&gt;<br />
+&nbsp; &nbsp; &nbsp; &lt;div class=&quot;game-image&quot;&gt;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$this</span>-&gt;<span class="me1">element</span><span class="br0">&#40;</span><span class="st0">'game_image'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'game'</span> =&gt; <span class="re0">$game</span>, <span class="st0">'thumb'</span> =&gt; <span class="kw2">true</span><span class="br0">&#41;</span><span class="br0">&#41;</span><span class="kw2">?&gt;</span><br />
+&nbsp; &nbsp; &nbsp; &lt;/div&gt;<br />
+&nbsp; &nbsp; &nbsp; &lt;div class=&quot;game-descr&quot;&gt;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw2">&lt;?php</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$name</span> = <span class="re0">$game</span><span class="br0">&#91;</span><span class="st0">'Game'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$hilite</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span class="re0">$name</span> = <span class="re0">$text</span>-&gt;<span class="me1">highlight</span><span class="br0">&#40;</span><span class="re0">$game</span><span class="br0">&#91;</span><span class="st0">'Game'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'name'</span><span class="br0">&#93;</span>, <span class="re0">$hilite</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$html</span>-&gt;<span class="me1">link</span><span class="br0">&#40;</span><span class="re0">$name</span>, Game::<span class="me2">url</span><span class="br0">&#40;</span><span class="re0">$game</span><span class="br0">&#41;</span>, <span class="kw2">null</span>, <span class="kw2">false</span>, <span class="kw2">false</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw2">?&gt;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw2">&lt;?php</span> <span class="kw1">if</span> <span class="br0">&#40;</span>!<span class="re0">$short</span><span class="br0">&#41;</span> : <span class="kw2">?&gt;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br />
+<span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$game</span><span class="br0">&#91;</span><span class="st0">'Game'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'short_desc'</span><span class="br0">&#93;</span> <span class="kw2">?&gt;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;div class=&quot;plays&quot;&gt;&lt;span&gt;Plays:&lt;/span&gt; <span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$game</span><span class="br0">&#91;</span><span class="st0">'Game'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'game_playing_count'</span><span class="br0">&#93;</span><span class="kw2">?&gt;</span>&lt;/div&gt;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw2">&lt;?php</span> <span class="kw1">endif</span>; <span class="kw2">?&gt;</span><br />
+&nbsp; &nbsp; &nbsp; &lt;/div&gt;<br />
+&nbsp; &nbsp; &lt;/div&gt;<br />
+&nbsp; <span class="kw2">&lt;?php</span> <span class="kw1">endforeach</span>; <span class="kw2">?&gt;</span><br />
+&lt;/div&gt;<br />
+?&gt;</div>
+<p>Straightforward... Let's move on to the paging element:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;"><span class="kw2">&lt;?php</span><br />
+<span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$model</span><span class="br0">&#41;</span> || <span class="re0">$paginator</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'paging'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="re0">$model</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'pageCount'</span><span class="br0">&#93;</span> &gt; <span class="nu0">1</span><span class="br0">&#41;</span> : <span class="kw2">?&gt;</span><br />
+&lt;div class=&quot;paging&quot;&gt;<br />
+&nbsp; <span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$paginator</span>-&gt;<span class="me1">prev</span><span class="br0">&#40;</span><span class="st0">'&amp;laquo; Previous'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'escape'</span> =&gt; <span class="kw2">false</span>, <span class="st0">'class'</span> =&gt; <span class="st0">'prev'</span><span class="br0">&#41;</span>, <span class="kw2">null</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'class'</span>=&gt;<span class="st0">'disabled'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;?&gt;<br />
+&nbsp;&nbsp;<span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$paginator</span>-&gt;<span class="me1">numbers</span><span class="br0">&#40;</span><span class="br0">&#41;</span>;?&gt;<br />
+&nbsp; <span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> <span class="re0">$paginator</span>-&gt;<span class="me1">next</span><span class="br0">&#40;</span><span class="st0">'Next &amp;raquo;'</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'escape'</span> =&gt; <span class="kw2">false</span>, <span class="st0">'class'</span> =&gt; <span class="st0">'next'</span><span class="br0">&#41;</span>, <span class="kw2">null</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'class'</span>=&gt;<span class="st0">'disabled'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;?&gt;<br />
+&lt;/div&gt;<br />
+<span class="kw2">&lt;?php</span> <span class="kw1">endif</span>; <span class="kw2">?&gt;</span></div>
+<p>Notice the different checks at the start in order to figure out if we need to display a div at all.. This is called in the advanced.ctp view and the model GameCategoriesGame is supplied, which is a convenience HABTM model which belongsTo both Game and GameCategory.</p>
+<h3>The controller action</h3>
+<p>The controller action might appear a little big at first glance. However, every line has its purpose. This is in a SearchesController. You could have your own search() method though in about any controller.</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> advanced<span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$searchCategories</span> = <span class="re0">$this</span>-&gt;<span class="me1">Game</span>-&gt;<span class="me1">GameCategory</span>-&gt;<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'list'</span>, <a href="http://www.php.net/compact"><span class="kw3">compact</span></a><span class="br0">&#40;</span><span class="st0">'conditions'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><a href="http://www.php.net/compact"><span class="kw3">compact</span></a><span class="br0">&#40;</span><span class="st0">'searchCategories'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$page</span> = <span class="nu0">1</span>;<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'named'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'page'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$page</span> = <span class="re0">$this</span>-&gt;<span class="me1">params</span><span class="br0">&#91;</span><span class="st0">'named'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'page'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="re0">$formData</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$sessionKey</span> = <span class="st0">'advanced_search_query'</span>;<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">data</span><span class="br0">&#91;</span><span class="st0">'Search'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'keywords'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$formData</span> = <span class="re0">$this</span>-&gt;<span class="me1">data</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">Session</span>-&gt;<span class="me1">write</span><span class="br0">&#40;</span><span class="re0">$sessionKey</span>, <span class="re0">$formData</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">elseif</span> <span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">Session</span>-&gt;<span class="me1">check</span><span class="br0">&#40;</span><span class="re0">$sessionKey</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$formData</span> = <span class="re0">$this</span>-&gt;<span class="me1">Session</span>-&gt;<span class="me1">read</span><span class="br0">&#40;</span><span class="re0">$sessionKey</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/assert"><span class="kw3">Assert</span></a>::<span class="kw2">true</span><span class="br0">&#40;</span><span class="kw2">false</span>, <span class="st0">'404'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><a href="http://www.php.net/compact"><span class="kw3">compact</span></a><span class="br0">&#40;</span><span class="st0">'formData'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$formData</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$query</span> = <span class="re0">$formData</span><span class="br0">&#91;</span><span class="st0">'Search'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'keywords'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$useQuery</span> = <a href="http://www.php.net/trim"><span class="kw3">trim</span></a><span class="br0">&#40;</span>low<span class="br0">&#40;</span><span class="re0">$query</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$conditions</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$formData</span><span class="br0">&#91;</span><span class="st0">'Search'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'game_category_id'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$conditions</span><span class="br0">&#91;</span><span class="st0">'GameCategoriesGame.game_category_id'</span><span class="br0">&#93;</span> = <span class="re0">$formData</span><span class="br0">&#91;</span><span class="st0">'Search'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'game_category_id'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$conditions</span> = am<span class="br0">&#40;</span><span class="re0">$conditions</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'Game.published'</span> =&gt; <span class="st0">'1'</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'or'</span> =&gt; <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'LOWER(Game.name) LIKE'</span> =&gt; <span class="st0">&quot;%{$useQuery}%&quot;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'LOWER(Game.short_desc) LIKE'</span> =&gt; <span class="st0">&quot;%{$useQuery}%&quot;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'LOWER(Game.long_desc) LIKE'</span> =&gt; <span class="st0">&quot;%{$useQuery}%&quot;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'LOWER(Game.instructions) LIKE'</span> =&gt; <span class="st0">&quot;%{$useQuery}%&quot;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">GameCategoriesGame</span>-&gt;<span class="me1">forcePaginateCount</span> = <span class="re0">$this</span>-&gt;<span class="me1">GameCategoriesGame</span>-&gt;<span class="me1">paginatorCount</span><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'game_categories_games'</span>, <span class="re0">$conditions</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Game'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$contain</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'GameCategory'</span>, <span class="st0">'Game.Tag'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$order</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'Game.name'</span> =&gt; <span class="st0">'asc'</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$formData</span><span class="br0">&#91;</span><span class="st0">'Search'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'order_by'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$order</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="re0">$formData</span><span class="br0">&#91;</span><span class="st0">'Search'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'order_by'</span><span class="br0">&#93;</span> =&gt; <span class="re0">$formData</span><span class="br0">&#91;</span><span class="st0">'Search'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'order_dir'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">paginate</span><span class="br0">&#91;</span><span class="st0">'GameCategoriesGame'</span><span class="br0">&#93;</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'conditions'</span> =&gt; <span class="re0">$this</span>-&gt;<span class="me1">GameCategoriesGame</span>-&gt;<span class="me1">paginatorConditions</span><span class="br0">&#40;</span><span class="st0">'game_categories_games'</span>, <span class="re0">$conditions</span><span class="br0">&#41;</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'contain'</span> =&gt; <span class="re0">$contain</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'order'</span> =&gt; <span class="re0">$order</span>,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="st0">'limit'</span> =&gt; <span class="nu0">12</span><br />
+&nbsp; &nbsp; &nbsp; <span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$games</span> = <span class="re0">$this</span>-&gt;<span class="me1">paginate</span><span class="br0">&#40;</span><span class="st0">'GameCategoriesGame'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$this</span>-&gt;<span class="me1">set</span><span class="br0">&#40;</span><a href="http://www.php.net/compact"><span class="kw3">compact</span></a><span class="br0">&#40;</span><span class="st0">'games'</span>, <span class="st0">'query'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; <span class="br0">&#125;</span></div>
+<p>So we are first loading all our game categories to populate the select tag. Then we check if there is a named parameter "page" given. If so, the user clicked on the Previous/Next/Numbered links. If it is not present, we might as well start at page 1. ; ]</p>
+<p>Now comes the tricky part. We check if the form was submitted via empty($this->data). If it is submitted, we store all the form data in the session. If the form is not submitted we try to recover the form data from the session. If both the form is not submitted and there is no data in the session, but it still a Get request, something bad happened and we fire the user by <a href="http://debuggable.com/posts/assert-the-yummyness-of-your-cake:480f4dd6-7fe0-4113-9776-458acbdd56cb">asserting the yummyness of his cake</a>.</p>
+<p>The rest should be familiar - some processing of the $formData array to extract the proper conditions and order stuff. The most interesting stuff now is that call to $this->GameCategoriesGame->paginatorCount('game_categories_games', $conditions, array('Game'));. This enables us to paginate over the HABTM relation (Game HABTM GameCategory). Here is the code from the GameCategoriesGame model:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;"><span class="kw2">&lt;?php</span><br />
+<span class="kw2">class</span> GameCategoriesGame <span class="kw2">extends</span> AppModel <span class="br0">&#123;</span><br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$name</span> = <span class="st0">'GameCategoriesGame'</span>;<br />
+&nbsp; <span class="kw2">var</span> <span class="re0">$belongsTo</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'GameCategory'</span>, <span class="st0">'Game'</span><span class="br0">&#41;</span>;<br />
+<br />
+<span class="coMULTI">/**<br />
+&nbsp;* Return count for given pagination<br />
+&nbsp;*<br />
+&nbsp;* @param string $paginator Pagination name<br />
+&nbsp;* @param array $conditions Conditions to use<br />
+&nbsp;* @return mixed Count, or false<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; <span class="kw2">function</span> paginatorCount<span class="br0">&#40;</span><span class="re0">$paginator</span>, <span class="re0">$conditions</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>, <span class="re0">$contain</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$Db</span> = ConnectionManager::<span class="me2">getDataSource</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">useDbConfig</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$contain</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$related</span> = ClassRegistry::<span class="me2">init</span><span class="br0">&#40;</span><span class="re0">$contain</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+<br />
+&nbsp; &nbsp; <span class="re0">$sql</span> = <span class="st0">'SELECT<br />
+&nbsp; &nbsp; &nbsp; COUNT(DISTINCT '</span> . <span class="re0">$this</span>-&gt;<span class="me1">alias</span> . <span class="st0">'.'</span> . <span class="re0">$this</span>-&gt;<span class="me1">belongsTo</span><span class="br0">&#91;</span><span class="st0">'Game'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'foreignKey'</span><span class="br0">&#93;</span> . <span class="st0">') count<br />
+&nbsp; &nbsp; FROM '</span> . <span class="re0">$Db</span>-&gt;<span class="me1">fullTableName</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">table</span><span class="br0">&#41;</span> . <span class="st0">' '</span> . <span class="re0">$Db</span>-&gt;<span class="me1">name</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">alias</span><span class="br0">&#41;</span> . <span class="st0">' '</span>;<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$contain</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$sql</span> .= <span class="st0">' INNER JOIN '</span> . <span class="re0">$Db</span>-&gt;<span class="me1">fullTableName</span><span class="br0">&#40;</span><span class="re0">$related</span>-&gt;<span class="me1">table</span><span class="br0">&#41;</span> . <span class="st0">' '</span> . <span class="re0">$Db</span>-&gt;<span class="me1">name</span><span class="br0">&#40;</span><span class="re0">$related</span>-&gt;<span class="me1">alias</span><span class="br0">&#41;</span> . <span class="st0">' '</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="re0">$sql</span> .= <span class="re0">$Db</span>-&gt;<span class="me1">conditions</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">paginatorConditions</span><span class="br0">&#40;</span><span class="re0">$paginator</span>, <span class="re0">$conditions</span>, <span class="st0">'count'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="re0">$count</span> = <span class="re0">$this</span>-&gt;<span class="me1">query</span><span class="br0">&#40;</span><span class="re0">$sql</span><span class="br0">&#41;</span>;<br />
+<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span>!<a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$count</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$count</span> = <span class="re0">$count</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="nu0">0</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'count'</span><span class="br0">&#93;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$count</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* Build conditions for given pagination<br />
+&nbsp;*<br />
+&nbsp;* @param string $paginator Pagination name<br />
+&nbsp;* @param array $extraConditions Extra conditions to use<br />
+&nbsp;* @param string $method 'count', or 'find'<br />
+&nbsp;* @return array Conditions<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; <span class="kw2">function</span> paginatorConditions<span class="br0">&#40;</span><span class="re0">$paginator</span>, <span class="re0">$extraConditions</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="br0">&#41;</span>, <span class="re0">$method</span> = <span class="kw2">null</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="re0">$Db</span> = ConnectionManager::<span class="me2">getDataSource</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">useDbConfig</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="re0">$conditions</span> = <span class="kw2">null</span>;<br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/empty"><span class="kw3">empty</span></a><span class="br0">&#40;</span><span class="re0">$extraConditions</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$extraConditions</span> = <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'1=1'</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">switch</span> <span class="br0">&#40;</span><a href="http://www.php.net/strtolower"><span class="kw3">strtolower</span></a><span class="br0">&#40;</span><span class="re0">$paginator</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="kw1">case</span> <span class="st0">'game_categories_games'</span>:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$method</span> != <span class="st0">'count'</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$conditions</span> = <a href="http://www.php.net/array_merge"><span class="kw3">array_merge</span></a><span class="br0">&#40;</span><span class="re0">$extraConditions</span>, <a href="http://www.php.net/array"><span class="kw3">array</span></a><span class="br0">&#40;</span><span class="st0">'1=1 GROUP BY '</span> . <span class="re0">$this</span>-&gt;<span class="me1">alias</span> . <span class="st0">'.'</span> . <span class="re0">$this</span>-&gt;<span class="me1">belongsTo</span><span class="br0">&#91;</span><span class="st0">'Game'</span><span class="br0">&#93;</span><span class="br0">&#91;</span><span class="st0">'foreignKey'</span><span class="br0">&#93;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$conditions</span> = <span class="re0">$extraConditions</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">break</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$conditions</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="coMULTI">/**<br />
+&nbsp;* Executed by the paginator to get the count. Overriden to allow<br />
+&nbsp;* forcing a count (through var $forcePaginateCount)<br />
+&nbsp;*<br />
+&nbsp;* @param array $conditions Conditions to use<br />
+&nbsp;* @param int $recursive Recursivity level<br />
+&nbsp;* @return int Count<br />
+&nbsp;* @access public<br />
+&nbsp;*/</span><br />
+&nbsp; <span class="kw2">function</span> paginateCount<span class="br0">&#40;</span><span class="re0">$conditions</span>, <span class="re0">$recursive</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/isset"><span class="kw3">isset</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">forcePaginateCount</span><span class="br0">&#41;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$count</span> = <span class="re0">$this</span>-&gt;<span class="me1">forcePaginateCount</span>;<br />
+&nbsp; &nbsp; &nbsp; <a href="http://www.php.net/unset"><span class="kw3">unset</span></a><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">forcePaginateCount</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; <span class="re0">$count</span> = <span class="re0">$this</span>-&gt;<span class="me1">find</span><span class="br0">&#40;</span><span class="st0">'count'</span>, <a href="http://www.php.net/compact"><span class="kw3">compact</span></a><span class="br0">&#40;</span><span class="st0">'conditions'</span>, <span class="st0">'recursive'</span><span class="br0">&#41;</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$count</span>;<br />
+&nbsp; <span class="br0">&#125;</span><br />
+<span class="br0">&#125;</span><br />
+<span class="kw2">?&gt;</span></div>
+<p>To make a long story short: You see we build up the count query on our on and then force Cake to use our calculated count via our own forcePaginateCount property of the model. The Group BY is already in there, we can supply extra conditions and have different queries for different types (see the switch statement in paginatorConditions).<br />
+Alas, we have to build the sql on our own for the JOINs, which can become a headache for more complex problems. Anyway, this code gives us enough flexibility to build the right pagination for every problem. :) If you can think of a problem this code cannot be used for, please let me know and we discuss.</p>
+<p>The paginateCount() method could go into your AppModel, I just put it here to have the code in one place to keep it simpler.</p>
+<h2>Conclusion</h2>
+<p>The method presented has some advantages and disadvantages, as always. The advantages would definitely include that we don't have to extend the controller's paginate() method in our app controller. This is what many people do and what I did in the past as well. However, as always, it's not good manners to hack the core.<br />
+Another advantage is the flexibility of the code - with just one line, we can calculate pagination counts for almost every occasion, and even if we paginate over two or three HABTM relations (I can show you later).</p>
+<p>Disadvantages include some bloat in your models and the need to write sql again (*sigh*), which can become very complex if you have to supply all the JOINS yourself for more complex problems. Apart from that the code does not yet have full integration of the containable behavior. However, that I can add later.</p>
+<p>I hope you liked the article and can put it to some use. Credits go to mariano for the original idea for this. If you guys are interested in seeing how I coupled the "Save search" feature from <a href="http://flashfun247.com/searches/advanced">here</a> with all of this, feel free to ask and we can have some nice discussion.</p>
+<p><img style="display: none;" src="http://debuggable.com/posts/tick/48fc5f77-38d0-41e0-b711-77c64834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-paginate-a-search-using-the-cakephp-framework%3A48fc5f77-38d0-41e0-b711-77c64834cda3 &amp;title=How+to+paginate+a+CakePHP+search+over+a+HABTM+relation+without+hacking+the+core';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-paginate-a-search-using-the-cakephp-framework%3A48fc5f77-38d0-41e0-b711-77c64834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-paginate-a-search-using-the-cakephp-framework%3A48fc5f77-38d0-41e0-b711-77c64834cda3&amp;title=How+to+paginate+a+CakePHP+search+over+a+HABTM+relation+without+hacking+the+core&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fhow-to-paginate-a-search-using-the-cakephp-framework%3A48fc5f77-38d0-41e0-b711-77c64834cda3&amp;title=How+to+paginate+a+CakePHP+search+over+a+HABTM+relation+without+hacking+the+core';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/how-to-transform-html-to-textile-markup-the-cakephp-textilehelper-revisited:480f4dfe-a258-4b54-a31b-4933cbdd56cb">How To Transform HTML To Textile Markup - The CakePHP TextileHelper Revisited</a></li>
+							<li><a href="/posts/unit-testing-in-cakephp-part-1---introduction-to-unit-testing:48102610-c5d0-4398-a010-76974834cda3">Unit Testing in CakePHP Part 1 - Introduction to Unit Testing</a></li>
+							<li><a href="/posts/remember-the-days-before-spam-a-cakephp-model-for-akismet:480f4dd5-d358-4f51-ac83-45f1cbdd56cb">Remember the days before spam? A CakePHP Model for Akismet  </a></li>
+							<li><a href="/posts/4-cakephp-tricks:4811ad82-32dc-4a38-bc10-36304834cda3">Two CakePHP tricks</a></li>
+							<li><a href="/posts/3000-candles-on-the-cakephp-cake:480f4dd5-01f8-40e6-9acc-413bcbdd56cb">3000 candles on the CakePHP cake</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/yummy-cakephp-functions-you-should-know-about:480f4dd5-4528-4a53-a0ec-4aa8cbdd56cb">Yummy CakePHP functions you should know about!</a></li>
+							<li><a href="/posts/cakephp-1.2-stable-come-and-help:4829b3ac-903c-4f56-94dc-27af4834cda3">CakePHP 1.2 Stable! Come and help</a></li>
+							<li><a href="/posts/How_to_Fetch_the_ENUM_Options_of_a_Field_The_CakePHP_Enumerable_Behavior:4a977c9b-1bdc-44b4-b027-1a54cbdd56cb">How to Fetch the ENUM Options of a Field - The CakePHP Enumerable Behavior</a></li>
+							<li><a href="/posts/testing-models-in-cakephp-now-lets-get-rid-of-the-unnecessary-modeltest-classes:4890ed55-be28-4d4a-ba4c-7fd64834cda3">Testing Models in CakePHP - Now let&#039;s get rid of the unnecessary ModelTest classes !</a></li>
+							<li><a href="/posts/how-to-do-group-by-conditions-in-model-find()-calls:483fdc1c-8454-4593-a55e-37244834cda3">How to do Group By conditions in Model find() calls in the CakePHP RC1</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/how-to-paginate-a-search-using-the-cakephp-framework:48fc5f77-38d0-41e0-b711-77c64834cda3">29 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/how-to-paginate-a-search-using-the-cakephp-framework:48fc5f77-38d0-41e0-b711-77c64834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4927349a-33dc-4b9e-97e8-2c6b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b7417e984cc78c088882a176050cfc07&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://codetunes.com" rel="nofollow">Michał Szajbe</a>						</strong>
+						<strong>said 
+						on Nov 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Not a trivial problem, definitely. </p>
+<p>For me the biggest problem when doing search with HABTM relation was how to fetch the data from database not killing it. I am curious how fast is your approach...</p>
+<p>Storing search parameters in session - not the best solution I think. User may be doing different searches in two browser windows and get unexpected results. It's also not too search-engine-friendly.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-492743f7-b29c-4c8c-95b6-777a4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Nov 21, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Michał Szajbe: Thanks for your comment. The approach should be pretty fast. After all, all what we do is calculating a COUNT with sql...</p>
+<p>As for storing the search data in the session: Well what would be the alternative? Storing it all in the url, which will result in very cryptic and long urls. What would you suggest?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49275308-8f34-477b-8838-4ec44834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e65dc761e9e2391777f8799ce4502c8e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://php-thoughts.cubedwater.com/" rel="nofollow">Jonah Turnquist</a>						</strong>
+						<strong>said 
+						on Nov 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Michał Szajbe "Storing search parameters in session - not the best solution I think. User may be doing different searches in two browser windows and get unexpected results."</p>
+<p>This is true if the "two browser windows" are from the same browser application, not from eg. a firefox window with a safari one.</p>
+<p>To me it seems that the search quarry should only be remembered through the URL. This is more efficient, more straight forward, and you are able to bookmark searches, and also Google can correctly index them.  This means setting the search form type to GET (instead of POST).  Then, when you click on "Next Page" or whatever, the GET string will be transferred over. Simple as heck.</p>
+<p>For instance, if you are at "/games/search?str=war&dir=ASC&page=1", the next button would just point to "/games/search?str=war&dir=ASC&page=2".</p>
+<p>You can argue the URLs are not pretty this way, but think about it, how many sites have pretty URLs for their search pages? Not Google!  Think about why Google does not use sessions.</p>
+<p>Sometimes you just gotta think about how you did things before you made love to cake...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4928193e-905c-48d7-94b2-77254834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b7417e984cc78c088882a176050cfc07&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://codetunes.com" rel="nofollow">Michał Szajbe</a>						</strong>
+						<strong>said 
+						on Nov 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>In one my projects I searched products by selecting tags (product habtm tag). The URL looked something like /t/tag1,tag2,tag3/page:2. I used routes for this</p>
+<p>Router::connect('/t/:tagSlugs/*', array('controller' => 'products', 'action' => 'index'));</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-492831c3-918c-4088-bb64-46374834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9523721c0e4410c8eb9384db9b571e71&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Khoi&nbsp;						</strong>
+						<strong>said 
+						on Nov 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Another problem of this method is: if a user search, then he try a game for a couple of minutes, then go back to the search page and click 'next page' but the session has been expired and return nothing.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49285d98-2e98-42fa-8ada-6c6a4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Nov 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Okay guys, I agreed already that the search should be supported by urls already.</p>
+<p>However, the article is not only about the search - but the HABTM pagination. Any comments about that?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-492afd78-056c-4218-8458-571e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ee19521b6ffa4187371641b6e409d9bc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="https://sites.google.com/a/esninteractive.com/cakephp-documentation/" rel="nofollow">Dooltaz</a>						</strong>
+						<strong>said 
+						on Nov 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey Tim,</p>
+<p>Thanks for the post. I worked on something similar to this a month or so back. I went with the solution of storing the data into the URL. I built it so that you can determine a url length threshold. </p>
+<p><a rel="nofollow" href="https://sites.google.com/a/esninteractive.com/cakephp-documentation/extensions/cake-reporting-filtering-extension">https://sites.google.com/a/esninteractive.com/cakephp-documentation/extensions/cake-reporting-filtering-extension</a></p>
+<p>It takes care of the whole session issue. As for HABTM pagination, I went with the manual on this one and built custom find() queries.</p>
+<p>The paginatorCounter is interesting... When I have more time I'll review it more in depth. Something along those lines may be an improvement to my code, however, for now I try to keep it simple and readable so that it is manageable to create new reports.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-492b0ff0-e698-46ca-b950-47474834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Nov 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Dooltaz: Sounds cool to me. : ) Yeah I will implement the whole url stuff into my method. Not sure why I haven't thought about it beforehand. :]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-494f8f06-ca6c-47e7-8519-74fd4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f32734828a0bc23bb5b3848270c68921&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.devmoz.com" rel="nofollow">othmane ouahbi</a>						</strong>
+						<strong>said 
+						on Dec 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>COUNT(DISTINCT.. is evil evil evil!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-494f920a-16f4-404c-8d16-6e3e4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Dec 22, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>othmane ouahbi: Please explain why it is evil in this context.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4952b01d-4ae0-4359-97ac-5dfd4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5fcf81687d42a9701e51b01245b3f7fe&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							tonedeaf&nbsp;						</strong>
+						<strong>said 
+						on Dec 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>"If you can think of a problem this code cannot be used for, please let me know and we discuss."</p>
+<p>Consider, that the Game model is also HABTM related to Players model. I want the Game results to be filtered on the conditions on Categories and Players models (eg. Game.Category = "RPG" AND Player.Score > 1000)</p>
+<p>"$this->GameCategoriesGame->paginatorCount('game_categories_games', $conditions, array('Game'));"</p>
+<p>Seeing that you're going through the GameCategories model for the first condition, it would not support conditions for the Players model (which is joined by games_players).</p>
+<p>How would you support conditions like these (with pagination)? Would you consider it food for thought for another article?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4953ae06-0b1c-4757-96dd-6f7c4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Dec 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hrm not easy. This needs two queries in my opinion, because of the extra HABTM between categories and games.</p>
+<p>What about a GamesPlayer model which is the HABTM model for the relation Player to Game. It belongsTo Player and Game.</p>
+<p>In the first query you would fetch all ids of the games in the RPG category. Then you can do ap agination query as outlined in the article with a IN (array_of_game_ids) clause.</p>
+<p>What do you think?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-495550f6-68e8-401c-87cc-3cb84834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5fcf81687d42a9701e51b01245b3f7fe&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							tonedeaf&nbsp;						</strong>
+						<strong>said 
+						on Dec 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Unfortunately, in CakePHP it is not easy to express joins without writing custom SQL.<br />
+Other PHP frameworks have made good progress in solving these issues by adapting popular ORM layers (ActiveRecord in CodeIgniter, Doctrine in Symfony) whereas CakePHP still relies on users hacking/working around the limited database quering features.</br><br />
+I haven't worked with other PHP frameworks, but Django 1.0 (Python) makes it a snap to get data from multiple related models based on multiple conditions (across models) and automatically takes care of the joins:</br><br />
+<a rel="nofollow" href="http://docs.djangoproject.com/en/dev/topics/db/queries/">http://docs.djangoproject.com/en/dev/topics/db/queries/</a></br><br />
+(look under the heading: Spanning multi-valued relationships)</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49556d2e-3a40-4dca-8c13-4ece4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Dec 26, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>tonedeaf: Actually, doing ad-hoc joins in CakePHP is quite easy. I've been meaning to do a post on it for a while, I'll have to do that soon.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-495607aa-86e8-49ff-91fc-3e104834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5fcf81687d42a9701e51b01245b3f7fe&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							tonedeaf&nbsp;						</strong>
+						<strong>said 
+						on Dec 27, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nate: "Actually, doing ad-hoc joins in CakePHP is quite easy. I've been meaning to do a post on it for a while, I'll have to do that soon."<br />
+I've spent countless hours searching for posts (bakery, google groups, teknoid etc.) and I see the questions repeated again and again.</br><br />
+What is of interest to me (and to other CakePHP users, I believe) is how to do a HABTM, Many-to-Many Search across multiple models. It is like the containable behaviour which allows for filtering of the results. Look at this ticket for details:</br><br />
+<a rel="nofollow" href="https://trac.cakephp.org/ticket/4712">https://trac.cakephp.org/ticket/4712</a></br><br />
+Now, there is a workaround to filter the results on the teknoid website, but it is less than optimal and won't support big record sizes.</br><br />
+Can you please do a post on doing such database queries through CakePHP? I'm kind of frustated by CakePHP's limitations / lack of reference / my lack of knowledge and I'm actively considering switching on to Django. Your post will go a long way in restoring my confidence back in CakePHP</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-498ae4f6-cb70-478c-81af-15424834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7742f3e3b873aa2a0aa6760c98a57c24&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							tonedeaf&nbsp;						</strong>
+						<strong>said 
+						on Feb 05, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks Nate for the article, I just found it today. If anyone else wants to look over it, here's the link: <a rel="nofollow" href="http://bakery.cakephp.org/articles/view/quick-tip-doing-ad-hoc-joins-in-model-find">http://bakery.cakephp.org/articles/view/quick-tip-doing-ad-hoc-joins-in-model-find</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49a5b745-d2bc-4839-926b-3e054834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4341d6f7c81a8d351f775885e434b70e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Tara Page&nbsp;						</strong>
+						<strong>said 
+						on Feb 25, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I have to have one page that has 3 tables on it. Each of the tables needs to be paginated, and they are ALL from the SAME model. They are for Trades, so I'm having 3 tables, one will show all trades in state open, the other for all trades in state closed, and the final all in pending state.</p>
+<p>My question is, how can I call the paginate 3 different times in the same model? I do:</p>
+<p>$this->set('trades1', $this->paginate('Trade', array('Trade.trading_state_id'=>'open')));<br />
+$this->set('trades2', $this->paginate('Trade', array('Trade.trading_state_id'=>'closed')));</br><br />
+$this->set('trades3', $this->paginate('Trade', array('Trade.trading_state_id'=>'pending')));</br></p>
+<p>Then when I render the screen, I use the appropriate data for the appropriate table. HOWEVER, all of the paging stats (next, previous, # of records) are all the data from the last paginate call of course...</p>
+<p>I'm using AJAX to render only the appropriate section, although I don't know where the user is coming from, it is re-rendering the entire screen (all 3 tables) in the desired output div instead of just the one.</p>
+<p>In summary, how can you call paginate multiple times for the same model in your controller? Also, is there a way of knowing where you came from (ie which table did you click next on) from your views?</p>
+<p>Hope this makes sense. Any help would be appreciated.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49a691fc-3f74-46dd-98a4-0f474834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Feb 26, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well what you can do is this:</p>
+<p>1. Create two dummy models that extend the original Trade Model. They inherit all functionality. The thing is, that they need a different alias (which is achieved by their class name) in order to distuingish them in the pagination process.</p>
+<p>2. Put this code in your app controller.<br />
+/**</br><br />
+ * undocumented function</br><br />
+ *</br><br />
+ * @param string $model</br><br />
+ * @return void</br><br />
+ * @access public</br><br />
+ */</br><br />
+	function pageForPagination($model) {</br><br />
+		$page = 1;</br><br />
+		$sameModel = isset($this->params['named']['model']) && $this->params['named']['model'] == $model;</br><br />
+		$pageInUrl = isset($this->params['named']['page']);</br><br />
+		if ($sameModel && $pageInUrl) {</br><br />
+			$page = $this->params['named']['page'];</br><br />
+		}</br></p>
+<p>		$this->passedArgs['page'] = $page;<br />
+		return $page;</br><br />
+	}</br></p>
+<p>3. Make sure your paging urls have a 'model' setting, so that the model is appended as named paramter to the url.</p>
+<p>4. In your pagination calls, make sure to add the attribute</p>
+<p>'page' => $this->pageForPagination('Trade2')</p>
+<p>Does this help?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49ad3524-8444-4c92-bfbc-2ea14834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4341d6f7c81a8d351f775885e434b70e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Tara Page&nbsp;						</strong>
+						<strong>said 
+						on Mar 03, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Tim,</p>
+<p>Thanks for your feedback.  I had implemented a solution similar to yours before there was a comment back.  I created 'dummy' models, there was still issues with the 'remembering' what page and what sort parameters that were supposed to be saved after entering into an edit page and returning for example, so I handled these with Session variables for each model (not sure if this is really a good way of doing it).  I just need a way of clearing the session variable when it is the first time that I come into the screen, other than that seems to work, now I just have to add a lot of them to one page and test that out :)</p>
+<p>I will definitely try your pageForPagination method on my next screen that uses this to see if it is easier than what I've implemented.  I do appreciate the feedback.</p>
+<p>Tara</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49ad50c7-2190-4f14-a405-3e284834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Mar 03, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>If you use the POST method in your search form, you could check for if ($this->RequestHandler->isPost()) to clear your session variable, perhaps?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b6cdf0-4c28-47ae-b3e6-0cfe4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2ea510739d0394665c0b872885614764&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://montanaharkin.net" rel="nofollow">Montana Harkin</a>						</strong>
+						<strong>said 
+						on Mar 10, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Nate Abele:  Have you had a chance to discuss the ad-hoc join simplicity in Cake? I'd be interested to see how you integrate this with pagination.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b6cef8-da18-4e31-9a52-4e634834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Mar 10, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Montana Harkin: See the comment above from tonedeaf.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49b6e8f8-b3b0-4c6e-a84a-1d5f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2ea510739d0394665c0b872885614764&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://montanaharkin.net" rel="nofollow">Montana Harkin</a>						</strong>
+						<strong>said 
+						on Mar 10, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ah, Yes, if only I were to read _all_ the comments. Thanks.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-49d1dde9-6304-4b83-bf49-05444834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=52a2db497925707f92d20c3f2cc7bf01&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Tim&nbsp;						</strong>
+						<strong>said 
+						on Mar 31, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice article! I wish I could find it several months ago... I had the problem similar to one of the commentators - while searching with HABTM relation how to fetch the data from database without damaging it. I tried to find the solution in the internet. But neither ar forums nor at rapidshare ( <a rel="nofollow" href="http://rapidqueen.com">http://rapidqueen.com</a> ) managed to find. Now I have the solution, but unfortunatelly too late (((</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a8258ed-028c-407e-b519-6a23cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bfb6f5028ab22c1a244e9ff1d9208161&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							David&nbsp;						</strong>
+						<strong>said 
+						on Aug 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The table in database table is missing,<br />
+and I don't think I get my table right...</br></p>
+<p>+-------------+-------------+------+-----+---------+-------+<br />
+| Field       | Type        | Null | Key | Default | Extra |</br><br />
++-------------+-------------+------+-----+---------+-------+</br><br />
+| keywords    | varchar(20) | YES  |     | NULL    |       |</br><br />
+| id          | int(11)     | NO   | PRI | NULL    |       |</br><br />
+| name        | varchar(30) | YES  |     | NULL    |       |</br><br />
+| body        | text        | YES  |     | NULL    |       |</br><br />
+| category_id | int(11)     | YES  |     | NULL    |       |</br><br />
+| tag_id      | int(11)     | YES  |     | NULL    |       |</br><br />
+| list        | varchar(30) | YES  |     | NULL    |       |</br><br />
+| tag         | varchar(30) | YES  |     | NULL    |       |</br><br />
++-------------+-------------+------+-----+---------+-------+</br></p>
+<p>Notice (8): Undefined property: SearchesController::$Game [APP/controllers/searches_controller.php, line 8]</p>
+<p>Code</p>
+<p>function advanced() {<br />
+    $searchCategories = $this->Game->GameCategory->find('list', compact('conditions'));</br></p>
+<p>SearchesController::advanced() - APP/controllers/searches_controller.php, line 8<br />
+Object::dispatchMethod() - CORE/cake/libs/object.php, line 118</br><br />
+Dispatcher::_invoke() - CORE/cake/dispatcher.php, line 227</br><br />
+Dispatcher::dispatch() - CORE/cake/dispatcher.php, line 194</br><br />
+[main] - APP/webroot/index.php, line 88</br></p>
+<p>Notice (8): Trying to get property of non-object [APP/controllers/searches_controller.php, line 8]</p>
+<p>Code</p>
+<p>function advanced() {<br />
+    $searchCategories = $this->Game->GameCategory->find('list', compact('conditions'));</br></p>
+<p>SearchesController::advanced() - APP/controllers/searches_controller.php, line 8<br />
+Object::dispatchMethod() - CORE/cake/libs/object.php, line 118</br><br />
+Dispatcher::_invoke() - CORE/cake/dispatcher.php, line 227</br><br />
+Dispatcher::dispatch() - CORE/cake/dispatcher.php, line 194</br><br />
+[main] - APP/webroot/index.php, line 88</br></p>
+<p>Fatal error: Call to a member function find() on a non-object in /var/www/cake/app/controllers/searches_controller.php on line 8</p>
+<p>Please tell me what's wrong.....</p>
+<p>This is the website:<br />
+<a rel="nofollow" href="http://cs215.mooo.com:16080/cake/searches/advanced/">http://cs215.mooo.com:16080/cake/searches/advanced/</a></br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a825939-ebdc-43ff-8637-6a25cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=bfb6f5028ab22c1a244e9ff1d9208161&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							David&nbsp;						</strong>
+						<strong>said 
+						on Aug 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sorry, wrong table<br />
+This is the right one:</br><br />
++------------------+-------------+------+-----+---------+----------------+</br><br />
+| Field            | Type        | Null | Key | Default | Extra          |</br><br />
++------------------+-------------+------+-----+---------+----------------+</br><br />
+| game_category_id | int(11)     | YES  |     | NULL    |                |</br><br />
+| keywords         | varchar(50) | YES  |     | NULL    |                |</br><br />
+| tags             | varchar(50) | YES  |     | NULL    |                |</br><br />
+| id               | int(10)     | NO   | PRI | NULL    | auto_increment |</br><br />
++------------------+-------------+------+-----+---------+----------------+</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a82dd0b-68a4-4902-b4f2-6a24cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Aug 12, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Did you make sure the game model is loaded in your $uses declaration in the SearchesController?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a8c0160-f2d4-45f2-9b8a-16d0cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=51dac1a810f97de7228cad4614e1b9cf&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.myinetplace.com" rel="nofollow">Roger</a>						</strong>
+						<strong>said 
+						on Aug 19, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>HI Tom,</p>
+<p>Can you share script for this project so we could have better look and understand what exactly you make in that project.</p>
+<p>Thanks for nice post.<br />
+Much appreciated !!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a93cc9a-81a0-4890-8081-65a4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=44db49e6ac2057d960b8caf7cd7c2111&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Mpho&nbsp;						</strong>
+						<strong>said 
+						on Aug 25, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>hey guys!</p>
+<p>I am in real trouble, we are creating a system for risk assessment for a construction company. I am looking for a code for search, and risk matrix using cake php.<br />
+please help!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

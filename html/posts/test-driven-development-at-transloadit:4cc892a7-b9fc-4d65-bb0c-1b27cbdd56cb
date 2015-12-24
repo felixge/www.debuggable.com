@@ -1,0 +1,732 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Test driven development at Transloadit &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/test-driven-development-at-transloadit:4cc892a7-b9fc-4d65-bb0c-1b27cbdd56cb">Test driven development at Transloadit</a></h2>	<div class="posted-on">
+		<p>Posted on 28/10/10 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>You have probably heard a few talks or read a few articles where test driven development is depicted as a magic unicorn that watches over your software and makes everybody happy. Well, about 18.000 lines of "magic unicorn" code later, I'd like to put things into perspective.</p>
+
+<p>The truth is, test driven development is a huge pain in the ass. Writing those damn tests all the time takes a huge amount of discipline, and it doesn't really get a whole lot easier with time.</p>
+
+<p>But do you know what sucks more? The liability that comes without those tests.</p>
+
+<p>Let me clarify. I'm not trying to tell you that you should practice test driven development. What I will try to do however, is to give you a realistic idea about the work it takes and the kind of benefits you get from it.</p>
+
+<p>At this point I basically think of test driven development as an insurance policy. It guarantees that your software will have a certain pre-defined quality mostly measured by the amount of bugs and the risks of changing the software. It can also reduce the costs of your main developer getting run over by a bus, or the <a href="http://transloadit.com/blog/2010/04/to-launch-or-not">same thing</a> happening to the API of the platform you are building on.</p>
+
+<p>However, there are also millions of people on this planet that live without any insurances whatsoever, so clearly this is not the only way of getting from point A to B. It all depends on your liability and how you can / want to deal with it.</p>
+
+<p>At <a href="http://transloadit.com/">Transloadit</a> 100% of our code is developed test driven. The main reason for that is that we are building on node.js which still is a very risky technology at this point and probably our biggest liability and advantage at the same time. Another big risk are third party tools such as ffmpeg and image magick that are insanely dangerous to upgrade since they love to change APIs and behavior all the time. And last but not least, some of the stuff we are doing is rather complex.</p>
+
+<p>Now let me explain how test driven development lets us deal with those risks. First of all, new features always start out as a system test. Each system test boots up the entire REST service, sends an actual HTTP request to it, and evaluates the response as well as the files that were created in the process. Files are verified by looking at their meta data, as well as performing visual diffs on images against expected fixtures. For videos we are using thumbnails to do the visual comparisons.</p>
+
+<p>Once that test is written (and failing), we start writing unit tests. Let me explain what we mean by "unit". A unit to us is the tiniest atomic piece of functionality we can possibly test. As soon as there is a function call, creation of a class, or even a callback closure - we stub it. Everything that can be isolated and tested separately is handled by itself. As you can imagine, that's the part where the pain and discipline come in.</p>
+
+<p>However, there is a certain undeniable beauty resulting from it. Writing those tests feels like proofing mathematical theorems. Every step is just small enough to be broken down to raw logic. Everything builds upon the previous step. There is no need to test all numbers in between 1 - 1000000, unless there is a logical reason for expecting a different result. </p>
+
+<p>Of course there is a good chance of you going crazy in the process and losing track of the original goal. That's where the system test comes to rescue. Whenever you don't know what needs to be done next, you simply run the system test and it will tell you what's missing.</p>
+
+<p>Is this process perfect? No. We have had a few bugs here and there, but I can still count them on two hands. Last weekend we pushed a rather insane change into production: We replaced our underlaying MySql driver (we were using that of PHP, don't ask how that worked) with node-mysql. I've been working on <a href="http://github.com/felixge/node-mysql">node-mysql</a> with the same care and <a href="http://github.com/felixge/node-mysql/tree/master/test/">TDD-masochism</a> as we have on transloadit, so the update went without a single hickup (so far). Not bad for a change that involved 6000 lines of code.</p>
+
+<p>And that's it. Our service is not necessarily better than our competitors' because we use TDD. However, our risk of breaking things is much smaller, and we can perform heart-surgeries like this without breaking a sweat. This gives us the confidence to charge money, and the ability to spend the rest of our limited resources (we are bootstrapping) on innovative new features rather than dealing with the shortcomings of our software all the time.</p>
+
+<p>So, is TDD right for you? It depends. Writing code the TDD way requires a ton of discipline, and the unicorns aren't always around to make you feel better.  So make sure you have good reasons to do it. Sometimes a few system tests can get you 80% of the results for 20% of the work. Other times you need the remaining 20%. Also keep in mind that we're lucky at Transloadit for using a flexible language and most of our interfaces are JSON. This makes testing cheaper for us than it might be for you.</p>
+
+<p>--fg</p>
+
+<p>PS: If I find some more time, I'd love to go into more details of our node.js unit testing. Leave a comment if you're interested. Meanwhile make sure to check out the <a href="http://github.com/felixge/node-mysql/tree/master/test/">tests for node-mysql</a>, they are done exactly like our internal tests.
+<img style="display: none;" src="http://debuggable.com/posts/tick/4cc892a7-b9fc-4d65-bb0c-1b27cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftest-driven-development-at-transloadit%3A4cc892a7-b9fc-4d65-bb0c-1b27cbdd56cb &amp;title=Test+driven+development+at+Transloadit';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftest-driven-development-at-transloadit%3A4cc892a7-b9fc-4d65-bb0c-1b27cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftest-driven-development-at-transloadit%3A4cc892a7-b9fc-4d65-bb0c-1b27cbdd56cb&amp;title=Test+driven+development+at+Transloadit&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Ftest-driven-development-at-transloadit%3A4cc892a7-b9fc-4d65-bb0c-1b27cbdd56cb&amp;title=Test+driven+development+at+Transloadit';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/introduction-to-test-driven-development-tdd-part-2:480f4dfd-b3e4-4f84-9399-4084cbdd56cb">Introduction to Test-Driven-Development (TDD) - Part 2</a></li>
+							<li><a href="/posts/upcoming:-code-coverage-in-cakephp---test-how-well-you-test:4814f672-0d78-4585-a349-64c64834cda3">Upcoming: Code Coverage in CakePHP - Test How Well You Test</a></li>
+							<li><a href="/posts/how-to-execute-only-specific-test-methods-in-cakephp-unit-tests:4858fa7b-7194-4652-9c7f-47784834cda3">How To Execute Only Specific Test Methods in CakePHP Unit Tests</a></li>
+							<li><a href="/posts/agile-web-development-with-cakephp:480f4dd5-c234-445a-b907-4876cbdd56cb">Agile web development (with CakePHP)</a></li>
+							<li><a href="/posts/transloadit-is-now-pay-as-you-go:4c979391-f264-4fce-8601-73d1cbdd56cb">Transloadit is now Pay as you Go</a></li>
+					</ul>
+		<ul>
+							<li><a href="/posts/introduction-to-test-driven-development-tdd-part-1:480f4dfd-e8f4-4a82-923c-4625cbdd56cb">Introduction to Test-Driven-Development (TDD) - Part 1</a></li>
+							<li><a href="/posts/code-coverage-analysis-soon-in-cakephp---test-how-well-you-test:4814f6a0-fe60-4f50-be0b-07194834cda3">Code Coverage Analysis soon in CakePHP - Test How Well You Test</a></li>
+							<li><a href="/posts/test-driven-development-in-real-world-apps:480f4dd5-514c-45f2-b3dc-4a16cbdd56cb">Test Driven Development in Real World Apps</a></li>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/test-driven-development-at-transloadit:4cc892a7-b9fc-4d65-bb0c-1b27cbdd56cb">32 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/test-driven-development-at-transloadit:4cc892a7-b9fc-4d65-bb0c-1b27cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4cc971af-80e8-42dd-8d14-2eefcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=42e8e2832b65e6de00f67c7966f64301&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Mauricio&nbsp;						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Really nice post. Pretty much what I wanted to know about TDD before trying it.<br />
+This kind of high level advices is what I needed after watching someone giving a talk about the beauty of TDD.</br><br />
+Thanks a lot!!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc97345-99cc-4b16-b166-423bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=688dbc14d8d8c19ebb3880f13be73f3f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.robmills.me/" rel="nofollow">Rob Mills</a>						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>You're not kidding about it requiring discipline!  It can get so boring writing out all the unit tests for each possible factor.  Oh and if a bug is later discovered it's so tempting to just go fix it instead of first figuring out where your tests missed that bug and fix those first so that the bug never gets reintroduced.</p>
+<p>But as you said if you keep at it you can confidently say your code is solid.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc97412-788c-488a-ad72-251acbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Rob Mills: Yeah, when the bug is really simple then adding the test is annoying. However, if the bug is difficult to reproduce, the test suite makes it so easy to try out different ways to re-create the bug that it's heaven : ).</p>
+<p>Also about writing the test for each possible factor: TDD makes that a lot harder. This has caused me to write less flexible functions. That is, the input signature is well-defined and there is very little magic to handle weird input.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc97627-b7ac-4071-ba03-2b09cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=acab65d674375c233a783d1aad163528&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Oliver Beattie&nbsp;						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I'd be interested to know how much time you think it ultimately added or saved from your development time?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc978cc-1258-43f5-8c42-2b09cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e210d17f2a4203ee56771a0be5c560ec&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.wendtswelt.de" rel="nofollow">André Wendt</a>						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for the writeup, Felix. It's good to finally hear someone admit how hard TDD actually is, discipline-wise.</p>
+<p>It's also good to see that this article isn't too technical and thus restricted to the node.js domain. A lot of people with a tech background, esp. in the Ruby/JS communities, already know how important tests are. But we need to spread the love for other communities as well.</p>
+<p>I'm looking at you, PHP!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc98030-8c78-4c2a-9fd1-4070cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=32c37abe8570fd46e2f5e69b7a4d4c97&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://luebken.com" rel="nofollow">Matthias Luebkken</a>						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice post. Would love to hear about Node.JS unit testing.<br />
+BTW: Do you happen to be in Cologne sometime? Maybe you want to join a Cologne.JS meetup?</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc98087-f870-4335-9fcb-4070cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Oliver Beattie: I think it took as twice the time of writing the initial version, but in the few months we've been in production we have already re-gained that time in terms of not having to fix bugs, and fixing those that we do find very quickly. Of course adding new features means investing more time again, overall I thin it's a break-even with a more solid product as a result.</p>
+<p>André Wendt: We couldn't have done the same TDD with PHP. JavaScript makes testing just a lot easier.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc9962d-2e44-4d7e-b250-5247cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=39ec9c1a27e3f92ffba2be5c8ddd8ca1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dumas&nbsp;						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sometimes it seems that if you don't do TDD then you don't test at all!!!<br />
+Clearly thats not true, you can have the same test or even more without doing TDD. It would be interesting for all the people that practice TDD to explain why doing the test before is "better" than doing them after, assuming in both cases that you test your code. For a reason or other I rarely see this kind of explanations.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc99633-1f94-47f6-b038-4f6bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=12d4632653ffc3222131cea6b18fbdf2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://johanneslink.net" rel="nofollow">Johannes Link</a>						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>To paraphrase Kent Beck (I forgot where he writes that): "Every test you write is an investment and every test you leave out is a risk." Decide for yourself which risks you want to take and which investments are worthwhile.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc9968b-5188-4f5f-a3d1-5302cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=02d85d64c5438b0145464239a0905915&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							yachris&nbsp;						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Excellent post, matches a lot of our experience.  I too would love to hear about Node.JS unit testing... please write it up!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc996b1-dab4-40b0-aa93-5178cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=be7454bf6e317d8db7e8609a861f6382&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://geewax.org/" rel="nofollow">JJ Geewax</a>						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>It might be important to mention that going down the TDD route also encourages writing "testable code" which frequently seems to translate as "properly factored code".</p>
+<p>In some work I've been involved in, ignoring testing (both high-level and low-level) resulted in an untestable mess of *working* code that needed a significant overhaul to get to the point where we could write what you called a "system test". Even at that point, due to the amount of monkey patching and mocking it seemed like we wrote code, then mocked out everything, then tested our mocks, which was definitely far from ideal.</p>
+<p>The worst part was that we ended up relying on manual testing before every release because the work required to automated high-level tests was so enormous that it was more effective in the short-term to stick two people on QA-duty, which led to a big bottleneck for every single release.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc99822-3130-4b3d-b147-597dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=02d85d64c5438b0145464239a0905915&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							yachris&nbsp;						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Dumas -- it may be a purely psychological thing, but I find that writing the tests before is better.  First, it's mentally easier because I'm exploring functionality, and how the API will work by actually building the code which *uses* the stuff I'm building.  Interestingly, this often makes the API more sensible; this is what the "TDD is Test Driven *Design*" people are talking about, so I think that that's a real, not psychological, gain.  Again, psychologically, writing tests after is painful because of the "Hey, I've solved that problem, why go over it again?" thinking starts to creep in.  Another real gain is that I find I'm thinking more of what the various corner-cases are, as I'm developing the code; if I have a test framework already set up, it's nearly trivial to add a test that shows that case.  I've seen people writing about TDD say that they had a "WOW, I'm glad I thought of that case *now*!" revelation, and I can relate to some extent.  So it's a balance between some genuinely psychological things and some real things, that honestly may have a lot to do with how I think. YMMV.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc998db-78d8-4149-b35f-5983cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=688dbc14d8d8c19ebb3880f13be73f3f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.robmills.me/" rel="nofollow">Rob Mills</a>						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Dumas,</p>
+<p>For me writing the test before writing the code helps clarify exactly what my code should be doing.</p>
+<p>In the past when I've gone back to write test cases after writing the code there's a big temptation to look at what the code is doing and base the tests off of that which leaves a lot of room to leave out important tests.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc99dea-d434-487c-90f8-5087cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=39ec9c1a27e3f92ffba2be5c8ddd8ca1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Dumas&nbsp;						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>That's right Rob, for me this is central in TDD, the "when" you do the tests "guides" your Code. I always test my code, but I prefer coding a little and running a little test in the command line, a real test without mocks stub or anything, I like my code on-the-wild failing! I like the Red in Real life -not on production of course- Then after some reflection I can write a more rigid test. I like to play with my methods because doing them before prescribes a corset to my code I dont want to be unflexible in the creative part, what if I want to change parameters, signature or things like that? But thats for me, it could be different for other person, is irresponsible not to test, not not doing TDD.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc99e70-dc44-46b0-a6b7-5983cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ed8c14e8157081c610e61e26315da1ea&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.atomweaver.com" rel="nofollow">Rui Curado</a>						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I am not using the pure TDD principle, but I am applying a very effective  (but also somewhat heavy) regression testing approach to my new model-driven IDE, AtomWeaver (<a rel="nofollow" href="http://www.atomweaver.com">http://www.atomweaver.com</a> for the curious).</p>
+<p>Like you said, it ensures a minimum level of quality of the product before release. Because it exercises the application at the GUI level, it allows me to save hundreds of hours in human testing.</p>
+<p>And yes, it's a pain to write the test script, and most of the time I feel I'm wasting some time. That's why I spent even more time creating a generator for the test script (yes, you can generate a test script!). Today, the regressing test script has 100K lines, roughly 40% of the tested application's code base. And it still only tests basic things. Why such a large script? Because I test the app's *complete* run-time data set for compliance after each and every simulated user action. That results in a lot of lines, and slow execution (everything is logged).</p>
+<p>But at the end of the day, and everytime I run the test script and catch a bug, I say, "man, this regression testing thing is the best time investment I could have done!"....</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc9a99a-2474-4b5a-ba81-5983cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0b92d66020291977c8501fc88e41b72d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Murbulous Scind &nbsp;						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi, Felix,</p>
+<p>Thanks for the balanced article. It is a rarity.</p>
+<p>The only problem some people have with TDD is that it can deflect junior programmers from fundamentals, leaving them believing the TDD is fundamental when it's not; it's not even a means to an end, but it is a means to a means to an end.</p>
+<p>You wrote, "Our service is not necessarily better than our competitors' because we use TDD. However, our risk of breaking things is much smaller, and we can perform heart-surgeries like this without breaking a sweat."</p>
+<p>But your risk of breaking things is not much smaller because you use TDD: your risk of breaking things is much smaller because you have loosely-coupled your system.</p>
+<p>It's the loose-coupling that the benefit; loose-coupling is a means to creating software that's easy to change; TDD is just a means to promote loose-coupling.</p>
+<p>Note, also, that loose-coupling will not help you discover faults when you introduce new code, and neither will TDD: the tests themselves will show you when you've broken something, whether you wrote them before or after you write your code that fails. (I know you didn't claim otherwise, but this is another common misconception and I just wanted to get it off my chest.)</p>
+<p>So far I've only one, irrefutable fact about TDD: TDD guarantees that the code you haven't written yet doesn't exist.</p>
+<p>I can't argue with that.</p>
+<p>Regards,</p>
+<p>Murbo.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc9aabe-5b40-4e92-b6cd-5983cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f5d564387ee06511f15bf00d7558930c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Daniele Milan&nbsp;						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Really nice article!<br />
+I like the feeling that TDD gives of having some solid assumptions to build a software upon. I think that the discipline required for TDD is a price I'm willing to pay for, and the outcomes are really valuable.</br><br />
+TDD makes me sleep better at night ;)</br></p>
+<p>Loving to hear some details about node.js unit tests!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc9ae37-2ef0-43dd-a090-5cc9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f32f547e66f3b6528376d67fdb67008f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://beletsky.net" rel="nofollow">alexanderb</a>						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Briliant post!</p>
+<p>I like to use TDD and I know the power of it). Unfortunately TDD is not so well spreaded yet, many people really much tries to avoid it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc9b60a-db98-4cc8-8856-597ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=650677040bd93b1ea6827e84da208863&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://trix.pl" rel="nofollow">Jacek Becela</a>						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great post!</p>
+<p>For me TDD is mostly about insurance and confidence. I have similar thoughts:</p>
+<p>1. use high level tests and very low level tests, don't try to cover all the spectrum - high level tests are enough and unit tests will help you with the details.</p>
+<p>2. Try to cover most of code with as little test code as possible.</p>
+<p>I would love to read more about node.js testing best practices!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc9bf14-ff94-412d-b51a-597ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9675b58c477773fc57fb5abe83cdcae3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://PowersOfTwo.agileInstitute.com/" rel="nofollow">Rob Myers</a>						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>You've given us a great description of the discipline and value of TDD.</p>
+<p>"There is no reason to test all numbers...unless there is a logical reason for expecting a different result."</p>
+<p>This is one of the benefits that often stays hidden: When you use tests to guide every bit of changing behavior, you test every corner of the code in isolation.  You hit both sides of every boundary, and you break up any possible combinatorial effect into decoupled units of behavior.  The tests are then able to pinpoint problems without resorting to debugger-marathons, time-consuming end-to-end scenarios, or even test heuristics (e.g., pair-wise).</p>
+<p>You go on to point out the value of those overarching functional tests, and those same test heuristics: They provide targets for the developers.  Testers play an important role here, because they have the experience with such heuristics and (hopefully) a familiarity with the product and the team's potential blind-spots.  Acceptance-tests/story-tests/functional-tests need not test everything, but serve as examples and guides.  Testers need not spend all their time gaining coverage with these tests, because they know the unit tests will cover all angles.  Thus, they have more time for creative sessions of exploratory testing.</p>
+<p>Okay, now I'm starting to extrapolate from your facts.  That's how I see numerous teams blending these techniques successfully.  At the core: Disciplined TDD.  Don't you ultimately find it more rewarding than development without microtesting?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc9bfed-ed5c-4dcc-bc9d-5983cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5b36666d8a379e550096cbb29b8bc012&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://q-go.com" rel="nofollow">Tijn Porcelijn</a>						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice article!</p>
+<p>@Jacek Becela<br />
++1 Insightful</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc9dc04-d244-483b-96a5-1a3fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9675b58c477773fc57fb5abe83cdcae3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://PowersOfTwo.agileInstitute.com/" rel="nofollow">Rob Myers</a>						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>After reading some of the other comments, I was inspired to describe one of my experiences with TDD:</p>
+<p><a rel="nofollow" href="http://bit.ly/apFVxR">http://bit.ly/apFVxR</a> ("I Have Written Bug-Free Code Without TDD")</p>
+<p>Thanks again, Felix!</p>
+<p>Rob</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cc9decc-820c-4b24-9823-1a54cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a49c9108089506c8be5f5de754d695d0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							gphilip&nbsp;						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Totally interested in nodejs unit testing as well as nodejs web development in general.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cca0203-572c-41ce-93aa-4211cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5bed5c28883cb3ba13b8241b06144451&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							shaun&nbsp;						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>nice post. keep 'em coming.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cca022e-f860-45d8-ac58-4763cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=30cd2c0748d86f53245986c5dc8281bf&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Marco Rogers&nbsp;						</strong>
+						<strong>said 
+						on Oct 28, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is a pretty nice write up Felix.  As an outsider who's been trying to force myself into TDD, I've pretty much developed the same thoughts about pains and benefits. I would like to hear more about your process. For example, a few concrete questions:</p>
+<p>1) Mocking of objects is easy in js. But how do you do mocking of classes and functions?<br />
+2) How do you make sure your mocks stay in line with changes to the actual implementation?</br><br />
+3) Do you write tests for error handling? How do you approach that.</br></p>
+<p>As for the discipline part, that's easily the biggest barrier.  I write code at work and we don't have a TDD process. I want to get into it for my open source stuff.  But I have limited time.  Most of the time I can't convince myself to spend what little time I have writing more tests.  I guess you have to weight it against potential gain.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cca6e42-eaa8-4c8a-98e6-110dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ce04b463c8b75ca093ac37ebb2616ab6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Sebastian Fahrenkrog&nbsp;						</strong>
+						<strong>said 
+						on Oct 29, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nice article! I'm curious: how do you perform the visual diffs on images? Did you use the Libpuzzle Extension for the diffs?</p>
+<p>Regards,<br />
+Sebastian</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ccd5cfa-f8c4-4a74-9e87-16b2cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6fd5b06afa330ac57065bd83844719c3&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://twitter.com/botanicus" rel="nofollow">Jakub Stastny aka Botanicus</a>						</strong>
+						<strong>said 
+						on Oct 31, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wow, this is just the best post about TDD I've ever seen, thank you Felix! I'm primarily a Ruby developer and unfortunately Ruby community is bunch of TDD fanatics (even though most of them doesn't actually have a bloody idea how to write good tests). In Ruby if you don't love TDD and don't write tests first, then you're weird or you very likely don't even get the job or contract. Really, it's ridiculous. I completely agree with your point of view, kudos for being objective about it! Debuggable is becoming one of my most favourite blogs BTW :)</p>
+<p>Oh BTW I wrote a tiny BDD framework for Node.js, based on already existing assert library from Node.js itself etc, you might want to check it: <a rel="nofollow" href="http://github.com/botanicus/minitest.js">http://github.com/botanicus/minitest.js</a> It's created with async testing in mind, so you have to call test.finish() manually in order to check that the test really finished - in case we'd have some assertions in callback and the callback wouldn't be called at all. Everything's described in its README.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cd19196-7f74-4040-8fe8-14e3cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=022e1ac79e7186ee6ef38c3916388aa0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.rezzz.com" rel="nofollow">Jason</a>						</strong>
+						<strong>said 
+						on Nov 03, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I've been learning Rails now for the better part of a half a year and TDD is a big part of it.  What I've found out is that with my background of PHP and Java, I've mostly not used that method of development and with TDD, I seem to spend most of my time writing tests, more than anything else :).  Which sucks, but I totally see the benefits to it.  </p>
+<p>I'm a freelancer, as well as bootstrapping a company, so time and resources are limited.  I've found it TDD to be useful for certain apps and not so much needed for others.  I'm sure everyone would agree on that.  This has been a great article though and I was going to write up a similar one, in my spare time :).  Thanks so much</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cd77d76-a420-49c2-a0c9-0f38cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4ab185c23be3076c02c2b7b7f48062d1&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://chr.ishenry.com" rel="nofollow">Chris Henry</a>						</strong>
+						<strong>said 
+						on Nov 08, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for an even-handed assessment of TDD.  It seems like your team made a decision that makes a lot of sense, while being completely pragmatic about the tradeoffs.  I've found that too many people who push TDD are completely unrealistic about the time costs when taken in context.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4cda0cd6-a40c-4044-b9ed-2d22cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b04afc8f39b3ee24b2e8c9e07efdc107&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Diego Pereira&nbsp;						</strong>
+						<strong>said 
+						on Nov 10, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thank you for writing this. The first two paragraphs expressed the exact feelings I was trying to communicate whenever talking about TDD to someone new to its practice, but couldn't find the correct way to put it into perspective. </p>
+<p>Kudos to you.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ce6b176-8d44-4db3-9709-4ab1cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7bfd7f57a1ada2b34eef98750b3864df&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Hendrik&nbsp;						</strong>
+						<strong>said 
+						on Nov 19, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>One thing I am curious about, which doesn't seem to have been mentioned in the article and the comments so far, is your choice of the test framework.</p>
+<p>Seeing that there are several test frameworks available for node.js, such as expresso and vows, what made you decide to use a custom solution?<br />
+Preventing dependencies on external libraries? Easier to adjust the tests to suit your needs?</br></p>
+<p>I'm just curious, as I am currently looking into the available options myself and it seems a lot of the node libraries are using their own custom solution instead of one of the available frameworks.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4ce6b591-5f4c-46e5-94c3-705dcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Nov 19, 2010:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hendrik: We are actually using node-gently which I've written: <a rel="nofollow" href="http://github.com/felixge/node-gently">http://github.com/felixge/node-gently</a></p>
+<p>I would not recommend it at this point, as I'm in the process of coming up with a more comprehensive module. That being said, I have used it for pretty much everything we do with transloadit, so it's certainly working. However, it only covers the very basics of stubbing a method and returning fake results for test purposes.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

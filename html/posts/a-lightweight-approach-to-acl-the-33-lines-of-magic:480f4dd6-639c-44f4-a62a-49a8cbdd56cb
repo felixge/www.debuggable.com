@@ -1,0 +1,1069 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>A lightweight approach to ACL - The 33 lines of Magic &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/a-lightweight-approach-to-acl-the-33-lines-of-magic:480f4dd6-639c-44f4-a62a-49a8cbdd56cb">A lightweight approach to ACL - The 33 lines of Magic</a></h2>	<div class="posted-on">
+		<p>Posted on 3/10/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Ok, I just finished a terrible (extended) weekend that featured 12 hours of CSS coding. The only reason I didn't loose my sanity was that I finally decided to figure out <a href="http://www.positioniseverything.net/explorer.html">what the heck is wrong with IE</a>. Those of you who have to do get their hands dirty in the field of graphics, css, and other non-php work from time to time as well, make sure to check out <a href="http://www.positioniseverything.net/">Position is Everything</a> at some point, it really <a href="http://www.positioniseverything.net/articles/onetruelayout/">helped me out quite a bit</a> so far.</p>
+<p>Anyway, that's not really what I want to talk about today. One of the topics I have been very silent about for months is ACL. At the end of May <a href="http://www.thinkingphp.org/2006/05/31/cakephp-and-acl-why-is-it-so-difficult/">I was somewhat unhappy</a> with some of the things regarding the CakePHP DB ACL implementation. And it wasn't until last week that I finally decided to implement some basic rights management in one of my applications again. So since I didn't want to bother to frustrate myself with Cake's ACL again, I started to roll my own solution. While I was happily hacking away at some code, I suddenly realized that there were a lot of familarities between the code I was writing and the way ACL was working. A couple minutes later and I was already convinced that I basically had created 33 lines of code giving me pretty much all the flexibility CakePHP's well over 500 lines would ever give me.</p>
+<p>But let me go a step back and explain my initial idea. My basic plan was to have a User belongsTo Group relationship and that each group entry in my database would have a field listing the controller actions the members of this group would be allowed to access. When helping another company to get their CakePHP based CMS done before the deadline I saw them using a Controller:action style syntax to do this which I liked. I modified it a little bit and came up with a Syntax like this:</p>
+<pre style="background-color: #eee">Posts:index,Posts:view,Posts:admin_edit,Articles:index,...</pre>
+<p>But since I felt it was too much work to type in all Controller actions for the admin account I decided to create some wildchar functionality:</p>
+<pre style="background-color: #eee">Posts:*,Articles:*</pre>
+<p>or even shorter:</p>
+<pre style="background-color: #eee">*:*</pre>
+<p>But since I wanted the visitors of the page to be able to use any Controller action besides the ones starting with 'admin_', I had to add negative statements as well:</p>
+<pre style="background-color: #eee">*:*,!*:admin_*</pre>
+<p>That's when I realized, wait, that's essentially the same thing as ACL. You start with some basic statement like DENY or ALLOW ALL at the beginning and then go down the tree (or the string) for the specific rules. All rules farther to the right in the ACL string will overwrite the ones farther left. So if you start out by saying Posts:* but add a !Posts:secret somewhere down the road, it means the group can access all Posts actions besides 'secret'. Or a little more creative set of rules could look like this:</p>
+<pre style="background-color: #eee">*:*,!*:admin_*,*:admin_index</pre>
+<p>But since I wanted even more control, I decided to add an ACL string to my user table as well so I could make exceptions on a per-user basis, even if all users belong to the same group. The basic logic I used for that was to first check the access the User group had to a certain action, and then use this value as the default value for the user-specific check. That means if the group says yes and the user has no rule matching the current Controller:action, he's allowed to request it. But if he has a matching rule, this rule is used to determine the outcome regardless of the group's permission.</p>
+<p>Ok, at this point I've got to disappoint you guys a little bit. I'm not quite ready to release my SimpleAuth / SimpleAcl class I'm using right now quite yet. The reason for this is that there is a very cool Security class coming with Cake 1.2 and I really want to make use of it as well. If you  want the code anyway, I'll put it in Cake bin - it's fully documented and should be ready to go, but I won't be able to give you much suppport on it. But what I'll give you, are the 33 lines of Magic code I was talking about, the ones taking apart a given set of $rules in order to determine if an $object is allowed to access a certain $property:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="kw2">function</span> requestAllowed<span class="br0">&#40;</span><span class="re0">$object</span>, <span class="re0">$property</span>, <span class="re0">$rules</span>, <span class="re0">$default</span> = <span class="kw2">false</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; &nbsp; <span class="co1">// The default value to return if no rule matching $object/$property can be found</span><br />
+&nbsp; &nbsp; <span class="re0">$allowed</span> = <span class="re0">$default</span>;<br />
+&nbsp; &nbsp; <br />
+&nbsp; &nbsp; <span class="co1">// This Regex converts a string of rules like &quot;objectA:actionA,objectB:actionB,...&quot; into the array $matches.</span><br />
+&nbsp; &nbsp; <a href="http://www.php.net/preg_match_all"><span class="kw3">preg_match_all</span></a><span class="br0">&#40;</span><span class="st0">'/([^:,]+):([^,:]+)/is'</span>, <span class="re0">$rules</span>, <span class="re0">$matches</span>, PREG_SET_ORDER<span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; <span class="kw1">foreach</span> <span class="br0">&#40;</span><span class="re0">$matches</span> <span class="kw1">as</span> <span class="re0">$match</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/list"><span class="kw3">list</span></a><span class="br0">&#40;</span><span class="re0">$rawMatch</span>, <span class="re0">$allowedObject</span>, <span class="re0">$allowedProperty</span><span class="br0">&#41;</span> = <span class="re0">$match</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$allowedObject</span> = <a href="http://www.php.net/str_replace"><span class="kw3">str_replace</span></a><span class="br0">&#40;</span><span class="st0">'*'</span>, <span class="st0">'.*'</span>, <span class="re0">$allowedObject</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$allowedProperty</span> = <a href="http://www.php.net/str_replace"><span class="kw3">str_replace</span></a><span class="br0">&#40;</span><span class="st0">'*'</span>, <span class="st0">'.*'</span>, <span class="re0">$allowedProperty</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/substr"><span class="kw3">substr</span></a><span class="br0">&#40;</span><span class="re0">$allowedObject</span>, <span class="nu0">0</span>, <span class="nu0">1</span><span class="br0">&#41;</span>==<span class="st0">'!'</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$allowedObject</span> = <a href="http://www.php.net/substr"><span class="kw3">substr</span></a><span class="br0">&#40;</span><span class="re0">$allowedObject</span>, <span class="nu0">1</span><span class="br0">&#41;</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$negativeCondition</span> = <span class="kw2">true</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span> <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$negativeCondition</span> = <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><a href="http://www.php.net/preg_match"><span class="kw3">preg_match</span></a><span class="br0">&#40;</span><span class="st0">'/^'</span>.<span class="re0">$allowedObject</span>.<span class="st0">'$/i'</span>, <span class="re0">$object</span><span class="br0">&#41;</span> &amp;&amp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.php.net/preg_match"><span class="kw3">preg_match</span></a><span class="br0">&#40;</span><span class="st0">'/^'</span>.<span class="re0">$allowedProperty</span>.<span class="st0">'$/i'</span>, <span class="re0">$property</span><span class="br0">&#41;</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#123;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">&#40;</span><span class="re0">$negativeCondition</span><span class="br0">&#41;</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$allowed</span> = <span class="kw2">false</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">else</span> <br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="re0">$allowed</span> = <span class="kw2">true</span>;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">&#125;</span><br />
+&nbsp; &nbsp; <span class="br0">&#125;</span> &nbsp; &nbsp; &nbsp; &nbsp;<br />
+&nbsp; &nbsp; <span class="kw1">return</span> <span class="re0">$allowed</span>;<br />
+<span class="br0">&#125;</span></div>
+<p>As you see, this is not specific to Controller actions. This can be used to control access on any kind of objects like Models, or other things. If you are familiar with CakePHP's ACL, you'll know there is nothing this does that CakePHP couldn't do. But what really makes me happy about this solution is the simplicity behind it. You don't have to really study ACL to grasp how it works, neither to you have to get into <a href="http://www.sitepoint.com/article/hierarchical-data-database/2">Modified Preorder Tree Traversal</a> nor do you have to plan complicated Model-Aro-Aco relationships. You simply add a field called 'rules' to the Model (table) you want to control access on, and use the function to perform your security checks.</p>
+<p>Some of you might point out performance issues, or the fact that the rights field shouldn't really be mixed in with the other Model fields. Heck, even all the rules should be seperate entries if you want to go for really high database normalization. But that's not what this solution is about, this solution is about simplicity. It's about being able to grasp the entire security concept in less then 5 minutes, avoiding all the dangerous complexity people usally tend to bring into this field. If you want to optimize, normalize or add more complexity in general, feel free to do so and let me know about the outcome ; ). But I think this is going for what most of us Baker's need in our daily kitchen work.</p>
+<p>So, write a comment if you like this approach or if you see some issue with it, so I can make a fix before releasing the Auth/Acl bundle of 2 drop-in components at some point soon.</p>
+<p>--Felix Geisendörfer aka the_undefined</p>
+<p>PS: I got my car back this weekend, so <a href="http://www.thinkingphp.org/2006/09/23/alright-i-lost/">the long promised cake party</a> should be happening this week for sure! Which reminds me, Thursday is my birthday, so maybe I don't even have to buy the cake myself ; ).<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd6-639c-44f4-a62a-49a8cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-lightweight-approach-to-acl-the-33-lines-of-magic%3A480f4dd6-639c-44f4-a62a-49a8cbdd56cb &amp;title=A+lightweight+approach+to+ACL+-+The+33+lines+of+Magic';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-lightweight-approach-to-acl-the-33-lines-of-magic%3A480f4dd6-639c-44f4-a62a-49a8cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-lightweight-approach-to-acl-the-33-lines-of-magic%3A480f4dd6-639c-44f4-a62a-49a8cbdd56cb&amp;title=A+lightweight+approach+to+ACL+-+The+33+lines+of+Magic&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fa-lightweight-approach-to-acl-the-33-lines-of-magic%3A480f4dd6-639c-44f4-a62a-49a8cbdd56cb&amp;title=A+lightweight+approach+to+ACL+-+The+33+lines+of+Magic';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/a-lightweight-approach-to-acl-the-33-lines-of-magic:480f4dd6-639c-44f4-a62a-49a8cbdd56cb">47 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/a-lightweight-approach-to-acl-the-33-lines-of-magic:480f4dd6-639c-44f4-a62a-49a8cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4ddf-15d0-4172-aaac-41d9cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2fe2fdb874207758ed6535f8b9828e3f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://scotfl.ca" rel="nofollow">scott lewis</a>						</strong>
+						<strong>said 
+						on Oct 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wow, just yesterday I wrote my own ACL implementation. Great minds think alike and fools seldom differ. :)</p>
+<p>I went with the Cake infrastructure and built it around the Acl::check() functiionality. The main point of mine is that I used a JSON file to store the permissions. Which gives me the convenience of the file-based system, along with the (aro, aco, aco_action) tuple that Cake's Db ACL supports, but its INI ACL doesn't.</p>
+<p>I'm planning on cleaning it up and publishing it next week, but if anybody's interested, here's the documentation blurb at the top of the acl.json.php file. Note the wildcards. ;)</p>
+<p>#  acl.json.php - JSON CakePHP ACL Configuration<br />
+#  ---------------------------------------------------------------------</br><br />
+#  Use this file to specify user permissions.</br><br />
+#  aco = access control object (something in your application)</br><br />
+#  aro = access request object (something requesting access)</br><br />
+#</br><br />
+#  All lines starting with '#' will be ignored.</br><br />
+#</br><br />
+#</br><br />
+#  ARO records are added as follows:</br><br />
+#</br><br />
+#  'uid': {</br><br />
+#     'groups': [ 'group1', 'group2', 'group3' ],</br><br />
+#     'allow': {</br><br />
+#        'aco1': '*',</br><br />
+#        'aco2': [ 'action1', 'action2', 'action3' ]</br><br />
+#     },</br><br />
+#     'deny': {</br><br />
+#        'aco1': 'action4',</br><br />
+#        'aco3': '*'</br><br />
+#     }</br><br />
+#  }</br><br />
+#</br><br />
+#</br><br />
+#  ARO Group records are added in a similar manner:</br><br />
+#</br><br />
+#  'group': {</br><br />
+#     'allow': {</br><br />
+#        'aco1': '*',</br><br />
+#        'aco2': [ 'action1', 'action2', 'action3' ]</br><br />
+#     },</br><br />
+#     'deny': {</br><br />
+#        'aco1': [ 'action4', 'action5', 'action6' ],</br><br />
+#        'aco3': '*'</br><br />
+#     }</br><br />
+#  }</br><br />
+#</br><br />
+#</br><br />
+#  The allow, deny, and groups sections are all optional.</br><br />
+#  NOTE: groups names MUST NOT be the same as usernames.</br><br />
+#</br><br />
+#  ACL permissions are checked in the following order:</br><br />
+#  1. Check for user denies (and DENY if specified)</br><br />
+#  2. Check for user allows (and ALLOW if specified)</br><br />
+#  3. Gather user's groups</br><br />
+#  4. Check group denies (and DENY if specified)</br><br />
+#  5. Check group allows (and ALLOW if specified)</br><br />
+#  6. If no aro, aco, or group information is found, DENY</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-6410-4dbf-8d61-4783cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4a1e7ccf9ec98a3d31548bc415e138a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://omnibuscreative.com" rel="nofollow">Ben Hirsch</a>						</strong>
+						<strong>said 
+						on Oct 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Funny, I've been reading this site regularly and realizing I agree with you on a lot of points and theories and it turns out we have the same birthday. Go figure.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-595c-4b4d-896d-4eefcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ben: That's awesome, let's have a big party, where do you live? ; ).</p>
+<p>Scott: Huh, JSON? Didn't know that was used for anything but AJA(X), but as long as it does the job ^^.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-6d6c-46c5-9e93-42d6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2fe2fdb874207758ed6535f8b9828e3f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://scotfl.ca" rel="nofollow">scott lewis</a>						</strong>
+						<strong>said 
+						on Oct 04, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well, JSON is a nice, clear format. I was originally going to use YAML, but while monkeying around with the layout of the file, I realized that all I needed were strings, arrays and dictionaries. So there was no point in adding a YAML parser to the projects when I could get those from JSON, a parser for which the project already had. :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddc-a838-4d11-ac89-4383cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4a1e7ccf9ec98a3d31548bc415e138a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://omnibuscreative.com" rel="nofollow">ben hirsch</a>						</strong>
+						<strong>said 
+						on Oct 04, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Huntington, NY. Where are you?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-f800-4c48-8758-43f1cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 04, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>scott: I see.</p>
+<p>Ben: Zwickau, Germany. Seems like one of us gotta get on a plane tomorrow ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-17a0-4a1d-83d0-4ebccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6cacda6f9cdac54d60f51d6190631fd8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Nao&nbsp;						</strong>
+						<strong>said 
+						on Oct 04, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I want the code anyway! :) Can you put it in Cake bin, plz?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddd-40c8-4881-8d9c-4d8ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4a1e7ccf9ec98a3d31548bc415e138a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://omnibuscreative.com" rel="nofollow">Ben Hirsch</a>						</strong>
+						<strong>said 
+						on Oct 04, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>oh well.. :) I thought you were studying in the states... ha!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddd-d684-4665-b78b-437ecbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 04, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Nao: Here you go: http://cakephp.org/pastes/show/b7c9f9545f91a858ef2fa859a05f1324 . But again, I can only give you limited support on this right now. If you don't understand how to implement I can help you, but other then that you'll be on your own ; ).</p>
+<p>Ben: I wish I was ... But I'm still in German high school and I don't think I'll be able to afford studying in the states since it's a lot more expensive for foreigners for some reason. And college is pretty much for free in Germany, so it wouldn't make sense to take out a lone or something.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-6940-4f5b-8ef2-4823cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2a7beefdd99589c42333579124967fc2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.noswad.me.uk" rel="nofollow">AD7six</a>						</strong>
+						<strong>said 
+						on Oct 04, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>About 3 weeks ago I started writing a blog on the topic of ACL and when I read your post I thought I should get around to finishing it off :). The approach mentioned here seems fine although administering it may be cumbersome - what happens if a user has more rules than will fit in the relavent field? It's never a good idea to try and store n results in a string field (IMO).</p>
+<p>Anyway for contrast, for the past couple of months I have been getting down and dirty with the cake DB ACL solution and kicking back a couple of fixes (I hope they saved Nate a bit of time), the long and the short is that in doing so I converted my previous 'how to apply ACL to websites' thoughts into 'how to /easily/ use the cake db acl solution'. There seem to be changes afoot in v1.2 as there is a new class related to actions (https://trac.cakephp.org/browser/branches/1.2.x.x/cake/libs/controller/components/dbacl/models/acoaction.php) so it's possible that, as with much of my past efforts, it may require some rework or be obsolete some time in the future.</p>
+<p>Anyway enough preambling the article is here: http://www.noswad.me.uk/MiBlog/ACLPart1</p>
+<p>I'd welcome comments,</p>
+<p>Cheers,</p>
+<p>AD7six</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-1d0c-41ed-bd5c-4bdfcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 04, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Ad7six: I agree, technically spoken it's not a 'good' idea to put n items in one string field. However, depending on what you are trying to do, it's very convenient! To me, this is a human-readable ACL format. MPTT is not. If you build a nice Admin interface where you list all Controllers / Actions (can be done using php's class inspection functions), and explain the user how to use wildchars, this can work out nicely. But if you got the time to build this big tower of logic & interface goodies aimed at providing rights management to users you wouldn't trust to spell the word 'security', then you'll probably need some more code ; ). This inspires me, I'll do a blog post on this topic right now ... *g*.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-1ce4-433d-8138-48e5cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=2a7beefdd99589c42333579124967fc2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.noswad.me.uk" rel="nofollow">AD7six</a>						</strong>
+						<strong>said 
+						on Oct 04, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>&gt;&gt; If you build a nice Admin interface where you list all Controllers / Actions</p>
+<p>That is exactly the topic of the next blog of mine on the topic - including a demo.</p>
+<p>The code was based on ACM, but is almost completely rewritten to be easier to use and edit (if editing is required). Within the realm of what the cake db acl can do - it allows you to define anything and everything via the gui. Anyway - more on that when it's ready for public viewing.</p>
+<p>Cheers,</p>
+<p>AD7six</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddf-6950-472b-854c-4f17cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e7ec2e6e9a72b31c5115a11658525c10&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Brandon P&nbsp;						</strong>
+						<strong>said 
+						on Oct 04, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>As usual ... the genious inside of you emerges!</p>
+<p>The methodolgy that I have adopted for naming methods within my controllers are based on the 3 "basic" types of users on a system.</p>
+<p>1. Guests<br />
+2. Members</br><br />
+3. Admins</br></p>
+<p>So my conventions for naming methods follow:</p>
+<p>admin_* - Admin methods (admin_edit, admin_delete, etc)<br />
+member_* - Member methods (member_index, member_search, etc)</br><br />
+* - Guest methods (index, search, etc)</br></p>
+<p>The 3 definition ...</p>
+<p>Admin Group (*:*)<br />
+Member Group (*:*,!*:admin_*)</br><br />
+Guest Group (*:*,!*:admin_*,!*:member_*)</br></p>
+<p>cover 99.9% of my permissions!!!</p>
+<p>Also, with my hack (https://trac.cakephp.org/ticket/1143) the routes are setup easily:</p>
+<p>$Route-&gt;connect ('/account/:controller/:action/*', array ('prepend_action'=&gt;'member_'));<br />
+$Route-&gt;connect ('/admin/:controller/:action/*', array ('prepend_action'=&gt;'admin_'));</br></p>
+<p>Great work! GREAT work!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddd-8e34-4877-8b33-4551cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=86fdb79bc6f3137c679711149ad3fc57&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Philip&nbsp;						</strong>
+						<strong>said 
+						on Oct 04, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks Felix, this looks understandable, even to me. I wonder though, if you could but your most logical brain power to the one small piece of the acl jigsaw that always seems to be ommitted - that is data access control (rather than function access control). i.e. a generic way of giving (say) an admin access to administrate a subset of data?</p>
+<p>I have struggled to design anything that implements both aspects of acl in a simple manner...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddd-9f40-41ce-a30e-4c60cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Oct 05, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Brandon: I'm glad to see this work out so nicely for you ; ). But, instead of hacking the dispatcher I would recommend to manipulate the $_GET['url'] string in bootstrap.php. Or do you have a specific reason for not doing that?</p>
+<p>Philip: Well let's say you want to control rights on every individual Post of your posts table. You could do that by simply adding a field called user_rights to the table and then filling it with user_id:action rules. When retrieving a Post from the table you could use the requestAllowed function from above to check if let's say User 5 is allowed to perform 'edit' on the Post or not. Or do you mean something different?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-e2ec-47ed-b4a3-463bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=86fdb79bc6f3137c679711149ad3fc57&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Philip&nbsp;						</strong>
+						<strong>said 
+						on Oct 29, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sorry for the tardy response - I've been away.  I see where you're heading, but I like the idea of seperating acl from the data model. </p>
+<p>If we stick with a psuedo Blog/CSM model, you'll see how quickly the acl 'mess' can grow once you try to partition the dataset. In our hypothetical CMS, it is divided into Sections. Each Section is transparent to a reader, but autonomous on the admin side. i.e. all categories, tags, posts etc are 'owned' by a section administrator and their contributors. This means the admin of one section cannot create, update or delete the entities 'owned' by other logical sections of the CMS. They may be able to assign other section's categories to their posts if the category owning section id a parent (I forgot to say that sections can be hierarchical :) The same applies to tags, posts, uploads, downloads etc.</p>
+<p>I have come across this type of acl scenario so many times and each time I end up with a bit of a furball implementation... usually more on the maintenance side of acl than the 'run time' side.</p>
+<p>I'm sure there is a generic way to approach this, but I've yet to work it out. In my head I see it as another 'layer' beneath the standard acl model (like yours) where when you you assign the group to an action you also specify a data set ID (in this example a section ID) but that doesn't automatically take care of the section hierarchy :)</p>
+<p>Philip</p>
+<p>P.S. Congrats on making it into the Cake contrib team.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de2-1c7c-4191-9855-4106cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2006/11/18/include-only-the-js-you-really-need/" rel="nofollow">ThinkingPHP and beyond &raquo; Include only the JS you really ne</a>						</strong>
+						<strong>said 
+						on Nov 18, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] So if up to know you've always included all JS for every page load, this might help to reduce bandwidth usage for both you, and the users of your application. I know this is not the most advanced solution one could come up with. I thought about using my light weight ACL algorythm for the problem. But then I decided that it's too simple a problem for that kind of bloat. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-abf0-4139-bc06-4aaccbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 31, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>A kind soul has just informed me that the Cake bin link to my SimpleAcl/SimpleAuth component above has expired, so I reposted the code:</p>
+<p>SimpleAclComponent: http://bin.cakephp.org/view/461496756<br />
+SimpleAuthComponent: http://bin.cakephp.org/view/1099483994</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de8-a2bc-4ad8-bcd2-4626cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=52d6d1f510025c43edb1b9d19f40b055&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dieter.plaetinck.be" rel="nofollow">Dieter@be</a>						</strong>
+						<strong>said 
+						on Apr 12, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>This is something really nice :-)</p>
+<p>Btw instead of substr($allowedObject, 0, 1) you could do $allowedObject{0}.<br />
+This method is even explained on php's <a href="http://be.php.net/manual/en/function.substr.php" rel="nofollow">substr page</a>.</br></p>
+<p>Keep on baking!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de8-6be8-47b6-be9e-40c2cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Dieter: Nice trick. It's amazing how I still learn stuff about PHP after all this years every once in a while ; ). Thanks a lot.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de8-e740-4883-bf0a-466ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=157b92b717ac7624465333d9ce3315cc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							TM&nbsp;						</strong>
+						<strong>said 
+						on Apr 25, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great component.  A real life saver.  For any other rookies like myself having trouble putting it to use make sure you have have the following:</p>
+<p>Groups table - must have a column named 'controller_acl'  (rules go here)<br />
+Users table - must have a column named 'controller_acl'</br></p>
+<p>You must include the User and Group models in each controller to be restricted</p>
+<p>class CommentsController extends AppController {<br />
+	var $name = 'Comments';</br><br />
+	var $uses = array('Comment','User','Group');</br><br />
+	var $components = array('SimpleAuth','SimpleAcl');</br></p>
+<p>You'll need to create login/logout functions in a controller of your choice (User).  The basic example in the Cake manual works for a start.<br />
+http://manual.cakephp.org/appendix/simple_user_auth</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de8-d648-497b-b98a-40b8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b733ef8b89cd901f8f6e21edbbf1c95b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							azzis&nbsp;						</strong>
+						<strong>said 
+						on Apr 26, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Can you write an example how to use your components?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de8-d4f4-4b05-ac86-4832cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Apr 26, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Azzis: Not right now, sry : /. I'll make a post if I find some time to do so.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de8-3b64-4956-8647-427ecbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b733ef8b89cd901f8f6e21edbbf1c95b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							azzis&nbsp;						</strong>
+						<strong>said 
+						on Apr 26, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Don't warry... i see your code and understand how component working.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-b6b0-4b86-b34e-400fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9ca5b21de15377ed1e13ce6c2380b20e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							jp09&nbsp;						</strong>
+						<strong>said 
+						on May 29, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Is there a sample code out? Still a newbie but I'm really interested in implementing ACL on my project site.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-cb2c-425f-8f61-4abbcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 29, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>jp09:</p>
+<p>Yeah, but it's experimental:</p>
+<p>SimpleAclComponent: http://bin.cakephp.org/view/461496756<br />
+SimpleAuthComponent: http://bin.cakephp.org/view/1099483994</br></p>
+<p>However, addons.mozillla.org seems to be using the code successfully so it can't be all that bad : P.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-32a8-4f37-8aea-4259cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9ca5b21de15377ed1e13ce6c2380b20e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							jp09&nbsp;						</strong>
+						<strong>said 
+						on May 30, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks Felix.</p>
+<p>Is there an example out there that uses your components? It would be great if there is. =)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dea-1168-42f1-9469-4fffcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on May 30, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>jp09: http://svn.mozilla.org/addons/trunk/site/app/</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-c304-4e5f-a85c-4e43cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9ca5b21de15377ed1e13ce6c2380b20e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							jp09&nbsp;						</strong>
+						<strong>said 
+						on Jun 08, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks Felix.</p>
+<p>I've only been able to get the code. Which files should I pay attention to if I just want to use ACL only? Sorry. Real noob here. =)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-7bfc-487f-9a2a-4cebcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 08, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>jp09: /app/components/simple_acl.php + /app/components/simple_auth.php + / app/app_controller.php.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-b064-49ff-83ca-4549cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=52d6d1f510025c43edb1b9d19f40b055&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://dieter.plaetinck.be" rel="nofollow">Dieter_be</a>						</strong>
+						<strong>said 
+						on Jun 09, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Another slight improvement for your code Felix:</p>
+<p>You can replace this:<br />
+if ($negativeCondition)       $allowed = false;</br><br />
+ else        $allowed = true;</br></p>
+<p>with this: $allowed = !$negativeCondition;</p>
+<p>PS: for those who do not yet know, I used Felix' access control logic for my masters thesis.<br />
+<a href="http://dieter.plaetinck.be/masterproef" rel="nofollow">On this page</a> you can download the full report.  It's in dutch however, but maybe it proves useful for somebody.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-b3fc-4cfa-9bde-430bcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4a42c8a79b3b4dbf63bdc4163b5370bc&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							benedict&nbsp;						</strong>
+						<strong>said 
+						on Jun 12, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi! Is there a simple example using simple_auth and simple_acl? I'm having a hard time with the one on http://svn.mozilla.org/addons/trunk/site/app/</p>
+<p>Thanks!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-1ef8-463d-b107-45bbcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 12, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>benedict: Not at this point - no. Sorry : /.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-fed4-4f90-926f-4598cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9ca5b21de15377ed1e13ce6c2380b20e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							jp09&nbsp;						</strong>
+						<strong>said 
+						on Jun 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>One more thing, what sample data can the users, groups and groups_users contain?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-7f6c-4d42-b740-4058cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>jp09: Not sure if I understand your question.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-6cdc-480b-ac2a-462acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9ca5b21de15377ed1e13ce6c2380b20e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							jp09&nbsp;						</strong>
+						<strong>said 
+						on Jun 13, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix: The rules should be on the groups table right? What will the groups_users table contain? Also on the users table, there won't be any data that the components need(aside from the id)?</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4deb-12c0-42a8-b6ce-4b58cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jun 17, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>jp09: You are free to set this up just like you need it. The method represented here is a generic way to define a list of object:property access rules and it's up to you to determine what they refer to and where to store them. So put them wherever it makes most sense to you ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-93e4-4859-9594-4b70cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://digitalhazard.wordpress.com/2007/07/01/cakephp-google-groups/" rel="nofollow">Digital Hazard</a>						</strong>
+						<strong>said 
+						on Jul 01, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p><strong>CakePHP | Google Groups...</strong></p>
+<p>Trước kia, tôi thường chỉ biết đến việc trao đổi, thảo luận trong forum mà ít khi ngó ngàng đến Google groups hay Yahoo! groups. Phải đến khi bắt tay vào tìm hiểu CakePHP, tôi mới nhận ra: Google Groups là...</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-d8cc-4c9c-98e1-4c66cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=08bafcac61914b387d9f4d12aa33688c&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							einstein&nbsp;						</strong>
+						<strong>said 
+						on Mar 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>code igniter, try it is much better</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df8-d040-408b-83f0-4d7fcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Mar 29, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>einstein: I especially like the "PR" they are using to prove themselves ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48685ede-8014-404f-b8f1-2e724834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8377d216a84f524199cee85b28430c4e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Christopher Vrooman&nbsp;						</strong>
+						<strong>said 
+						on Jun 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hello,<br />
+  First of all, thanks for publishing such a slick pair of components. I got them working, except for one small bump. Each time I login for the first time, I get the following error in simple_auth.php: </br></p>
+<p>  Fatal error: Call to a member function findById() on a non-object </p>
+<p>Which is related to the line: </p>
+<p>  $user = $this->Controller->{$this->userModel}->findById($id);</p>
+<p>After I reload the page, all is well and I get where I want to go and as I navigate the the error does not appear again; however, with debug = 0; all I get is a blank page which is obviously undesirable. </p>
+<p>I tried var_dump($this->Controller->{$this->userModel}) and it presents me with what looks like a valid User controller object. But obviously PHP isn't buying it.</p>
+<p>Any suggestions?</p>
+<p>Thanks in advance,<br />
+  Christopher.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48685f68-b718-4ffc-a8ff-46064834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8377d216a84f524199cee85b28430c4e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Christopher Vrooman&nbsp;						</strong>
+						<strong>said 
+						on Jun 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Whoops, </p>
+<p>  I forgot to add that I'm using Cake v1.2.0.7296-rc2<br />
+-Christopher.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48689236-860c-4939-80a0-4fbd4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8377d216a84f524199cee85b28430c4e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Christopher Vrooman&nbsp;						</strong>
+						<strong>said 
+						on Jun 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Looks like I found the problem... </p>
+<p>I had to set </p>
+<p>  $this->Auth->autoRedirect = false; </p>
+<p>in my app_controller.php beforeFilter() function to enable me to do a </p>
+<p>  $this->SimpleAuth->setActiveUser($this->Auth->user('id'), true);</p>
+<p>before redirecting to my Admin start page.</p>
+<p>And it wouldn't hurt to put a:</p>
+<p>      $this->SimpleAuth->setActiveUser(null, true);</p>
+<p>in the logout function to reset the activeUser to it's default.</p>
+<p>Another thing somebody might find useful is this:<br />
+I was unable to access SimpleAcl from a template file (unlike the mozilla addon site using v1.1 where they just used $this->controller->SimpleAcl->setActiveUser(...), so I did the following:</br></p>
+<p>in the beforeRender() function of app_controller.php, I have:</p>
+<p>      if ($this->Auth->user())<br />
+      {</br><br />
+          $this->set('simpleAcl', $this->SimpleAcl);</br><br />
+      }</br></p>
+<p>So if the user is logged in, then the $simpleAcl variable will be available in any administrative views, elements, etc that need to do something like:</p>
+<p>< ?php<br />
+  if ($this->simpleAcl->actionAllowed('Superuser', '*', $session->read('User'))):<br />
+?></br><br />
+        show Superuser controller related</br><br />
+        content here for all actions</br><br />
+< ?php<br />
+  endif;<br />
+?></br></></br></></p>
+<p>Cheers,<br />
+  Christopher.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48689ba5-7348-41ed-a260-6e264834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8377d216a84f524199cee85b28430c4e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Christopher Vrooman&nbsp;						</strong>
+						<strong>said 
+						on Jun 30, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Last whoops!</p>
+<p>if ($this->simpleAcl->actionAllowed('Superuser', '*', $session->read('User'))):</p>
+<p>Should be:</p>
+<p>if ($simpleAcl->actionAllowed('Superuser', '*', $session->read('User'))):</p>
+<p>without the $this-></p>
+<p>Note to self, get more sleep.<br />
+- Christopher.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4869c9aa-4ac4-4d71-8512-4fae4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jul 01, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Christopher: Please check the release date on those components. I actually just use the function as shown in this post without any components these days. I should do another post about it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48a494b8-0740-442d-bc79-46e94834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=0da28f57093ea98336d9b0a2bb9bdcb7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.eberfdias.com" rel="nofollow">Éber</a>						</strong>
+						<strong>said 
+						on Aug 14, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>You definitely should! I would love...<br />
+Working with ACL on SQL Server is really a pain... This method would make things really easier...</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4969c4f3-5de4-44a6-a295-6ce24834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=51c0131ad59080cd1c8f1a34e8b8b948&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.olivertreend.com" rel="nofollow">Oliver Treend</a>						</strong>
+						<strong>said 
+						on Jan 11, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Have you made the finished version with Cake 1.2?<br />
+I'd really love to start using it in my recipes, but I wanted to wait until you bring out the final Cake 1.2 version..</br><br />
+Thanks!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

@@ -1,0 +1,452 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Cake 3 interview with Nate Abele &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/Cake_3_interview_with_Nate_Abele:4a665a5e-5bfc-4e42-96ee-6d284834cda3">Cake 3 interview with Nate Abele</a></h2>	<div class="posted-on">
+		<p>Posted on 22/7/09 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>since there is still little public information about CakePHP 2.0 and especially the all-new 3.0, I decided to do a little interview with Nate Abele, lead developer of Cake 3.</p>
+<dl>
+<dt>Hi Nate. CakeFest is over, and now everybody is slowly catching up on the announcement of CakePHP 2.0 and Cake 3. Can you give me a high-level idea of what those two new version are all about?</dt>
+<dd>Well, CakePHP 2.0 is basically an update of the existing 1.x codebase for PHP5 strict mode compliance.  What this means is that, beyond the benefits of shedding some extra code and structure needed for PHP4 compatibility, upgrading to 2.0 will give your applications, on average, a 25% speed bump right out of the gate.</dd>
+<dd>Cake 3.0, on the other hand, is pretty different from the existing core code in a few notable ways.  Mainly, it's been re-written from the ground up for PHP 5.3.</dd>
+<dt>Is CakePHP 2.0 going to be compatible with 1.x? We saw a big upgrade from 1.1 to 1.2, is the upgrade to 2.0 going to be an even bigger one?</dt>
+<dd>Actually no, CakePHP 2.0 will be almost 100% API-compatible with the forthcoming CakePHP 1.3, and 1.3 is still API-compatible with 1.2, except for a few deprecated (but still working) methods.</dd>
+<dd>Also, when migrating from 1.2 to 1.3/2.0, we have a small migration guide which will alert developers to the few changes as they update their code.</dd>
+<dt>Awesome, so it's going to be pretty much a free performance boost for all current 1.2 apps?</dt>
+<dd>Yes, exactly.</dd>
+<dt>Ok, back to 3.0. Can you talk a little about the fundamental changes in both PHP as language as well as its impact on the new CakePHP core?</dt>
+<dd>Well, for CakePHP, going from PHP4 compatibility straight to a 5.3-only version is a very big jump, not only because of 5.3's new features, but also because of the features that have been available in PHP5 that we're now able to take advantage of.</dd>
+<dd>One of the biggest new features in PHP 5.3, that has really informed Cake's new architecture is namespaces.  The new core is organized into "packages", each of which builds off of other packages.</dd>
+<dd>This not only makes the core itself very modular (i.e. packages can be used in non-Cake applications), but it also makes the plugin architecture extremely simple and powerful.  Plugins can now include just as much functionality as any class in an application, or in the core, and can even dynamically replace core class dependencies.</dd>
+<dd>Another of 5.3's new features is closures.  Closures are anonymous functions (i.e. functions assigned to a property or variable) that can inherit the context of the scope in which they're defined.  This allows us to inject custom functionality directly into classes and methods, and with 3.0, we've leveraged this in an interesting way with the filters system.</dd>
+<dd>In the new core, many object methods implement this filters system, and this allows you to attach custom behavior directly to method calls: modify parameters on the way in, and return values on the way out.</dd>
+<dd>This is extremely powerful, because it makes functionality like caching or logging a snap, as these can be applied in a completely unobtrusive way, without the class in question needing to know anything about how to do those things.</dd>
+<dd>One thing we often struggle with as developers is figuring out which class a piece of logic belongs in, or coupling classes too tightly because each "needs" to know something about how the other works.</dd>
+<dd>With this system, we can keep classes cleanly separated, but still make them talk to each other even though each one doesn't know anything about the other.</dd>
+<dd>Another great feature of the system is that the interface is standard, and all filters can be applied the same way, so if you know how to write filters for one core class, you know how to write filters for all of them.</dd>
+<dt>Do you have a simple example to illustrate this?</dt>
+<dd>As an example, let's say I wanted to see a log of all the queries executed against the database.  In Cake 1.2, we have logic built into the database classes to keep a record of queries that get executed, and output them on demand.</dd>
+<dd>However, the database classes are for interacting with databases; they shouldn't have to know anything about logging.</dd>
+<dd>In Cake 3, I can simply do the following:</dd>
+<dd>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+Connections::<span class="me2">get</span><span class="br0">&#40;</span><span class="st0">'default'</span><span class="br0">&#41;</span>-&gt;<span class="me1">applyFilter</span><span class="br0">&#40;</span><span class="st0">'_execute'</span>, <span class="kw2">function</span><span class="br0">&#40;</span><span class="re0">$self</span>, <span class="re0">$params</span>, <span class="re0">$chain</span><span class="br0">&#41;</span> <span class="br0">&#123;</span><br />
+&nbsp; <span class="re0">$out</span> = <a href="http://www.php.net/fopen"><span class="kw3">fopen</span></a><span class="br0">&#40;</span><span class="st0">'php://stderr'</span><span class="br0">&#41;</span>;<br />
+&nbsp; <a href="http://www.php.net/fwrite"><span class="kw3">fwrite</span></a><span class="br0">&#40;</span><span class="re0">$out</span>, <span class="re0">$params</span><span class="br0">&#91;</span><span class="st0">'sql'</span><span class="br0">&#93;</span><span class="br0">&#41;</span>;<br />
+&nbsp; <a href="http://www.php.net/fclose"><span class="kw3">fclose</span></a><span class="br0">&#40;</span><span class="re0">$out</span><span class="br0">&#41;</span>;<br />
+&nbsp; <span class="kw1">return</span> <span class="re0">$chain</span>-&gt;<span class="me1">next</span><span class="br0">&#40;</span><span class="re0">$self</span>, <span class="re0">$params</span>, <span class="re0">$chain</span><span class="br0">&#41;</span>;<br />
+<span class="br0">&#125;</span><span class="br0">&#41;</span>;</div>
+</dd>
+<dd>In this example, I'm getting an instance of the database object from the Connections class (this is equivalent to calling <code>ConnectionManager::getDataSource()</code> in 1.2), and attaching a filter that intercepts the <code>_execute()</code> method.</dd>
+<dd>Now, I could send the output to a proper logging class, but for now I just want to see the queries sent to the error log, just so I can quickly see what's going on.</dd>
+<dd>This code will now be executed every time a query gets run against that database, and all queries will be logged as I expect.</dd>
+<dt>So filters are always instance specific and do not apply to a class in general?</dt>
+<dd>The example is just a small taste of the power of the filters system.</dd>
+<dd>For instantiated classes, yes, you typically apply them on a case-by-case basis.  However, as the framework is still in progress, we have anticipated the need to apply configuration to all classes of a certain type, so in the future this will likely be possible as well.</dd>
+<dd>Additionally, one new utility class available in 3.0 core is the <code>Collection</code> class.  This class acts similarly to an array, but has some extra goodies, like allowing you to call a method on all the object instances it contains, just by calling that method on the <code>Collection</code> instance itself.</dd>
+<dd>So in that way, it would be possible to apply the same filter to many classes at once using that technique as well.</dd>
+<dt>Since you are mentioning the Collection class, I heard the Model layer is actually going to see the biggest changes in 3.0. Can you elaborate a bit on your plans for that?</dt>
+<dd>Yes, in many ways the Model will change; in many ways it won't.  For example, records are still queried by making calls like <code>$posts = Post::find("all");</code></dd>
+<dd>This, and much of the rest of the basic Model-interaction syntax, should be immediately familiar to anyone working with Cake currently.</dd>
+<dd>Under the hood, however, the Model layer is completely new.  Models now interact with the underlying DataSource architecture through a constrained set of methods using query objects.  Query objects are extremely useful, as they allow us to encapsulate much of the query-generation work that was previously spread throughout several different classes.  In addition, since the query object works with the data layer to generate queries, and since the core query object can be replaced with custom, user-defined objects, users can easily modify and extend the SQL syntax that Cake supports.</dd>
+<dd>Building off of the <code>Collection</code> class mentioned previously, model return results have also been improved with the introduction of objects, not only for returned records themselves, but also for record sets.  The <code>RecordSet</code> object, which extends <code>Collection</code>, acts like an array in that you can iterate over it with foreach and friends, but it has some other notable advantages, like being able to lazy-fetch records as you ask for them.</dd>
+<dd>This reflects a design decision that plays out in many areas of the framework, which is only possible with the new, more object-oriented architecture, which is being lazy.</dd>
+<dd>Any loading or processing that needs to take place, doesn't take place until it actually has to.  Referenced classes aren't loaded until they're used, routes aren't compiled until they're queried, database results aren't fetched until you're ready to do something with them.</dd>
+<dd>Aside from the many other architectural improvements, this makes the new core exceedingly efficient.</dd>
+<dt>With all returned records being objects, does this mean CakePHP is moving towards a full ActiveRecord implementation?</dt>
+<dd>Practically speaking, yes, that's where we're at.  With PHP 5.3's new Late Static Binding features, we can now properly reference static classes as mentioned above.</dd>
+<dt>Ok. A personal goal of mine is to stop using relational databases for unstructured data in 2009. Is Cake 3 going to be #nosql friendly?</dt>
+<dd>Definitely.  With the simplified DataSource interface and looser schema requirements, modeling non-relational data becomes almost as easy.  The new model system is also more flexible in how it allows you to define the relationships between models; and with custom query objects, you can implement custom flags and expressions that are specific to whatever data store you're working with.</dd>
+<dt>Fantastic! When can we expect to get our hands on those new goodies? Do you have a general timeline for cake 3?</dt>
+<dd>While the code is immediately available at <a href="http://code.cakephp.org/">code.cakephp.org</a>, it's still hard to say when we'll see an official release; but expect to see lots of movement on it in the coming months.</dd>
+<dt>With Cake 3 advancing in both features as well as server-side requirements, how does it compete with frameworks such as Ruby on Rails, Django, etc.?</dt>
+<dd>Well, conveniently, migrating from PHP 5.2 to 5.3 is pretty quick and painless, as very little has changed in the way of existing features.  As ever, PHP itself is the easiest to use and easiest to deploy to platform on the web, and provided a host that supports 5.3, it's a simple matter of dropping the files in the web root, just like always.  Additionally, with the falling cost of virtualized computing and readily available server configurations with PHP ready to go out-of-the-box, deploying Cake applications, or any PHP application, has never been simpler.</dd>
+<dd>Maintenance for PHP applications has always been equally simple, and in terms of performance, PHP is always at or near the top.  With its shared-nothing architecture, you never have to worry about memory management, dead-locked threads, or infrastructure issues when scaling across multiple web servers.</dd>
+<dt>Ok, thank you very much for the interesting interview Nate. If our readers have any questions, will you be available to answer them in the comments?</dt>
+<dd>Sure thing, thanks for having me.</dd>
+</dl>
+<p>If you are still looking for more CakeFest information, Matt published his <a href="http://www.pseudocoder.com/archives/2009/07/21/cakephp-digest-18-the-cakefest-edition/">CakePHP Digest #18 - The CakeFest Edition post</a> and the first videos are starting to show up at <a href="http://live.cakephp.org/">live.cakephp.org</a>.</p>
+<p>-- Felix Geisendörfer aka the_undefined</p>
+<p><strong>Update:</strong> The Cake 3 codebase is still labeled as experimental by the cake project. Play around with it at your own risk, the roadmap is still subject to change.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4a665a5e-5bfc-4e42-96ee-6d284834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2FCake_3_interview_with_Nate_Abele%3A4a665a5e-5bfc-4e42-96ee-6d284834cda3 &amp;title=Cake+3+interview+with+Nate+Abele';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2FCake_3_interview_with_Nate_Abele%3A4a665a5e-5bfc-4e42-96ee-6d284834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2FCake_3_interview_with_Nate_Abele%3A4a665a5e-5bfc-4e42-96ee-6d284834cda3&amp;title=Cake+3+interview+with+Nate+Abele&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2FCake_3_interview_with_Nate_Abele%3A4a665a5e-5bfc-4e42-96ee-6d284834cda3&amp;title=Cake+3+interview+with+Nate+Abele';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/exceptional-cake:480f4dd5-1b10-4bc8-931f-49cecbdd56cb">Exceptional Cake</a></li>
+							<li><a href="/posts/new-feed-for-cake-news:480f4dd5-0378-4781-91ee-44b2cbdd56cb">New feed for Cake News</a></li>
+							<li><a href="/posts/dessert-4-keep-your-cake-fresh-use-svn-head:480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb">Dessert #4 - Keep your Cake fresh (use SVN HEAD)</a></li>
+							<li><a href="/posts/cake-12s-set-class-eats-arrays-for-breakfast:480f4dd6-d084-4fb7-bacc-49fdcbdd56cb">Cake 1.2&#039;s Set class eats nested arrays for breakfast!</a></li>
+							<li><a href="/posts/cake-vs-zend-vs-symfony-vs-igniter:4942b243-85bc-404a-afc9-34aa4834cda3">Cake vs Zend vs Symfony vs Igniter</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/Cake_3_interview_with_Nate_Abele:4a665a5e-5bfc-4e42-96ee-6d284834cda3">14 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/Cake_3_interview_with_Nate_Abele:4a665a5e-5bfc-4e42-96ee-6d284834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-4a66d3c6-1098-4d29-97d9-4fba4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4c1f7ad0026132535ddc7af0a48ca8be&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.happyworm.com" rel="nofollow">Mark Boas</a>						</strong>
+						<strong>said 
+						on Jul 22, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sounding good! Look forward to it's release!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a66db81-9e98-4a10-a9b6-06f64834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=68c529c3442953c3beb00a7ccca7e6bb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Lucian Lature&nbsp;						</strong>
+						<strong>said 
+						on Jul 22, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Can't wait to taste Cake3!...must be f****** delicious</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a66f8c6-8194-4b7d-b329-44454834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ef3f9e612e0d1869523f5d4f16326ed2&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							tomo&nbsp;						</strong>
+						<strong>said 
+						on Jul 22, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Sounds great!<br />
+This will definetly be a great leap forward in the way php code is written throughout the world.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a6700bc-7d90-496a-bbd4-455f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e8e91d86b2942247ba47ee63bcd9fe50&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://jacob.saxberg.dk" rel="nofollow">Jacob Friis Saxberg</a>						</strong>
+						<strong>said 
+						on Jul 22, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>My next project will be written in 3 I hope.<br />
+Thanks people!</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a670ebf-bbcc-40a3-9de7-550f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c28cbc5ff5f63a4fa191af3bb49a36a7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.nateklaiber.com" rel="nofollow">Nate Klaiber</a>						</strong>
+						<strong>said 
+						on Jul 22, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Wow, sounds like some awesome changes are on the way for Cake 3.0. I have always enjoyed Cake, but been frustrated by the 'we return an array from our model calls' - so I look forward to seeing the implementation of returning objects instead.</p>
+<p>Big pat on the back to all working on this, I look forward to playing with it! Thanks to Nate for the insight.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a67116a-8fbc-418c-bd86-659d4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=faa3d08ba02b85f180df3a9bf1af0738&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakealot.com" rel="nofollow">Kjell</a>						</strong>
+						<strong>said 
+						on Jul 22, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>looking forward to see 2.0 soon.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a6715ea-c450-4ff8-a6e0-070b4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1653498fe7f387b3f39d40741b2f9a4b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.juliendesrosiers.com" rel="nofollow">Julien</a>						</strong>
+						<strong>said 
+						on Jul 22, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thanks for this post.<br />
+But the main reason why i use CakePHP is because it lets me code in PHP4 with a decent structure and automagic. because a lot of my clients only have PHP4. If i had the control to install PHP5.3 i would rather install Ruby or Rhino or Perl 6. It's cool to see that PHP will evolve, though. But it still has an inferior syntax, IMO.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a67226e-c588-43cb-84ce-6de74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=5b883d5e78e97a9cf371e0c9b458dc72&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Jose Lorenzo&nbsp;						</strong>
+						<strong>said 
+						on Jul 22, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Will Cake3 support fetching associations like this?</p>
+<p>$post = Post::find('first')<br />
+$comments = $post->comments</br></p>
+<p>I would really love to have something like that</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a675f12-a2d0-47ea-bcf4-27f14834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jul 22, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Julien: If you still use PHP4 because of your clients you may want to consider firing the clients and re-evaluating your overall priorities : ).</p>
+<p>If you think PHP has an inferior syntax and another language will make you more productive - by all means, follow your instincts! Personally I'm sticking with PHP because it is the most powerful language out-of-the-box, nothing else ships with a base library that comprehensive.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a676b09-65a4-442a-b663-3ff44834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=32378c4f76f261d63c3c3a941054e440&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.neilcrookes.com" rel="nofollow">Neil Crookes</a>						</strong>
+						<strong>said 
+						on Jul 22, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Awesome blog post Nate & Felix, really good stuff.</p>
+<p>I've got tonnes of stuff on at the moment, but after reading this, having a dig around in Cake3 has moved well up my priority list.</p>
+<p>This progress in terms of sophistication of coding concepts and the flexibility and performance boosts they will provide will be friggin' excellent for the framework, and I want to say a big thank you to everyone on the core team. Top job guys, I'm very grateful.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a67cc85-f198-4585-bf2b-16484834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e0a3d8bad3526a207b8234539681cd8e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.steveoliveira.com" rel="nofollow">Steve</a>						</strong>
+						<strong>said 
+						on Jul 23, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Great interview. I know these are just version numbers, but it seems like CakePHP 2.0 will come and go with the already emerging CakePHP 3.0. Although I'm looking forward to 2.0, the adoption of PHP 5.3 and the use of namespaces has got me pretty excited.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a67dfb7-f380-405d-9aed-4cf04834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6b87c8f999cae0403486ee83fcae2edb&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							isaacraja&nbsp;						</strong>
+						<strong>said 
+						on Jul 23, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>The announcement and the  sample controller code for Cake3  makes me curious to see Cake 3 soon. </p>
+<p>It makes me to ignore cakephp2.0 :) (in the mind)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a6888f8-cbb0-465f-a6d7-57634834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1653498fe7f387b3f39d40741b2f9a4b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.juliendesrosiers.com" rel="nofollow">Julien</a>						</strong>
+						<strong>said 
+						on Jul 23, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Felix :<br />
+Thanks for your response. You're absolutely right. And I'd like to learn advanced PHP5 techniques and fire my clients, but i love them. So that's probably why i'm sticking with PHP4. Because sometimes, there is a server that is stuck with v4 but the job still must be done.</br><br />
+Sometimes i even have this big project that i have to accept or reject. But i dont have any precisions about the version of php that the server is using. That's ridiculous. But so is the freelance webmaster job. It's extreme adaptation. That's why im stuck in the past and nothing is evolving. People are still using IE6. Hosts are still using PHP4. Even if exciting new technologies arrives, it is not usable for common corporate websites with pointy haired boss.</br></p>
+<p>Fear of change? Yes.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4a688e2c-cecc-43e3-9957-6e7d4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Jul 23, 2009:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Julien: I think the point is that if you're good enough at what you do, finding clients that aren't too cheap to pony up for good hardware is easy.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

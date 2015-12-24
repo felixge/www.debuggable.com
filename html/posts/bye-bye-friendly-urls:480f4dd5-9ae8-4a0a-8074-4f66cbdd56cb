@@ -1,0 +1,593 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Bye, bye Friendly URL's &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/bye-bye-friendly-urls:480f4dd5-9ae8-4a0a-8074-4f66cbdd56cb">Bye, bye Friendly URL's</a></h2>	<div class="posted-on">
+		<p>Posted on 2/8/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+		<div class="deprecated-post">
+	<h3>Deprecated post</h3>
+	<p>
+		The authors of this post have marked it as deprecated. This means the information displayed is most likely
+		<strong>outdated, inaccurate, boring</strong> or a combination of all three.
+	</p>
+	<p><strong>Policy:</strong> We never delete deprecated posts, but they are not listed in our categories or show up in the search anymore.</p>
+	<p>
+		<strong>Comments:</strong> You can continue to leave comments on this post, but please consult
+		<a href="http://www.google.com">Google</a> or <a href="/posts/search/conditions:posts">our search</a>		first if you want to get an answer ; ).
+	</p>
+</div>		<p><strong>Important:</strong> A while after publishing this post I came up with a solution to the problem which I've documented in this post. <a href="http://www.thinkingphp.org/2006/09/18/dessert-11-welcome-back-friendly-urls/">"Dessert #11 - Welcome back, Friendly URL’s"</a>. So if you're a first-time reader of this article please make sure to read the follow up post as well and leave your comments there.</p>
+<p>Usually, I don't really consume the stuff that is being put out by the rails community in terms of blogs, screencasts, or conferences. But yesterday I stumbled across <a href="http://blog.scribestudio.com/articles/2006/07/09/david-heinemeier-hansson-railsconf-2006-keynote-address">David Heinemeier Hansson RailsConf 2006 Keynote Address</a> (the slides to it can be found <a href="http://www.loudthinking.com/lt-files/worldofresources.pdf">here</a>), which I felt was a quite impressive and discussed some of the things I've recently struggled with.</p>
+<p>One of the things that caught my attention the most, was DHH's oppinnion on friendly urls. Torward the end of Part 7 he is arguing that identifying Objects via friendly URL's is "just not worth it", and that auto-incrementing id's should be used instead. I've been a long time advocate for the opposite point of view, but those words along with the explanation about how this approach is stupid in the database world, made me changed my mind. But let me explain my personal take on it a little more:</p>
+<p>In the past couple of weeks I've used a Model called UrlAlias that hooks into the routes.php and allows the completly free assignment of any public URL to any internal CakePHP url. So for example http://www.my-domain.com/about could be connected to /sites/view/1 internally based of the database table url_aliases. That gave me enough power to assign friendly url's to just about any content of the web site I've been working on. I even had an option for redirectional routing, which means if somebody would go to /sites/view/1 he would be redirected to /about instead. But lord, maintaining this complex setup has been difficult. Because what happens if you take the title of a blog as the url, and the blog title get's edited by the user afterwards? The url changes and previous links break. So I thought, well, if the title changes, remember the old one and redirect requests to it to the new one. Nice, that would even allow me to maintain legacy url's! Hm, but now that I'm doing this, I need to build an interface for this, so the user knows how the internal url system works, and can activley use it to improve the friendyness of his url's. Otherwise he'd soon get lost in the world of multiple aliases for the same content.<br />
+But now, one day you want to make an international site, so all the url's should be internationalized as well, right? No problem, just convert all the special characters of the foreign languages into url compatible ones, and make the url internationalization an additional layer of abstraction. Sweet ... or? Am I the only one getting a headache at this point? I hope not.</p>
+<p>I mean all of this is really nice, and could improve your url's for humans as well as for search engines. But what you are really doing, is breaking up with a convention! And not just a little "alphabetical order for join table parts"-Convention, but one of the conventions most crucial to the RAD'ness of CakePHP. Breaking up with the routing system means an incredible amount of organizational overhead to any application you might build. I've decided that "It's not really worth" it for my current projects. If I need some /about or /new-product page for public advertising, I can use CakePHP's build in routing system, but for the rest I'll stick to the convention and safe myself hours and hours of programming, debugging and worrying. For search engine optimization, friendly url's would be nice, but looking at the serps (search engine result pages) for the keywords important to me, I realized that this is not the main factor for Google & Co. My time seems to be better invested in making my HTML as semantic and accessible as possible, instead of wasting my times on those stupid url's and get lost in a crazy world where I don't know what url belongs to what controller/action/etc.</p>
+<p>What do you guys think about this? Anyone still willing to go through the trouble of "friendly url's" or do you rather go for the RAD'ness and simplicity approach instead?</p>
+<p>--Felix Geisendörfer aka the_undefined</p>
+<p>PS: Sorry for the long time I've not posted on here. I'm in the United States right now, visiting my host family in Atlanta, so I've been a little busy the last 2 weeks with catching up with old friends and interacting with real-world-models ; ). Expect more good stuff on here again from now on.<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-9ae8-4a0a-8074-4f66cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbye-bye-friendly-urls%3A480f4dd5-9ae8-4a0a-8074-4f66cbdd56cb &amp;title=Bye%2C+bye+Friendly+URL%27s';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbye-bye-friendly-urls%3A480f4dd5-9ae8-4a0a-8074-4f66cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbye-bye-friendly-urls%3A480f4dd5-9ae8-4a0a-8074-4f66cbdd56cb&amp;title=Bye%2C+bye+Friendly+URL%27s&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fbye-bye-friendly-urls%3A480f4dd5-9ae8-4a0a-8074-4f66cbdd56cb&amp;title=Bye%2C+bye+Friendly+URL%27s';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/dessert-11-welcome-back-friendly-urls:480f4dd5-8dac-414b-b329-4dd5cbdd56cb">Dessert #11 - Welcome back, Friendly URL&#039;s</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/bye-bye-friendly-urls:480f4dd5-9ae8-4a0a-8074-4f66cbdd56cb">24 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/bye-bye-friendly-urls:480f4dd5-9ae8-4a0a-8074-4f66cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-480f4dd9-ae74-481d-8cd4-48f8cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c28cbc5ff5f63a4fa191af3bb49a36a7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.theklaibers.com" rel="nofollow">Nate K</a>						</strong>
+						<strong>said 
+						on Aug 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix, this is a great post. A topic I battled with for a while as well. I ran into the same problem you discussed with user input. If they were to change a title, it would change the URL friendly link - and the previous one created would then be broken. In that sense, I took the same approach as wordpress seems to take with their system - dont update the URL if they change the post title. So, the URL friendly title would stay the same. Unfortunately, this brings in an array of other issues. What happens if the user mis-spelled something? They obviously dont what that in the SEF URL. BUT - since it is serving as a 'unique key' to access the content - it shouldn't be easily editable by the user. </p>
+<p>So, it is confusing, and there are many aspects you have to think about. Right now, I am not using CakePHP for a framework. I have played with it for a few other sites, but haven't implemented it at www.barbourbooks.com. I manage our URLS with mod_rewrite. For our needs - this fits better without the need for a router file or a URL parser. However, I like to make sure all URLS WORK. So, when we moved to a new system - I mapped the majority of the previous URLS that were indexed to their new location with the new website. So, we still have support for the majority of our legacy URLS. </p>
+<p>Overall - I would take the extra work to make a URL SEF - versus ugly query strings or the link. I prefer the clean structure - and a structure that has keywords and meaning. Simplicity is nice, but I think it is worth giving meaning to ALL of your content - and this includes URLs. I also give convenience 'short' urls for those looking for specific books. They can type in the actual ISBN instead of the title, and this is then validated and routed with a 301 redirect to the SEF url. This way there is only one of them indexed with google and it helps keep our statistics clean of duplicate pages being accounted for.</p>
+<p>Ok - now im rambling - but my overall response is - YES - it is worth it to have SEF URLs.</p>
+<p>And, I hope you are enjoying your time in the states!</p>
+<p>Peace,<br />
+Nate</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-4a54-4b06-87b9-43afcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 02, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Nate, thanks for your in-depth comment on my little rant on consistent url's. Let me explain a little further:</p>
+<p>Having SEF Url's is great, I love them, and for the last month I've started to dislike site's just for not having them. But, if you checkout DHH's keynote a little further up to the point where he talks about ActiveResource (which will be implemented in CakePHP soon as well afaik) you will realize what advantages you are giving up for them.</p>
+<p>He talks about how you can have Model's based on external Resources of other Rails web sites following the conventions and use them just as easily as you would with normal Models when using auto-incrementing id's. Now he also says you might be able to work with non-auto-incrementing id's as well, but it will come with a high price. Just as it probably will be in CakePHP.</p>
+<p>Now you could still have those "conventional" url's alongside with their aliased buddies, but you know search engines don't like duplicated pages. You could propably even work around that. But again, what you are doing is working AGAINST the conventions and the framework instead of working WITH it. It is possible, but it will come at a high price and you have to decide weather you want to pay it - and I don't! Now you are not using CakePHP or Rails, so none of that applies to you in the same extend.</p>
+<p>Recently I just come to realize the best framework is not the one that is the easiest to hack and customize but the one that comes with the SMARTEST set of conventions and approaches to your daily problems. Initially I wrote a lot about how to make CakePHP do what I imagine is best, instead of trying to understand what CakePHP thinks is the best. There will always be exceptions to the conventions, but the goal should be to avoid them as much as possible! Doing this will get you higher maintainability for your apps, easier access to support, more simplicity and just a lot more faster!</p>
+<p>Back to SEF Url's: As I said, I like them. But looking at it realisticly, I rarly use those nice url's for anything else then Wikipedia, where I know that freely entering an URL will often be faster then starting of from the main page. How many people will make use of them on the small-business websites most of us are building? 0.5%, 1%, 2%? Not a lot. And search engines? Yes they like SEF url's, but consistent url's are worth more to them. So unless you plan on legacy support, after legacy support, after legacy support for your websites url's - auto-incrementing id's seem to be a lot more future proof of a concept. Because they follow a very easy pattern, and mapping them to whatever new / underlaying system will be a matter of 3 lines of code (or less).</p>
+<p>For the projects I'm working on with CakePHP right now, I'll stick with auto-incrementing id's for content pages. Things like categories or tags are a different story, but SEF url's for content - "It's just not worth it" to me.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-cea0-492d-baeb-4f4fcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=4a1e7ccf9ec98a3d31548bc415e138a0&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://omnibuscreative.com" rel="nofollow">ben hirsch</a>						</strong>
+						<strong>said 
+						on Aug 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I've been struggling with this for some time as well. It's really nice to hear somebody else is willing to ditch the friendly URLs. Nice article.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-c874-4935-8977-4f56cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d809a50c6c838d69bbd3a65c68983309&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://blog.madarco.net" rel="nofollow">Madarco</a>						</strong>
+						<strong>said 
+						on Aug 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Choose an URL can be a difficult task, but the most important thing is to keep it in the future: "Cool URIs don't change".<br />
+Here it is a good style guide: http://www.w3.org/Provider/Style/URI</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-bf58-4612-a4fa-47b6cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c28cbc5ff5f63a4fa191af3bb49a36a7&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.theklaibers.com" rel="nofollow">Nate K</a>						</strong>
+						<strong>said 
+						on Aug 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Felix:<br />
+I understand completely where you are coming from, and if I were using CakePHP - I would be in the same boat you are. You are correct, search engines care about CONSISTENCY - not so much the name. And, as the example I gave last time with the barbourbooks.com website - I HIGHLY doubt people will know to directly type in a SEF URL - especially because the word order might be different from the title of the book. So - I don't see a big usage overall, but it is a convenience. </br></p>
+<p>And - that was the pattern I decided in the beginning - and I don't want to change ours now - so I will learn to adapt things from this point forward. Not giving the search engine duplicate pages, but feeding it a 301 permanently moved so that its not compared as duplicate content and the index will eventually be updated with its new location.</p>
+<p>On a side note, I have played with several different PHP Frameworks, and I have found CakePHP to be the best to suit my needs, and, as you said - simplifying your day to day tools. I am actually going to be using it in some upcoming sites to watch it run in a production environment. I am very impressed with the documentation and ease of us (and a small learning curve).</p>
+<p>Anyway, I really enjoy this topic - you've given me several things to think about....</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-29dc-4c14-baff-49e4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=aed72c5895afe9a09411ff121dbf3c51&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.i-scream.net/" rel="nofollow">tomo</a>						</strong>
+						<strong>said 
+						on Aug 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Interesting conversation. We've had the same problem in the office recently. We use cake for several months now. I was all for custom URLs, and I opted for the exact approach you were using before Felix, and that still seems as an acceptable solution, except for the part of the user changing the url keyword. But, if You look at it in a realistic manner, that happens very, very rarely, and even then, it is most likely it will happen before SE indexing the content and folks linking to it. But hey, it's a possibility, so I've been thinking about a compromise:<br />
+you could use this instead:</br><br />
+domain.com/category/article_title/article_id</br></p>
+<p>this way, the keyword is still at an acceptable place for the SE's, if it changes with, it doesn't really matter, since you can still find the right content by the article_id.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-a9ac-4a88-b915-4c66cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>tomo: Ah that's interesting, so you suggest to place the title in the url without actually using it for anything, but rather for SEF'ness only. So only the article_id would be considered for identifying the item.</p>
+<p>That actually is a very nice idea. A bit dirty, but It takes away the complexity of having to identify things by the title, keeps URL's intact even if they might change, but still leaves the juicy buzzwords in for the SE's. Pretty cool!</p>
+<p>I just thought about another trick of preventing users from changing the article_title after a while: Just use the created field to see how much time has passed since the item has been created and present a warning/"yes-no"-dialog to the user after a certain amount of hours, if he want's to change the article_title for the URL.</p>
+<p>Hm, the only problem with the solution of yours is, that Search Engines might believe you've got dupplicated content on your page if they somehow index several pages with the same article_id but different article_title's. Now to prevent that you could check if the article_title matches the current article_title of the item with the article_id, and if not, as Nate K suggested, redirect them with a 301 to the right URL. Even so this might not always get's your backlinks-power redirected, it should at least get you out of the trouble of having "duplicated content".</p>
+<p>Thanks for this idea tomo. I like it quite a bit and am going to play around with it. If it works out well I'll publish my source for reuse to others (and give you some credit for it of course ^^). Interesting conversations like this (including all the other commentators as well), are one of the major benifits from maintaining a php/web-dev bog like this!</p>
+<p>One thing I would probably do differently, is to use a controller/action/article_id/article_title format, since this would be closer to the cakephp way of doing things.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-f1d0-4a45-816f-48ffcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=00d595d4340c4ac04edd294f8128aed8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.onelobby.com" rel="nofollow">Peter Goodman</a>						</strong>
+						<strong>said 
+						on Aug 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>For some reason, I don't know why, a lot of people are skipping over a very obvious solution:</p>
+<p>blah.com/news/1/some_test_post</p>
+<p>where 'some_test_post' is the friendly version of the name but serves no actual purpose and where '1' is the primary key id in the database for that news post. Simple and elegant.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-ff5c-44de-b114-4d14cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=00d595d4340c4ac04edd294f8128aed8&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.onelobby.com" rel="nofollow">Peter Goodman</a>						</strong>
+						<strong>said 
+						on Aug 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Damn, seems someone beat me to it :P</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-2628-46e9-a765-4733cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=aed72c5895afe9a09411ff121dbf3c51&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.i-scream.net/" rel="nofollow">tomo</a>						</strong>
+						<strong>said 
+						on Aug 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Thnx for the kind reply. I'm always glad to start a productive conversation, if you realy play around with it and release a source, then it's obvious why. :)</p>
+<p>As for the order of variables in the url, controller/action/article_id/article_title is probably more human/cake usable, but the other version is much better for the SE's, more left in the URI, the more value SE put's to it. That's why I reversed it. But hey, it doesn't change much anyway.</p>
+<p>Keep up the good work with the site.</p>
+<p>@Peter Goodman:<br />
+;)</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-ce10-46d8-9dee-411dcbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Aug 03, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hey tomo: Yes, search engines like things to be as far left as possible, but humans/conventions are more important to me then an officially unconfirmed and probably very minimal factor for the rankings of certain search engines.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dd9-a2f8-48f1-9e55-421dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e0a3d8bad3526a207b8234539681cd8e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.overlee.com/baker" rel="nofollow">Steve</a>						</strong>
+						<strong>said 
+						on Aug 04, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I do often wonder how much importance major search engines really put on the url string, however I agree with Felix, it's probably not worth the sacrifice.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dda-fa38-4ad1-813a-426acbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.roland-ehle.de/blog/2006/08/14/64" rel="nofollow">Freundliche URLs &laquo; Roland&#8217;s Weblog</a>						</strong>
+						<strong>said 
+						on Aug 14, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] F&#252;r manche Dinge brauche ich ein wenig l&#228;nger, das muss am Alter liegen  Wie dem auch sei, geschrieben wurde schon in diversen Blogs (z.B. Felix und Andreas) &#252;ber die &#8220;freundlichen&#8221; URLs, also optisch wirkungsvollere URLs f&#252;r Blogeintr&#228;ge. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4ddc-fc90-44f1-8736-495dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.thinkingphp.org/2006/09/18/dessert-11-welcome-back-friendly-urls/" rel="nofollow">ThinkingPHP and beyond &raquo; Dessert #11 - Welcome back, Frien</a>						</strong>
+						<strong>said 
+						on Sep 18, 2006:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] Not too long ago you've all heard me saying Bye, bye Friendly URL’s. Now, after a lot of feedback and some more thoughts on it I came to what I find a nice compromise between REST'ness, SEO'ness, and FRIENDLY'ness. [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-260c-4bb6-8694-434dcbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99f62fbe62ba7cd45fe9e04d788b5add&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.flexewebs.com/weblogs/seo" rel="nofollow">Jason</a>						</strong>
+						<strong>said 
+						on Jan 11, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi there,</p>
+<p>Friendly URLs are more or less crucial for serious sites and SEO work, however, the process you described here is definitely something not worth working on, since it is overcomplicating the matter. </p>
+<p>I find it that normal procedural approach to PHP + mod_rewrite work quite nicely for my sites, while CakePHP ought to be routed with their own routing systems, but I haven't yet worked out how to properly make the URLs work the way I want them. </p>
+<p>Cheers,</p>
+<p>Jason<br />
+www.flexewebs.com</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-e470-48df-8c21-4ca8cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 11, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Jason: I've found a way that solves all friendly URL problems I used to have, see my post above: http://www.thinkingphp.org/2006/09/18/dessert-11-welcome-back-friendly-urls/.</p>
+<p>PS: When I wrote this I typed your name and saw I wrote down "JSON" ... Too much DOM/Ajax scripting over the past days, I'm telling you ... ; ).</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de4-ff18-493e-be60-472ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d41d8cd98f00b204e9800998ecf8427e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://indonesia.gobloglah.com/2006/11/10/catatan-kunjungan-2006-08-10/" rel="nofollow">Quality Indonesian Blogger &raquo; Blog Archive &raquo; Catatan </a>						</strong>
+						<strong>said 
+						on Jan 18, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>[...] ThinkingPHP » Bye, bye Friendly URL’s. Apakah harus seperti ini? [...]</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-c094-4765-a9b7-457ccbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99f62fbe62ba7cd45fe9e04d788b5add&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.flexewebs.com" rel="nofollow">Jason</a>						</strong>
+						<strong>said 
+						on Jan 31, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Hi Felix,</p>
+<p>Like I say I find it that classic PHP + a bit of mod_rewrite does the job very nicely.</p>
+<p>If you look at what I have put together at www.flexewebs.com it all works with mod_rewrite and classic PHP4 with scripts that feature IDs and lots of other parameters, but are hidden via the mod_rewrite. </p>
+<p>I am increasingly finding it to be the case that whatever approach one takes to programming web pages or anything else for that matter, the time consumption ends up being very similar. </p>
+<p>I will write more about this on my blog at some point and share my own feelings on the matter. I think it is very important for people to realise and understand it. </p>
+<p>Cheers,</p>
+<p>Jason (JSON) :-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4de5-d8f4-4de0-8cda-4294cbdd56cb" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/felix" rel="nofollow">Felix Geisendörfer</a>						</strong>
+						<strong>said 
+						on Jan 31, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Jason: No offense, but sessions id's in every url? Come on, that's a real SEO killer and destroys whatever advantages mod_rewrite can offer to somebody ; ). Other then that I consider myself to be the obnoxious guy who is looking for the "perfect solution", so I always try to shoot for something a little more then "does the job" ; ). Take a look at my other article I gave you the link to above and let me know what you think about it.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4dec-9bc0-4647-803a-44cacbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d6e1156352fbd5f7451bcb8b3ef9491b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Baris Balic&nbsp;						</strong>
+						<strong>said 
+						on Jul 03, 2007:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I think my main quarrel with this whole scheme is that we have a system that uses an intuitive, obvious approach to handling unique objects... with unique IDs, now if we are going to present it to a user then reshaping those identifiers into something more paletteable seems both sensical and simple, for what's effectively a one way transaction.<br />
+The problem is that we're taking this highly appropriate method of identifying objects and then hiding it so that another system (usually a search engine in my case) may index it in a particular way, applying it's own set of identifying rules internally.  For inter-system transactions, this should not be necessary, it seems fallic.</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-480f4df4-74f4-400c-87f9-47c4cbdd56cb" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7fe0c5dba88da01a435f46b2f0b56f4e&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.3-bids.net" rel="nofollow">3-bids</a>						</strong>
+						<strong>said 
+						on Jan 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>How are people redirecting http://domain.com to http://www.domain.com in Cake? I've tried several different redirects, but I get a 404 at some level.  Thanks.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-4819d167-959c-46a6-a5ae-3f304834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a0b76f4ba6e6390ae979089aab1aaafe&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.darksideofthecarton.com" rel="nofollow">Chris</a>						</strong>
+						<strong>said 
+						on May 01, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@3-bids</p>
+<p>Do that via your .htaccess. Try something like this:</p>
+<p>RewriteEngine On<br />
+RewriteBase /</br><br />
+RewriteCond %{HTTP_HOST} ^yourdomain.com [NC]</br><br />
+RewriteRule ^(.*)$ http://www.yourdomain.com/$1 [L,R=301,NC]</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489a4af5-d820-4074-b795-7ca24834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ac97b5f71c623d60aa7e8f534908dd75&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Silver Knight&nbsp;						</strong>
+						<strong>said 
+						on Aug 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Firstly, I'd like to comment to the blog owners Felix and Tim to thank them for this fantastic blog.  It's been a valuable source of learning for me about many things Cake-related.  Thank you for your time and effort.  It is highly appreciated.</p>
+<p>Secondly, I'd like to comment to the idiots who TRY to post spam links in the comments.  Are you people morons, or what?  Read a little bit about rel="nofollow" some time.  You are NOT improving your search engine rankings one little bit with this slimy practice.  You are only polluting the comments threads with worthless garbage that not only does not help anyone ELSE, but it ALSO doesn't even help YOU at all.  The search engine robots will not index your lame links to acne-cream or futures-trading or whatever pathetic product you are trying to hawk.</p>
+<p>(If you wonder what I am talking about, mouse over some of the links a few comments back to see where they lead, and then examine the source for the page.  Notice that these links are all rel="nofollow"?)</p>
+<p>I hate to hate, but this practice of polluting comment threads in blogs is one thing I truly DO hate.  People who do this sort of thing should not be allowed to own a computer.</p>
+<p>Well, enough of my rant.  The real reason for this comment still is to thank the owners of this blog for all they do to help the CakePHP community.  The world needs more people like you.  Thank you again for all the good you do in the world of web design and PHP coding.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-489aacc0-c364-4fa2-9a48-172c4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Aug 07, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Silver Knight: Thanks a lot for your comment. Those are what keeps us going here. :)</p>
+<p>As for the spam guys: Listen to Silver Knight - you aren't making anyboy happy, not even yourself. : /</p>
+<p>Silver Knight: Yeah the html parsing needs some more work. I hope we will get to that soon. Thanks again for your kind comment!</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

@@ -1,0 +1,478 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Private methods - Follow Up &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="post">
+	<h2><a href="/posts/private-methods-follow-up:4873b289-8f70-4500-a798-76ea4834cda3">Private methods - Follow Up</a></h2>	<div class="posted-on">
+		<p>Posted on 23/8/08 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Hey folks,</p>
+<p>as I expected almost everybody disagreed with <a href="http://debuggable.com/posts/programming-psychology-ii-private-methods:481ed862-b0d8-4a0e-9247-165c4834cda3">my views on private methods</a>. Here is the deal:</p>
+<blockquote><p>If you can use the private / protected feature of your language to do more good than evil in the world, all power to you.</p></blockquote>
+<p>If you have doubts ... read on.</p>
+<p>First I have to make some confessions. I have not studied computer science. I have not done much Java. I have little trust in theory that I cannot apply to the real world. I do not think modern programming is much of a scientific endeavor. I believe <a href="http://www.codinghorror.com/blog/archives/000878.html">the best code is no code at all</a>. And I think there are lots of reasons to question anything people call fundamentally true.</p>
+<p>But more than everything else, I believe the following:</p>
+<blockquote><p>We are in the stone age of programming. We are really just talking Fire, Water, Wind and Earth here.</p></blockquote>
+<p><img src="http://static.thinkingphp.org/img/private-methods-follow-up-four-elements.png"></p>
+<p>It has only been 50 years since <a href="http://en.wikipedia.org/wiki/FORTRAN">modern</a> <a href="http://en.wikipedia.org/wiki/Lisp_programming_language">programming</a> <a href="http://en.wikipedia.org/wiki/COBOL">appeared</a>. Chances are that 100 years from now most of what we consider good ideas and best practices will seem like a joke. But here I go lecturing you people with what in reality isn't more than a bunch of hunches and ideas of some guy without formal education in the field.</p>
+<p>But ... I do have some experience with applications heavily using private functions. Once upon a time I worked on a CakePHP application. It was big. 300++ database tables. We're talking about what is probably the biggest CakePHP install out there. The previous programmers seemed to love private methods. They made sure to put 4-5 in at least every controller for good measure. I refactored this code, at least a lot of it. And I noticed a consistent pattern: 9 out of 10 times private methods were used as a rug that shit the programmers didn't want to architect properly was swept under.</p>
+<p>Now this is just one example Felix, you might say. You haven't seen my glorious use of this most awesome of all OOP concepts. And you are right. I haven't. But I want my theory to be true. I feel I'm onto something. I saw this pattern to emerge every time I looked at private functions. And I either want you guys to proof me that I'm an idiot (I can live with that, no worries) or see the elegance of avoiding private methods yourself.</p>
+<p>So I decided to join Nate Abele's <a href="http://debuggable.com/posts/i-will-insult-your-code!:48ac91d1-ca78-4e95-ad66-1e854834cda3">I will insult your code</a> challenge. Send me some CakePHP code that you cannot imagine to be elegant without private or protected methods / properties. Limit yourself to a class or two tops (like controller + model). <a href="mailto:felix@debuggable.com">Send this code to me</a>. I will either refactor it to my idea of beauty and elegance or admit my mistake : ).</p>
+<p>This is not exactly going to be a scientific proof or anything close, but as long as I might be able to convince or get myself convinced somebody is going to learn from it!</p>
+<p>-- Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/4873b289-8f70-4500-a798-76ea4834cda3"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprivate-methods-follow-up%3A4873b289-8f70-4500-a798-76ea4834cda3 &amp;title=Private+methods+-+Follow+Up';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprivate-methods-follow-up%3A4873b289-8f70-4500-a798-76ea4834cda3';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprivate-methods-follow-up%3A4873b289-8f70-4500-a798-76ea4834cda3&amp;title=Private+methods+-+Follow+Up&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fprivate-methods-follow-up%3A4873b289-8f70-4500-a798-76ea4834cda3&amp;title=Private+methods+-+Follow+Up';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+	<div class="related-posts">
+		<h3>(Theoretically) Related Posts</h3>
+				<ul class="first">
+							<li><a href="/posts/programming-psychology-ii-private-methods:481ed862-b0d8-4a0e-9247-165c4834cda3">Programming Psychology II: Private methods </a></li>
+							<li><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li>
+					</ul>
+		<ul>
+					</ul>
+	</div>
+	<div class="clear">&nsbp;</div>
+
+			<p>You can <a href="#comment_form">skip to the end</a> and add a comment.</p>
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/private-methods-follow-up:4873b289-8f70-4500-a798-76ea4834cda3">16 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/private-methods-follow-up:4873b289-8f70-4500-a798-76ea4834cda3#CommentAddForm">Add Comment</a>	</div>
+	<div class="post_comments">
+	<div class="clear"></div>
+									<div id="comment-48afa85d-d270-4cc7-b108-66264834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=ac93f8dadcdd1c057947257e47c0150f&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							nukem&nbsp;						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>nice concept of refactoring service.</p>
+<p>If this get tons of response you can actually charge or have a micro payment as "thank you" token for fixing their codes.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48afae1c-bf74-4239-a92d-1c6e4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=f4112f3023c643bf2f7b32c9c5dcfcba&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://cakebaker.42dh.com" rel="nofollow">Daniel Hofstetter</a>						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Take one of the core components of cakephp like email or cookie which make use of "private" methods ;-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48afd5bc-1b28-45a8-905e-57d74834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c2fc4bbfd42dcf3e9df26a06d329dfa5&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://fluffigt.com/2008/08/23/private-methods-in-php-programming-response/" rel="nofollow">Mikael Löfstrand</a>						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I wrote a responce about why I think private/protected methods might be a necessary evil, but pingbacks didn't get through (might be my wordpress installation...), but here's the link: <a rel="nofollow" href="http://fluffigt.com/2008/08/23/private-methods-in-php-programming-response/">http://fluffigt.com/2008/08/23/private-methods-in-php-programming-response/</a></p>
+<p>regards,<br />
+Micke</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48aff83f-2638-4e04-a2f9-44d84834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=9c31d1102d95104fb994ae67cd1989b6&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.debuggable.com/tim" rel="nofollow">Tim Koschützki</a>						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Mikael Löfstrand: We are currently working on pingbacks and trackbacks. This blog is custom developed with CakePHP. No wordpress, nothing. Expect something soonish.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b01404-2d8c-44e8-ad06-57b94834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=eb395c01c13732362c4b705a9842cbef&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							tagada&nbsp;						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Obviously as you said, your idea is not shared by community.<br />
+So *you* have to prove you're not an idiot we do not have to do so.</br></p>
+<p>So, you are wrong until you prove and we (the community) admit you are right.</p>
+<p>You didn't study computer science, you don't know Java you are young (an I right?) and you don't have a long strong programming experience. Sorry, but you really have to prove your idea !</p>
+<p>You are quite good at PHP, you're discovering the beginning of OOP, great ! Welcome to the developper community, study more, work hard on other languages and OOP and then come back and share your global vision.</p>
+<p>Until then, continue to share with us your great PHP and CakePHP vision but please, do not try to explain us we are *all* wrong on things you admit yourself not to know 100% :-)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b015ab-54f4-4481-977f-4f344834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@tagada: Hah!  Since it's his blog, I'm pretty sure he can put the burden of proof on whoever he wants.  If you don't agree, you don't have to participate.</p>
+<p>@Felix: Awesome idea, can't wait to see the refactoring.  For the record, I'm sometimes okay with protected, but never with private.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b0181a-52fc-47cf-8276-34e04834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c7ae119a764e33216279b9ef0f1052ea&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://inarow.net" rel="nofollow">Chris</a>						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Well, I think the deal here is that most code you'll get here is going to be "End-user" cake code.  I don't think there's generally much value to private or protected methods there.  I think the primary place for such formal code protection is in library code that is widely distributed.  Where the "private" keyword is basically a signal of "don't even try to use this method, because we're likely to change, remove or alter it in any release."  It's just a formal way of enforcing a public interface, so that people don't accidentally use pieces of your library which you want the freedom to change, without breaking anyone's code that uses your library.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b01a54-dd50-4877-a620-06ba4834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>That reminds me of a quote: "Those who say it cannot be done should be quiet and get out of the way of those who are doing it."</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b03855-3544-4024-a54d-2f0f4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=1f27710d8568b64fa5b3c1e08e7a55de&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							HeathNail&nbsp;						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Chris<br />
+Your explanation makes more sense to me than anything else I have read :)</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b04234-0c98-4c05-ac35-24014834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b289671dac2a82c40d00afbd17334aca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://burned.com" rel="nofollow">Pat Collins</a>						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>I tend to agree with your theory in the context of MVC. The functionality of private methods in controllers is almost always crying to be refactored into a model or component. Then I'd argue your thoughts could be thrown on top of the fat model skinny controller debate.</p>
+<p>It could also be argued that your realization is also a realization of the limits of the PHP language itself and its lack of effective functional programming and function-as-object constructs that languages like Python or Ruby have.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b04de8-c584-46ea-b3bd-47de4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b6c08a70ff91550071438fdd63de843d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://www.fenix-solutions.com" rel="nofollow">Eric Lawless</a>						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>You've become a bit of a joke for that previous post, so I'm surprised to see you beating this dead horse. Here's something like the example you were given last time, that I didn't see an adequate response to:</p>
+<p>class Airplane<br />
+{</br><br />
+	private $altitude = 1000;	// meters</br></p>
+<p>	public function requestAltitudeChange($newAlt)<br />
+	{</br><br />
+		if ($newAlt &lt; 0) throw new BlewUpPlaneException();</br><br />
+		if ($newAlt &gt;= 100000) throw new InSpaceException();</br></p>
+<p>		$this-&gt;altitude = $newAlt;<br />
+		return true;</br><br />
+	}</br><br />
+}</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b07e39-3818-4a63-89ab-2f854834cda3" class="blogcomment admin">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=cb57e13b63e8130e9efc693bc0d1c4ca&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://debuggable.com/nate" rel="nofollow">Nate Abele</a>						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Eric Lawless:</p>
+<p>Stupidly simple.</p>
+<p>class Cessna extends Airplane {</p>
+<p>// Lower default altitude for a prop plane<br />
+protected $altitude = 500;</br></p>
+<p>}</p>
+<p>Making it private is dumb, because it can't even be accessed or overridden in subclasses.  Let's say Cessna needed to extend and add some extra checks to requestAltitudeChange.  What then?</p>
+<p>Besides, if you'll notice, the title reads "Private *methods*", not "Private *properties*".  Pay attention next time and you won't come off as such a joke.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b08c7d-15b0-447b-a009-6eda4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b6c08a70ff91550071438fdd63de843d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Eric Lawless&nbsp;						</strong>
+						<strong>said 
+						on Aug 23, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>@Nate Abele</p>
+<p>"Private / <b>protected</b> methods <b>and properties</b> are one of the most stupid concepts of OOP." - Felix Geisendörfer</p>
+<p>Big letters, top of the page, previous post. Bravo.</p>
+<p>Your now wonderfully extensible class does exactly the same thing mine does in terms of encapsulation; where's the counter-example?</p>
+<p>Private methods consolidate code that you don't want other classes calling, but which you want to reuse/abstract inside the class. Continuing the example:</p>
+<p>class Airplane<br />
+{</br><br />
+	protected $altitude = 1000;	// just for you Nate Abele ;)</br></p>
+<p>	protected function changeAltitude($newAlt)<br />
+	{</br><br />
+		if (checkFlaps() &amp;&amp; doOtherCrapIDontKnow() &amp;&amp; seriouslyImNotAPilot()) {</br><br />
+			$altitude = $newAlt;</br><br />
+			return true;</br><br />
+		}</br><br />
+		return false;</br></p>
+<p>	}</p>
+<p>	public function requestBankingTurn($direction, $requester)<br />
+	{</br><br />
+		if (is_a($requester,"Hobo")) throw new YoureAHoboException();</br><br />
+		if (!in_array($direction,array("left","right"))) throw new IllegalDirectionException();</br><br />
+		return changeAltitude(max($this-&gt;altitude - 100,0)) // sure, airplanes can bank on the ground</br><br />
+			&amp;&amp; turnAirplaneAndCrap($direction);</br><br />
+	}</br></p>
+<p>	public function requestAltitudeChange($newAlt, $requester)<br />
+	{</br><br />
+		if (is_a($requester,"Hobo")) throw new YoureAHoboException();</br><br />
+		if ($newAlt &lt;= 0) throw new BlewUpPlaneException();</br><br />
+		if ($newAlt &gt;= 100000) throw new InSpaceException();</br></p>
+<p>		return changeAltitude($newAlt);<br />
+	}</br><br />
+}</br></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b10b09-c838-4d7d-a76e-34c94834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=c2fc4bbfd42dcf3e9df26a06d329dfa5&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://fluffigt.com/2008/08/23/private-methods-in-php-programming-response/" rel="nofollow">Mikael Löfstrand</a>						</strong>
+						<strong>said 
+						on Aug 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>Tim Koschützki: Sounds nice! I'd love to see that code sometime... But maybe you should remove the pingback tag (link hrel=pingback etc) in the html headers 'til you are done with the functionality? :)</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b1cd18-30c4-4977-a819-065a4834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=6e333c5051ee580b75d9a20db899098d&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							<a href="http://rafaelbandeira3.wordpress.com" rel="nofollow">rafaelbandeira3</a>						</strong>
+						<strong>said 
+						on Aug 24, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>pingback : </p>
+<p>[...] more and more amateur programmers are landing on the OOP - Object Oriented Planet - without having even scripted before, what is nice because they are starting in a well known and mature concept wich rules most of great application’s design, but is also evil, because they don’t really know something, and so they can’t tell what is really going on in the whole [...]</p>
+<p><a rel="nofollow" href="http://rafaelbandeira3.wordpress.com/2008/08/24/new-agemisconceptioned-private-methods">http://rafaelbandeira3.wordpress.com/2008/08/24/new-agemisconceptioned-private-methods</a></p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  						<div id="comment-48b2506c-e6c4-4de0-a6f5-05844834cda3" class="blogcomment">
+				<span class="author">
+					<a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=a5acf866b8a9ca72bc568cca9852369b&size=31&rating=R&d=identicon" alt="" /></a>					<div>
+						<strong class="author-name">
+							Xr&nbsp;						</strong>
+						<strong>said 
+						on Aug 25, 2008:</strong>
+					</div>
+				</span>
+				<div class="clear"></div>
+				<div class="body">
+					<p>> But ... I do have some experience with applications heavily using private functions.<br />
+Experience ? At 20 ? (no offense intended, I'm not much older)</br><br />
+The only way you can have enough experience without a formal background in my opinion is to have at least ten years of experience in various projects.</br><br />
+Mind you, some won't achieve this in 40 years and others won't get any benefit from studies either because they merely go through them without thinking once. However, courses include things so dull that you would never read about them otherwise but which are still useful to see where we're going and why (state machines anyone ?).</br></p>
+<p>In short : I don't doubt you saw awful uses of protected and private methods, but I can say the same about public methods. And OOP. And any programming paradigm I worked on.</p>
+				</div>
+				<div class="clear"></div>
+							</div>
+	  	
+				<div class="divider"></div>
+		<a name="comment_form"></a>
+		<p>This post is too old. We do not allow comments here anymore in order to fight spam. If you have real feedback or questions for the post, please <a href="/contact">contact us</a>.</p>
+	</div></div>
+	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class=""><a href="/blog">Blog</a></li><li class="active"><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>

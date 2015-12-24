@@ -1,0 +1,422 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Blog &raquo; Debuggable - Node.js Consulting</title>
+
+	<link href="http://feeds.feedburner.com/debuggable" type="application/rss+xml" rel="alternate" title="RSS 2.0" />	<link rel="pingback" href="Debuggable.com/pingback" />
+	<link rel="stylesheet" type="text/css" href="/css/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/4026ee2275e22a4e5ec8aea13747c557.php" /></head>
+	<body>
+		<div class="container_16">
+			<h1 id="logo-text"><a href="/">debuggable</a></h1>
+			<ul id="navigation">
+				<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>			</ul>
+			<div class="clear">&nbsp;</div>
+
+			<div id="blueprint">
+				<a href="/contact" class="contact">Contact Us</a>			</div>
+
+			<div class="clear">&nbsp;</div>
+			<div class="grid_11 alpha" id="content">
+	<cake:nocache>
+			<div class="messages empty"></div>
+	</cake:nocache>
+	<div class="paging">
+	<a href="/posts/index/page:56" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:53">53</a></span> | <span><a href="/posts/index/page:54">54</a></span> | <span><a href="/posts/index/page:55">55</a></span> | <span><a href="/posts/index/page:56">56</a></span> | <span class="current">57</span> | <span><a href="/posts/index/page:58">58</a></span> | <span><a href="/posts/index/page:59">59</a></span> | <span><a href="/posts/index/page:60">60</a></span> | <span><a href="/posts/index/page:61">61</a></span> <a href="/posts/index/page:58" class="next">Next &raquo;</a></div>
+	<div class="post">
+	<h2><a href="/posts/dessert-8-render-custom-errors:480f4dd5-6fcc-4a19-8da5-46c2cbdd56cb">Dessert #8 - Render custom errors</a></h2>	<div class="posted-on">
+		<p>Posted on 17/9/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>This is a very small but hopefully tasteful dessert. You've probably seen the /app/views/errors/ folder before and you maybe also know that you can use it to overwrite the default error templates which can be found in /cake/libs/view/templates/errors/ (error404.thtml, missing_action.thtml, missing_component_class.thtml, missing_component_file.thtml, missing_connection.thtml, missing_controller.thtml, missing_helper_class.thtml, missing_helper_file.thtml, missing_layout.thtml, missing_model.thtml, missing_scaffolddb.thtml, missing_table.thtml, missing_view.thtml, private_action.thtml, scaffold_error.thtml).</p>
+<p>But what you might not know, or have not used before is that you can also use this folder to place your own error templates in it. For example if you have an action where the user needs to have a certain permission to do something and you want to render /app/views/errors/permission_denied.thtml when the permission isn't set, you can do it like that:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+<span class="re0">$this</span>-&gt;<span class="me1">viewPath</span> = <span class="st0">'errors'</span>;<br />
+<span class="re0">$this</span>-&gt;<span class="me1">render</span><span class="br0">&#40;</span><span class="st0">'permission_denied'</span><span class="br0">&#41;</span>;</div>
+<p>Now I've seen people using $this->render('../errors/permission_denied') before, but I think this is a more logical & cakish' way of doing it. It can also be used to render views from different controllers or elements, *but* I would not recommend you to do this unless you have a good reason to do so.</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-6fcc-4a19-8da5-46c2cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-8-render-custom-errors%3A480f4dd5-6fcc-4a19-8da5-46c2cbdd56cb &amp;title=Dessert+%238+-+Render+custom+errors';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-8-render-custom-errors%3A480f4dd5-6fcc-4a19-8da5-46c2cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-8-render-custom-errors%3A480f4dd5-6fcc-4a19-8da5-46c2cbdd56cb&amp;title=Dessert+%238+-+Render+custom+errors&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-8-render-custom-errors%3A480f4dd5-6fcc-4a19-8da5-46c2cbdd56cb&amp;title=Dessert+%238+-+Render+custom+errors';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/dessert-8-render-custom-errors:480f4dd5-6fcc-4a19-8da5-46c2cbdd56cb">1 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/dessert-8-render-custom-errors:480f4dd5-6fcc-4a19-8da5-46c2cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/dessert-7-conventions-over-ego:480f4dd5-8154-4f7f-9de9-4a0dcbdd56cb">Dessert #7 - Conventions over Ego</a></h2>	<div class="posted-on">
+		<p>Posted on 16/9/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>Ok, this is probably one of the most important tips I'll give throughout this entire "desserts" series, so listen up.</p>
+<p>For those of you who have been reading this blog for a while you probably know that I've written a lot about soft hacking CakePHP which allowed to overwrite some difficult-to-bypass conventions with custom behavior. But lately I have come to realize that I was all wrong about this kind of stuff. Not wrong in the sense that I published bad code, or had bad ideas, but I was wrong by misunderstanding the basic principles of RAD development.</p>
+<p>Whenever I worked on an application with CakePHP in the past I frequently noticed some things were I thought "Hmm, would'nt it be nice if this [function, class, ...] would work like this". And a lot of times I took it as a personal challenge to find a way to cirvumvent the standard behavior without having to modify any core files. Up to now I've only failed at this one single time when trying to make some major <a href="http://www.thinkingphp.org/tutorials/view/changing-the-way-elements-are-identified-within-db_acl/">changes to the behavior of the current ACL implementation</a>. But other then that, one way or the other, I was able to put my own configuration over the CakePHP'ish convention. Now as I already said, I think most of the times those soft hacks "improved" the framework and would be nice to have in the core. However, what I didn't realize back then was that I was loosing the #1 major advantage of using the framework - Rapid Application Development. Because by implementing all those modifications, I spent a lot of time on configuration that slowed down my development process considerably. And not even that, now that I had a good amount of little tweaks and "improvments" in my application my debugging began to be more difficult since whenever I hit a bug, I had to check if one of my soft hacks broke something. No way to get support in #cakephp or somewhere else if your code doesn't behave the default way CakePHP behaves.</p>
+<p>So, let me try to translate the paragraph above in a pragmatic workflow for you guys so that you don't have to go through the troubles I went through. First of all: I am not saying that you should never soft hack some CakePHP behavior. Sometimes you have to support legacy table names, legacy url's or other things. BUT - most of the times - you don't. If you feel like tweaking some convention ask yourself this question: "Is this change needed to satisfy a real world requirement, or is it my ego pushing for a more 'advanced & flexible' approach to the problem". I don't hesitate to admit that in the past it was mostly my ego that demanded those nifty little tweaks that would be so cool to have. But looking back at it I didn't take any real advantages of it. A while ago I read about about an extreme/agile programming approach called <a href="http://c2.com/xp/YouArentGonnaNeedIt.html">YAGNI (You Arent Gonna Need It)</a>, and I think my advice above is a very pragmatic adoption of it when working with a framework like CakePHP.</p>
+<p>Today I have started to completly refactor my current project under the aspect of removing all tweaks I did to CakePHP behaviors and I noticed something else I didn't even percieve as soft hacks before: My AppController modifications. When looking at my old AppController I noticed that I filled it with nice and convenient functions I wanted to have available throughout my project. Now I don't say it is a bad practise to put useful stuff in your AppController, but I think there is a better one to do it. Instead of filling it with all those functions directly try to think if they could be refactored as Components. This maybe doesn't sound like a big difference, but I found that now that my AppController has less then 20 lines of code in it and my components folder has 3-4 more components, the structure and simplicity of my project has increased dramatically. I mean stuff like a beforeFilter that would send a Utf-8 header, retrieve my MenuEntries and a very simple Auth function seemed to work just fine in the AppController, but now that I've moved them into components my understanding for the application really increased. I can easily turn those things On & Off by removing the components and tracking down bugs became a lot easier.</p>
+<p>So far so good, I would love to hear your guys oppinion about this post.</p>
+<p>PS: Oh and if you are afraid I'll never publish a soft hack again, that's not going to happen either. But I'll try to be a lot more thoughtful about my reasons for doing so and will always point to this article when describing the technique I used ; ).</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-8154-4f7f-9de9-4a0dcbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-7-conventions-over-ego%3A480f4dd5-8154-4f7f-9de9-4a0dcbdd56cb &amp;title=Dessert+%237+-+Conventions+over+Ego';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-7-conventions-over-ego%3A480f4dd5-8154-4f7f-9de9-4a0dcbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-7-conventions-over-ego%3A480f4dd5-8154-4f7f-9de9-4a0dcbdd56cb&amp;title=Dessert+%237+-+Conventions+over+Ego&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-7-conventions-over-ego%3A480f4dd5-8154-4f7f-9de9-4a0dcbdd56cb&amp;title=Dessert+%237+-+Conventions+over+Ego';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/dessert-7-conventions-over-ego:480f4dd5-8154-4f7f-9de9-4a0dcbdd56cb">2 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/dessert-7-conventions-over-ego:480f4dd5-8154-4f7f-9de9-4a0dcbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/dessert-4-keep-your-cake-fresh-use-svn-head:480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb">Dessert #4 - Keep your Cake fresh (use SVN HEAD)</a></h2>	<div class="posted-on">
+		<p>Posted on 15/9/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>This is something you might already have found your own solutions for, but never the less I think it's a topic people will struggle with when first using CakePHP together with SVN to version their project. However, you should already have an alright understanding for SVN itself to follow this post. If not, checkout <a href="http://svnbook.red-bean.com/">this free svn book</a> for information.</p>
+<p>Ok, back to the topic. The problem is the following: You use CakePHP (or any foreign vendor, but let's keep it simple for now) to create your project and want to regulary update your version to enjoy the benifits of the frequent changes in the SVN trunk (like bug fixes, new features, etc.).</p>
+<p>There are basically 3 options you can accomblish this:</p>
+<h2>#1 Overwriting your Project Frequently</h2>
+<p>This method might be the first one you consider, but believe me it's the worst of all. The idea is basically to frequently either export the latest SVN HEAD version from the <a href="https://svn.cakephp.org/repo/trunk/cake/1.x.x.x/">CakePHP repository</a>, or to visit CakePHP.org and grab the <a href="http://cakephp.org/downloads/index/nightly/1.x.x.x">latest nightly build</a>. Aferwards you take the new version of /cake, /index.php, /.htaccess, /VERSION.txt and use them to overwrite them with the existing ones in your working copy. Afterwards you do a commit and voilá you just updated your CakePHP version.</p>
+<p><strong>Pro's:</strong></p>
+<ul>
+<li>Easy to understand</li>
+<li>If a CakePHP update breaks the application you can easily roll back</li>
+</ul>
+<p><strong>Cons's:</strong> </p>
+<ul>
+<li>Manual update required</li>
+<li>Get's hairy when you modified CakePHP core files in your working copy or when updating /app</li>
+</ul>
+<h2>#2 Use svn:externals</h2>
+<p>The next idea you might try is to use the <a href="http://svnbook.red-bean.com/en/1.2/svn.advanced.externals.html">svn:externals</a> property to directly link /cake (and eventually the other 3 files in /) to the latest SVN Version. If you use <a href="http://tortoisesvn.tigris.org/">TortoiseSVN</a> (highly recommended for Windows users) this is simply a matter of right clicking the root folder of the working copy of your application's trunks and selecting properties. Then you select the Subversion tab, choose the svn:externals from the drop down on the bottom and enter "cake https://svn.cakephp.org/repo/branches/1.2.x.x/cake" in the text field below (assuming you are using CakePHP 1.2). Make sure you have deleted /cake in your working copy, then run svn update and SVN will automatically fetch the latest SVN version of the /cake folder and put it in your working copy. Whenever you run svn update from now on, you will also get the latest changes from the trunk. I think you could also link to the 3 other files in / with this method, but I haven't tried that so far.</p>
+<p><strong>Pro's:</strong> </p>
+<ul>
+<li>Easy to setup</li>
+<li>CakePHP Updates flow in almost automatically</li>
+<li>Allows modification of CakePHP core files</li>
+</ul>
+<p><strong>Cons's:</strong> </p>
+<ul>
+<li>Modifications to CakePHP core files will not be versioned (and therefor not be available to other people using the same repository)</li>
+<li>If a CakePHP update breaks your application rolling those changes back get's a bit hairy</li>
+<li>/app can (should) not be updated this way</li>
+</ul>
+<h2>#3 Use a vendor branch</h2>
+<p>Using a <a href="http://svnbook.red-bean.com/en/1.2/svn.advanced.vendorbr.html">vendor branch</a> is probably the most advanced of all approaches, but also the most complicated compared to the other ones. The idea is basically to create a branch for every vendor your project depends on (in our case CakePHP) and to regulary update this branch with the latest version of the vendor library. After updating the vendor branch you simply merge the changes between the previous vendor branch update and the current one into your trunk and only those changes will be applied to your application. To understand this proccess a little better I would recommend you to read this <a href="http://svnbook.red-bean.com/en/1.2/svn.advanced.vendorbr.html">page about vendor branches</a> I already mentioned.</p>
+<p><strong>Pro's:</strong></p>
+<ul>
+<li>CakePHP core files can be modifed and versioned</li>
+<li>If a vendor update breaks the application you can easily roll back</li>
+<li>You can easily recieve updates to /app</li>
+</ul>
+<p><strong>Cons's:</strong></p>
+<ul>
+<li>Difficult to set up</li>
+<li>Manual update of the vendor branch required (but you could automate this)</li>
+</ul>
+<h2>Conclusion</h2>
+<p>There is not perfect way to handle this. When working on an application with a group of developers, using a vendor branch gives you most control about the entire proccess. Personally, when working on a project all by myself I often use method #2 since it's quite simple to setup and easy to maintain. The important thing is that you know about the existing options and their advantages / disadvantages so you can choose which one suits your project best. However, method #1 should be avoided if possible ; ).</p>
+<p>Another hint: Right now most changes to CakePHP go into the <a href="https://svn.cakephp.org/repo/branches/1.2.x.x/">1.2.x branch</a> and therefor the stuff above doesn't make a lot of sense if you are working with <a href="https://svn.cakephp.org/repo/branches/1.1.x.x/">1.1.x</a> right now. Currently I'm working on the new ThinkingPHP.org and another project using the 1.2.x branch and it seems pretty stable, however it's not the officially recommended version right now, so I recommend you to only do this if you are pretty familiar with CakePHP and know what you are doing.</p>
+<p><strong>Oh and before I forget:</strong> You should almost never have to modify anything inside /cake. Often people who do that and post their own fixes on Trac are wrong, and their problems can be solved in /app. However, never say never, being able to modify core files is still a nice option to have, *especially* when using those technics above for including other vendors that don't write as perfect code as the CakePHP developers do ; ).</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-4-keep-your-cake-fresh-use-svn-head%3A480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb &amp;title=Dessert+%234+-+Keep+your+Cake+fresh+%28use+SVN+HEAD%29';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-4-keep-your-cake-fresh-use-svn-head%3A480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-4-keep-your-cake-fresh-use-svn-head%3A480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb&amp;title=Dessert+%234+-+Keep+your+Cake+fresh+%28use+SVN+HEAD%29&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-4-keep-your-cake-fresh-use-svn-head%3A480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb&amp;title=Dessert+%234+-+Keep+your+Cake+fresh+%28use+SVN+HEAD%29';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/dessert-4-keep-your-cake-fresh-use-svn-head:480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb">13 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/dessert-4-keep-your-cake-fresh-use-svn-head:480f4dd5-6fdc-4fd5-b64d-4df8cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/dessert-2-become-friends-with-the-inflector:480f4dd5-1de0-45a4-b8f0-4282cbdd56cb">Dessert #2 - Become friends with the Inflector</a></h2>	<div class="posted-on">
+		<p>Posted on 14/9/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>It's still day one of my "10 Days of Free Dessert!" challenge, and here comes the 2nd post already (which doesn't count for tomorrow of course).</p>
+<p>One of my favourite class in CakePHP is the Inflector. Whenever I work with file names it's very useful to convert them from lower_case_and_underscored into CamelCasedOnes. Doing this is very easy:</p>
+<div style="width: 400px; overflow: hidden;">
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+Inflector::<span class="me2">camelize</span><span class="br0">&#40;</span><span class="st0">'my_file_name'</span><span class="br0">&#41;</span>;</div>
+</div>
+<p>This would return MyFileName (even so the php docs in the class say "camelCased" which would make you think camelBack is being used, but it's really not).</p>
+<p>Or yet another nifty trick you can use if you got a lot of similar Views, is to replace your Model name in them with a small piece of Inflector logic so you don't have to go through all of them and replace "Post" with "Item" and so on:</p>
+<div class="clear"></div>
+<div class="code debuggable_sh_php" style="white-space: wrap;white-space: nowrap;">
+&lt;h2&gt;Create a <span class="kw2">new</span> <span class="kw2">&lt;?php</span> <a href="http://www.php.net/echo"><span class="kw3">echo</span></a> Inflector::<span class="me2">classify</span><span class="br0">&#40;</span><span class="re0">$this</span>-&gt;<span class="me1">name</span><span class="br0">&#41;</span>; <span class="kw2">?&gt;</span>&lt;/h2&gt;</div>
+<p>If your Controller is named Posts, this would output a 2nd level headline saying: "Create a new Post". Of course this only works if you stick with the convention of using pluralized Controller names and singularized Model ones, but you can see the advantage.</p>
+<p>So if all of this sounds convenient to you, go ahead and checkout /cake/libs/inflector.php to find out about all the other great functions it contains!</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-1de0-45a4-b8f0-4282cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-2-become-friends-with-the-inflector%3A480f4dd5-1de0-45a4-b8f0-4282cbdd56cb &amp;title=Dessert+%232+-+Become+friends+with+the+Inflector';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-2-become-friends-with-the-inflector%3A480f4dd5-1de0-45a4-b8f0-4282cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-2-become-friends-with-the-inflector%3A480f4dd5-1de0-45a4-b8f0-4282cbdd56cb&amp;title=Dessert+%232+-+Become+friends+with+the+Inflector&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2Fdessert-2-become-friends-with-the-inflector%3A480f4dd5-1de0-45a4-b8f0-4282cbdd56cb&amp;title=Dessert+%232+-+Become+friends+with+the+Inflector';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/dessert-2-become-friends-with-the-inflector:480f4dd5-1de0-45a4-b8f0-4282cbdd56cb">2 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/dessert-2-become-friends-with-the-inflector:480f4dd5-1de0-45a4-b8f0-4282cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="post">
+	<h2><a href="/posts/10-days-of-free-dessert-cakephp-tips:480f4dd5-1da4-4248-91f4-4043cbdd56cb">10 Days of free Dessert! (CakePHP Tips)</a></h2>	<div class="posted-on">
+		<p>Posted on 13/9/06 by 
+		<a href="/felix">Felix Geisendörfer</a>				</p>
+		<div class="thumb">
+			<img alt="" src="/img/felix_thumb.jpg"/>		</div>
+	</div>
+	<div class="body">
+				<p>If you have been following this blog since it's beginning in early January this year, you probably know that I was posting a lot more short and easy to adapt tips back then.These days I write a lot of lengthy and pretty specific articles that are not useful to quite everybody out there and sometimes take long to write.</p>
+<p>For that reason I'm announcing the "10 Days of free Dessert!". This basically means that I'll post at least 1 useful and easy to adapt CakePHP tip begining tomorrow for the next 10 days. I will try to pick things you might not have heard before and that didn't get a lot of loving from the docs team so far ; ).<br />
+<br/><br/><br />
+<em>In case I break my promise and miss only 1 day of posting a new tip (my time zone is GMT+1), I'll take & post a picture of myself putting my face into a cake.</em></p>
+<p>So this last part should make sure I'll stay with it, even so some of you might wouldn't mind if I miss day 10 ; ). </p>
+<p>I hope you guys are going to enjoy it.</p>
+<p>--Felix Geisendörfer aka the_undefined<br />
+<img style="display: none;" src="http://debuggable.com/posts/tick/480f4dd5-1da4-4248-91f4-4043cbdd56cb"></p>
+	</div>
+	<div class="clear">&nbsp;</div>
+	<div class="social">
+	<p class="subscribe">Did you like this blog post? If so, please consider <a href="http://feeds.feedburner.com/debuggable">subscribing to the Blog RSS feed</a>.</p>
+
+	<ul>
+	<li class="sociablefirst">
+				<a class="linkedin" title="LinkedIn" href="javascript:window.location='http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fdebuggable.com%2Fposts%2F10-days-of-free-dessert-cakephp-tips%3A480f4dd5-1da4-4248-91f4-4043cbdd56cb &amp;title=10+Days+of+free+Dessert%21+%28CakePHP+Tips%29';" rel="nofollow">
+			<img class="sociable-hovers" alt="Linked In" title="Linked In" src="/img/social_icons/linkedin.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="sphinn" title="Sphinn" href="javascript:window.location='http://sphinn.com/index.php?c=post&amp;m=submit&amp;link=http%3A%2F%2Fdebuggable.com%2Fposts%2F10-days-of-free-dessert-cakephp-tips%3A480f4dd5-1da4-4248-91f4-4043cbdd56cb';" rel="nofollow">
+		<img class="sociable-hovers" alt="Sphinn" title="Sphinn" src="/img/social_icons/sphinn.png"/>
+		</a>
+	</li>
+	<li>
+		<a class="digg" title="Digg" href="javascript:window.location='http://digg.com/submit?url=http%3A%2F%2Fdebuggable.com%2Fposts%2F10-days-of-free-dessert-cakephp-tips%3A480f4dd5-1da4-4248-91f4-4043cbdd56cb&amp;title=10+Days+of+free+Dessert%21+%28CakePHP+Tips%29&amp;bodytext=+..&amp;media=News&amp;topic=Programming';" rel="nofollow">
+		<img class="sociable-hovers" alt="Digg" title="Digg" src="/img/social_icons/digg.png"/>
+		</a>
+	</li>
+	<li>
+	<a class="del.icio.us" title="del.icio.us" href="javascript:window.location='http://delicious.com/post?url=http%3A%2F%2Fdebuggable.com%2Fposts%2F10-days-of-free-dessert-cakephp-tips%3A480f4dd5-1da4-4248-91f4-4043cbdd56cb&amp;title=10+Days+of+free+Dessert%21+%28CakePHP+Tips%29';" rel="nofollow">
+		<img class="sociable-hovers" alt="Delicious" title="Delicious" src="/img/social_icons/delicious.png"/>
+	</a>
+	</li>
+	<li class="sociablelast">
+		<a class="stumbleupon" title="StumbleUpon" href="javascript:window.location='http://www.stumbleupon.com/submit?url=http%253A%252F%252Fyoast.com%252F40-wordpress-optimisation-tips%252F&amp;title=40%2520WordPress%2520Optimisation%2520tips';" rel="nofollow">
+		<img class="sociable-hovers" alt="StumbleUpon" title="StumbleUpon" src="/img/social_icons/stumbleupon.png"/>
+		</a>
+	</li>
+	</ul>
+</div>
+
+	
+	<div class="post-footer">
+		<img src="/css/img/comments.png" alt="Comments"> <a href="/posts/10-days-of-free-dessert-cakephp-tips:480f4dd5-1da4-4248-91f4-4043cbdd56cb">14 Comments</a> &nbsp; | &nbsp; 
+		<img src="/css/img/add_comment.png" alt="Add Comment"> <a href="/posts/10-days-of-free-dessert-cakephp-tips:480f4dd5-1da4-4248-91f4-4043cbdd56cb#CommentAddForm">Add Comment</a>	</div>
+	</div>
+<div class="paging">
+	<a href="/posts/index/page:56" class="prev">&laquo; Previous</a> <span><a href="/posts/index/page:53">53</a></span> | <span><a href="/posts/index/page:54">54</a></span> | <span><a href="/posts/index/page:55">55</a></span> | <span><a href="/posts/index/page:56">56</a></span> | <span class="current">57</span> | <span><a href="/posts/index/page:58">58</a></span> | <span><a href="/posts/index/page:59">59</a></span> | <span><a href="/posts/index/page:60">60</a></span> | <span><a href="/posts/index/page:61">61</a></span> <a href="/posts/index/page:58" class="next">Next &raquo;</a></div>	
+</div>
+<div class="grid_4 prefix_1 omega" id="sidebar">
+	<cake:nocache>
+			</cake:nocache>
+
+	<h3>RSS Feeds</h3>
+	<div id="bug">
+		<img src="/img/rss_bug.png" alt="" />	</div>
+	<div class="rss">
+		<p class="bug-message"></p>
+		<a href="http://feeds.feedburner.com/debuggable">Blog RSS</a><br/>
+		<a href="http://feeds.feedburner.com/debuggable-comments">Comments RSS</a><br/><br/>
+		<img width="88" height="26" alt="" style="border: 0pt none ;" src="http://feeds.feedburner.com/~fc/debuggable?bg=FF9933&amp;fg=444444&amp;anim=0"/>
+		<div class="clear"></div>
+	</div>
+
+	<h3>Recent Posts</h3>
+	<ul>
+<li class=""><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb">Releasing node-mysql 2.0.0-alpha</a></li><li class=""><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb">How to write jQuery plugins</a></li><li class=""><a href="/posts/vim-workshop-in-berlin-april-20:4f702b83-ce24-429c-9403-0e39cbdd56cb">Vim Workshop in Berlin (April 20)</a></li><li class=""><a href="/posts/npm-an-intervention:4f44dd25-a114-4361-ada1-6cefcbdd56cb">NPM - An intervention</a></li><li class="active"><a href="/posts/testing-node-js-modules-with-travis-ci:4ec62298-aec4-4ee3-8b5a-2c96cbdd56cb">Testing node.js modules with Travis CI</a></li><li class=""><a href="/posts/private-npm-modules:4e68cc7d-1ac4-42d9-995a-343dcbdd56cb">Private npm modules</a></li></ul>
+	<h3>Archive</h3>
+	<p class="small align">
+		<strong>443 Posts</strong>, <strong>4608 Comments</strong><br /><br />
+		We are on air since 2006. Take a tour through the
+		<a href="/posts/archive">blog archive</a>.
+	</p>
+	<div class="search">
+	<form id="PostSearchForm" method="post" action="/posts/search"><fieldset style="display:none;"><input type="hidden" name="_method" value="POST" /></fieldset><input name="data[Post][keywords]" type="text" value="" id="PostKeywords" /><input type="submit" class="button" value="Search" /></form>	<div class="clear"></div>
+</div>
+	<h3>Recent Comments</h3>
+	<div class="recent-comments">
+		<div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=23968f0ca75b13463d2db5343e5c2096&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd32b85-220c-4fc8-84b2-378fcbdd56cb">William: thanks, fixed ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=b47010beec892f11619d1e81f0c94f11&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/releasing-node-mysql-2-0-0-alpha:4fb21c18-7f84-4e8c-a1ef-599bcbdd56cb#comment-4fd30119-06fc-4712-aecd-7fa5cbdd56cb">Hi Felix,
+
+The Upgra ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=99b59e8a9cfe2c5575f0fa90f7f30307&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f99a4a2-9ad8-4476-b208-611acbdd56cb">Maybe you can write so ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=8364689a1eefb5eceb6a4f38bbf95731&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f9651b9-eb88-4096-94c1-0fc2cbdd56cb">This is very nice plug ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=7e3d69d16d3b845e89198512355b2ac9&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f8bb75a-96cc-4197-8e93-7c63cbdd56cb">Nice article!
+
+Somet ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f83326b-8c28-43fc-b70d-097ecbdd56cb">That&#039;s fine ognian, th ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=994516a664c2bdc728d18c47e935bc14&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f832a25-5818-4d38-9e39-097ecbdd56cb">Really nice work! I wa ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c15ca-c7c4-48e3-a4db-27decbdd56cb">@Jörn: Sorry, thought  ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=d5d83832be2b6c70d1968635f68a1b4a&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7c11aa-6f9c-448c-abdb-2066cbdd56cb">Thanks didn&#039;t quite un ..</a></div><div class="clear_left"></div><div class="comment"><a href="http://en.gravatar.com/site/signup" class="gravatar"><img src="http://www.gravatar.com/avatar.php?gravatar_id=e57a2bc121063a81e8e6a04aa85cc54f&size=15&rating=R&d=identicon" alt="" /></a><a href="/posts/how-to-write-jquery-plugins:4f72ab2e-7310-4a74-817a-0a04cbdd56cb#comment-4f7bf934-d4e8-4885-9a2c-7a93cbdd56cb">Well you could expose  ..</a></div><div class="clear_left"></div>	</div>
+	<div class="clear_left"></div>
+	<h3>Keep an eye on</h3>
+<ul class="links external">
+	<li><a href="http://transloadit.com" title="Video encoding, image resizing and more for your web or mobile app">Transloadit</a></li><li><a href="http://tus.io" title="Resumable file uploading, upload progress bar, faster upload speed">tus - resumable file upload protocol</a></li><li><a href="http://kevin.vanzonneveld.net/">Kevin van Zonneveld</a></li><li><a href="http://www.littlehart.net/atthekeyboard/">Chris Hartjes</a></li><li><a href="http://mark-story.com">Mark Story</a></li><li><a href="http://www.webbosaurus.de">Webbosaurus</a></li></ul>
+	<a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number' title='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'><img src='http://static.jsconf.us/promotejshs.png' height='150' width='180' alt='JavaScript JS Documentation: JS Number Example: Using the Number object to assign values to numeric variables, JavaScript Number Example: Using the Number object to assign values to numeric variables'/></a>
+</div>
+
+						<div class="clear">&nbsp;</div>
+		</div>
+
+		<div id="footer">
+			<div class="container_16">
+				<ul id="footer_navigation">
+					<ul>
+<li class="active"><a href="/blog">Blog</a></li><li class=""><a href="/">About</a></li></ul>				</ul>
+				<p>&copy; 2008 - 2015, Debuggable Ltd. All rights reserved.
+				<i>Designed by <a href="http://www.fluidcore.net" target="_blank">fluidCORE</a>.</i>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="/js/aggregate/58a4727fb2207154ddd0739cbc3b15104ad6cd03/5627ea2806458e56fb8a5f4b231a44c2.php"></script><script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-3306079-3']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script');
+ga.src = ('https:' == document.location.protocol ?
+    'https://ssl' : 'http://www') +
+    '.google-analytics.com/ga.js';
+ga.setAttribute('async', 'true');
+document.documentElement.firstChild.appendChild(ga);
+})();
+</script></body>
+</html>
